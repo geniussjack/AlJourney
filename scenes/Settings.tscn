@@ -1,0 +1,22 @@
+[gd_scene load_steps=2 format=3 uid="uid://cuons3oic6afs"]
+
+[ext_resource type="Script" uid="uid://bbofyuahfd6bn" path="res://scripts/Settings.cs" id="1_rbmmp"]
+
+[node name="Settings" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_rbmmp")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="MusicSlider" type="HSlider" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="SoundSlider" type="HSlider" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="BackButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2

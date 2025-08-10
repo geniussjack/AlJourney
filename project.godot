@@ -11,8 +11,20 @@ config_version=5
 [application]
 
 config/name="AlJourney"
-config/features=PackedStringArray("4.4", "Mobile")
+run/main_scene="uid://cmutdu1urtub0"
+config/features=PackedStringArray("4.4", "C#", "Mobile")
 config/icon="res://icon.svg"
+
+[autoload]
+
+Global="*res://autoload/Global.cs"
+
+[display]
+
+window/size/viewport_width=1280
+window/size/viewport_height=720
+window/stretch/mode="canvas_items"
+window/stretch/aspect="keep_width"
 
 [dotnet]
 
@@ -21,3 +33,5 @@ project/assembly_name="AlJourney"
 [rendering]
 
 renderer/rendering_method="mobile"
+2d/snap/snap_2d_transforms_to_pixel=true
+2d/snap/snap_2d_vertices_to_pixel=true
