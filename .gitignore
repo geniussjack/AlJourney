@@ -483,6 +483,61 @@ $RECYCLE.BIN/
 # Vim temporary swap files
 *.swp
 
-# Godot 4+ specific ignores
+### Godot 4.5.1 (C#) additions ###
+
+# Godot editor metadata
+.import/
 .godot/
-/android/
+.editor_settings-*.tres
+
+# Exported builds
+export/
+exports/
+builds/
+*.pck
+*.zip
+*.exe
+*.apk
+*.aab
+*.app
+*.x86_64
+*.wasm
+*.html
+
+# Mono / C# generated files
+.mono/
+.mono_temp/
+.mono_logs/
+.mono/
+data_Managed/
+*.mdb
+*.dll.config
+*.runtimeconfig.json
+
+# Temporary files from Godot C# build process
+/.godot/mono/temp/
+.godot/mono/temp/
+.godot/mono/assemblies/
+.godot/mono/builds/
+.godot/mono/solutions/
+.godot/mono/external/
+
+# Backup and autosave files
+*.import
+*.old
+*.bak
+*.tmp
+*.autosave
+*.translation
+*.translation.import
+*.converted.scn
+*.converted.res
+
+# Godot crash dumps
+crash*.log
+
+# Rider / VS Code project files (if not shared)
+.idea/
+.vscode/
+*.sln.iml
+*.csproj.user
