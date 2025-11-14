@@ -1,4 +1,5 @@
 using AlJourney.Scripts.Characters;
+using AlJourney.Scripts.Core;
 using AlJourney.Scripts.Managers;
 using Godot;
 using System.Collections.Generic;
@@ -6,16 +7,22 @@ using System.Collections.Generic;
 namespace AlJourney.Scripts.UI
 {
     /// <summary>
-    /// Battle HUD controller.
-    /// Displays player health, enemy health, coins, and turn information.
+    /// Battle HUD controller for dual hero system.
+    /// Displays both Mage and Warrior health, enemy health, coins, and turn information.
     /// </summary>
     public partial class BattleHUD : Control
     {
-        // Player UI elements
-        private Label _playerNameLabel;
-        private ProgressBar _playerHealthBar;
-        private Label _playerHealthLabel;
-        private Label _playerShieldLabel;
+        // Mage UI elements
+        private Label _mageNameLabel;
+        private ProgressBar _mageHealthBar;
+        private Label _mageHealthLabel;
+        private Label _mageShieldLabel;
+
+        // Warrior UI elements
+        private Label _warriorNameLabel;
+        private ProgressBar _warriorHealthBar;
+        private Label _warriorHealthLabel;
+        private Label _warriorShieldLabel;
 
         // Enemy UI container
         private HBoxContainer _enemiesContainer;
@@ -29,16 +36,22 @@ namespace AlJourney.Scripts.UI
         private Button _pauseButton;
 
         // References
-        private PlayerCharacter _player;
+        private DualHeroSystem _heroSystem;
         private readonly List<EnemyHealthBar> _enemyHealthBars = [];
 
         public override void _Ready()
         {
-            // Get player UI elements
-            _playerNameLabel = GetNode<Label>("MarginContainer/VBoxContainer/TopBar/PlayerInfo/PlayerName");
-            _playerHealthBar = GetNode<ProgressBar>("MarginContainer/VBoxContainer/TopBar/PlayerInfo/HealthBar");
-            _playerHealthLabel = GetNode<Label>("MarginContainer/VBoxContainer/TopBar/PlayerInfo/HealthLabel");
-            _playerShieldLabel = GetNode<Label>("MarginContainer/VBoxContainer/TopBar/PlayerInfo/ShieldLabel");
+            // Get Mage UI elements
+            _mageNameLabel = GetNode<Label>("MarginContainer/VBoxContainer/TopBar/HeroesContainer/MageInfo/MageName");
+            _mageHealthBar = GetNode<ProgressBar>("MarginContainer/VBoxContainer/TopBar/HeroesContainer/MageInfo/HealthBar");
+            _mageHealthLabel = GetNode<Label>("MarginContainer/VBoxContainer/TopBar/HeroesContainer/MageInfo/HealthLabel");
+            _mageShieldLabel = GetNode<Label>("MarginContainer/VBoxContainer/TopBar/HeroesContainer/MageInfo/ShieldLabel");
+
+            // Get Warrior UI elements
+            _warriorNameLabel = GetNode<Label>("MarginContainer/VBoxContainer/TopBar/HeroesContainer/WarriorInfo/WarriorName");
+            _warriorHealthBar = GetNode<ProgressBar>("MarginContainer/VBoxContainer/TopBar/HeroesContainer/WarriorInfo/HealthBar");
+            _warriorHealthLabel = GetNode<Label>("MarginContainer/VBoxContainer/TopBar/HeroesContainer/WarriorInfo/HealthLabel");
+            _warriorShieldLabel = GetNode<Label>("MarginContainer/VBoxContainer/TopBar/HeroesContainer/WarriorInfo/ShieldLabel");
 
             // Get enemy container
             _enemiesContainer = GetNode<HBoxContainer>("MarginContainer/VBoxContainer/TopBar/EnemiesInfo");
@@ -56,84 +69,98 @@ namespace AlJourney.Scripts.UI
             GameStateManager.Instance.CoinsChanged += OnCoinsChanged;
             GameStateManager.Instance.WaveChanged += OnWaveChanged;
 
-            GD.Print("[BattleHUD] Initialized");
+            GD.Print("[BattleHUD] Initialized for dual hero system");
         }
 
         /// <summary>
-        /// Initializes HUD with player reference.
+        /// Initializes HUD with dual hero system reference.
         /// </summary>
-        public void Initialize(PlayerCharacter player)
+        public void Initialize(DualHeroSystem heroSystem)
         {
-            _player = player;
+            _heroSystem = heroSystem;
 
-            // Connect player signals
-            _player.HealthChanged += OnPlayerHealthChanged;
-            _player.ShieldChanged += OnPlayerShieldChanged;
+            // Connect hero signals
+            _heroSystem.HeroHealthChanged += OnHeroHealthChanged;
+            _heroSystem.HeroShieldChanged += OnHeroShieldChanged;
+
+            // Connect individual hero signals for shields
+            _heroSystem.Mage.ShieldChanged += (shield) => UpdateHeroShield(CharacterClass.Mage, shield);
+            _heroSystem.Warrior.ShieldChanged += (shield) => UpdateHeroShield(CharacterClass.Warrior, shield);
 
             // Update UI
-            _playerNameLabel.Text = _player.CharacterName;
-            UpdatePlayerHealth(_player.CurrentHealth, _player.MaxHealth);
-            UpdatePlayerShield(_player.CurrentShield);
+            _mageNameLabel.Text = _heroSystem.Mage.CharacterName + " 🧙";
+            _warriorNameLabel.Text = _heroSystem.Warrior.CharacterName + " ⚔️";
+
+            UpdateHeroHealth(CharacterClass.Mage, _heroSystem.Mage.CurrentHealth, _heroSystem.Mage.MaxHealth);
+            UpdateHeroHealth(CharacterClass.Warrior, _heroSystem.Warrior.CurrentHealth, _heroSystem.Warrior.MaxHealth);
+            UpdateHeroShield(CharacterClass.Mage, _heroSystem.Mage.CurrentShield);
+            UpdateHeroShield(CharacterClass.Warrior, _heroSystem.Warrior.CurrentShield);
+
             UpdateWave(GameStateManager.Instance.CurrentWave);
             UpdateCoins(GameStateManager.Instance.Coins);
 
-            GD.Print($"[BattleHUD] Initialized for player: {_player.CharacterName}");
+            GD.Print($"[BattleHUD] Initialized for {_heroSystem.Mage.CharacterName} and {_heroSystem.Warrior.CharacterName}");
         }
 
         /// <summary>
-        /// Updates player health display.
+        /// Updates hero health display.
         /// </summary>
-        private void OnPlayerHealthChanged(int currentHealth, int maxHealth)
+        private void OnHeroHealthChanged(CharacterClass heroClass, int currentHealth, int maxHealth)
         {
-            UpdatePlayerHealth(currentHealth, maxHealth);
+            UpdateHeroHealth(heroClass, currentHealth, maxHealth);
         }
 
         /// <summary>
-        /// Updates player health bar and label.
+        /// Updates hero health bar and label.
         /// </summary>
-        private void UpdatePlayerHealth(int currentHealth, int maxHealth)
+        private void UpdateHeroHealth(CharacterClass heroClass, int currentHealth, int maxHealth)
         {
-            _playerHealthBar.MaxValue = maxHealth;
-            _playerHealthBar.Value = currentHealth;
-            _playerHealthLabel.Text = $"{currentHealth} / {maxHealth}";
+            ProgressBar healthBar = heroClass == CharacterClass.Mage ? _mageHealthBar : _warriorHealthBar;
+            Label healthLabel = heroClass == CharacterClass.Mage ? _mageHealthLabel : _warriorHealthLabel;
+
+            healthBar.MaxValue = maxHealth;
+            healthBar.Value = currentHealth;
+            healthLabel.Text = $"{currentHealth} / {maxHealth}";
 
             // Color coding based on health percentage
             float healthPercent = (float)currentHealth / maxHealth;
             if (healthPercent > 0.5f)
             {
-                _playerHealthBar.Modulate = Colors.Green;
+                healthBar.Modulate = Colors.Green;
             }
             else if (healthPercent > 0.25f)
             {
-                _playerHealthBar.Modulate = Colors.Yellow;
+                healthBar.Modulate = Colors.Yellow;
             }
             else
             {
-                _playerHealthBar.Modulate = Colors.Red;
+                healthBar.Modulate = Colors.Red;
             }
         }
 
         /// <summary>
-        /// Updates player shield display.
+        /// Updates hero shield display.
         /// </summary>
-        private void OnPlayerShieldChanged(int shieldAmount)
+        private void OnHeroShieldChanged(CharacterClass heroClass, int shieldAmount)
         {
-            UpdatePlayerShield(shieldAmount);
+            UpdateHeroShield(heroClass, shieldAmount);
         }
 
         /// <summary>
         /// Updates shield label.
         /// </summary>
-        private void UpdatePlayerShield(int shieldAmount)
+        private void UpdateHeroShield(CharacterClass heroClass, int shieldAmount)
         {
+            Label shieldLabel = heroClass == CharacterClass.Mage ? _mageShieldLabel : _warriorShieldLabel;
+
             if (shieldAmount > 0)
             {
-                _playerShieldLabel.Show();
-                _playerShieldLabel.Text = $"🛡️ {shieldAmount}";
+                shieldLabel.Show();
+                shieldLabel.Text = $"🛡️ {shieldAmount}";
             }
             else
             {
-                _playerShieldLabel.Hide();
+                shieldLabel.Hide();
             }
         }
 
@@ -222,10 +249,10 @@ namespace AlJourney.Scripts.UI
         public override void _ExitTree()
         {
             // Disconnect signals
-            if (_player != null)
+            if (_heroSystem != null)
             {
-                _player.HealthChanged -= OnPlayerHealthChanged;
-                _player.ShieldChanged -= OnPlayerShieldChanged;
+                _heroSystem.HeroHealthChanged -= OnHeroHealthChanged;
+                _heroSystem.HeroShieldChanged -= OnHeroShieldChanged;
             }
 
             GameStateManager.Instance.CoinsChanged -= OnCoinsChanged;
@@ -234,7 +261,7 @@ namespace AlJourney.Scripts.UI
     }
 
     /// <summary>
-    /// Individual enemy health bar widget.
+    /// Individual enemy health bar widget (unchanged).
     /// </summary>
     public partial class EnemyHealthBar : VBoxContainer
     {
@@ -266,22 +293,15 @@ namespace AlJourney.Scripts.UI
             AddChild(_healthLabel);
         }
 
-        /// <summary>
-        /// Initializes enemy health bar with enemy reference.
-        /// </summary>
         public void Initialize(Enemy enemy)
         {
             _enemy = enemy;
-
-            // Connect signals
             _enemy.HealthChanged += OnHealthChanged;
             _enemy.CharacterDied += OnEnemyDied;
 
-            // Set initial values
             _nameLabel.Text = _enemy.CharacterName;
             UpdateHealth(_enemy.CurrentHealth, _enemy.MaxHealth);
 
-            // Color based on enemy type
             if (_enemy.IsBoss)
             {
                 _healthBar.Modulate = Colors.Purple;
@@ -296,17 +316,11 @@ namespace AlJourney.Scripts.UI
             }
         }
 
-        /// <summary>
-        /// Updates health display.
-        /// </summary>
         private void OnHealthChanged(int currentHealth, int maxHealth)
         {
             UpdateHealth(currentHealth, maxHealth);
         }
 
-        /// <summary>
-        /// Updates health bar and label.
-        /// </summary>
         private void UpdateHealth(int currentHealth, int maxHealth)
         {
             _healthBar.MaxValue = maxHealth;
@@ -314,12 +328,8 @@ namespace AlJourney.Scripts.UI
             _healthLabel.Text = $"{currentHealth}/{maxHealth}";
         }
 
-        /// <summary>
-        /// Called when enemy dies.
-        /// </summary>
         private void OnEnemyDied()
         {
-            // Fade out animation
             var tween = CreateTween();
             tween.TweenProperty(this, "modulate:a", 0.0f, 0.5f);
             tween.TweenCallback(Callable.From(() => QueueFree()));

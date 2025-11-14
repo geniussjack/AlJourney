@@ -1,3 +1,4 @@
+using AlJourney.Scripts.Core;
 using AlJourney.Scripts.Managers;
 using Godot;
 
@@ -81,12 +82,11 @@ namespace AlJourney.Scripts.UI
         private void OnNewGamePressed()
         {
             GD.Print("[MainMenuUI] New Game pressed");
-
-            // Play button sound
             AudioManager.Instance.PlaySfx("res://Resources/Audio/SFX/button_click.wav");
 
-            // Transition to character select
-            SceneManager.StartNewGame();
+            // Start new game directly (no character selection)
+            GameStateManager.Instance.StartNewGame();
+            SceneManager.Instance.LoadScene(GameState.Battle);
         }
 
         /// <summary>
