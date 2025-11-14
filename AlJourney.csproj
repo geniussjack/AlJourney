@@ -23,7 +23,6 @@
     <Folder Include="Scenes\Match3\" />
     <Folder Include="Scenes\Characters\" />
     <Folder Include="Scenes\Prefabs\" />
-    <Folder Include="Scripts\UI\" />
     <Folder Include="Scripts\Utils\" />
   </ItemGroup>
   <ItemGroup>
