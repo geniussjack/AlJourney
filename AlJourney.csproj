@@ -23,7 +23,6 @@
     <Folder Include="Scenes\Match3\" />
     <Folder Include="Scenes\Characters\" />
     <Folder Include="Scenes\Prefabs\" />
-    <Folder Include="Scripts\Utils\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="scenes\battle\BattleScene.tscn" />
