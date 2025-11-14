@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="AlJourney"
-run/main_scene="uid://cmutdu1urtub0"
+run/main_scene="res://Scenes/UI/MainMenu.tscn"
 config/features=PackedStringArray("4.5", "C#", "Mobile")
 config/icon="res://icon.svg"
 

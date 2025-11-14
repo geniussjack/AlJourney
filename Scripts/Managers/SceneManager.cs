@@ -27,7 +27,6 @@ namespace AlJourney.Scripts.Managers
         private readonly Dictionary<GameState, string> _scenePaths = new()
         {
             { GameState.MainMenu, "res://Scenes/UI/MainMenu.tscn" },
-            { GameState.CharacterSelect, "res://Scenes/UI/CharacterSelect.tscn" },
             { GameState.Battle, "res://Scenes/Battle/BattleScene.tscn" },
             { GameState.Shop, "res://Scenes/UI/ShopScene.tscn" },
             { GameState.GameOver, "res://Scenes/UI/GameOverScreen.tscn" },
