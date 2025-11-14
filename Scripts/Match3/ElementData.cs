@@ -1,6 +1,6 @@
 using AltarionsJourney.Core;
 
-namespace AltarionsJourney.Managers
+namespace AltarionsJourney.Match3
 {
     /// <summary>
     /// Represents a match-3 grid element with its type and properties.
