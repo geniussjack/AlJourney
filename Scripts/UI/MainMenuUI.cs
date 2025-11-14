@@ -61,9 +61,16 @@ namespace AlJourney.Scripts.UI
         {
             bool saveExists = SaveSystem.Instance.SaveFileExists();
             _continueButton.Disabled = !saveExists;
-            _continueButton.TooltipText = saveExists
-                ? "Continue from last save"
-                : "No save file found";
+
+            if (saveExists)
+            {
+                _continueButton.TooltipText = "Continue from last save";
+            }
+            else
+            {
+                _continueButton.TooltipText = "No save file found";
+                _continueButton.Text = "Continue (No Save)";
+            }
         }
 
         /// <summary>
