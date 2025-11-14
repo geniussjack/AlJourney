@@ -1,0 +1,196 @@
+[gd_scene load_steps=2 format=3 uid="uid://cdmiad6sigfpe"]
+
+[ext_resource type="Script" uid="uid://bdltufdw3l4ui" path="res://Scripts/UI/ShopUI.cs" id="1_shop"]
+
+[node name="ShopScene" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_shop")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.1, 0.15, 0.2, 1)
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 50
+theme_override_constants/margin_top = 50
+theme_override_constants/margin_right = 50
+theme_override_constants/margin_bottom = 50
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 30
+
+[node name="Header" type="VBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="WaveLabel" type="Label" parent="MarginContainer/VBoxContainer/Header"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Wave X Complete!"
+horizontal_alignment = 1
+
+[node name="CoinsLabel" type="Label" parent="MarginContainer/VBoxContainer/Header"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "💰 0"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="ShopTitle" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "🛒 Upgrade Shop"
+horizontal_alignment = 1
+
+[node name="ShopContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 50
+alignment = 1
+
+[node name="MageUpgrades" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ShopContainer"]
+custom_minimum_size = Vector2(400, 0)
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="MageTitle" type="Label" parent="MarginContainer/VBoxContainer/ShopContainer/MageUpgrades"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "🧙 Eltarion (Mage)"
+horizontal_alignment = 1
+
+[node name="HealthUpgrade" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ShopContainer/MageUpgrades"]
+layout_mode = 2
+
+[node name="BuyButton" type="Button" parent="MarginContainer/VBoxContainer/ShopContainer/MageUpgrades/HealthUpgrade"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Upgrade Health"
+
+[node name="PriceLabel" type="Label" parent="MarginContainer/VBoxContainer/ShopContainer/MageUpgrades/HealthUpgrade"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "+X Max HP
+💰 XX"
+horizontal_alignment = 1
+
+[node name="DamageUpgrade" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ShopContainer/MageUpgrades"]
+layout_mode = 2
+
+[node name="BuyButton" type="Button" parent="MarginContainer/VBoxContainer/ShopContainer/MageUpgrades/DamageUpgrade"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Upgrade Damage"
+
+[node name="PriceLabel" type="Label" parent="MarginContainer/VBoxContainer/ShopContainer/MageUpgrades/DamageUpgrade"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "+X Damage
+💰 XX"
+horizontal_alignment = 1
+
+[node name="DefenseUpgrade" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ShopContainer/MageUpgrades"]
+layout_mode = 2
+
+[node name="BuyButton" type="Button" parent="MarginContainer/VBoxContainer/ShopContainer/MageUpgrades/DefenseUpgrade"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Upgrade Defense"
+
+[node name="PriceLabel" type="Label" parent="MarginContainer/VBoxContainer/ShopContainer/MageUpgrades/DefenseUpgrade"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "+X Defense
+💰 XX"
+horizontal_alignment = 1
+
+[node name="WarriorUpgrades" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ShopContainer"]
+custom_minimum_size = Vector2(400, 0)
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="WarriorTitle" type="Label" parent="MarginContainer/VBoxContainer/ShopContainer/WarriorUpgrades"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "⚔️ Eldric (Warrior)"
+horizontal_alignment = 1
+
+[node name="HealthUpgrade" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ShopContainer/WarriorUpgrades"]
+layout_mode = 2
+
+[node name="BuyButton" type="Button" parent="MarginContainer/VBoxContainer/ShopContainer/WarriorUpgrades/HealthUpgrade"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Upgrade Health"
+
+[node name="PriceLabel" type="Label" parent="MarginContainer/VBoxContainer/ShopContainer/WarriorUpgrades/HealthUpgrade"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "+X Max HP
+💰 XX"
+horizontal_alignment = 1
+
+[node name="DamageUpgrade" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ShopContainer/WarriorUpgrades"]
+layout_mode = 2
+
+[node name="BuyButton" type="Button" parent="MarginContainer/VBoxContainer/ShopContainer/WarriorUpgrades/DamageUpgrade"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Upgrade Damage"
+
+[node name="PriceLabel" type="Label" parent="MarginContainer/VBoxContainer/ShopContainer/WarriorUpgrades/DamageUpgrade"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "+X Damage
+💰 XX"
+horizontal_alignment = 1
+
+[node name="DefenseUpgrade" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ShopContainer/WarriorUpgrades"]
+layout_mode = 2
+
+[node name="BuyButton" type="Button" parent="MarginContainer/VBoxContainer/ShopContainer/WarriorUpgrades/DefenseUpgrade"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Upgrade Defense"
+
+[node name="PriceLabel" type="Label" parent="MarginContainer/VBoxContainer/ShopContainer/WarriorUpgrades/DefenseUpgrade"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "+X Defense
+💰 XX"
+horizontal_alignment = 1
+
+[node name="HSeparator2" type="HSeparator" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="ContinueButton" type="Button" parent="MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(300, 80)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 32
+text = "Continue to Next Wave"
