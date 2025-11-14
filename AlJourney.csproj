@@ -1,0 +1,42 @@
+<Project Sdk="Godot.NET.Sdk/4.5.1">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <RootNamespace>AlJourney</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="Docs\Architecture\" />
+    <Folder Include="Docs\GameDesign\" />
+    <Folder Include="Docs\API\" />
+    <Folder Include="Resources\Audio\Music\" />
+    <Folder Include="Resources\Audio\SFX\" />
+    <Folder Include="Resources\Sprites\UI\" />
+    <Folder Include="Resources\Sprites\Characters\" />
+    <Folder Include="Resources\Sprites\Elements\" />
+    <Folder Include="Resources\Sprites\Icons\" />
+    <Folder Include="Resources\Sprites\Backgrounds\" />
+    <Folder Include="Resources\Fonts\" />
+    <Folder Include="Resources\Themes\" />
+    <Folder Include="Resources\Data\" />
+    <Folder Include="Scenes\UI\" />
+    <Folder Include="Scenes\Battle\" />
+    <Folder Include="Scenes\Match3\" />
+    <Folder Include="Scenes\Characters\" />
+    <Folder Include="Scenes\Prefabs\" />
+    <Folder Include="Scripts\UI\" />
+    <Folder Include="Scripts\Utils\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="scenes\battle\BattleScene.tscn" />
+    <None Include="scenes\characters\Enemy.tscn" />
+    <None Include="scenes\characters\Player.tscn" />
+    <None Include="scenes\match3\ElementSprite.tscn" />
+    <None Include="scenes\match3\GridCell.tscn" />
+    <None Include="scenes\ui\BattleHUD.tscn" />
+    <None Include="scenes\ui\CharacterSelect.tscn" />
+    <None Include="scenes\ui\GameOverScreen.tscn" />
+    <None Include="scenes\ui\MainMenu.tscn" />
+    <None Include="scenes\ui\ShopScene.tscn" />
+    <None Include="scenes\ui\VictoryScreen.tscn" />
+  </ItemGroup>
+</Project>
