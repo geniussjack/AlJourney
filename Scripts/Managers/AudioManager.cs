@@ -1,7 +1,7 @@
 using Godot;
 using System.Collections.Generic;
 
-namespace AltarionsJourney.Managers
+namespace AlJourney.Scripts.Managers
 {
     /// <summary>
     /// Manages game audio including music and sound effects.
@@ -81,7 +81,7 @@ namespace AltarionsJourney.Managers
             AddChild(_musicPlayer);
 
             // Setup SFX player pool
-            _sfxPlayers = new List<AudioStreamPlayer>();
+            _sfxPlayers = [];
             for (int i = 0; i < SFX_POOL_SIZE; i++)
             {
                 var sfxPlayer = new AudioStreamPlayer
@@ -102,7 +102,7 @@ namespace AltarionsJourney.Managers
         /// </summary>
         public void PlayMusic(string musicPath, bool loop = true)
         {
-            var stream = GD.Load<AudioStream>(musicPath);
+            AudioStream stream = GD.Load<AudioStream>(musicPath);
             if (stream == null)
             {
                 GD.PrintErr($"[AudioManager] Failed to load music: {musicPath}");
@@ -138,7 +138,7 @@ namespace AltarionsJourney.Managers
         /// </summary>
         public void PlaySfx(string sfxPath, float pitchVariation = 0.0f)
         {
-            var stream = GD.Load<AudioStream>(sfxPath);
+            AudioStream stream = GD.Load<AudioStream>(sfxPath);
             if (stream == null)
             {
                 GD.PrintErr($"[AudioManager] Failed to load SFX: {sfxPath}");
@@ -147,7 +147,7 @@ namespace AltarionsJourney.Managers
 
             // Find available player
             AudioStreamPlayer availablePlayer = null;
-            foreach (var player in _sfxPlayers)
+            foreach (AudioStreamPlayer player in _sfxPlayers)
             {
                 if (!player.Playing)
                 {
@@ -157,10 +157,7 @@ namespace AltarionsJourney.Managers
             }
 
             // If all busy, use first one
-            if (availablePlayer == null)
-            {
-                availablePlayer = _sfxPlayers[0];
-            }
+            availablePlayer ??= _sfxPlayers[0];
 
             availablePlayer.Stream = stream;
             availablePlayer.VolumeDb = Mathf.LinearToDb(_sfxVolume * _masterVolume);

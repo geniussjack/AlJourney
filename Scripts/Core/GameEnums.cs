@@ -1,6 +1,4 @@
-using System;
-
-namespace AltarionsJourney.Core
+namespace AlJourney.Scripts.Core
 {
     /// <summary>
     /// Represents the current state of the game flow.

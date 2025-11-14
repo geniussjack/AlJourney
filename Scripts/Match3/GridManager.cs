@@ -1,9 +1,8 @@
+using AlJourney.Scripts.Core;
 using Godot;
 using System.Collections.Generic;
-using System.Linq;
-using AltarionsJourney.Core;
 
-namespace AltarionsJourney.Match3
+namespace AlJourney.Scripts.Match3
 {
     /// <summary>
     /// Manages the match-3 grid logic including swaps, matches, and cascades.
@@ -17,7 +16,7 @@ namespace AltarionsJourney.Match3
         public delegate void SwapCompletedEventHandler(bool wasValid);
 
         [Signal]
-        public delegate void MatchesFoundEventHandler(List<MatchResult> matches);
+        public delegate void MatchesFoundEventHandler(int matchCount);
 
         [Signal]
         public delegate void GridRefillCompletedEventHandler();
@@ -70,13 +69,13 @@ namespace AltarionsJourney.Match3
         /// </summary>
         private ElementData GenerateSafeElement(int x, int y)
         {
-            List<ElementType> availableTypes = new()
-            {
+            List<ElementType> availableTypes =
+            [
                 ElementType.Fire,
                 ElementType.Heal,
                 ElementType.Sword,
                 ElementType.Shield
-            };
+            ];
 
             // Remove types that would create horizontal match
             if (x >= 2)
@@ -172,9 +171,7 @@ namespace AltarionsJourney.Match3
         /// </summary>
         private void SwapElements(int x1, int y1, int x2, int y2)
         {
-            var temp = _grid[x1, y1];
-            _grid[x1, y1] = _grid[x2, y2];
-            _grid[x2, y2] = temp;
+            (_grid[x1, y1], _grid[x2, y2]) = (_grid[x2, y2], _grid[x1, y1]);
 
             // Update positions
             _grid[x1, y1].X = x1;
@@ -220,7 +217,8 @@ namespace AltarionsJourney.Match3
 
             if (allMatches.Count > 0)
             {
-                EmitSignal(SignalName.MatchesFound, allMatches);
+                // FIX: Передаём только количество, а не List
+                EmitSignal(SignalName.MatchesFound, allMatches.Count);
                 GD.Print($"[GridManager] Found {allMatches.Count} matches");
             }
 

@@ -1,10 +1,10 @@
+using AlJourney.Scripts.Core;
+using AlJourney.Scripts.Data;
 using Godot;
 using System.Collections.Generic;
 using System.Linq;
-using AltarionsJourney.Core;
-using AltarionsJourney.Data;
 
-namespace AltarionsJourney.Characters
+namespace AlJourney.Scripts.Characters
 {
     /// <summary>
     /// Base class for all battle characters (players and enemies).
@@ -89,7 +89,7 @@ namespace AltarionsJourney.Characters
 
         public override void _Ready()
         {
-            _activeEffects = new List<StatusEffectData>();
+            _activeEffects = [];
         }
 
         /// <summary>
@@ -104,7 +104,7 @@ namespace AltarionsJourney.Characters
             _baseDefense = defense;
             _currentShield = 0;
             _attackType = attackType;
-            _activeEffects = new List<StatusEffectData>();
+            _activeEffects = [];
 
             EmitSignal(SignalName.HealthChanged, _currentHealth, _maxHealth);
         }
@@ -155,7 +155,7 @@ namespace AltarionsJourney.Characters
             }
 
             // Check for reflect damage
-            var reflectEffect = _activeEffects.FirstOrDefault(e => e.Type == StatusEffect.ShieldReflect);
+            StatusEffectData reflectEffect = _activeEffects.FirstOrDefault(e => e.Type == StatusEffect.ShieldReflect);
             if (reflectEffect != null && finalDamage > 0)
             {
                 int reflectedDamage = Mathf.CeilToInt(damage * reflectEffect.ExtraData);
@@ -212,7 +212,7 @@ namespace AltarionsJourney.Characters
             }
 
             // Check if effect already exists
-            var existingEffect = _activeEffects.FirstOrDefault(e => e.Type == effect.Type);
+            StatusEffectData existingEffect = _activeEffects.FirstOrDefault(e => e.Type == effect.Type);
             if (existingEffect != null)
             {
                 // Refresh duration if new effect is longer
@@ -236,10 +236,10 @@ namespace AltarionsJourney.Characters
         /// </summary>
         public virtual void ClearNegativeEffects()
         {
-            var negativeEffects = new[] { StatusEffect.Burning, StatusEffect.Bleeding, StatusEffect.Weakened, StatusEffect.Stunned };
+            StatusEffect[] negativeEffects = [StatusEffect.Burning, StatusEffect.Bleeding, StatusEffect.Weakened, StatusEffect.Stunned];
 
             var toRemove = _activeEffects.Where(e => negativeEffects.Contains(e.Type)).ToList();
-            foreach (var effect in toRemove)
+            foreach (StatusEffectData effect in toRemove)
             {
                 _activeEffects.Remove(effect);
                 EmitSignal(SignalName.StatusEffectRemoved, (int)effect.Type);
@@ -256,7 +256,7 @@ namespace AltarionsJourney.Characters
 
             var effectsToRemove = new List<StatusEffectData>();
 
-            foreach (var effect in _activeEffects)
+            foreach (StatusEffectData effect in _activeEffects)
             {
                 switch (effect.Type)
                 {
@@ -284,7 +284,7 @@ namespace AltarionsJourney.Characters
             }
 
             // Remove expired effects
-            foreach (var effect in effectsToRemove)
+            foreach (StatusEffectData effect in effectsToRemove)
             {
                 _activeEffects.Remove(effect);
                 EmitSignal(SignalName.StatusEffectRemoved, (int)effect.Type);
@@ -310,7 +310,7 @@ namespace AltarionsJourney.Characters
         /// </summary>
         public List<StatusEffectData> GetActiveEffects()
         {
-            return new List<StatusEffectData>(_activeEffects);
+            return [.. _activeEffects];
         }
 
         /// <summary>

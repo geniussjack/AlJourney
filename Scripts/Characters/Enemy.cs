@@ -1,7 +1,7 @@
+using AlJourney.Scripts.Core;
 using Godot;
-using AltarionsJourney.Core;
 
-namespace AltarionsJourney.Characters
+namespace AlJourney.Scripts.Characters
 {
     /// <summary>
     /// Represents an enemy character with wave-based scaling.
@@ -37,12 +37,14 @@ namespace AltarionsJourney.Characters
         /// </summary>
         public static Enemy Create(EnemyType enemyType, int waveNumber)
         {
-            var enemy = new Enemy();
-            enemy._enemyType = enemyType;
-            enemy._waveNumber = waveNumber;
+            var enemy = new Enemy
+            {
+                _enemyType = enemyType,
+                _waveNumber = waveNumber
+            };
 
             // Get base stats
-            var (name, baseHp, baseDmg, baseDef, attackType, coinReward) = GetEnemyBaseStats(enemyType);
+            (string name, int baseHp, int baseDmg, int baseDef, AttackType attackType, int coinReward) = GetEnemyBaseStats(enemyType);
 
             // Apply wave scaling
             int scaledHp = Mathf.CeilToInt(baseHp * (1 + waveNumber * GameConstants.ENEMY_HP_SCALE_PER_WAVE));

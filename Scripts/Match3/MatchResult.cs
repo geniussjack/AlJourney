@@ -1,40 +1,32 @@
+using AlJourney.Scripts.Core;
 using System.Collections.Generic;
-using AltarionsJourney.Core;
 
-namespace AltarionsJourney.Match3
+namespace AlJourney.Scripts.Match3
 {
     /// <summary>
     /// Represents the result of a match detection.
     /// </summary>
-    public class MatchResult
+    public class MatchResult(ElementType elementType, int matchCount, bool isHorizontal)
     {
         /// <summary>
         /// Type of element that was matched.
         /// </summary>
-        public ElementType ElementType { get; set; }
+        public ElementType ElementType { get; set; } = elementType;
 
         /// <summary>
         /// Number of elements in the match (3, 4, or 5).
         /// </summary>
-        public int MatchCount { get; set; }
+        public int MatchCount { get; set; } = matchCount;
 
         /// <summary>
         /// List of matched element positions.
         /// </summary>
-        public List<(int x, int y)> MatchedPositions { get; set; }
+        public List<(int x, int y)> MatchedPositions { get; set; } = [];
 
         /// <summary>
         /// Is this a horizontal match.
         /// </summary>
-        public bool IsHorizontal { get; set; }
-
-        public MatchResult(ElementType elementType, int matchCount, bool isHorizontal)
-        {
-            ElementType = elementType;
-            MatchCount = matchCount;
-            IsHorizontal = isHorizontal;
-            MatchedPositions = new List<(int x, int y)>();
-        }
+        public bool IsHorizontal { get; set; } = isHorizontal;
 
         /// <summary>
         /// Returns the combo level (0 for no match, 1 for 3-match, 2 for 4-match, 3 for 5-match).

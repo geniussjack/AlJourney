@@ -1,7 +1,7 @@
+using AlJourney.Scripts.Core;
 using Godot;
-using AltarionsJourney.Core;
 
-namespace AltarionsJourney.Characters
+namespace AlJourney.Scripts.Characters
 {
     /// <summary>
     /// Represents a player-controlled character (Mage or Warrior).
@@ -20,8 +20,10 @@ namespace AltarionsJourney.Characters
         /// </summary>
         public static PlayerCharacter Create(CharacterClass characterClass)
         {
-            var player = new PlayerCharacter();
-            player._characterClass = characterClass;
+            var player = new PlayerCharacter
+            {
+                _characterClass = characterClass
+            };
 
             switch (characterClass)
             {
@@ -74,7 +76,7 @@ namespace AltarionsJourney.Characters
         /// Warrior deals +0% bonus to physical damage (base).
         /// Future: Can be modified by artifacts/upgrades.
         /// </summary>
-        public int CalculateDamage(int baseDamage, ElementType elementType)
+        public int CalculateDamage(int baseDamage, ElementType _)
         {
             int finalDamage = baseDamage + _baseDamage;
 
@@ -88,7 +90,7 @@ namespace AltarionsJourney.Characters
         /// <summary>
         /// Applies healing with character-specific modifiers.
         /// </summary>
-        public int CalculateHealing(int baseHealing)
+        public static int CalculateHealing(int baseHealing)
         {
             int finalHealing = baseHealing;
 
@@ -102,7 +104,7 @@ namespace AltarionsJourney.Characters
         /// <summary>
         /// Applies shield with character-specific modifiers.
         /// </summary>
-        public int CalculateShield(int baseShield)
+        public static int CalculateShield(int baseShield)
         {
             int finalShield = baseShield;
 

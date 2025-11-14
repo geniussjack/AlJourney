@@ -1,4 +1,4 @@
-namespace AltarionsJourney.Core
+namespace AlJourney.Scripts.Core
 {
     /// <summary>
     /// Central storage for all game balance constants and configuration values.

@@ -1,28 +1,22 @@
+using AlJourney.Scripts.Core;
+using AlJourney.Scripts.Data;
 using Godot;
 using System.Collections.Generic;
-using AltarionsJourney.Core;
-using AltarionsJourney.Data;
 
-namespace AltarionsJourney.Match3
+namespace AlJourney.Scripts.Match3
 {
     /// <summary>
     /// Data structure representing a combo effect to be applied in battle.
     /// </summary>
-    public class ComboEffect
+    public class ComboEffect(ElementType elementType, int comboLevel)
     {
-        public ElementType ElementType { get; set; }
-        public int ComboLevel { get; set; }
+        public ElementType ElementType { get; set; } = elementType;
+        public int ComboLevel { get; set; } = comboLevel;
         public int Damage { get; set; }
         public int Healing { get; set; }
         public int Shield { get; set; }
         public bool IsAoE { get; set; }
         public StatusEffectData StatusEffect { get; set; }
-
-        public ComboEffect(ElementType elementType, int comboLevel)
-        {
-            ElementType = elementType;
-            ComboLevel = comboLevel;
-        }
     }
 
     /// <summary>
@@ -31,10 +25,15 @@ namespace AltarionsJourney.Match3
     public partial class ComboSystem : Node
     {
         [Signal]
-        public delegate void ComboProcessedEventHandler(ComboEffect effect);
+        public delegate void CombosProcessedEventHandler(int comboCount);
 
-        [Signal]
-        public delegate void AllCombosProcessedEventHandler(List<ComboEffect> effects);
+        // Кэш последних обработанных эффектов для доступа из других систем
+        private List<ComboEffect> _lastProcessedEffects = [];
+
+        /// <summary>
+        /// Gets the last processed combo effects.
+        /// </summary>
+        public List<ComboEffect> GetLastProcessedEffects() => _lastProcessedEffects;
 
         /// <summary>
         /// Processes all match results and converts them to combat effects.
@@ -49,13 +48,13 @@ namespace AltarionsJourney.Match3
                 if (effect != null)
                 {
                     comboEffects.Add(effect);
-                    EmitSignal(SignalName.ComboProcessed, effect);
                 }
             }
 
             if (comboEffects.Count > 0)
             {
-                EmitSignal(SignalName.AllCombosProcessed, comboEffects);
+                _lastProcessedEffects = comboEffects;
+                EmitSignal(SignalName.CombosProcessed, comboEffects.Count);
                 GD.Print($"[ComboSystem] Processed {comboEffects.Count} combo effects");
             }
 
@@ -65,7 +64,7 @@ namespace AltarionsJourney.Match3
         /// <summary>
         /// Creates a combo effect based on match result.
         /// </summary>
-        private ComboEffect CreateComboEffect(MatchResult match)
+        private static ComboEffect CreateComboEffect(MatchResult match)
         {
             int comboLevel = match.GetComboLevel();
             if (comboLevel == 0) return null;
@@ -97,7 +96,7 @@ namespace AltarionsJourney.Match3
         /// <summary>
         /// Processes Fire (Fireball) combo effects.
         /// </summary>
-        private void ProcessFireCombo(ComboEffect effect, int level)
+        private static void ProcessFireCombo(ComboEffect effect, int level)
         {
             switch (level)
             {
@@ -135,7 +134,7 @@ namespace AltarionsJourney.Match3
         /// <summary>
         /// Processes Sword (Axe) combo effects.
         /// </summary>
-        private void ProcessSwordCombo(ComboEffect effect, int level)
+        private static void ProcessSwordCombo(ComboEffect effect, int level)
         {
             switch (level)
             {
@@ -173,7 +172,7 @@ namespace AltarionsJourney.Match3
         /// <summary>
         /// Processes Heal combo effects.
         /// </summary>
-        private void ProcessHealCombo(ComboEffect effect, int level)
+        private static void ProcessHealCombo(ComboEffect effect, int level)
         {
             switch (level)
             {
@@ -204,7 +203,7 @@ namespace AltarionsJourney.Match3
         /// <summary>
         /// Processes Shield combo effects.
         /// </summary>
-        private void ProcessShieldCombo(ComboEffect effect, int level)
+        private static void ProcessShieldCombo(ComboEffect effect, int level)
         {
             switch (level)
             {

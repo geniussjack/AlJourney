@@ -1,10 +1,10 @@
+using AlJourney.Scripts.Core;
+using AlJourney.Scripts.Data;
 using Godot;
 using System;
 using System.Text.Json;
-using AltarionsJourney.Core;
-using AltarionsJourney.Data;
 
-namespace AltarionsJourney.Managers
+namespace AlJourney.Scripts.Managers
 {
     /// <summary>
     /// Handles saving and loading game data to/from JSON files.
@@ -44,6 +44,12 @@ namespace AltarionsJourney.Managers
             GD.Print($"[SaveSystem] Initialized. Save path: {_savePath}");
         }
 
+        private static readonly JsonSerializerOptions _jsonOptions = new()
+        {
+            WriteIndented = true,
+            IncludeFields = false
+        };
+
         /// <summary>
         /// Saves current game state to JSON file.
         /// </summary>
@@ -69,7 +75,7 @@ namespace AltarionsJourney.Managers
                     IncludeFields = false
                 };
 
-                string jsonData = JsonSerializer.Serialize(saveData, options);
+                string jsonData = JsonSerializer.Serialize(saveData, _jsonOptions);
 
                 // Write to file
                 using var file = FileAccess.Open(_savePath, FileAccess.ModeFlags.Write);

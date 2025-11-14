@@ -1,12 +1,13 @@
+using AlJourney.Scripts.Characters;
+using AlJourney.Scripts.Core;
+using AlJourney.Scripts.Data;
+using AlJourney.Scripts.Managers;
+using AlJourney.Scripts.Match3;
 using Godot;
 using System.Collections.Generic;
 using System.Linq;
-using AltarionsJourney.Core;
-using AltarionsJourney.Characters;
-using AltarionsJourney.Match3;
-using AltarionsJourney.Managers;
 
-namespace AltarionsJourney.Battle
+namespace AlJourney.Scripts.Battle
 {
     /// <summary>
     /// Manages battle flow, turn order, and combat resolution.
@@ -59,7 +60,7 @@ namespace AltarionsJourney.Battle
 
         public override void _Ready()
         {
-            _enemies = new List<Enemy>();
+            _enemies = [];
             _currentPhase = BattlePhase.PlayerSwap;
             _necromancerTurnCount = 0;
 
@@ -69,7 +70,6 @@ namespace AltarionsJourney.Battle
 
             // Connect signals
             _gridManager.SwapCompleted += OnSwapCompleted;
-            _comboSystem.AllCombosProcessed += OnCombosProcessed;
 
             GD.Print("[BattleManager] Initialized");
         }
@@ -175,17 +175,17 @@ namespace AltarionsJourney.Battle
         /// <summary>
         /// Gets a random basic enemy type.
         /// </summary>
-        private EnemyType GetRandomBasicEnemyType()
+        private static EnemyType GetRandomBasicEnemyType()
         {
-            var basicTypes = new[]
-            {
+            EnemyType[] basicTypes =
+            [
                 EnemyType.SkeletonWarrior,
                 EnemyType.SkeletonArcher,
                 EnemyType.Zombie,
                 EnemyType.DraugrWarrior,
                 EnemyType.DraugrDefender,
                 EnemyType.DraugrCaster
-            };
+            ];
 
             return basicTypes[GD.RandRange(0, basicTypes.Length - 1)];
         }
@@ -193,7 +193,7 @@ namespace AltarionsJourney.Battle
         /// <summary>
         /// Gets a random miniboss type.
         /// </summary>
-        private EnemyType GetRandomMinibossType()
+        private static EnemyType GetRandomMinibossType()
         {
             return GD.Randf() < 0.5f ? EnemyType.GeneralOfDraugr : EnemyType.Arhiskeleton;
         }
@@ -229,10 +229,9 @@ namespace AltarionsJourney.Battle
                 // Process matches will trigger cascade
                 _gridManager.ProcessMatches(matches);
 
-                // Convert matches to combat effects
+                // FIX: Прямой вызов вместо сигнала
                 var comboEffects = _comboSystem.ProcessMatches(matches);
-
-                // Apply combo effects will be handled in OnCombosProcessed
+                OnCombosProcessed(comboEffects);
             }
             else
             {
@@ -258,6 +257,8 @@ namespace AltarionsJourney.Battle
             {
                 GD.Print("[BattleManager] Cascade detected!");
                 _gridManager.ProcessMatches(cascadeMatches);
+
+                // FIX: Прямой вызов для каскадов
                 var cascadeEffects = _comboSystem.ProcessMatches(cascadeMatches);
 
                 // Apply cascade effects
@@ -271,7 +272,7 @@ namespace AltarionsJourney.Battle
             _player.ProcessStatusEffects();
 
             // After all combos, start enemy turn
-            CallDeferred(MethodName.StartEnemyTurn);
+            CallDeferred(nameof(StartEnemyTurn));
         }
 
         /// <summary>
@@ -307,7 +308,7 @@ namespace AltarionsJourney.Battle
             {
                 // Hit all enemies
                 GD.Print($"[BattleManager] AoE attack for {damage} damage!");
-                foreach (var enemy in _enemies.Where(e => e.IsAlive))
+                foreach (Enemy enemy in _enemies.Where(e => e.IsAlive))
                 {
                     int reflected = enemy.TakeDamage(damage, _player.AttackType);
 
@@ -327,7 +328,7 @@ namespace AltarionsJourney.Battle
             else
             {
                 // Hit single target (first alive enemy)
-                var target = _enemies.FirstOrDefault(e => e.IsAlive);
+                Enemy target = _enemies.FirstOrDefault(e => e.IsAlive);
                 if (target != null)
                 {
                     GD.Print($"[BattleManager] Attacking {target.CharacterName} for {damage} damage!");
@@ -353,7 +354,7 @@ namespace AltarionsJourney.Battle
         /// </summary>
         private void ApplyHealEffect(ComboEffect effect)
         {
-            int healing = _player.CalculateHealing(effect.Healing);
+            int healing = PlayerCharacter.CalculateHealing(effect.Healing);
             _player.Heal(healing);
 
             // 4-match: Clear negative effects
@@ -375,7 +376,7 @@ namespace AltarionsJourney.Battle
         /// </summary>
         private void ApplyShieldEffect(ComboEffect effect)
         {
-            int shield = _player.CalculateShield(effect.Shield);
+            int shield = PlayerCharacter.CalculateShield(effect.Shield);
             _player.AddShield(shield);
 
             // Apply status effect (reflect/immunity)
@@ -396,13 +397,13 @@ namespace AltarionsJourney.Battle
             GD.Print("[BattleManager] Enemy turn starting...");
 
             // Process enemy status effects first
-            foreach (var enemy in _enemies.Where(e => e.IsAlive))
+            foreach (Enemy enemy in _enemies.Where(e => e.IsAlive))
             {
                 enemy.ProcessStatusEffects();
             }
 
             // Each enemy attacks
-            foreach (var enemy in _enemies.Where(e => e.IsAlive))
+            foreach (Enemy enemy in _enemies.Where(e => e.IsAlive))
             {
                 PerformEnemyAction(enemy);
             }
@@ -455,7 +456,7 @@ namespace AltarionsJourney.Battle
         private void PerformNecromancerAction(Enemy necromancer)
         {
             _necromancerTurnCount++;
-            var ability = necromancer.GetNecromancerAbility(_necromancerTurnCount);
+            Enemy.NecromancerAbility ability = necromancer.GetNecromancerAbility(_necromancerTurnCount);
 
             switch (ability)
             {
@@ -529,7 +530,7 @@ namespace AltarionsJourney.Battle
             EmitSignal(SignalName.BattleEnded, false);
 
             // Trigger game over
-            Managers.SceneManager.Instance.GameOver();
+            SceneManager.GameOver();
         }
 
         /// <summary>
@@ -559,7 +560,7 @@ namespace AltarionsJourney.Battle
         public void EndBattle()
         {
             // Cleanup
-            foreach (var enemy in _enemies)
+            foreach (Enemy enemy in _enemies)
             {
                 enemy.QueueFree();
             }

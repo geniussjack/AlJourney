@@ -1,8 +1,8 @@
+using AlJourney.Scripts.Core;
+using AlJourney.Scripts.Data;
 using Godot;
-using AltarionsJourney.Core;
-using AltarionsJourney.Data;
 
-namespace AltarionsJourney.Managers
+namespace AlJourney.Scripts.Managers
 {
     /// <summary>
     /// Central manager for game state, progression, and runtime data.

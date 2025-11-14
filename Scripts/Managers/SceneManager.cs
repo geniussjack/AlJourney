@@ -1,8 +1,8 @@
+using AlJourney.Scripts.Core;
 using Godot;
 using System.Collections.Generic;
-using RoguelikeMatch3.Core;
 
-namespace AltarionsJourney.Managers
+namespace AlJourney.Scripts.Managers
 {
     /// <summary>
     /// Manages scene transitions and loading.
@@ -60,19 +60,11 @@ namespace AltarionsJourney.Managers
         /// </summary>
         public void LoadScene(GameState state)
         {
-            if (_isTransitioning)
-            {
-                GD.PrintErr("[SceneManager] Scene transition already in progress");
-                return;
-            }
-
-            if (!_scenePaths.ContainsKey(state))
+            if (!_scenePaths.TryGetValue(state, out string scenePath))
             {
                 GD.PrintErr($"[SceneManager] No scene path defined for state: {state}");
                 return;
             }
-
-            string scenePath = _scenePaths[state];
             LoadSceneByPath(scenePath);
         }
 
@@ -87,23 +79,22 @@ namespace AltarionsJourney.Managers
                 return;
             }
 
-            CallDeferred(MethodName._DeferredSceneChange, scenePath);
+            // FIX: Используем nameof вместо строки
+            CallDeferred(nameof(DeferredSceneChange), scenePath);
         }
 
-        private void _DeferredSceneChange(string scenePath)
+        // FIX: Метод должен быть public для CallDeferred
+        public void DeferredSceneChange(string scenePath)
         {
             _isTransitioning = true;
             EmitSignal(SignalName.SceneLoadStarted, scenePath);
 
             // Free current scene
-            if (_currentScene != null)
-            {
-                _currentScene.QueueFree();
-            }
+            _currentScene?.QueueFree();
 
             // Load new scene
             var newSceneResource = GD.Load<PackedScene>(scenePath);
-            if (newSceneResource == null)
+            if (newSceneResource is null)
             {
                 GD.PrintErr($"[SceneManager] Failed to load scene: {scenePath}");
                 _isTransitioning = false;
@@ -137,31 +128,31 @@ namespace AltarionsJourney.Managers
         /// <summary>
         /// Transitions to main menu.
         /// </summary>
-        public void GoToMainMenu()
+        public static void GoToMainMenu()
         {
             GameStateManager.Instance.ReturnToMainMenu();
-            LoadScene(GameState.MainMenu);
+            Instance.LoadScene(GameState.MainMenu); // FIX: Через Instance
         }
 
         /// <summary>
         /// Starts a new game with character selection.
         /// </summary>
-        public void StartNewGame()
+        public static void StartNewGame()
         {
             GameStateManager.Instance.ChangeState(GameState.CharacterSelect);
-            LoadScene(GameState.CharacterSelect);
+            Instance.LoadScene(GameState.CharacterSelect); // FIX: Через Instance
         }
 
         /// <summary>
         /// Continues from saved game.
         /// </summary>
-        public void ContinueGame()
+        public static void ContinueGame()
         {
             var saveData = SaveSystem.Instance.LoadGame();
             if (saveData != null)
             {
                 GameStateManager.Instance.LoadGame(saveData);
-                LoadScene(GameState.Battle);
+                Instance.LoadScene(GameState.Battle); // FIX: Через Instance
             }
             else
             {
@@ -172,28 +163,28 @@ namespace AltarionsJourney.Managers
         /// <summary>
         /// Transitions to shop after wave completion.
         /// </summary>
-        public void GoToShop()
+        public static void GoToShop()
         {
             GameStateManager.Instance.ChangeState(GameState.Shop);
-            LoadScene(GameState.Shop);
+            Instance.LoadScene(GameState.Shop); // FIX: Через Instance
         }
 
         /// <summary>
         /// Returns to battle from shop.
         /// </summary>
-        public void ReturnToBattle()
+        public static void ReturnToBattle()
         {
             GameStateManager.Instance.ChangeState(GameState.Battle);
-            LoadScene(GameState.Battle);
+            Instance.LoadScene(GameState.Battle); // FIX: Через Instance
         }
 
         /// <summary>
         /// Handles game over scenario.
         /// </summary>
-        public void GameOver()
+        public static void GameOver()
         {
             GameStateManager.Instance.EndGame(false);
-            LoadScene(GameState.GameOver);
+            Instance.LoadScene(GameState.GameOver); // FIX: Через Instance
         }
     }
 }
