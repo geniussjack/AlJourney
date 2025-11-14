@@ -17,7 +17,14 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-Global="*res://autoload/Global.cs"
+SaveSystem="*res://Scripts/Managers/SaveSystem.cs"
+GameStateManager="*res://Scripts/Managers/GameStateManager.cs"
+SceneManager="*res://Scripts/Managers/SceneManager.cs"
+AudioManager="*res://Scripts/Managers/AudioManager.cs"
+SettingsManager="*res://Scripts/Managers/SettingsManager.cs"
+UIManager="*res://Scripts/Managers/UIManager.cs"
+GridManager="*res://Scripts/Match3/GridManager.cs"
+ComboSystem="*res://Scripts/Match3/ComboSystem.cs"
 
 [display]
 
