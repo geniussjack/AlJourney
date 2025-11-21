@@ -1,5 +1,6 @@
 using AlJourney.Scripts.Core;
 using AlJourney.Scripts.Match3;
+using AlJourney.Scripts.Utils;
 using Godot;
 using System.Collections.Generic;
 
@@ -25,11 +26,13 @@ namespace AlJourney.Scripts.UI
         private Dictionary<ElementType, Texture2D> _elementTextures;
 
         private GridManager _gridManager;
+        private ComboSystem _comboSystem;
         private int _gridSize;
 
         public override void _Ready()
         {
             _gridManager = GetNode<GridManager>("/root/GridManager");
+            _comboSystem = GetNode<ComboSystem>("/root/ComboSystem");
             _gridSize = GameConstants.GRID_SIZE;
 
             // Create grid container
@@ -250,6 +253,12 @@ namespace AlJourney.Scripts.UI
 
             if (matches.Count > 0)
             {
+                // Get combo effects
+                List<ComboEffect> effects = _comboSystem.ProcessMatches(matches);
+
+                // Visualize combo effects
+                VisualizeComboEffects(effects, matches);
+
                 // Animate matched elements
                 foreach (MatchResult match in matches)
                 {
@@ -266,6 +275,108 @@ namespace AlJourney.Scripts.UI
                     _gridManager.ProcessMatches(matches);
                 };
             }
+        }
+
+        /// <summary>
+        /// Visualizes combo effects on the grid.
+        /// </summary>
+        private void VisualizeComboEffects(List<ComboEffect> effects, List<MatchResult> matches)
+        {
+            for (int i = 0; i < effects.Count && i < matches.Count; i++)
+            {
+                ComboEffect effect = effects[i];
+                MatchResult match = matches[i];
+
+                // Calculate center position of match
+                Vector2 centerPos = CalculateMatchCenter(match);
+
+                // Spawn particles at match location
+                ComboParticles.SpawnComboEffect(this, centerPos, effect.ElementType, effect.ComboLevel);
+
+                // Flash cells
+                FlashMatchedCells(match, effect.ElementType);
+
+                // Spawn effect text
+                string effectText = GetEffectText(effect);
+                Color effectColor = GetEffectColor(effect.ElementType);
+                ComboParticles.SpawnFloatingText(this, centerPos - new Vector2(0, 40), effectText, effectColor);
+            }
+        }
+
+        /// <summary>
+        /// Calculates center position of a match.
+        /// </summary>
+        private Vector2 CalculateMatchCenter(MatchResult match)
+        {
+            if (match.MatchedPositions.Count == 0)
+            {
+                return Vector2.Zero;
+            }
+
+            float sumX = 0;
+            float sumY = 0;
+
+            foreach ((int x, int y) in match.MatchedPositions)
+            {
+                Vector2 pos = GetElementPosition(x, y);
+                sumX += pos.X;
+                sumY += pos.Y;
+            }
+
+            return new Vector2(
+                sumX / match.MatchedPositions.Count + CELL_SIZE / 2,
+                sumY / match.MatchedPositions.Count + CELL_SIZE / 2
+            );
+        }
+
+        /// <summary>
+        /// Flashes matched cells with color.
+        /// </summary>
+        private void FlashMatchedCells(MatchResult match, ElementType elementType)
+        {
+            Color flashColor = GetEffectColor(elementType);
+
+            foreach ((int x, int y) in match.MatchedPositions)
+            {
+                ElementSprite sprite = _visualGrid[x, y];
+                if (sprite != null)
+                {
+                    // Quick flash animation
+                    Tween tween = CreateTween();
+                    _ = tween.TweenProperty(sprite, "modulate", flashColor * 1.5f, 0.1f);
+                    _ = tween.TweenProperty(sprite, "modulate", Colors.White, 0.1f);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets effect text for combo.
+        /// </summary>
+        private static string GetEffectText(ComboEffect effect)
+        {
+            return effect.ElementType switch
+            {
+                ElementType.Fire => $"🔥 {effect.Damage} DMG!",
+                ElementType.Heal => $"💚 +{effect.Healing} HP!",
+                ElementType.Sword => $"⚔️ {effect.Damage} DMG!",
+                ElementType.Shield => $"🛡️ +{effect.Shield} Shield!",
+                _ => "Combo!"
+            };
+        }
+
+        /// <summary>
+        /// Gets effect color for element type.
+        /// </summary>
+        private static Color GetEffectColor(ElementType elementType)
+        {
+            return elementType switch
+            {
+                ElementType.Fire => new Color(1.0f, 0.5f, 0.0f),
+                ElementType.Heal => new Color(0.0f, 1.0f, 0.5f),
+                ElementType.Sword => new Color(1.0f, 0.7f, 0.0f),
+                ElementType.Shield => new Color(0.3f, 0.6f, 1.0f),
+                _ => Colors.White
+            };
         }
 
         /// <summary>
@@ -302,7 +413,69 @@ namespace AlJourney.Scripts.UI
             }
 
             // Check for cascade matches after animation
-            GetTree().CreateTimer(0.5f).Timeout += ProcessMatches;
+            GetTree().CreateTimer(0.5f).Timeout += ProcessCascadeMatches;
+        }
+
+        /// <summary>
+        /// Processes cascade matches with bonus.
+        /// </summary>
+        private void ProcessCascadeMatches()
+        {
+            List<MatchResult> matches = _gridManager.FindAllMatches();
+
+            if (matches.Count > 0)
+            {
+                // Get combo effects with cascade bonus
+                List<ComboEffect> effects = _comboSystem.ProcessMatches(matches, isCascade: true);
+
+                // Visualize combo effects with cascade indicator
+                VisualizeComboEffects(effects, matches);
+
+                // Show cascade level indicator
+                int cascadeLevel = _comboSystem.GetCascadeLevel();
+                if (cascadeLevel > 0)
+                {
+                    ShowCascadeIndicator(cascadeLevel);
+                }
+
+                // Animate matched elements
+                foreach (MatchResult match in matches)
+                {
+                    foreach ((int x, int y) in match.MatchedPositions)
+                    {
+                        _visualGrid[x, y]?.PlayMatchAnimation();
+                        _visualGrid[x, y] = null;
+                    }
+                }
+
+                // Process matches in grid manager (with delay)
+                GetTree().CreateTimer(0.4f).Timeout += () =>
+                {
+                    _gridManager.ProcessMatches(matches);
+                };
+            }
+            else
+            {
+                // No more cascades - reset counter
+                _comboSystem.ResetCascade();
+            }
+        }
+
+        /// <summary>
+        /// Shows cascade level indicator.
+        /// </summary>
+        private void ShowCascadeIndicator(int cascadeLevel)
+        {
+            Vector2 centerPos = new Vector2(
+                (_gridSize * (CELL_SIZE + CELL_SPACING)) / 2,
+                (_gridSize * (CELL_SIZE + CELL_SPACING)) / 2
+            );
+
+            string cascadeText = $"⚡ CASCADE x{cascadeLevel}! ⚡";
+            Color cascadeColor = new Color(1.0f, 0.8f, 0.0f); // Golden yellow
+
+            ComboParticles.SpawnFloatingText(this, centerPos, cascadeText, cascadeColor);
+            GD.Print($"[GridUI] Cascade x{cascadeLevel} displayed!");
         }
 
         /// <summary>

@@ -27,8 +27,12 @@ namespace AlJourney.Scripts.Match3
         [Signal]
         public delegate void CombosProcessedEventHandler(int comboCount);
 
+        [Signal]
+        public delegate void CascadeDetectedEventHandler(int cascadeLevel);
+
         // Кэш последних обработанных эффектов для доступа из других систем
         private List<ComboEffect> _lastProcessedEffects = [];
+        private int _currentCascadeLevel;
 
         /// <summary>
         /// Gets the last processed combo effects.
@@ -41,8 +45,20 @@ namespace AlJourney.Scripts.Match3
         /// <summary>
         /// Processes all match results and converts them to combat effects.
         /// </summary>
-        public List<ComboEffect> ProcessMatches(List<MatchResult> matches)
+        public List<ComboEffect> ProcessMatches(List<MatchResult> matches, bool isCascade = false)
         {
+            // Track cascade level
+            if (isCascade)
+            {
+                _currentCascadeLevel++;
+                _ = EmitSignal(SignalName.CascadeDetected, _currentCascadeLevel);
+                GD.Print($"[ComboSystem] Cascade detected! Level: {_currentCascadeLevel}");
+            }
+            else
+            {
+                _currentCascadeLevel = 0;
+            }
+
             List<ComboEffect> comboEffects = [];
 
             foreach (MatchResult match in matches)
@@ -50,6 +66,17 @@ namespace AlJourney.Scripts.Match3
                 ComboEffect effect = CreateComboEffect(match);
                 if (effect != null)
                 {
+                    // Bonus damage/healing for cascades
+                    if (_currentCascadeLevel > 0)
+                    {
+                        float cascadeBonus = 1.0f + (_currentCascadeLevel * 0.2f); // +20% per cascade level
+                        effect.Damage = Mathf.CeilToInt(effect.Damage * cascadeBonus);
+                        effect.Healing = Mathf.CeilToInt(effect.Healing * cascadeBonus);
+                        effect.Shield = Mathf.CeilToInt(effect.Shield * cascadeBonus);
+
+                        GD.Print($"[ComboSystem] Cascade bonus applied: x{cascadeBonus:F1}");
+                    }
+
                     comboEffects.Add(effect);
                 }
             }
@@ -62,6 +89,22 @@ namespace AlJourney.Scripts.Match3
             }
 
             return comboEffects;
+        }
+
+        /// <summary>
+        /// Gets current cascade level.
+        /// </summary>
+        public int GetCascadeLevel()
+        {
+            return _currentCascadeLevel;
+        }
+
+        /// <summary>
+        /// Resets cascade counter (call at start of turn).
+        /// </summary>
+        public void ResetCascade()
+        {
+            _currentCascadeLevel = 0;
         }
 
         /// <summary>
