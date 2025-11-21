@@ -7,7 +7,7 @@ namespace AlJourney.Scripts.Core
     {
         // === MATCH-3 GRID ===
         public const int GRID_SIZE = 5;
-        public const int PLAYER_SWAPS_PER_TURN = 3;
+        public const int PLAYER_SWAPS_PER_TURN = 5;             // Increased from 3 - more dynamic gameplay
         public const int MATCH_MIN_LENGTH = 3;
 
         // === COMBO DAMAGE/EFFECTS ===
@@ -42,8 +42,8 @@ namespace AlJourney.Scripts.Core
         public const float SHIELD_4_REFLECT_PERCENT = 0.2f;
 
         // === DIFFICULTY SCALING ===
-        public const float ENEMY_HP_SCALE_PER_WAVE = 0.15f;
-        public const float ENEMY_DAMAGE_SCALE_PER_WAVE = 0.10f;
+        public const float ENEMY_HP_SCALE_PER_WAVE = 0.08f;     // Reduced from 0.15f - more gradual scaling
+        public const float ENEMY_DAMAGE_SCALE_PER_WAVE = 0.06f; // Reduced from 0.10f - more gradual scaling
         public const int ENEMY_COUNT_INCREASE_EVERY = 5;
         public const int MAX_ENEMIES_PER_WAVE = 5;
         public const int MINIBOSS_WAVE_INTERVAL = 5;
@@ -116,12 +116,12 @@ namespace AlJourney.Scripts.Core
         public const int SHOP_UPGRADE_DAMAGE_MAX = 5;
         public const int SHOP_UPGRADE_DEFENSE_MIN = 1;
         public const int SHOP_UPGRADE_DEFENSE_MAX = 4;
-        public const float SHOP_WAVE_SCALE_FACTOR = 2.5f;
+        public const float SHOP_WAVE_SCALE_FACTOR = 1.8f;       // Reduced from 2.5f - more affordable
 
-        // Coin rewards
-        public const int COINS_PER_BASIC_ENEMY = 5;
-        public const int COINS_PER_MINIBOSS = 25;
-        public const int COINS_PER_BOSS = 100;
+        // Coin rewards (increased for better economy)
+        public const int COINS_PER_BASIC_ENEMY = 8;             // Increased from 5
+        public const int COINS_PER_MINIBOSS = 40;               // Increased from 25
+        public const int COINS_PER_BOSS = 150;                  // Increased from 100
 
         // === SAVE SYSTEM ===
         public const string SAVE_FILE_NAME = "save_data.json";
