@@ -117,7 +117,7 @@ namespace AlJourney.Scripts.UI
         /// </summary>
         private void LoadCurrentSettings()
         {
-            var settings = SettingsManager.Instance;
+            SettingsManager settings = SettingsManager.Instance;
 
             // Video settings
             _fullscreenToggle.ButtonPressed = settings.Fullscreen;
@@ -269,7 +269,7 @@ namespace AlJourney.Scripts.UI
             GD.Print("[SettingsMenuUI] Back pressed");
 
             // Get parent main menu and call back method
-            var mainMenu = GetParent().GetNode<MainMenuUI>("../");
+            MainMenuUI mainMenu = GetParent().GetNode<MainMenuUI>("../");
             mainMenu?.OnBackToMainMenu();
         }
     }

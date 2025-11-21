@@ -14,31 +14,28 @@ namespace AlJourney.Scripts.UI
 
         private TextureRect _sprite;
         private Panel _highlightPanel;
-        private ElementData _data;
-
         private Vector2 _targetPosition;
-        private bool _isAnimating;
         private float _animationSpeed = 10.0f;
 
         /// <summary>
         /// Associated element data.
         /// </summary>
-        public ElementData Data => _data;
+        public ElementData Data { get; private set; }
 
         /// <summary>
         /// Grid X position.
         /// </summary>
-        public int GridX => _data?.X ?? -1;
+        public int GridX => Data?.X ?? -1;
 
         /// <summary>
         /// Grid Y position.
         /// </summary>
-        public int GridY => _data?.Y ?? -1;
+        public int GridY => Data?.Y ?? -1;
 
         /// <summary>
         /// Is element currently animating.
         /// </summary>
-        public bool IsAnimating => _isAnimating;
+        public bool IsAnimating { get; private set; }
 
         public override void _Ready()
         {
@@ -69,7 +66,7 @@ namespace AlJourney.Scripts.UI
         /// </summary>
         public void Initialize(ElementData data, Texture2D texture)
         {
-            _data = data;
+            Data = data;
             _sprite.Texture = texture;
             _targetPosition = Position;
 
@@ -82,7 +79,7 @@ namespace AlJourney.Scripts.UI
         /// </summary>
         public void UpdateData(ElementData newData)
         {
-            _data = newData;
+            Data = newData;
         }
 
         /// <summary>
@@ -112,7 +109,7 @@ namespace AlJourney.Scripts.UI
         public void AnimateToPosition(Vector2 targetPos)
         {
             _targetPosition = targetPos;
-            _isAnimating = true;
+            IsAnimating = true;
         }
 
         /// <summary>
@@ -122,7 +119,7 @@ namespace AlJourney.Scripts.UI
         {
             Position = pos;
             _targetPosition = pos;
-            _isAnimating = false;
+            IsAnimating = false;
         }
 
         /// <summary>
@@ -131,11 +128,11 @@ namespace AlJourney.Scripts.UI
         public void PlayMatchAnimation()
         {
             // Scale down animation
-            var tween = CreateTween();
-            tween.SetParallel(true);
-            tween.TweenProperty(this, "scale", Vector2.Zero, 0.3f).SetEase(Tween.EaseType.In);
-            tween.TweenProperty(this, "modulate:a", 0.0f, 0.3f);
-            tween.Chain().TweenCallback(Callable.From(() => QueueFree()));
+            Tween tween = CreateTween();
+            _ = tween.SetParallel(true);
+            _ = tween.TweenProperty(this, "scale", Vector2.Zero, 0.3f).SetEase(Tween.EaseType.In);
+            _ = tween.TweenProperty(this, "modulate:a", 0.0f, 0.3f);
+            _ = tween.Chain().TweenCallback(Callable.From(QueueFree));
         }
 
         /// <summary>
@@ -143,13 +140,13 @@ namespace AlJourney.Scripts.UI
         /// </summary>
         public void PlaySwapAnimation(Vector2 targetPos, float duration = 0.2f)
         {
-            var tween = CreateTween();
-            tween.TweenProperty(this, "position", targetPos, duration).SetEase(Tween.EaseType.InOut);
+            Tween tween = CreateTween();
+            _ = tween.TweenProperty(this, "position", targetPos, duration).SetEase(Tween.EaseType.InOut);
         }
 
         public override void _Process(double delta)
         {
-            if (_isAnimating)
+            if (IsAnimating)
             {
                 // Smooth movement to target position
                 Position = Position.Lerp(_targetPosition, _animationSpeed * (float)delta);
@@ -158,7 +155,7 @@ namespace AlJourney.Scripts.UI
                 if (Position.DistanceTo(_targetPosition) < 1.0f)
                 {
                     Position = _targetPosition;
-                    _isAnimating = false;
+                    IsAnimating = false;
                 }
             }
         }
@@ -172,7 +169,7 @@ namespace AlJourney.Scripts.UI
             {
                 if (mouseButton.ButtonIndex == MouseButton.Left && mouseButton.Pressed)
                 {
-                    EmitSignal(SignalName.ElementClicked, this);
+                    _ = EmitSignal(SignalName.ElementClicked, this);
                 }
             }
         }

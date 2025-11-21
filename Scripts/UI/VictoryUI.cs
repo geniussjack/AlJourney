@@ -1,3 +1,4 @@
+using AlJourney.Scripts.Data;
 using AlJourney.Scripts.Managers;
 using Godot;
 
@@ -41,7 +42,7 @@ namespace AlJourney.Scripts.UI
         /// </summary>
         private void DisplayStats()
         {
-            var saveData = GameStateManager.Instance.CurrentSave;
+            SaveData saveData = GameStateManager.Instance.CurrentSave;
 
             if (saveData != null)
             {
@@ -83,7 +84,7 @@ namespace AlJourney.Scripts.UI
             AudioManager.Instance.PlaySfx("res://Resources/Audio/SFX/button_click.wav");
 
             // Clear save (optional)
-            SaveSystem.Instance.DeleteSave();
+            _ = SaveSystem.Instance.DeleteSave();
 
             // Return to main menu
             SceneManager.GoToMainMenu();
@@ -99,7 +100,7 @@ namespace AlJourney.Scripts.UI
             AudioManager.Instance.PlaySfx("res://Resources/Audio/SFX/button_click.wav");
 
             // Delete old save
-            SaveSystem.Instance.DeleteSave();
+            _ = SaveSystem.Instance.DeleteSave();
 
             // Start new game
             GameStateManager.Instance.StartNewGame();

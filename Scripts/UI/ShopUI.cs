@@ -1,4 +1,5 @@
 using AlJourney.Scripts.Core;
+using AlJourney.Scripts.Data;
 using AlJourney.Scripts.Managers;
 using Godot;
 
@@ -109,7 +110,7 @@ namespace AlJourney.Scripts.UI
             float scaleFactor = GameConstants.SHOP_WAVE_SCALE_FACTOR;
 
             // Base price increases with wave number
-            int basePrice = Mathf.CeilToInt(10 * (1 + wave * 0.5f));
+            int basePrice = Mathf.CeilToInt(10 * (1 + (wave * 0.5f)));
 
             // Health upgrades (more expensive)
             _mageHealthPrice = Mathf.CeilToInt(basePrice * scaleFactor * 1.2f);
@@ -158,14 +159,7 @@ namespace AlJourney.Scripts.UI
             priceLabel.Text = $"{upgradeText}\n💰 {price}";
 
             // Visual feedback
-            if (canAfford)
-            {
-                priceLabel.Modulate = Colors.White;
-            }
-            else
-            {
-                priceLabel.Modulate = Colors.Gray;
-            }
+            priceLabel.Modulate = canAfford ? Colors.White : Colors.Gray;
         }
 
         /// <summary>
@@ -204,7 +198,7 @@ namespace AlJourney.Scripts.UI
             {
                 GD.Print($"[ShopUI] Cannot afford {upgradeType} upgrade");
                 // Play error sound or shake animation
-                var button = GetUpgradeButton(upgradeType);
+                Button button = GetUpgradeButton(upgradeType);
                 if (button != null)
                 {
                     ShakeButton(button);
@@ -219,7 +213,7 @@ namespace AlJourney.Scripts.UI
             AudioManager.Instance.PlaySfx("res://Resources/Audio/SFX/button_click.wav");
 
             // Animate purchase success
-            var purchasedButton = GetUpgradeButton(upgradeType);
+            Button purchasedButton = GetUpgradeButton(upgradeType);
             if (purchasedButton != null)
             {
                 PulseButton(purchasedButton);
@@ -255,10 +249,10 @@ namespace AlJourney.Scripts.UI
         private void ShakeButton(Button button)
         {
             Vector2 originalPos = button.Position;
-            var tween = CreateTween();
-            tween.TweenProperty(button, "position:x", originalPos.X + 5, 0.05f);
-            tween.TweenProperty(button, "position:x", originalPos.X - 5, 0.05f);
-            tween.TweenProperty(button, "position:x", originalPos.X, 0.05f);
+            Tween tween = CreateTween();
+            _ = tween.TweenProperty(button, "position:x", originalPos.X + 5, 0.05f);
+            _ = tween.TweenProperty(button, "position:x", originalPos.X - 5, 0.05f);
+            _ = tween.TweenProperty(button, "position:x", originalPos.X, 0.05f);
         }
 
         /// <summary>
@@ -266,9 +260,9 @@ namespace AlJourney.Scripts.UI
         /// </summary>
         private void PulseButton(Button button)
         {
-            var tween = CreateTween();
-            tween.TweenProperty(button, "scale", new Vector2(1.1f, 1.1f), 0.1f);
-            tween.TweenProperty(button, "scale", Vector2.One, 0.1f);
+            Tween tween = CreateTween();
+            _ = tween.TweenProperty(button, "scale", new Vector2(1.1f, 1.1f), 0.1f);
+            _ = tween.TweenProperty(button, "scale", Vector2.One, 0.1f);
         }
 
         /// <summary>
@@ -293,8 +287,11 @@ namespace AlJourney.Scripts.UI
         /// </summary>
         private static void ApplyUpgrade(UpgradeType type)
         {
-            var saveData = GameStateManager.Instance.CurrentSave;
-            if (saveData == null) return;
+            SaveData saveData = GameStateManager.Instance.CurrentSave;
+            if (saveData == null)
+            {
+                return;
+            }
 
             switch (type)
             {
@@ -338,7 +335,7 @@ namespace AlJourney.Scripts.UI
             }
 
             // Emit signal for stat change
-            GameStateManager.Instance.EmitSignal(GameStateManager.SignalName.HeroStatsChanged);
+            _ = GameStateManager.Instance.EmitSignal(GameStateManager.SignalName.HeroStatsChanged);
         }
 
         /// <summary>
@@ -351,7 +348,7 @@ namespace AlJourney.Scripts.UI
             AudioManager.Instance.PlaySfx("res://Resources/Audio/SFX/button_click.wav");
 
             // Save game before continuing
-            SaveSystem.Instance.SaveGame();
+            _ = SaveSystem.Instance.SaveGame();
 
             // Return to battle
             SceneManager.ReturnToBattle();

@@ -129,18 +129,7 @@ namespace AlJourney.Scripts.UI
 
             // Color coding based on health percentage
             float healthPercent = (float)currentHealth / maxHealth;
-            if (healthPercent > 0.5f)
-            {
-                healthBar.Modulate = Colors.Green;
-            }
-            else if (healthPercent > 0.25f)
-            {
-                healthBar.Modulate = Colors.Yellow;
-            }
-            else
-            {
-                healthBar.Modulate = Colors.Red;
-            }
+            healthBar.Modulate = healthPercent > 0.5f ? Colors.Green : healthPercent > 0.25f ? Colors.Yellow : Colors.Red;
         }
 
         /// <summary>
@@ -180,7 +169,7 @@ namespace AlJourney.Scripts.UI
             // Create health bar for each enemy
             foreach (Enemy enemy in enemies)
             {
-                var enemyBar = new EnemyHealthBar();
+                EnemyHealthBar enemyBar = new();
                 enemyBar.Initialize(enemy);
                 _enemiesContainer.AddChild(enemyBar);
                 _enemyHealthBars.Add(enemyBar);
@@ -194,7 +183,7 @@ namespace AlJourney.Scripts.UI
         /// </summary>
         private void ClearEnemies()
         {
-            foreach (var bar in _enemyHealthBars)
+            foreach (EnemyHealthBar bar in _enemyHealthBars)
             {
                 bar.QueueFree();
             }
@@ -306,18 +295,7 @@ namespace AlJourney.Scripts.UI
             _nameLabel.Text = _enemy.CharacterName;
             UpdateHealth(_enemy.CurrentHealth, _enemy.MaxHealth);
 
-            if (_enemy.IsBoss)
-            {
-                _healthBar.Modulate = Colors.Purple;
-            }
-            else if (_enemy.IsMiniboss)
-            {
-                _healthBar.Modulate = Colors.Orange;
-            }
-            else
-            {
-                _healthBar.Modulate = Colors.Red;
-            }
+            _healthBar.Modulate = _enemy.IsBoss ? Colors.Purple : _enemy.IsMiniboss ? Colors.Orange : Colors.Red;
         }
 
         private void OnHealthChanged(int currentHealth, int maxHealth)
@@ -334,9 +312,9 @@ namespace AlJourney.Scripts.UI
 
         private void OnEnemyDied()
         {
-            var tween = CreateTween();
-            tween.TweenProperty(this, "modulate:a", 0.0f, 0.5f);
-            tween.TweenCallback(Callable.From(() => QueueFree()));
+            Tween tween = CreateTween();
+            _ = tween.TweenProperty(this, "modulate:a", 0.0f, 0.5f);
+            _ = tween.TweenCallback(Callable.From(QueueFree));
         }
 
         public override void _ExitTree()

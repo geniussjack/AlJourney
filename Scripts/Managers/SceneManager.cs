@@ -1,4 +1,5 @@
 using AlJourney.Scripts.Core;
+using AlJourney.Scripts.Data;
 using Godot;
 using System.Collections.Generic;
 
@@ -10,12 +11,10 @@ namespace AlJourney.Scripts.Managers
     /// </summary>
     public partial class SceneManager : Node
     {
-        private static SceneManager _instance;
-
         /// <summary>
         /// Singleton instance accessor.
         /// </summary>
-        public static SceneManager Instance => _instance;
+        public static SceneManager Instance { get; private set; }
 
         [Signal]
         public delegate void SceneLoadStartedEventHandler(string sceneName);
@@ -38,17 +37,17 @@ namespace AlJourney.Scripts.Managers
 
         public override void _Ready()
         {
-            if (_instance != null && _instance != this)
+            if (Instance != null && Instance != this)
             {
                 QueueFree();
                 return;
             }
 
-            _instance = this;
+            Instance = this;
             _isTransitioning = false;
 
             // Get initial scene
-            var root = GetTree().Root;
+            Window root = GetTree().Root;
             _currentScene = root.GetChild(root.GetChildCount() - 1);
 
             GD.Print("[SceneManager] Initialized");
@@ -79,20 +78,20 @@ namespace AlJourney.Scripts.Managers
             }
 
             // FIX: Используем nameof вместо строки
-            CallDeferred(nameof(DeferredSceneChange), scenePath);
+            _ = CallDeferred(nameof(DeferredSceneChange), scenePath);
         }
 
         // FIX: Метод должен быть public для CallDeferred
         public void DeferredSceneChange(string scenePath)
         {
             _isTransitioning = true;
-            EmitSignal(SignalName.SceneLoadStarted, scenePath);
+            _ = EmitSignal(SignalName.SceneLoadStarted, scenePath);
 
             // Free current scene
             _currentScene?.QueueFree();
 
             // Load new scene
-            var newSceneResource = GD.Load<PackedScene>(scenePath);
+            PackedScene newSceneResource = GD.Load<PackedScene>(scenePath);
             if (newSceneResource is null)
             {
                 GD.PrintErr($"[SceneManager] Failed to load scene: {scenePath}");
@@ -105,7 +104,7 @@ namespace AlJourney.Scripts.Managers
             GetTree().CurrentScene = _currentScene;
 
             _isTransitioning = false;
-            EmitSignal(SignalName.SceneLoadCompleted, scenePath);
+            _ = EmitSignal(SignalName.SceneLoadCompleted, scenePath);
 
             GD.Print($"[SceneManager] Scene loaded: {scenePath}");
         }
@@ -115,7 +114,10 @@ namespace AlJourney.Scripts.Managers
         /// </summary>
         public void ReloadCurrentScene()
         {
-            if (_currentScene == null) return;
+            if (_currentScene == null)
+            {
+                return;
+            }
 
             string scenePath = _currentScene.SceneFilePath;
             if (!string.IsNullOrEmpty(scenePath))
@@ -147,7 +149,7 @@ namespace AlJourney.Scripts.Managers
         /// </summary>
         public static void ContinueGame()
         {
-            var saveData = SaveSystem.Instance.LoadGame();
+            SaveData saveData = SaveSystem.Instance.LoadGame();
             if (saveData != null)
             {
                 GameStateManager.Instance.LoadGame(saveData);

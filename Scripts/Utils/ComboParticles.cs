@@ -14,7 +14,7 @@ namespace AlJourney.Scripts.Utils
         /// </summary>
         public static void SpawnComboEffect(Node parent, Vector2 position, ElementType elementType, int comboLevel)
         {
-            var particles = new CpuParticles2D
+            CpuParticles2D particles = new()
             {
                 Position = position,
                 Emitting = true,
@@ -34,8 +34,8 @@ namespace AlJourney.Scripts.Utils
             parent.AddChild(particles);
 
             // Auto-delete after lifetime
-            var timer = parent.GetTree().CreateTimer(particles.Lifetime + 0.1f);
-            timer.Timeout += () => particles.QueueFree();
+            SceneTreeTimer timer = parent.GetTree().CreateTimer(particles.Lifetime + 0.1f);
+            timer.Timeout += particles.QueueFree;
 
             GD.Print($"[ComboParticles] Spawned {elementType} particles (combo {comboLevel})");
         }
@@ -74,7 +74,7 @@ namespace AlJourney.Scripts.Utils
         /// </summary>
         public static void SpawnFloatingText(Node parent, Vector2 position, string text, Color color)
         {
-            var label = new Label
+            Label label = new()
             {
                 Position = position,
                 Text = text,
@@ -85,11 +85,11 @@ namespace AlJourney.Scripts.Utils
             parent.AddChild(label);
 
             // Animate upward and fade out
-            var tween = label.CreateTween();
-            tween.SetParallel(true);
-            tween.TweenProperty(label, "position:y", position.Y - 50, 1.0f);
-            tween.TweenProperty(label, "modulate:a", 0.0f, 1.0f);
-            tween.Chain().TweenCallback(Callable.From(() => label.QueueFree()));
+            Tween tween = label.CreateTween();
+            _ = tween.SetParallel(true);
+            _ = tween.TweenProperty(label, "position:y", position.Y - 50, 1.0f);
+            _ = tween.TweenProperty(label, "modulate:a", 0.0f, 1.0f);
+            _ = tween.Chain().TweenCallback(Callable.From(label.QueueFree));
         }
 
         /// <summary>

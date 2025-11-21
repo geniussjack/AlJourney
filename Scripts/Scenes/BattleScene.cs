@@ -1,5 +1,6 @@
 using AlJourney.Scripts.Battle;
 using AlJourney.Scripts.Characters;
+using AlJourney.Scripts.Data;
 using AlJourney.Scripts.Managers;
 using AlJourney.Scripts.Match3;
 using AlJourney.Scripts.UI;
@@ -70,7 +71,7 @@ namespace AlJourney.Scripts.Scenes
         /// </summary>
         private void InitializeHeroes()
         {
-            var saveData = _gameStateManager.CurrentSave;
+            SaveData saveData = _gameStateManager.CurrentSave;
 
             if (saveData != null)
             {
@@ -121,10 +122,7 @@ namespace AlJourney.Scripts.Scenes
             SaveHeroStats();
 
             // Transition to shop
-            GetTree().CreateTimer(1.0f).Timeout += () =>
-            {
-                SceneManager.GoToShop();
-            };
+            GetTree().CreateTimer(1.0f).Timeout += SceneManager.GoToShop;
         }
 
         /// <summary>
@@ -137,10 +135,7 @@ namespace AlJourney.Scripts.Scenes
                 GD.Print("[BattleScene] Battle lost - transitioning to Game Over...");
 
                 // Transition to game over screen
-                GetTree().CreateTimer(1.5f).Timeout += () =>
-                {
-                    SceneManager.GameOver();
-                };
+                GetTree().CreateTimer(1.5f).Timeout += SceneManager.GameOver;
             }
         }
 
@@ -149,7 +144,7 @@ namespace AlJourney.Scripts.Scenes
         /// </summary>
         private void SaveHeroStats()
         {
-            var (mageHealth, mageMaxHealth, mageDamage, mageDefense, warriorHealth, warriorMaxHealth, warriorDamage, warriorDefense) = _heroSystem.GetCombinedStats();
+            (int mageHealth, int mageMaxHealth, int mageDamage, int mageDefense, int warriorHealth, int warriorMaxHealth, int warriorDamage, int warriorDefense) = _heroSystem.GetCombinedStats();
             _gameStateManager.UpdateHeroStats(
                 mageHealth, mageMaxHealth, mageDamage, mageDefense,
                 warriorHealth, warriorMaxHealth, warriorDamage, warriorDefense

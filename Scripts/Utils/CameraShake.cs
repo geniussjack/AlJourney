@@ -33,7 +33,10 @@ namespace AlJourney.Scripts.Utils
 
         public override void _Process(double delta)
         {
-            if (!_isShaking || _camera == null) return;
+            if (!_isShaking || _camera == null)
+            {
+                return;
+            }
 
             _shakeTimer -= (float)delta;
 
@@ -47,9 +50,9 @@ namespace AlJourney.Scripts.Utils
             {
                 // Apply shake
                 float currentIntensity = _shakeIntensity * (_shakeTimer / _shakeDuration);
-                Vector2 randomOffset = new Vector2(
-                    GD.Randf() * currentIntensity * 2 - currentIntensity,
-                    GD.Randf() * currentIntensity * 2 - currentIntensity
+                Vector2 randomOffset = new(
+                    (GD.Randf() * currentIntensity * 2) - currentIntensity,
+                    (GD.Randf() * currentIntensity * 2) - currentIntensity
                 );
                 _camera.Offset = _originalOffset + randomOffset;
             }
@@ -62,7 +65,10 @@ namespace AlJourney.Scripts.Utils
         /// <param name="duration">Shake duration in seconds</param>
         public void Shake(float intensity = 10.0f, float duration = 0.3f)
         {
-            if (_camera == null) return;
+            if (_camera == null)
+            {
+                return;
+            }
 
             _shakeIntensity = intensity;
             _shakeDuration = duration;
@@ -102,10 +108,7 @@ namespace AlJourney.Scripts.Utils
         public void StopShake()
         {
             _isShaking = false;
-            if (_camera != null)
-            {
-                _camera.Offset = _originalOffset;
-            }
+            _ = _camera?.Offset = _originalOffset;
         }
     }
 }

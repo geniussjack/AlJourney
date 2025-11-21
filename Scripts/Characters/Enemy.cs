@@ -8,38 +8,36 @@ namespace AlJourney.Scripts.Characters
     /// </summary>
     public partial class Enemy : Character
     {
-        private EnemyType _enemyType;
         private int _waveNumber;
-        private int _coinReward;
 
         /// <summary>
         /// Type of enemy.
         /// </summary>
-        public EnemyType EnemyType => _enemyType;
+        public EnemyType EnemyType { get; private set; }
 
         /// <summary>
         /// Coin reward for defeating this enemy.
         /// </summary>
-        public int CoinReward => _coinReward;
+        public int CoinReward { get; private set; }
 
         /// <summary>
         /// Is this a miniboss.
         /// </summary>
-        public bool IsMiniboss => _enemyType == EnemyType.GeneralOfDraugr || _enemyType == EnemyType.Arhiskeleton;
+        public bool IsMiniboss => EnemyType is EnemyType.GeneralOfDraugr or EnemyType.Arhiskeleton;
 
         /// <summary>
         /// Is this the boss.
         /// </summary>
-        public bool IsBoss => _enemyType == EnemyType.Necromancer;
+        public bool IsBoss => EnemyType == EnemyType.Necromancer;
 
         /// <summary>
         /// Creates an enemy of specified type scaled to wave number.
         /// </summary>
         public static Enemy Create(EnemyType enemyType, int waveNumber)
         {
-            var enemy = new Enemy
+            Enemy enemy = new()
             {
-                _enemyType = enemyType,
+                EnemyType = enemyType,
                 _waveNumber = waveNumber
             };
 
@@ -47,11 +45,11 @@ namespace AlJourney.Scripts.Characters
             (string name, int baseHp, int baseDmg, int baseDef, AttackType attackType, int coinReward) = GetEnemyBaseStats(enemyType);
 
             // Apply wave scaling
-            int scaledHp = Mathf.CeilToInt(baseHp * (1 + waveNumber * GameConstants.ENEMY_HP_SCALE_PER_WAVE));
-            int scaledDmg = Mathf.CeilToInt(baseDmg * (1 + waveNumber * GameConstants.ENEMY_DAMAGE_SCALE_PER_WAVE));
+            int scaledHp = Mathf.CeilToInt(baseHp * (1 + (waveNumber * GameConstants.ENEMY_HP_SCALE_PER_WAVE)));
+            int scaledDmg = Mathf.CeilToInt(baseDmg * (1 + (waveNumber * GameConstants.ENEMY_DAMAGE_SCALE_PER_WAVE)));
 
             enemy.Initialize(name, scaledHp, scaledDmg, baseDef, attackType);
-            enemy._coinReward = coinReward;
+            enemy.CoinReward = coinReward;
 
             GD.Print($"[Enemy] Created {name} (Wave {waveNumber}) - HP: {scaledHp}, DMG: {scaledDmg}");
             return enemy;
@@ -155,12 +153,15 @@ namespace AlJourney.Scripts.Characters
         /// </summary>
         public int PerformAttack()
         {
-            if (!IsAlive || IsStunned) return 0;
+            if (!IsAlive || IsStunned)
+            {
+                return 0;
+            }
 
             int damage = _baseDamage;
 
             // Special enemy abilities
-            switch (_enemyType)
+            switch (EnemyType)
             {
                 case EnemyType.Arhiskeleton:
                     // Fires multiple arrows
@@ -200,8 +201,10 @@ namespace AlJourney.Scripts.Characters
         /// </summary>
         public NecromancerAbility GetNecromancerAbility(int turnNumber)
         {
-            if (_enemyType != EnemyType.Necromancer)
+            if (EnemyType != EnemyType.Necromancer)
+            {
                 return NecromancerAbility.None;
+            }
 
             // Rotate abilities every turn
             return (NecromancerAbility)((turnNumber % 3) + 1);

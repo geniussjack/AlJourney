@@ -43,17 +43,17 @@ namespace AlJourney.Scripts.Utils
             GD.Print($"[SceneTransition] Transitioning to: {scenePath}");
 
             // Fade out
-            var tween = CreateTween();
-            tween.TweenProperty(_fadeRect, "modulate:a", 1.0f, duration / 2);
-            tween.TweenCallback(Callable.From(() =>
+            Tween tween = CreateTween();
+            _ = tween.TweenProperty(_fadeRect, "modulate:a", 1.0f, duration / 2);
+            _ = tween.TweenCallback(Callable.From(() =>
             {
                 // Change scene
-                GetTree().ChangeSceneToFile(scenePath);
+                _ = GetTree().ChangeSceneToFile(scenePath);
 
                 // Fade in
-                var fadeTween = CreateTween();
-                fadeTween.TweenProperty(_fadeRect, "modulate:a", 0.0f, duration / 2);
-                fadeTween.TweenCallback(Callable.From(() =>
+                Tween fadeTween = CreateTween();
+                _ = fadeTween.TweenProperty(_fadeRect, "modulate:a", 0.0f, duration / 2);
+                _ = fadeTween.TweenCallback(Callable.From(() =>
                 {
                     _isTransitioning = false;
                 }));
@@ -65,8 +65,8 @@ namespace AlJourney.Scripts.Utils
         /// </summary>
         public void FadeOut(float duration = 0.3f)
         {
-            var tween = CreateTween();
-            tween.TweenProperty(_fadeRect, "modulate:a", 1.0f, duration);
+            Tween tween = CreateTween();
+            _ = tween.TweenProperty(_fadeRect, "modulate:a", 1.0f, duration);
         }
 
         /// <summary>
@@ -74,8 +74,8 @@ namespace AlJourney.Scripts.Utils
         /// </summary>
         public void FadeIn(float duration = 0.3f)
         {
-            var tween = CreateTween();
-            tween.TweenProperty(_fadeRect, "modulate:a", 0.0f, duration);
+            Tween tween = CreateTween();
+            _ = tween.TweenProperty(_fadeRect, "modulate:a", 0.0f, duration);
         }
 
         /// <summary>
@@ -86,10 +86,10 @@ namespace AlJourney.Scripts.Utils
             Color originalColor = _fadeRect.Color;
             _fadeRect.Color = color;
 
-            var tween = CreateTween();
-            tween.TweenProperty(_fadeRect, "modulate:a", 0.7f, duration / 2);
-            tween.TweenProperty(_fadeRect, "modulate:a", 0.0f, duration / 2);
-            tween.TweenCallback(Callable.From(() =>
+            Tween tween = CreateTween();
+            _ = tween.TweenProperty(_fadeRect, "modulate:a", 0.7f, duration / 2);
+            _ = tween.TweenProperty(_fadeRect, "modulate:a", 0.0f, duration / 2);
+            _ = tween.TweenCallback(Callable.From(() =>
             {
                 _fadeRect.Color = originalColor;
             }));

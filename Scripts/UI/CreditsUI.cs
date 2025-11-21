@@ -73,7 +73,7 @@ C# / .NET 8.0
             AudioManager.Instance.PlaySfx("res://Resources/Audio/SFX/button_click.wav");
 
             // Get parent main menu and call back method
-            var mainMenu = GetParent().GetNode<MainMenuUI>("../");
+            MainMenuUI mainMenu = GetParent().GetNode<MainMenuUI>("../");
             mainMenu?.OnBackToMainMenu();
         }
     }

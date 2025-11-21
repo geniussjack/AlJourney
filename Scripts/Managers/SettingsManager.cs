@@ -8,12 +8,10 @@ namespace AlJourney.Scripts.Managers
     /// </summary>
     public partial class SettingsManager : Node
     {
-        private static SettingsManager _instance;
-
         /// <summary>
         /// Singleton instance accessor.
         /// </summary>
-        public static SettingsManager Instance => _instance;
+        public static SettingsManager Instance { get; private set; }
 
         [Signal]
         public delegate void SettingsChangedEventHandler();
@@ -23,14 +21,8 @@ namespace AlJourney.Scripts.Managers
 
         // Video settings
         private Vector2I _resolution = new(1920, 1080);
-        private bool _fullscreen = true;
-        private bool _vsync = true;
-        private int _maxFps = 60;
 
         // Audio settings
-        private float _masterVolume = 1.0f;
-        private float _musicVolume = 0.7f;
-        private float _sfxVolume = 0.8f;
 
         /// <summary>
         /// Current screen resolution.
@@ -40,42 +32,42 @@ namespace AlJourney.Scripts.Managers
         /// <summary>
         /// Is fullscreen enabled.
         /// </summary>
-        public bool Fullscreen => _fullscreen;
+        public bool Fullscreen { get; private set; } = true;
 
         /// <summary>
         /// Is VSync enabled.
         /// </summary>
-        public bool VSync => _vsync;
+        public bool VSync { get; private set; } = true;
 
         /// <summary>
         /// Maximum FPS limit (0 = unlimited).
         /// </summary>
-        public int MaxFps => _maxFps;
+        public int MaxFps { get; private set; } = 60;
 
         /// <summary>
         /// Master volume (0.0 to 1.0).
         /// </summary>
-        public float MasterVolume => _masterVolume;
+        public float MasterVolume { get; private set; } = 1.0f;
 
         /// <summary>
         /// Music volume (0.0 to 1.0).
         /// </summary>
-        public float MusicVolume => _musicVolume;
+        public float MusicVolume { get; private set; } = 0.7f;
 
         /// <summary>
         /// SFX volume (0.0 to 1.0).
         /// </summary>
-        public float SfxVolume => _sfxVolume;
+        public float SfxVolume { get; private set; } = 0.8f;
 
         public override void _Ready()
         {
-            if (_instance != null && _instance != this)
+            if (Instance != null && Instance != this)
             {
                 QueueFree();
                 return;
             }
 
-            _instance = this;
+            Instance = this;
             LoadSettings();
             ApplySettings();
 
@@ -102,7 +94,7 @@ namespace AlJourney.Scripts.Managers
         /// </summary>
         public void SetFullscreen(bool enabled, bool applyImmediately = true)
         {
-            _fullscreen = enabled;
+            Fullscreen = enabled;
 
             if (applyImmediately)
             {
@@ -117,7 +109,7 @@ namespace AlJourney.Scripts.Managers
         /// </summary>
         public void SetVSync(bool enabled, bool applyImmediately = true)
         {
-            _vsync = enabled;
+            VSync = enabled;
 
             if (applyImmediately)
             {
@@ -132,7 +124,7 @@ namespace AlJourney.Scripts.Managers
         /// </summary>
         public void SetMaxFps(int fps, bool applyImmediately = true)
         {
-            _maxFps = fps;
+            MaxFps = fps;
 
             if (applyImmediately)
             {
@@ -147,9 +139,9 @@ namespace AlJourney.Scripts.Managers
         /// </summary>
         public void SetMasterVolume(float volume)
         {
-            _masterVolume = Mathf.Clamp(volume, 0.0f, 1.0f);
-            AudioManager.Instance.MasterVolume = _masterVolume;
-            GD.Print($"[SettingsManager] Master volume: {_masterVolume:F2}");
+            MasterVolume = Mathf.Clamp(volume, 0.0f, 1.0f);
+            AudioManager.Instance.MasterVolume = MasterVolume;
+            GD.Print($"[SettingsManager] Master volume: {MasterVolume:F2}");
         }
 
         /// <summary>
@@ -157,9 +149,9 @@ namespace AlJourney.Scripts.Managers
         /// </summary>
         public void SetMusicVolume(float volume)
         {
-            _musicVolume = Mathf.Clamp(volume, 0.0f, 1.0f);
-            AudioManager.Instance.MusicVolume = _musicVolume;
-            GD.Print($"[SettingsManager] Music volume: {_musicVolume:F2}");
+            MusicVolume = Mathf.Clamp(volume, 0.0f, 1.0f);
+            AudioManager.Instance.MusicVolume = MusicVolume;
+            GD.Print($"[SettingsManager] Music volume: {MusicVolume:F2}");
         }
 
         /// <summary>
@@ -167,9 +159,9 @@ namespace AlJourney.Scripts.Managers
         /// </summary>
         public void SetSfxVolume(float volume)
         {
-            _sfxVolume = Mathf.Clamp(volume, 0.0f, 1.0f);
-            AudioManager.Instance.SfxVolume = _sfxVolume;
-            GD.Print($"[SettingsManager] SFX volume: {_sfxVolume:F2}");
+            SfxVolume = Mathf.Clamp(volume, 0.0f, 1.0f);
+            AudioManager.Instance.SfxVolume = SfxVolume;
+            GD.Print($"[SettingsManager] SFX volume: {SfxVolume:F2}");
         }
 
         /// <summary>
@@ -177,13 +169,13 @@ namespace AlJourney.Scripts.Managers
         /// </summary>
         public void ApplyVideoSettings()
         {
-            var window = GetWindow();
+            Window window = GetWindow();
 
             // Set resolution
             window.Size = _resolution;
 
             // Set fullscreen mode
-            if (_fullscreen)
+            if (Fullscreen)
             {
                 window.Mode = Window.ModeEnum.Fullscreen;
             }
@@ -194,14 +186,14 @@ namespace AlJourney.Scripts.Managers
             }
 
             // Set VSync
-            DisplayServer.WindowSetVsyncMode(_vsync
+            DisplayServer.WindowSetVsyncMode(VSync
                 ? DisplayServer.VSyncMode.Enabled
                 : DisplayServer.VSyncMode.Disabled);
 
             // Set FPS limit
-            Engine.MaxFps = _maxFps;
+            Engine.MaxFps = MaxFps;
 
-            EmitSignal(SignalName.SettingsChanged);
+            _ = EmitSignal(SignalName.SettingsChanged);
             GD.Print("[SettingsManager] Video settings applied");
         }
 
@@ -211,9 +203,9 @@ namespace AlJourney.Scripts.Managers
         private void ApplySettings()
         {
             ApplyVideoSettings();
-            AudioManager.Instance.MasterVolume = _masterVolume;
-            AudioManager.Instance.MusicVolume = _musicVolume;
-            AudioManager.Instance.SfxVolume = _sfxVolume;
+            AudioManager.Instance.MasterVolume = MasterVolume;
+            AudioManager.Instance.MusicVolume = MusicVolume;
+            AudioManager.Instance.SfxVolume = SfxVolume;
         }
 
         /// <summary>
@@ -221,19 +213,19 @@ namespace AlJourney.Scripts.Managers
         /// </summary>
         public void SaveSettings()
         {
-            var config = new ConfigFile();
+            ConfigFile config = new();
 
             // Video
             config.SetValue("video", "resolution_x", _resolution.X);
             config.SetValue("video", "resolution_y", _resolution.Y);
-            config.SetValue("video", "fullscreen", _fullscreen);
-            config.SetValue("video", "vsync", _vsync);
-            config.SetValue("video", "max_fps", _maxFps);
+            config.SetValue("video", "fullscreen", Fullscreen);
+            config.SetValue("video", "vsync", VSync);
+            config.SetValue("video", "max_fps", MaxFps);
 
             // Audio
-            config.SetValue("audio", "master_volume", _masterVolume);
-            config.SetValue("audio", "music_volume", _musicVolume);
-            config.SetValue("audio", "sfx_volume", _sfxVolume);
+            config.SetValue("audio", "master_volume", MasterVolume);
+            config.SetValue("audio", "music_volume", MusicVolume);
+            config.SetValue("audio", "sfx_volume", SfxVolume);
 
             Error err = config.Save(SettingsPath);
             if (err != Error.Ok)
@@ -251,7 +243,7 @@ namespace AlJourney.Scripts.Managers
         /// </summary>
         private void LoadSettings()
         {
-            var config = new ConfigFile();
+            ConfigFile config = new();
             Error err = config.Load(SettingsPath);
 
             if (err != Error.Ok)
@@ -265,14 +257,14 @@ namespace AlJourney.Scripts.Managers
                 (int)config.GetValue("video", "resolution_x", 1920),
                 (int)config.GetValue("video", "resolution_y", 1080)
             );
-            _fullscreen = (bool)config.GetValue("video", "fullscreen", true);
-            _vsync = (bool)config.GetValue("video", "vsync", true);
-            _maxFps = (int)config.GetValue("video", "max_fps", 60);
+            Fullscreen = (bool)config.GetValue("video", "fullscreen", true);
+            VSync = (bool)config.GetValue("video", "vsync", true);
+            MaxFps = (int)config.GetValue("video", "max_fps", 60);
 
             // Audio
-            _masterVolume = (float)config.GetValue("audio", "master_volume", 1.0f);
-            _musicVolume = (float)config.GetValue("audio", "music_volume", 0.7f);
-            _sfxVolume = (float)config.GetValue("audio", "sfx_volume", 0.8f);
+            MasterVolume = (float)config.GetValue("audio", "master_volume", 1.0f);
+            MusicVolume = (float)config.GetValue("audio", "music_volume", 0.7f);
+            SfxVolume = (float)config.GetValue("audio", "sfx_volume", 0.8f);
 
             GD.Print("[SettingsManager] Settings loaded");
         }
@@ -283,12 +275,12 @@ namespace AlJourney.Scripts.Managers
         public void ResetToDefaults()
         {
             _resolution = new Vector2I(1920, 1080);
-            _fullscreen = true;
-            _vsync = true;
-            _maxFps = 60;
-            _masterVolume = 1.0f;
-            _musicVolume = 0.7f;
-            _sfxVolume = 0.8f;
+            Fullscreen = true;
+            VSync = true;
+            MaxFps = 60;
+            MasterVolume = 1.0f;
+            MusicVolume = 0.7f;
+            SfxVolume = 0.8f;
 
             ApplySettings();
             SaveSettings();

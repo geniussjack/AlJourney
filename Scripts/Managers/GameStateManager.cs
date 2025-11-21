@@ -10,12 +10,10 @@ namespace AlJourney.Scripts.Managers
     /// </summary>
     public partial class GameStateManager : Node
     {
-        private static GameStateManager _instance;
-
         /// <summary>
         /// Singleton instance accessor.
         /// </summary>
-        public static GameStateManager Instance => _instance;
+        public static GameStateManager Instance { get; private set; }
 
         // Signals
         [Signal]
@@ -32,8 +30,6 @@ namespace AlJourney.Scripts.Managers
 
         // Current game state
         private GameState _currentState;
-        private SaveData _currentSaveData;
-        private bool _isGameActive;
 
         /// <summary>
         /// Current game flow state.
@@ -46,7 +42,7 @@ namespace AlJourney.Scripts.Managers
                 if (_currentState != value)
                 {
                     _currentState = value;
-                    EmitSignal(SignalName.StateChanged, (int)value);
+                    _ = EmitSignal(SignalName.StateChanged, (int)value);
                 }
             }
         }
@@ -54,34 +50,34 @@ namespace AlJourney.Scripts.Managers
         /// <summary>
         /// Active save data reference.
         /// </summary>
-        public SaveData CurrentSave => _currentSaveData;
+        public SaveData CurrentSave { get; private set; }
 
         /// <summary>
         /// Current wave number.
         /// </summary>
-        public int CurrentWave => _currentSaveData?.CurrentWave ?? 1;
+        public int CurrentWave => CurrentSave?.CurrentWave ?? 1;
 
         /// <summary>
         /// Player's total coins.
         /// </summary>
-        public int Coins => _currentSaveData?.Coins ?? 0;
+        public int Coins => CurrentSave?.Coins ?? 0;
 
         /// <summary>
         /// Is a game session currently active.
         /// </summary>
-        public bool IsGameActive => _isGameActive;
+        public bool IsGameActive { get; private set; }
 
         public override void _Ready()
         {
-            if (_instance != null && _instance != this)
+            if (Instance != null && Instance != this)
             {
                 QueueFree();
                 return;
             }
 
-            _instance = this;
+            Instance = this;
             _currentState = GameState.MainMenu;
-            _isGameActive = false;
+            IsGameActive = false;
 
             GD.Print("[GameStateManager] Initialized");
         }
@@ -91,13 +87,13 @@ namespace AlJourney.Scripts.Managers
         /// </summary>
         public void StartNewGame()
         {
-            _currentSaveData = SaveData.CreateNew();
-            _isGameActive = true;
+            CurrentSave = SaveData.CreateNew();
+            IsGameActive = true;
             CurrentState = GameState.Battle;
 
-            EmitSignal(SignalName.WaveChanged, _currentSaveData.CurrentWave);
-            EmitSignal(SignalName.CoinsChanged, _currentSaveData.Coins);
-            EmitSignal(SignalName.HeroStatsChanged);
+            _ = EmitSignal(SignalName.WaveChanged, CurrentSave.CurrentWave);
+            _ = EmitSignal(SignalName.CoinsChanged, CurrentSave.Coins);
+            _ = EmitSignal(SignalName.HeroStatsChanged);
 
             GD.Print("[GameStateManager] New game started with dual heroes - Wave 1");
         }
@@ -107,15 +103,15 @@ namespace AlJourney.Scripts.Managers
         /// </summary>
         public void LoadGame(SaveData saveData)
         {
-            _currentSaveData = saveData;
-            _isGameActive = true;
+            CurrentSave = saveData;
+            IsGameActive = true;
             CurrentState = GameState.Battle;
 
-            EmitSignal(SignalName.WaveChanged, _currentSaveData.CurrentWave);
-            EmitSignal(SignalName.CoinsChanged, _currentSaveData.Coins);
-            EmitSignal(SignalName.HeroStatsChanged);
+            _ = EmitSignal(SignalName.WaveChanged, CurrentSave.CurrentWave);
+            _ = EmitSignal(SignalName.CoinsChanged, CurrentSave.Coins);
+            _ = EmitSignal(SignalName.HeroStatsChanged);
 
-            GD.Print($"[GameStateManager] Game loaded - Wave {_currentSaveData.CurrentWave}");
+            GD.Print($"[GameStateManager] Game loaded - Wave {CurrentSave.CurrentWave}");
         }
 
         /// <summary>
@@ -123,12 +119,15 @@ namespace AlJourney.Scripts.Managers
         /// </summary>
         public void NextWave()
         {
-            if (_currentSaveData == null) return;
+            if (CurrentSave == null)
+            {
+                return;
+            }
 
-            _currentSaveData.CurrentWave++;
-            EmitSignal(SignalName.WaveChanged, _currentSaveData.CurrentWave);
+            CurrentSave.CurrentWave++;
+            _ = EmitSignal(SignalName.WaveChanged, CurrentSave.CurrentWave);
 
-            GD.Print($"[GameStateManager] Advanced to wave {_currentSaveData.CurrentWave}");
+            GD.Print($"[GameStateManager] Advanced to wave {CurrentSave.CurrentWave}");
         }
 
         /// <summary>
@@ -136,12 +135,15 @@ namespace AlJourney.Scripts.Managers
         /// </summary>
         public void AddCoins(int amount)
         {
-            if (_currentSaveData == null || amount <= 0) return;
+            if (CurrentSave == null || amount <= 0)
+            {
+                return;
+            }
 
-            _currentSaveData.Coins += amount;
-            EmitSignal(SignalName.CoinsChanged, _currentSaveData.Coins);
+            CurrentSave.Coins += amount;
+            _ = EmitSignal(SignalName.CoinsChanged, CurrentSave.Coins);
 
-            GD.Print($"[GameStateManager] Added {amount} coins. Total: {_currentSaveData.Coins}");
+            GD.Print($"[GameStateManager] Added {amount} coins. Total: {CurrentSave.Coins}");
         }
 
         /// <summary>
@@ -149,13 +151,15 @@ namespace AlJourney.Scripts.Managers
         /// </summary>
         public bool SpendCoins(int amount)
         {
-            if (_currentSaveData == null || amount <= 0 || _currentSaveData.Coins < amount)
+            if (CurrentSave == null || amount <= 0 || CurrentSave.Coins < amount)
+            {
                 return false;
+            }
 
-            _currentSaveData.Coins -= amount;
-            EmitSignal(SignalName.CoinsChanged, _currentSaveData.Coins);
+            CurrentSave.Coins -= amount;
+            _ = EmitSignal(SignalName.CoinsChanged, CurrentSave.Coins);
 
-            GD.Print($"[GameStateManager] Spent {amount} coins. Remaining: {_currentSaveData.Coins}");
+            GD.Print($"[GameStateManager] Spent {amount} coins. Remaining: {CurrentSave.Coins}");
             return true;
         }
 
@@ -166,19 +170,22 @@ namespace AlJourney.Scripts.Managers
             int mageHealth, int mageMaxHealth, int mageDamage, int mageDefense,
             int warriorHealth, int warriorMaxHealth, int warriorDamage, int warriorDefense)
         {
-            if (_currentSaveData == null) return;
+            if (CurrentSave == null)
+            {
+                return;
+            }
 
-            _currentSaveData.MageHealth = mageHealth;
-            _currentSaveData.MageMaxHealth = mageMaxHealth;
-            _currentSaveData.MageDamage = mageDamage;
-            _currentSaveData.MageDefense = mageDefense;
+            CurrentSave.MageHealth = mageHealth;
+            CurrentSave.MageMaxHealth = mageMaxHealth;
+            CurrentSave.MageDamage = mageDamage;
+            CurrentSave.MageDefense = mageDefense;
 
-            _currentSaveData.WarriorHealth = warriorHealth;
-            _currentSaveData.WarriorMaxHealth = warriorMaxHealth;
-            _currentSaveData.WarriorDamage = warriorDamage;
-            _currentSaveData.WarriorDefense = warriorDefense;
+            CurrentSave.WarriorHealth = warriorHealth;
+            CurrentSave.WarriorMaxHealth = warriorMaxHealth;
+            CurrentSave.WarriorDamage = warriorDamage;
+            CurrentSave.WarriorDefense = warriorDefense;
 
-            EmitSignal(SignalName.HeroStatsChanged);
+            _ = EmitSignal(SignalName.HeroStatsChanged);
         }
 
         /// <summary>
@@ -195,7 +202,7 @@ namespace AlJourney.Scripts.Managers
         /// </summary>
         public void EndGame(bool isVictory)
         {
-            _isGameActive = false;
+            IsGameActive = false;
             CurrentState = isVictory ? GameState.Victory : GameState.GameOver;
 
             GD.Print($"[GameStateManager] Game ended - {(isVictory ? "Victory" : "Defeat")}");
@@ -206,8 +213,8 @@ namespace AlJourney.Scripts.Managers
         /// </summary>
         public void ReturnToMainMenu()
         {
-            _isGameActive = false;
-            _currentSaveData = null;
+            IsGameActive = false;
+            CurrentSave = null;
             CurrentState = GameState.MainMenu;
 
             GD.Print("[GameStateManager] Returned to main menu");

@@ -22,24 +22,22 @@ namespace AlJourney.Scripts.Match3
         public delegate void GridRefillCompletedEventHandler();
 
         private ElementData[,] _grid;
-        private int _gridSize;
-        private int _remainingSwaps;
 
         /// <summary>
         /// Current grid size (5x5).
         /// </summary>
-        public int GridSize => _gridSize;
+        public int GridSize { get; private set; }
 
         /// <summary>
         /// Remaining swaps for current turn.
         /// </summary>
-        public int RemainingSwaps => _remainingSwaps;
+        public int RemainingSwaps { get; private set; }
 
         public override void _Ready()
         {
-            _gridSize = GameConstants.GRID_SIZE;
-            _grid = new ElementData[_gridSize, _gridSize];
-            _remainingSwaps = 0;
+            GridSize = GameConstants.GRID_SIZE;
+            _grid = new ElementData[GridSize, GridSize];
+            RemainingSwaps = 0;
 
             GD.Print("[GridManager] Initialized");
         }
@@ -50,16 +48,16 @@ namespace AlJourney.Scripts.Match3
         public void InitializeGrid()
         {
             // Fill grid with random elements
-            for (int x = 0; x < _gridSize; x++)
+            for (int x = 0; x < GridSize; x++)
             {
-                for (int y = 0; y < _gridSize; y++)
+                for (int y = 0; y < GridSize; y++)
                 {
                     _grid[x, y] = GenerateSafeElement(x, y);
                 }
             }
 
-            _remainingSwaps = GameConstants.PLAYER_SWAPS_PER_TURN;
-            EmitSignal(SignalName.GridInitialized);
+            RemainingSwaps = GameConstants.PLAYER_SWAPS_PER_TURN;
+            _ = EmitSignal(SignalName.GridInitialized);
 
             GD.Print("[GridManager] Grid initialized with no initial matches");
         }
@@ -80,22 +78,22 @@ namespace AlJourney.Scripts.Match3
             // Remove types that would create horizontal match
             if (x >= 2)
             {
-                var type1 = _grid[x - 1, y]?.Type;
-                var type2 = _grid[x - 2, y]?.Type;
+                ElementType? type1 = _grid[x - 1, y]?.Type;
+                ElementType? type2 = _grid[x - 2, y]?.Type;
                 if (type1 != null && type1 == type2 && type1 != ElementType.None)
                 {
-                    availableTypes.Remove(type1.Value);
+                    _ = availableTypes.Remove(type1.Value);
                 }
             }
 
             // Remove types that would create vertical match
             if (y >= 2)
             {
-                var type1 = _grid[x, y - 1]?.Type;
-                var type2 = _grid[x, y - 2]?.Type;
+                ElementType? type1 = _grid[x, y - 1]?.Type;
+                ElementType? type2 = _grid[x, y - 2]?.Type;
                 if (type1 != null && type1 == type2 && type1 != ElementType.None)
                 {
-                    availableTypes.Remove(type1.Value);
+                    _ = availableTypes.Remove(type1.Value);
                 }
             }
 
@@ -105,7 +103,7 @@ namespace AlJourney.Scripts.Match3
                 availableTypes.Add((ElementType)GD.RandRange(1, 4));
             }
 
-            var selectedType = availableTypes[GD.RandRange(0, availableTypes.Count - 1)];
+            ElementType selectedType = availableTypes[GD.RandRange(0, availableTypes.Count - 1)];
             return new ElementData(selectedType, x, y);
         }
 
@@ -114,8 +112,7 @@ namespace AlJourney.Scripts.Match3
         /// </summary>
         public ElementData GetElement(int x, int y)
         {
-            if (!IsValidPosition(x, y)) return null;
-            return _grid[x, y];
+            return !IsValidPosition(x, y) ? null : _grid[x, y];
         }
 
         /// <summary>
@@ -123,7 +120,7 @@ namespace AlJourney.Scripts.Match3
         /// </summary>
         public bool TrySwap(int x1, int y1, int x2, int y2)
         {
-            if (_remainingSwaps <= 0)
+            if (RemainingSwaps <= 0)
             {
                 GD.Print("[GridManager] No swaps remaining");
                 return false;
@@ -144,19 +141,19 @@ namespace AlJourney.Scripts.Match3
                 SwapElements(x1, y1, x2, y2);
 
                 // Check if swap creates matches
-                var matches = FindAllMatches();
+                List<MatchResult> matches = FindAllMatches();
                 if (matches.Count > 0)
                 {
-                    _remainingSwaps--;
-                    EmitSignal(SignalName.SwapCompleted, true);
-                    GD.Print($"[GridManager] Valid swap! Remaining: {_remainingSwaps}");
+                    RemainingSwaps--;
+                    _ = EmitSignal(SignalName.SwapCompleted, true);
+                    GD.Print($"[GridManager] Valid swap! Remaining: {RemainingSwaps}");
                     return true;
                 }
                 else
                 {
                     // Revert swap
                     SwapElements(x1, y1, x2, y2);
-                    EmitSignal(SignalName.SwapCompleted, false);
+                    _ = EmitSignal(SignalName.SwapCompleted, false);
                     GD.Print("[GridManager] Invalid swap - no matches created");
                     return false;
                 }
@@ -185,14 +182,14 @@ namespace AlJourney.Scripts.Match3
         /// </summary>
         public List<MatchResult> FindAllMatches()
         {
-            var allMatches = new List<MatchResult>();
+            List<MatchResult> allMatches = [];
 
             // Check horizontal matches
-            for (int y = 0; y < _gridSize; y++)
+            for (int y = 0; y < GridSize; y++)
             {
-                for (int x = 0; x < _gridSize - 2; x++)
+                for (int x = 0; x < GridSize - 2; x++)
                 {
-                    var matches = CheckLineMatch(x, y, 1, 0); // horizontal
+                    MatchResult matches = CheckLineMatch(x, y, 1, 0); // horizontal
                     if (matches != null)
                     {
                         allMatches.Add(matches);
@@ -202,11 +199,11 @@ namespace AlJourney.Scripts.Match3
             }
 
             // Check vertical matches
-            for (int x = 0; x < _gridSize; x++)
+            for (int x = 0; x < GridSize; x++)
             {
-                for (int y = 0; y < _gridSize - 2; y++)
+                for (int y = 0; y < GridSize - 2; y++)
                 {
-                    var matches = CheckLineMatch(x, y, 0, 1); // vertical
+                    MatchResult matches = CheckLineMatch(x, y, 0, 1); // vertical
                     if (matches != null)
                     {
                         allMatches.Add(matches);
@@ -218,7 +215,7 @@ namespace AlJourney.Scripts.Match3
             if (allMatches.Count > 0)
             {
                 // FIX: Передаём только количество, а не List
-                EmitSignal(SignalName.MatchesFound, allMatches.Count);
+                _ = EmitSignal(SignalName.MatchesFound, allMatches.Count);
                 GD.Print($"[GridManager] Found {allMatches.Count} matches");
             }
 
@@ -230,25 +227,31 @@ namespace AlJourney.Scripts.Match3
         /// </summary>
         private MatchResult CheckLineMatch(int startX, int startY, int deltaX, int deltaY)
         {
-            var startElement = _grid[startX, startY];
+            ElementData startElement = _grid[startX, startY];
             if (startElement == null || startElement.Type == ElementType.None)
+            {
                 return null;
+            }
 
             int matchCount = 1;
-            var matchedPositions = new List<(int, int)> { (startX, startY) };
+            List<(int, int)> matchedPositions = [(startX, startY)];
 
             // Count consecutive matches
-            for (int i = 1; i < _gridSize; i++)
+            for (int i = 1; i < GridSize; i++)
             {
-                int x = startX + i * deltaX;
-                int y = startY + i * deltaY;
+                int x = startX + (i * deltaX);
+                int y = startY + (i * deltaY);
 
                 if (!IsValidPosition(x, y))
+                {
                     break;
+                }
 
-                var element = _grid[x, y];
+                ElementData element = _grid[x, y];
                 if (element == null || !startElement.CanMatchWith(element))
+                {
                     break;
+                }
 
                 matchCount++;
                 matchedPositions.Add((x, y));
@@ -257,7 +260,7 @@ namespace AlJourney.Scripts.Match3
             // Valid match is 3 or more
             if (matchCount >= GameConstants.MATCH_MIN_LENGTH)
             {
-                var result = new MatchResult(startElement.Type, matchCount, deltaX == 1)
+                MatchResult result = new(startElement.Type, matchCount, deltaX == 1)
                 {
                     MatchedPositions = matchedPositions
                 };
@@ -273,9 +276,9 @@ namespace AlJourney.Scripts.Match3
         public void ProcessMatches(List<MatchResult> matches)
         {
             // Mark matched elements
-            foreach (var match in matches)
+            foreach (MatchResult match in matches)
             {
-                foreach (var (x, y) in match.MatchedPositions)
+                foreach ((int x, int y) in match.MatchedPositions)
                 {
                     if (IsValidPosition(x, y))
                     {
@@ -285,9 +288,9 @@ namespace AlJourney.Scripts.Match3
             }
 
             // Remove matched elements
-            for (int x = 0; x < _gridSize; x++)
+            for (int x = 0; x < GridSize; x++)
             {
-                for (int y = 0; y < _gridSize; y++)
+                for (int y = 0; y < GridSize; y++)
                 {
                     if (_grid[x, y].IsMatched)
                     {
@@ -308,12 +311,12 @@ namespace AlJourney.Scripts.Match3
         /// </summary>
         private void ApplyGravity()
         {
-            for (int x = 0; x < _gridSize; x++)
+            for (int x = 0; x < GridSize; x++)
             {
                 // Start from bottom
-                int writePos = _gridSize - 1;
+                int writePos = GridSize - 1;
 
-                for (int y = _gridSize - 1; y >= 0; y--)
+                for (int y = GridSize - 1; y >= 0; y--)
                 {
                     if (_grid[x, y] != null)
                     {
@@ -334,9 +337,9 @@ namespace AlJourney.Scripts.Match3
         /// </summary>
         private void RefillGrid()
         {
-            for (int x = 0; x < _gridSize; x++)
+            for (int x = 0; x < GridSize; x++)
             {
-                for (int y = 0; y < _gridSize; y++)
+                for (int y = 0; y < GridSize; y++)
                 {
                     if (_grid[x, y] == null)
                     {
@@ -345,7 +348,7 @@ namespace AlJourney.Scripts.Match3
                 }
             }
 
-            EmitSignal(SignalName.GridRefillCompleted);
+            _ = EmitSignal(SignalName.GridRefillCompleted);
             GD.Print("[GridManager] Grid refilled");
         }
 
@@ -354,8 +357,8 @@ namespace AlJourney.Scripts.Match3
         /// </summary>
         public void ResetSwaps()
         {
-            _remainingSwaps = GameConstants.PLAYER_SWAPS_PER_TURN;
-            GD.Print($"[GridManager] Swaps reset to {_remainingSwaps}");
+            RemainingSwaps = GameConstants.PLAYER_SWAPS_PER_TURN;
+            GD.Print($"[GridManager] Swaps reset to {RemainingSwaps}");
         }
 
         /// <summary>
@@ -363,7 +366,7 @@ namespace AlJourney.Scripts.Match3
         /// </summary>
         private bool IsValidPosition(int x, int y)
         {
-            return x >= 0 && x < _gridSize && y >= 0 && y < _gridSize;
+            return x >= 0 && x < GridSize && y >= 0 && y < GridSize;
         }
 
         /// <summary>
