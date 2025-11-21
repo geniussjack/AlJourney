@@ -1,0 +1,303 @@
+[gd_scene load_steps=2 format=3 uid="uid://cmutdu1urtub0"]
+
+[ext_resource type="Script" uid="uid://c7wem1c34vp64" path="res://Scripts/UI/MainMenuUI.cs" id="1_main"]
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_main")
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="MainMenuPanel" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MainMenuPanel"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Title" type="Label" parent="MainMenuPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "AlJourney"
+horizontal_alignment = 1
+
+[node name="Spacer1" type="Control" parent="MainMenuPanel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+
+[node name="NewGameButton" type="Button" parent="MainMenuPanel/VBoxContainer"]
+custom_minimum_size = Vector2(300, 60)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "New Game"
+
+[node name="ContinueButton" type="Button" parent="MainMenuPanel/VBoxContainer"]
+custom_minimum_size = Vector2(300, 60)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Continue"
+
+[node name="SettingsButton" type="Button" parent="MainMenuPanel/VBoxContainer"]
+custom_minimum_size = Vector2(300, 60)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Settings"
+
+[node name="CreditsButton" type="Button" parent="MainMenuPanel/VBoxContainer"]
+custom_minimum_size = Vector2(300, 60)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Credits"
+
+[node name="QuitButton" type="Button" parent="MainMenuPanel/VBoxContainer"]
+custom_minimum_size = Vector2(300, 60)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Quit"
+
+[node name="SettingsPanel" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SettingsMenu" type="MarginContainer" parent="SettingsPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 100
+theme_override_constants/margin_top = 50
+theme_override_constants/margin_right = 100
+theme_override_constants/margin_bottom = 50
+
+[node name="Panel" type="PanelContainer" parent="SettingsPanel/SettingsMenu"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="SettingsPanel/SettingsMenu/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Title" type="Label" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Settings"
+horizontal_alignment = 1
+
+[node name="HSeparator1" type="HSeparator" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="VideoSettings" type="VBoxContainer" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="VideoLabel" type="Label" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/VideoSettings"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Video Settings"
+
+[node name="ResolutionContainer" type="HBoxContainer" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/VideoSettings"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/VideoSettings/ResolutionContainer"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Resolution:"
+
+[node name="ResolutionDropdown" type="OptionButton" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/VideoSettings"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+
+[node name="FullscreenContainer" type="HBoxContainer" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/VideoSettings"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/VideoSettings/FullscreenContainer"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Fullscreen:"
+
+[node name="FullscreenToggle" type="CheckButton" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/VideoSettings"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+
+[node name="VsyncContainer" type="HBoxContainer" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/VideoSettings"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/VideoSettings/VsyncContainer"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "VSync:"
+
+[node name="VsyncToggle" type="CheckButton" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/VideoSettings"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+
+[node name="FpsContainer" type="HBoxContainer" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/VideoSettings"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/VideoSettings/FpsContainer"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "FPS Limit:"
+
+[node name="FpsLimitDropdown" type="OptionButton" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/VideoSettings"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+
+[node name="HSeparator2" type="HSeparator" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="AudioSettings" type="VBoxContainer" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="AudioLabel" type="Label" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/AudioSettings"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Audio Settings"
+
+[node name="MasterVolumeContainer" type="VBoxContainer" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/AudioSettings"]
+layout_mode = 2
+
+[node name="MasterVolumeLabel" type="Label" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/AudioSettings/MasterVolumeContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Master: 100%"
+
+[node name="MasterVolumeSlider" type="HSlider" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/AudioSettings"]
+layout_mode = 2
+max_value = 1.0
+step = 0.01
+value = 1.0
+
+[node name="MusicVolumeContainer" type="VBoxContainer" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/AudioSettings"]
+layout_mode = 2
+
+[node name="MusicVolumeLabel" type="Label" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/AudioSettings/MusicVolumeContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Music: 70%"
+
+[node name="MusicVolumeSlider" type="HSlider" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/AudioSettings"]
+layout_mode = 2
+max_value = 1.0
+step = 0.01
+value = 0.7
+
+[node name="SfxVolumeContainer" type="VBoxContainer" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/AudioSettings"]
+layout_mode = 2
+
+[node name="SfxVolumeLabel" type="Label" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/AudioSettings/SfxVolumeContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "SFX: 80%"
+
+[node name="SfxVolumeSlider" type="HSlider" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/AudioSettings"]
+layout_mode = 2
+max_value = 1.0
+step = 0.01
+value = 0.8
+
+[node name="HSeparator3" type="HSeparator" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="ButtonsContainer" type="HBoxContainer" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="ApplyButton" type="Button" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/ButtonsContainer"]
+custom_minimum_size = Vector2(150, 50)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Apply"
+
+[node name="ResetButton" type="Button" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/ButtonsContainer"]
+custom_minimum_size = Vector2(150, 50)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Reset"
+
+[node name="BackButton" type="Button" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/ButtonsContainer"]
+custom_minimum_size = Vector2(150, 50)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Back"
+
+[node name="CreditsPanel" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CreditsMenu" type="MarginContainer" parent="CreditsPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 200
+theme_override_constants/margin_top = 100
+theme_override_constants/margin_right = 200
+theme_override_constants/margin_bottom = 100
+
+[node name="Panel" type="PanelContainer" parent="CreditsPanel/CreditsMenu"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CreditsPanel/CreditsMenu/Panel"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="CreditsPanel/CreditsMenu/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Credits"
+horizontal_alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="CreditsPanel/CreditsMenu/Panel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="CreditsText" type="RichTextLabel" parent="CreditsPanel/CreditsMenu/Panel/VBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+bbcode_enabled = true
+fit_content = true
+
+[node name="BackButton" type="Button" parent="CreditsPanel/CreditsMenu/Panel/VBoxContainer"]
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 24
+text = "Back"

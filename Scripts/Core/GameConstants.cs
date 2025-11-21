@@ -112,10 +112,10 @@ namespace AlJourney.Scripts.Core
         // === SHOP & ECONOMY ===
         public const int SHOP_UPGRADE_HP_MIN = 25;
         public const int SHOP_UPGRADE_HP_MAX = 60;
-        public const int SHOP_UPGRADE_DAMAGE_MIN = 20;
-        public const int SHOP_UPGRADE_DAMAGE_MAX = 50;
-        public const int SHOP_UPGRADE_DEFENSE_MIN = 15;
-        public const int SHOP_UPGRADE_DEFENSE_MAX = 40;
+        public const int SHOP_UPGRADE_DAMAGE_MIN = 2;
+        public const int SHOP_UPGRADE_DAMAGE_MAX = 5;
+        public const int SHOP_UPGRADE_DEFENSE_MIN = 1;
+        public const int SHOP_UPGRADE_DEFENSE_MAX = 4;
         public const float SHOP_WAVE_SCALE_FACTOR = 2.5f;
 
         // Coin rewards

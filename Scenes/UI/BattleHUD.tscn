@@ -1,0 +1,130 @@
+[gd_scene load_steps=2 format=3 uid="uid://cgmssg1q3f8r3"]
+
+[ext_resource type="Script" uid="uid://vykqe4gaplol" path="res://Scripts/UI/BattleHUD.cs" id="1_hud"]
+
+[node name="BattleHUD" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_hud")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="TopBar" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="HeroesContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/TopBar"]
+layout_mode = 2
+theme_override_constants/separation = 30
+
+[node name="MageInfo" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TopBar/HeroesContainer"]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="MageName" type="Label" parent="MarginContainer/VBoxContainer/TopBar/HeroesContainer/MageInfo"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Eltarion 🧙"
+
+[node name="HealthBar" type="ProgressBar" parent="MarginContainer/VBoxContainer/TopBar/HeroesContainer/MageInfo"]
+custom_minimum_size = Vector2(0, 25)
+layout_mode = 2
+value = 80.0
+show_percentage = false
+
+[node name="HealthLabel" type="Label" parent="MarginContainer/VBoxContainer/TopBar/HeroesContainer/MageInfo"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "80 / 80"
+
+[node name="ShieldLabel" type="Label" parent="MarginContainer/VBoxContainer/TopBar/HeroesContainer/MageInfo"]
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "🛡️ 0"
+
+[node name="WarriorInfo" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TopBar/HeroesContainer"]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="WarriorName" type="Label" parent="MarginContainer/VBoxContainer/TopBar/HeroesContainer/WarriorInfo"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Eldric ⚔️"
+
+[node name="HealthBar" type="ProgressBar" parent="MarginContainer/VBoxContainer/TopBar/HeroesContainer/WarriorInfo"]
+custom_minimum_size = Vector2(0, 25)
+layout_mode = 2
+value = 100.0
+show_percentage = false
+
+[node name="HealthLabel" type="Label" parent="MarginContainer/VBoxContainer/TopBar/HeroesContainer/WarriorInfo"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "120 / 120"
+
+[node name="ShieldLabel" type="Label" parent="MarginContainer/VBoxContainer/TopBar/HeroesContainer/WarriorInfo"]
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "🛡️ 0"
+
+[node name="EnemiesInfo" type="HBoxContainer" parent="MarginContainer/VBoxContainer/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 15
+alignment = 2
+
+[node name="PauseButton" type="Button" parent="MarginContainer/VBoxContainer/TopBar"]
+custom_minimum_size = Vector2(80, 60)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "⏸"
+
+[node name="Spacer" type="Control" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="BottomBar" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 30
+
+[node name="WaveLabel" type="Label" parent="MarginContainer/VBoxContainer/BottomBar"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Wave: 1"
+
+[node name="CoinsLabel" type="Label" parent="MarginContainer/VBoxContainer/BottomBar"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "💰 0"
+
+[node name="SwapsLabel" type="Label" parent="MarginContainer/VBoxContainer/BottomBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 24
+text = "Swaps: 3"
+horizontal_alignment = 2

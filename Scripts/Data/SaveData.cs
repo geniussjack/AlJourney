@@ -6,6 +6,7 @@ namespace AlJourney.Scripts.Data
 {
     /// <summary>
     /// Serializable data structure for game save/load system.
+    /// Now supports dual hero system.
     /// </summary>
     [Serializable]
     public class SaveData
@@ -20,30 +21,47 @@ namespace AlJourney.Scripts.Data
         /// </summary>
         public int Coins { get; set; }
 
+        // === MAGE STATS ===
         /// <summary>
-        /// Selected character class.
+        /// Mage's current HP.
         /// </summary>
-        public CharacterClass SelectedCharacter { get; set; }
+        public int MageHealth { get; set; }
 
         /// <summary>
-        /// Player's current HP.
+        /// Mage's current maximum HP.
         /// </summary>
-        public int PlayerHealth { get; set; }
+        public int MageMaxHealth { get; set; }
 
         /// <summary>
-        /// Player's current maximum HP.
+        /// Mage's damage stat.
         /// </summary>
-        public int PlayerMaxHealth { get; set; }
+        public int MageDamage { get; set; }
 
         /// <summary>
-        /// Player's damage stat.
+        /// Mage's defense stat.
         /// </summary>
-        public int PlayerDamage { get; set; }
+        public int MageDefense { get; set; }
+
+        // === WARRIOR STATS ===
+        /// <summary>
+        /// Warrior's current HP.
+        /// </summary>
+        public int WarriorHealth { get; set; }
 
         /// <summary>
-        /// Player's defense stat.
+        /// Warrior's current maximum HP.
         /// </summary>
-        public int PlayerDefense { get; set; }
+        public int WarriorMaxHealth { get; set; }
+
+        /// <summary>
+        /// Warrior's damage stat.
+        /// </summary>
+        public int WarriorDamage { get; set; }
+
+        /// <summary>
+        /// Warrior's defense stat.
+        /// </summary>
+        public int WarriorDefense { get; set; }
 
         /// <summary>
         /// Permanent upgrades purchased from shop.
@@ -64,39 +82,32 @@ namespace AlJourney.Scripts.Data
         {
             CurrentWave = 1;
             Coins = 0;
-            SelectedCharacter = CharacterClass.Warrior;
             PermanentUpgrades = [];
             ActiveArtifacts = [];
             LastSaveTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
         }
 
         /// <summary>
-        /// Creates a fresh save with initial character stats.
+        /// Creates a fresh save with both heroes at starting stats.
         /// </summary>
-        public static SaveData CreateNew(CharacterClass characterClass)
+        public static SaveData CreateNew()
         {
             var save = new SaveData
             {
-                SelectedCharacter = characterClass,
                 CurrentWave = 1,
-                Coins = 0
-            };
+                Coins = 0,
+                // Mage starting stats
+                MageMaxHealth = GameConstants.MAGE_BASE_HP,
+                MageHealth = GameConstants.MAGE_BASE_HP,
+                MageDamage = GameConstants.MAGE_BASE_DAMAGE,
+                MageDefense = GameConstants.MAGE_BASE_DEFENSE,
 
-            // Set initial stats based on character
-            if (characterClass == CharacterClass.Mage)
-            {
-                save.PlayerMaxHealth = GameConstants.MAGE_BASE_HP;
-                save.PlayerHealth = GameConstants.MAGE_BASE_HP;
-                save.PlayerDamage = GameConstants.MAGE_BASE_DAMAGE;
-                save.PlayerDefense = GameConstants.MAGE_BASE_DEFENSE;
-            }
-            else // Warrior
-            {
-                save.PlayerMaxHealth = GameConstants.WARRIOR_BASE_HP;
-                save.PlayerHealth = GameConstants.WARRIOR_BASE_HP;
-                save.PlayerDamage = GameConstants.WARRIOR_BASE_DAMAGE;
-                save.PlayerDefense = GameConstants.WARRIOR_BASE_DEFENSE;
-            }
+                // Warrior starting stats
+                WarriorMaxHealth = GameConstants.WARRIOR_BASE_HP,
+                WarriorHealth = GameConstants.WARRIOR_BASE_HP,
+                WarriorDamage = GameConstants.WARRIOR_BASE_DAMAGE,
+                WarriorDefense = GameConstants.WARRIOR_BASE_DEFENSE
+            };
 
             return save;
         }

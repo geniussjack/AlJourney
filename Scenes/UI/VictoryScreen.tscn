@@ -1,0 +1,102 @@
+[gd_scene load_steps=2 format=3 uid="uid://c2qfb3sh8ha50"]
+
+[ext_resource type="Script" uid="uid://dnic0xpqxvq30" path="res://Scripts/UI/VictoryUI.cs" id="1_victory"]
+
+[node name="VictoryScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_victory")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.1, 0.2, 0.15, 1)
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
+layout_mode = 2
+theme_override_constants/separation = 40
+
+[node name="Title" type="Label" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 72
+text = "🏆 VICTORY!"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "The Necromancer has been defeated!"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="StatsContainer" type="VBoxContainer" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="StatsTitle" type="Label" parent="CenterContainer/VBoxContainer/StatsContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Final Statistics"
+horizontal_alignment = 1
+
+[node name="WaveLabel" type="Label" parent="CenterContainer/VBoxContainer/StatsContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Final Wave: X"
+horizontal_alignment = 1
+
+[node name="CoinsLabel" type="Label" parent="CenterContainer/VBoxContainer/StatsContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Total Coins: 💰 X"
+horizontal_alignment = 1
+
+[node name="EnemiesLabel" type="Label" parent="CenterContainer/VBoxContainer/StatsContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Enemies Defeated: ⚔️ X"
+horizontal_alignment = 1
+
+[node name="TimeLabel" type="Label" parent="CenterContainer/VBoxContainer/StatsContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "🏆 Victory Achieved!"
+horizontal_alignment = 1
+
+[node name="HSeparator2" type="HSeparator" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="ButtonsContainer" type="HBoxContainer" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 30
+alignment = 1
+
+[node name="MainMenuButton" type="Button" parent="CenterContainer/VBoxContainer/ButtonsContainer"]
+custom_minimum_size = Vector2(250, 80)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Main Menu"
+
+[node name="NewGameButton" type="Button" parent="CenterContainer/VBoxContainer/ButtonsContainer"]
+custom_minimum_size = Vector2(250, 80)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "New Game"

@@ -28,7 +28,7 @@ namespace AlJourney.Scripts.Managers
         public delegate void CoinsChangedEventHandler(int newAmount);
 
         [Signal]
-        public delegate void PlayerStatsChangedEventHandler();
+        public delegate void HeroStatsChangedEventHandler();
 
         // Current game state
         private GameState _currentState;
@@ -87,19 +87,19 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Starts a new game with selected character.
+        /// Starts a new game with both heroes.
         /// </summary>
-        public void StartNewGame(CharacterClass characterClass)
+        public void StartNewGame()
         {
-            _currentSaveData = SaveData.CreateNew(characterClass);
+            _currentSaveData = SaveData.CreateNew();
             _isGameActive = true;
             CurrentState = GameState.Battle;
 
             EmitSignal(SignalName.WaveChanged, _currentSaveData.CurrentWave);
             EmitSignal(SignalName.CoinsChanged, _currentSaveData.Coins);
-            EmitSignal(SignalName.PlayerStatsChanged);
+            EmitSignal(SignalName.HeroStatsChanged);
 
-            GD.Print($"[GameStateManager] New game started - {characterClass}, Wave 1");
+            GD.Print("[GameStateManager] New game started with dual heroes - Wave 1");
         }
 
         /// <summary>
@@ -113,7 +113,7 @@ namespace AlJourney.Scripts.Managers
 
             EmitSignal(SignalName.WaveChanged, _currentSaveData.CurrentWave);
             EmitSignal(SignalName.CoinsChanged, _currentSaveData.Coins);
-            EmitSignal(SignalName.PlayerStatsChanged);
+            EmitSignal(SignalName.HeroStatsChanged);
 
             GD.Print($"[GameStateManager] Game loaded - Wave {_currentSaveData.CurrentWave}");
         }
@@ -160,18 +160,25 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Updates player stats in save data.
+        /// Updates hero stats in save data.
         /// </summary>
-        public void UpdatePlayerStats(int health, int maxHealth, int damage, int defense)
+        public void UpdateHeroStats(
+            int mageHealth, int mageMaxHealth, int mageDamage, int mageDefense,
+            int warriorHealth, int warriorMaxHealth, int warriorDamage, int warriorDefense)
         {
             if (_currentSaveData == null) return;
 
-            _currentSaveData.PlayerHealth = health;
-            _currentSaveData.PlayerMaxHealth = maxHealth;
-            _currentSaveData.PlayerDamage = damage;
-            _currentSaveData.PlayerDefense = defense;
+            _currentSaveData.MageHealth = mageHealth;
+            _currentSaveData.MageMaxHealth = mageMaxHealth;
+            _currentSaveData.MageDamage = mageDamage;
+            _currentSaveData.MageDefense = mageDefense;
 
-            EmitSignal(SignalName.PlayerStatsChanged);
+            _currentSaveData.WarriorHealth = warriorHealth;
+            _currentSaveData.WarriorMaxHealth = warriorMaxHealth;
+            _currentSaveData.WarriorDamage = warriorDamage;
+            _currentSaveData.WarriorDefense = warriorDefense;
+
+            EmitSignal(SignalName.HeroStatsChanged);
         }
 
         /// <summary>

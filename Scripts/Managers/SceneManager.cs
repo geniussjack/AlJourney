@@ -27,7 +27,6 @@ namespace AlJourney.Scripts.Managers
         private readonly Dictionary<GameState, string> _scenePaths = new()
         {
             { GameState.MainMenu, "res://Scenes/UI/MainMenu.tscn" },
-            { GameState.CharacterSelect, "res://Scenes/UI/CharacterSelect.tscn" },
             { GameState.Battle, "res://Scenes/Battle/BattleScene.tscn" },
             { GameState.Shop, "res://Scenes/UI/ShopScene.tscn" },
             { GameState.GameOver, "res://Scenes/UI/GameOverScreen.tscn" },
@@ -135,12 +134,12 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Starts a new game with character selection.
+        /// Starts a new game (no character selection needed).
         /// </summary>
         public static void StartNewGame()
         {
-            GameStateManager.Instance.ChangeState(GameState.CharacterSelect);
-            Instance.LoadScene(GameState.CharacterSelect); // FIX: Через Instance
+            GameStateManager.Instance.StartNewGame();
+            Instance.LoadScene(GameState.Battle);
         }
 
         /// <summary>
