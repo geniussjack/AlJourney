@@ -17,6 +17,11 @@ namespace AlJourney.Scripts.Data
         public int CurrentWave { get; set; }
 
         /// <summary>
+        /// Highest wave reached (for statistics).
+        /// </summary>
+        public int HighestWave { get; set; }
+
+        /// <summary>
         /// Player's accumulated coins.
         /// </summary>
         public int Coins { get; set; }
@@ -81,6 +86,7 @@ namespace AlJourney.Scripts.Data
         public SaveData()
         {
             CurrentWave = 1;
+            HighestWave = 1;
             Coins = 0;
             PermanentUpgrades = [];
             ActiveArtifacts = [];
@@ -95,6 +101,7 @@ namespace AlJourney.Scripts.Data
             SaveData save = new()
             {
                 CurrentWave = 1,
+                HighestWave = 1,
                 Coins = 0,
                 // Mage starting stats
                 MageMaxHealth = GameConstants.MAGE_BASE_HP,

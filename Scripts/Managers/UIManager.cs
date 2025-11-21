@@ -106,14 +106,5 @@ namespace AlJourney.Scripts.Managers
 
             GD.Print("[UIManager] All menus closed");
         }
-
-        /// <summary>
-        /// Shows a simple notification popup.
-        /// </summary>
-        public static void ShowNotification(string message, float duration = 3.0f)
-        {
-            GD.Print($"[UIManager] Notification: {message}");
-            // TODO: Implement notification popup system
-        }
     }
 }
