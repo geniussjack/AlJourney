@@ -370,6 +370,162 @@ namespace AlJourney.Scripts.Match3
         }
 
         /// <summary>
+        /// Checks if there are any valid moves available on the grid.
+        /// If no valid moves exist, grid should be refilled.
+        /// </summary>
+        public bool HasValidMoves()
+        {
+            // Check horizontal swaps
+            for (int x = 0; x < GridSize - 1; x++)
+            {
+                for (int y = 0; y < GridSize; y++)
+                {
+                    if (WouldCreateMatch(x, y, x + 1, y))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            // Check vertical swaps
+            for (int x = 0; x < GridSize; x++)
+            {
+                for (int y = 0; y < GridSize - 1; y++)
+                {
+                    if (WouldCreateMatch(x, y, x, y + 1))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            GD.Print("[GridManager] No valid moves available!");
+            return false;
+        }
+
+        /// <summary>
+        /// Checks if swapping two elements would create a match.
+        /// </summary>
+        private bool WouldCreateMatch(int x1, int y1, int x2, int y2)
+        {
+            if (!IsValidPosition(x1, y1) || !IsValidPosition(x2, y2))
+            {
+                return false;
+            }
+
+            ElementData elem1 = _grid[x1, y1];
+            ElementData elem2 = _grid[x2, y2];
+
+            if (elem1 == null || elem2 == null)
+            {
+                return false;
+            }
+
+            // Temporarily swap
+            _grid[x1, y1] = elem2;
+            _grid[x2, y2] = elem1;
+            elem2.X = x1;
+            elem2.Y = y1;
+            elem1.X = x2;
+            elem1.Y = y2;
+
+            // Check if swap creates match
+            bool createsMatch = CheckMatchAtPosition(x1, y1) || CheckMatchAtPosition(x2, y2);
+
+            // Swap back
+            _grid[x1, y1] = elem1;
+            _grid[x2, y2] = elem2;
+            elem1.X = x1;
+            elem1.Y = y1;
+            elem2.X = x2;
+            elem2.Y = y2;
+
+            return createsMatch;
+        }
+
+        /// <summary>
+        /// Checks if element at position is part of a match.
+        /// </summary>
+        private bool CheckMatchAtPosition(int x, int y)
+        {
+            if (!IsValidPosition(x, y))
+            {
+                return false;
+            }
+
+            ElementData element = _grid[x, y];
+            if (element == null || element.Type == ElementType.None)
+            {
+                return false;
+            }
+
+            // Check horizontal
+            int horizontalCount = 1;
+
+            // Count left
+            for (int i = x - 1; i >= 0; i--)
+            {
+                if (_grid[i, y] != null && element.CanMatchWith(_grid[i, y]))
+                {
+                    horizontalCount++;
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            // Count right
+            for (int i = x + 1; i < GridSize; i++)
+            {
+                if (_grid[i, y] != null && element.CanMatchWith(_grid[i, y]))
+                {
+                    horizontalCount++;
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            if (horizontalCount >= GameConstants.MATCH_MIN_LENGTH)
+            {
+                return true;
+            }
+
+            // Check vertical
+            int verticalCount = 1;
+
+            // Count up
+            for (int i = y - 1; i >= 0; i--)
+            {
+                if (_grid[x, i] != null && element.CanMatchWith(_grid[x, i]))
+                {
+                    verticalCount++;
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            // Count down
+            for (int i = y + 1; i < GridSize; i++)
+            {
+                if (_grid[x, i] != null && element.CanMatchWith(_grid[x, i]))
+                {
+                    verticalCount++;
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            return verticalCount >= GameConstants.MATCH_MIN_LENGTH;
+        }
+
+        /// <summary>
         /// Gets the entire grid (for debugging/visualization).
         /// </summary>
         public ElementData[,] GetGrid()

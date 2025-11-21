@@ -502,7 +502,7 @@ namespace AlJourney.Scripts.Battle
 
         /// <summary>
         /// Performs action for a single enemy.
-        /// Enemy randomly targets one of the alive heroes.
+        /// Enemy intelligently targets one of the alive heroes.
         /// </summary>
         private void PerformEnemyAction(Enemy enemy)
         {
@@ -523,8 +523,8 @@ namespace AlJourney.Scripts.Battle
                 return; // No targets
             }
 
-            // Select random target
-            PlayerCharacter target = aliveHeroes[GD.RandRange(0, aliveHeroes.Count - 1)];
+            // Select target with AI logic
+            PlayerCharacter target = SelectTarget(aliveHeroes, enemy);
 
             if (enemy.IsBoss)
             {
@@ -536,7 +536,15 @@ namespace AlJourney.Scripts.Battle
                 if (damage > 0)
                 {
                     GD.Print($"[BattleManager] {enemy.CharacterName} attacks {target.CharacterName}");
+
+                    // Camera shake for enemy attack
+                    _cameraShake?.ShakeLight();
+
                     int reflected = target.TakeDamage(damage, enemy.AttackType);
+
+                    // Spawn damage number
+                    Vector2 targetPos = target == HeroSystem.Mage ? new Vector2(200, 100) : new Vector2(1000, 100);
+                    ComboParticles.SpawnDamageNumber(this, targetPos, damage);
 
                     // Handle reflect damage
                     if (reflected > 0)
@@ -545,6 +553,40 @@ namespace AlJourney.Scripts.Battle
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Selects target for enemy using AI logic.
+        /// Priority: 1) Finish wounded hero (< 30% HP), 2) Random target
+        /// </summary>
+        private static PlayerCharacter SelectTarget(List<PlayerCharacter> aliveHeroes, Enemy enemy)
+        {
+            // Strategy 1: Finish off wounded hero (< 30% HP)
+            PlayerCharacter wounded = aliveHeroes
+                .Where(h => h.CurrentHealth < h.MaxHealth * 0.3f)
+                .OrderBy(h => h.CurrentHealth)
+                .FirstOrDefault();
+
+            if (wounded != null)
+            {
+                GD.Print($"[BattleManager] {enemy.CharacterName} targets wounded {wounded.CharacterName}!");
+                return wounded;
+            }
+
+            // Strategy 2: Target hero with less defense (for smart enemies)
+            if (enemy.IsMiniboss || enemy.IsBoss)
+            {
+                PlayerCharacter weakestDefense = aliveHeroes
+                    .OrderBy(h => h.BaseDefense)
+                    .First();
+
+                GD.Print($"[BattleManager] {enemy.CharacterName} targets {weakestDefense.CharacterName} (weaker defense)");
+                return weakestDefense;
+            }
+
+            // Strategy 3: Random target (basic enemies)
+            PlayerCharacter randomTarget = aliveHeroes[GD.RandRange(0, aliveHeroes.Count - 1)];
+            return randomTarget;
         }
 
         /// <summary>

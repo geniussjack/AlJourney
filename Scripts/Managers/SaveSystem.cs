@@ -130,6 +130,14 @@ namespace AlJourney.Scripts.Managers
 
                 if (saveData != null)
                 {
+                    // Validate save data
+                    if (!ValidateSaveData(saveData))
+                    {
+                        GD.PrintErr("[SaveSystem] Save data validation failed - corrupted save");
+                        _ = EmitSignal(SignalName.LoadCompleted, false);
+                        return null;
+                    }
+
                     GD.Print($"[SaveSystem] Game loaded successfully - Wave {saveData.CurrentWave}");
                     _ = EmitSignal(SignalName.LoadCompleted, true);
                     return saveData;
@@ -179,6 +187,68 @@ namespace AlJourney.Scripts.Managers
                 GD.PrintErr($"[SaveSystem] Failed to delete save: {e.Message}");
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Validates save data integrity.
+        /// </summary>
+        private static bool ValidateSaveData(SaveData data)
+        {
+            if (data == null)
+            {
+                GD.PrintErr("[SaveSystem] Validation failed: Save data is null");
+                return false;
+            }
+
+            // Validate wave number
+            if (data.CurrentWave < 1)
+            {
+                GD.PrintErr($"[SaveSystem] Validation failed: Invalid wave number ({data.CurrentWave})");
+                return false;
+            }
+
+            // Validate mage stats
+            if (data.MageMaxHealth <= 0 || data.MageHealth < 0 || data.MageHealth > data.MageMaxHealth)
+            {
+                GD.PrintErr($"[SaveSystem] Validation failed: Invalid Mage health ({data.MageHealth}/{data.MageMaxHealth})");
+                return false;
+            }
+
+            if (data.MageDamage < 0 || data.MageDefense < 0)
+            {
+                GD.PrintErr($"[SaveSystem] Validation failed: Invalid Mage stats (Dmg:{data.MageDamage}, Def:{data.MageDefense})");
+                return false;
+            }
+
+            // Validate warrior stats
+            if (data.WarriorMaxHealth <= 0 || data.WarriorHealth < 0 || data.WarriorHealth > data.WarriorMaxHealth)
+            {
+                GD.PrintErr($"[SaveSystem] Validation failed: Invalid Warrior health ({data.WarriorHealth}/{data.WarriorMaxHealth})");
+                return false;
+            }
+
+            if (data.WarriorDamage < 0 || data.WarriorDefense < 0)
+            {
+                GD.PrintErr($"[SaveSystem] Validation failed: Invalid Warrior stats (Dmg:{data.WarriorDamage}, Def:{data.WarriorDefense})");
+                return false;
+            }
+
+            // Validate coins
+            if (data.Coins < 0)
+            {
+                GD.PrintErr($"[SaveSystem] Validation failed: Invalid coins ({data.Coins})");
+                return false;
+            }
+
+            // Validate highest wave
+            if (data.HighestWave < 1 || data.HighestWave < data.CurrentWave)
+            {
+                GD.PrintErr($"[SaveSystem] Validation failed: Invalid highest wave ({data.HighestWave})");
+                return false;
+            }
+
+            GD.Print("[SaveSystem] Save data validation passed");
+            return true;
         }
 
         /// <summary>
