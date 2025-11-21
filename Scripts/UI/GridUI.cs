@@ -316,7 +316,7 @@ namespace AlJourney.Scripts.UI
         /// <summary>
         /// Calculates center position of a match.
         /// </summary>
-        private Vector2 CalculateMatchCenter(MatchResult match)
+        private static Vector2 CalculateMatchCenter(MatchResult match)
         {
             if (match.MatchedPositions.Count == 0)
             {
@@ -334,8 +334,8 @@ namespace AlJourney.Scripts.UI
             }
 
             return new Vector2(
-                sumX / match.MatchedPositions.Count + CELL_SIZE / 2,
-                sumY / match.MatchedPositions.Count + CELL_SIZE / 2
+                (sumX / match.MatchedPositions.Count) + (CELL_SIZE / 2),
+                (sumY / match.MatchedPositions.Count) + (CELL_SIZE / 2)
             );
         }
 
@@ -431,13 +431,13 @@ namespace AlJourney.Scripts.UI
         /// </summary>
         private void ShowCascadeIndicator(int cascadeLevel)
         {
-            Vector2 centerPos = new Vector2(
-                (_gridSize * (CELL_SIZE + CELL_SPACING)) / 2,
-                (_gridSize * (CELL_SIZE + CELL_SPACING)) / 2
+            Vector2 centerPos = new(
+                _gridSize * (CELL_SIZE + CELL_SPACING) / 2,
+                _gridSize * (CELL_SIZE + CELL_SPACING) / 2
             );
 
             string cascadeText = $"⚡ CASCADE x{cascadeLevel}! ⚡";
-            Color cascadeColor = new Color(1.0f, 0.8f, 0.0f); // Golden yellow
+            Color cascadeColor = new(1.0f, 0.8f, 0.0f); // Golden yellow
 
             ComboParticles.SpawnFloatingText(this, centerPos, cascadeText, cascadeColor);
             GD.Print($"[GridUI] Cascade x{cascadeLevel} displayed!");
