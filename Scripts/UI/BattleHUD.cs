@@ -38,6 +38,7 @@ namespace AlJourney.Scripts.UI
         // References
         private DualHeroSystem _heroSystem;
         private readonly List<EnemyHealthBar> _enemyHealthBars = [];
+        private PauseMenu _pauseMenu;
 
         public override void _Ready()
         {
@@ -68,6 +69,10 @@ namespace AlJourney.Scripts.UI
             _pauseButton.Pressed += OnPausePressed;
             GameStateManager.Instance.CoinsChanged += OnCoinsChanged;
             GameStateManager.Instance.WaveChanged += OnWaveChanged;
+
+            // Create pause menu
+            _pauseMenu = new PauseMenu();
+            AddChild(_pauseMenu);
 
             GD.Print("[BattleHUD] Initialized for dual hero system");
         }
@@ -242,8 +247,7 @@ namespace AlJourney.Scripts.UI
         private void OnPausePressed()
         {
             GD.Print("[BattleHUD] Pause pressed");
-            GetTree().Paused = true;
-            // TODO: Show pause menu
+            _pauseMenu?.Pause();
         }
 
         public override void _ExitTree()

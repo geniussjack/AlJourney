@@ -203,6 +203,12 @@ namespace AlJourney.Scripts.UI
             if (!GameStateManager.Instance.SpendCoins(price))
             {
                 GD.Print($"[ShopUI] Cannot afford {upgradeType} upgrade");
+                // Play error sound or shake animation
+                var button = GetUpgradeButton(upgradeType);
+                if (button != null)
+                {
+                    ShakeButton(button);
+                }
                 return;
             }
 
@@ -212,11 +218,57 @@ namespace AlJourney.Scripts.UI
             // Play sound
             AudioManager.Instance.PlaySfx("res://Resources/Audio/SFX/button_click.wav");
 
+            // Animate purchase success
+            var purchasedButton = GetUpgradeButton(upgradeType);
+            if (purchasedButton != null)
+            {
+                PulseButton(purchasedButton);
+            }
+
             // Update display
             _coinsLabel.Text = $"💰 {GameStateManager.Instance.Coins}";
             UpdateShopDisplay();
 
             GD.Print($"[ShopUI] Purchased {upgradeType} upgrade for {price} coins");
+        }
+
+        /// <summary>
+        /// Gets button for upgrade type.
+        /// </summary>
+        private Button GetUpgradeButton(UpgradeType type)
+        {
+            return type switch
+            {
+                UpgradeType.MageHealth => _mageHealthButton,
+                UpgradeType.MageDamage => _mageDamageButton,
+                UpgradeType.MageDefense => _mageDefenseButton,
+                UpgradeType.WarriorHealth => _warriorHealthButton,
+                UpgradeType.WarriorDamage => _warriorDamageButton,
+                UpgradeType.WarriorDefense => _warriorDefenseButton,
+                _ => null
+            };
+        }
+
+        /// <summary>
+        /// Shakes button when purchase fails.
+        /// </summary>
+        private void ShakeButton(Button button)
+        {
+            Vector2 originalPos = button.Position;
+            var tween = CreateTween();
+            tween.TweenProperty(button, "position:x", originalPos.X + 5, 0.05f);
+            tween.TweenProperty(button, "position:x", originalPos.X - 5, 0.05f);
+            tween.TweenProperty(button, "position:x", originalPos.X, 0.05f);
+        }
+
+        /// <summary>
+        /// Pulses button on successful purchase.
+        /// </summary>
+        private void PulseButton(Button button)
+        {
+            var tween = CreateTween();
+            tween.TweenProperty(button, "scale", new Vector2(1.1f, 1.1f), 0.1f);
+            tween.TweenProperty(button, "scale", Vector2.One, 0.1f);
         }
 
         /// <summary>
