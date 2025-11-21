@@ -125,6 +125,14 @@ namespace AlJourney.Scripts.Managers
             }
 
             CurrentSave.CurrentWave++;
+
+            // Update highest wave if current wave is higher
+            if (CurrentSave.CurrentWave > CurrentSave.HighestWave)
+            {
+                CurrentSave.HighestWave = CurrentSave.CurrentWave;
+                GD.Print($"[GameStateManager] New highest wave record: {CurrentSave.HighestWave}");
+            }
+
             _ = EmitSignal(SignalName.WaveChanged, CurrentSave.CurrentWave);
 
             GD.Print($"[GameStateManager] Advanced to wave {CurrentSave.CurrentWave}");
