@@ -239,41 +239,51 @@ namespace AlJourney.Scripts.UI
         {
             if (wasValid)
             {
-                // Process matches
-                ProcessMatches();
+                // Find matches for visualization only (don't process them yet)
+                List<MatchResult> matches = _gridManager.FindAllMatches();
+
+                if (matches.Count > 0)
+                {
+                    // Animate matched elements (visual feedback only)
+                    foreach (MatchResult match in matches)
+                    {
+                        foreach ((int x, int y) in match.MatchedPositions)
+                        {
+                            _visualGrid[x, y]?.PlayMatchAnimation();
+                        }
+                    }
+                }
             }
         }
 
         /// <summary>
-        /// Processes and animates matches.
+        /// Visualizes combo effects (called by BattleManager).
         /// </summary>
-        private void ProcessMatches()
+        public void VisualizeMatchesAndEffects(List<MatchResult> matches, List<ComboEffect> effects)
         {
-            List<MatchResult> matches = _gridManager.FindAllMatches();
-
-            if (matches.Count > 0)
+            if (matches == null || effects == null || matches.Count == 0)
             {
-                // Get combo effects
-                List<ComboEffect> effects = _comboSystem.ProcessMatches(matches);
+                return;
+            }
 
-                // Visualize combo effects
-                VisualizeComboEffects(effects, matches);
+            // Visualize combo effects
+            VisualizeComboEffects(effects, matches);
 
-                // Animate matched elements
-                foreach (MatchResult match in matches)
+            // Show cascade indicator if applicable
+            int cascadeLevel = _comboSystem.GetCascadeLevel();
+            if (cascadeLevel > 0)
+            {
+                ShowCascadeIndicator(cascadeLevel);
+            }
+
+            // Animate matched elements disappearing
+            foreach (MatchResult match in matches)
+            {
+                foreach ((int x, int y) in match.MatchedPositions)
                 {
-                    foreach ((int x, int y) in match.MatchedPositions)
-                    {
-                        _visualGrid[x, y]?.PlayMatchAnimation();
-                        _visualGrid[x, y] = null;
-                    }
+                    _visualGrid[x, y]?.PlayMatchAnimation();
+                    _visualGrid[x, y] = null;
                 }
-
-                // Process matches in grid manager (with delay)
-                GetTree().CreateTimer(0.4f).Timeout += () =>
-                {
-                    _gridManager.ProcessMatches(matches);
-                };
             }
         }
 
@@ -412,53 +422,8 @@ namespace AlJourney.Scripts.UI
                 }
             }
 
-            // Check for cascade matches after animation
-            GetTree().CreateTimer(0.5f).Timeout += ProcessCascadeMatches;
-        }
-
-        /// <summary>
-        /// Processes cascade matches with bonus.
-        /// </summary>
-        private void ProcessCascadeMatches()
-        {
-            List<MatchResult> matches = _gridManager.FindAllMatches();
-
-            if (matches.Count > 0)
-            {
-                // Get combo effects with cascade bonus
-                List<ComboEffect> effects = _comboSystem.ProcessMatches(matches, isCascade: true);
-
-                // Visualize combo effects with cascade indicator
-                VisualizeComboEffects(effects, matches);
-
-                // Show cascade level indicator
-                int cascadeLevel = _comboSystem.GetCascadeLevel();
-                if (cascadeLevel > 0)
-                {
-                    ShowCascadeIndicator(cascadeLevel);
-                }
-
-                // Animate matched elements
-                foreach (MatchResult match in matches)
-                {
-                    foreach ((int x, int y) in match.MatchedPositions)
-                    {
-                        _visualGrid[x, y]?.PlayMatchAnimation();
-                        _visualGrid[x, y] = null;
-                    }
-                }
-
-                // Process matches in grid manager (with delay)
-                GetTree().CreateTimer(0.4f).Timeout += () =>
-                {
-                    _gridManager.ProcessMatches(matches);
-                };
-            }
-            else
-            {
-                // No more cascades - reset counter
-                _comboSystem.ResetCascade();
-            }
+            // BattleManager now handles cascade detection and processing
+            GD.Print("[GridUI] Grid refilled and visualized");
         }
 
         /// <summary>

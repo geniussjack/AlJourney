@@ -3,6 +3,7 @@ using AlJourney.Scripts.Core;
 using AlJourney.Scripts.Data;
 using AlJourney.Scripts.Managers;
 using AlJourney.Scripts.Match3;
+using AlJourney.Scripts.UI;
 using AlJourney.Scripts.Utils;
 using Godot;
 using System.Collections.Generic;
@@ -35,6 +36,10 @@ namespace AlJourney.Scripts.Battle
         private GridManager _gridManager;
         private ComboSystem _comboSystem;
         private CameraShake _cameraShake;
+        private GridUI _gridUI;
+
+        // Accumulated combo effects during player turn
+        private readonly List<ComboEffect> _accumulatedEffects = [];
 
         /// <summary>
         /// Current battle phase.
@@ -70,6 +75,15 @@ namespace AlJourney.Scripts.Battle
             _gridManager.SwapCompleted += OnSwapCompleted;
 
             GD.Print("[BattleManager] Initialized for dual hero system");
+        }
+
+        /// <summary>
+        /// Initializes battle manager with GridUI reference.
+        /// </summary>
+        public void Initialize(GridUI gridUI)
+        {
+            _gridUI = gridUI;
+            GD.Print("[BattleManager] GridUI reference set");
         }
 
         /// <summary>
@@ -223,51 +237,66 @@ namespace AlJourney.Scripts.Battle
             CurrentPhase = BattlePhase.PlayerCombo;
             _ = EmitSignal(SignalName.PhaseChanged, (int)CurrentPhase);
 
-            // Find and process all matches
-            List<MatchResult> matches = _gridManager.FindAllMatches();
+            // Clear accumulated effects from previous turn
+            _accumulatedEffects.Clear();
+            _comboSystem.ResetCascade();
 
-            if (matches.Count > 0)
-            {
-                // Process matches will trigger cascade
-                _gridManager.ProcessMatches(matches);
-
-                // Process combo effects
-                List<ComboEffect> comboEffects = _comboSystem.ProcessMatches(matches);
-                OnCombosProcessed(comboEffects);
-            }
-            else
-            {
-                // No matches, move to enemy turn
-                StartEnemyTurn();
-            }
+            // Process all matches and cascades
+            ProcessMatchesRecursive();
         }
 
         /// <summary>
-        /// Called when combo system finishes processing matches.
+        /// Recursively processes matches and cascades, accumulating all effects.
         /// </summary>
-        private void OnCombosProcessed(List<ComboEffect> effects)
+        private void ProcessMatchesRecursive(bool isCascade = false)
         {
-            // Apply all combo effects
-            foreach (ComboEffect effect in effects)
+            // Find all matches on current grid
+            List<MatchResult> matches = _gridManager.FindAllMatches();
+
+            if (matches.Count == 0)
             {
-                ApplyComboEffect(effect);
+                // No more matches - apply all accumulated effects
+                ApplyAccumulatedEffects();
+                return;
             }
 
-            // Check for cascade matches
-            List<MatchResult> cascadeMatches = _gridManager.FindAllMatches();
-            if (cascadeMatches.Count > 0)
+            // Process combo effects
+            List<ComboEffect> comboEffects = _comboSystem.ProcessMatches(matches, isCascade);
+
+            // Accumulate effects
+            _accumulatedEffects.AddRange(comboEffects);
+
+            // Visualize matches and effects in GridUI
+            _gridUI?.VisualizeMatchesAndEffects(matches, comboEffects);
+
+            // Process matches in grid (remove, apply gravity, refill)
+            _gridManager.ProcessMatches(matches);
+
+            // Wait for animation and refill, then check for cascades
+            GetTree().CreateTimer(0.6f).Timeout += () =>
             {
-                GD.Print("[BattleManager] Cascade detected!");
-                _gridManager.ProcessMatches(cascadeMatches);
+                ProcessMatchesRecursive(isCascade: true);
+            };
+        }
 
-                // Process cascade effects
-                List<ComboEffect> cascadeEffects = _comboSystem.ProcessMatches(cascadeMatches);
+        /// <summary>
+        /// Applies all accumulated combo effects to heroes and enemies.
+        /// </summary>
+        private void ApplyAccumulatedEffects()
+        {
+            if (_accumulatedEffects.Count == 0)
+            {
+                GD.Print("[BattleManager] No combo effects to apply");
+                StartEnemyTurn();
+                return;
+            }
 
-                // Apply cascade effects
-                foreach (ComboEffect effect in cascadeEffects)
-                {
-                    ApplyComboEffect(effect);
-                }
+            GD.Print($"[BattleManager] Applying {_accumulatedEffects.Count} accumulated combo effects");
+
+            // Apply all accumulated combo effects
+            foreach (ComboEffect effect in _accumulatedEffects)
+            {
+                ApplyComboEffect(effect);
             }
 
             // Process hero status effects (regeneration, etc)
