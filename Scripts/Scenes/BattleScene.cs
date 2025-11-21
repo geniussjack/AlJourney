@@ -4,6 +4,7 @@ using AlJourney.Scripts.Data;
 using AlJourney.Scripts.Managers;
 using AlJourney.Scripts.Match3;
 using AlJourney.Scripts.UI;
+using AlJourney.Scripts.Utils;
 using Godot;
 
 namespace AlJourney.Scripts.Scenes
@@ -19,6 +20,8 @@ namespace AlJourney.Scripts.Scenes
         private GridUI _gridUI;
         private BattleManager _battleManager;
         private DualHeroSystem _heroSystem;
+        private Camera2D _camera;
+        private CameraShake _cameraShake;
 
         // Managers
         private GridManager _gridManager;
@@ -34,6 +37,17 @@ namespace AlJourney.Scripts.Scenes
             _battleHUD = GetNode<BattleHUD>("CanvasLayer/BattleHUD");
             _gridUI = GetNode<GridUI>("CanvasLayer/CenterContainer/GridUI");
             _battleManager = GetNode<BattleManager>("BattleManager");
+
+            // Create camera with shake effect
+            _camera = new Camera2D
+            {
+                Enabled = true,
+                Position = new Vector2(640, 360) // Center of 1280x720
+            };
+            AddChild(_camera);
+
+            _cameraShake = new CameraShake();
+            _camera.AddChild(_cameraShake);
 
             // Create hero system
             _heroSystem = new DualHeroSystem();
@@ -55,7 +69,7 @@ namespace AlJourney.Scripts.Scenes
 
             // Start battle
             int currentWave = _gameStateManager.CurrentWave;
-            _battleManager.StartBattle(_heroSystem, currentWave);
+            _battleManager.StartBattle(_heroSystem, currentWave, _cameraShake);
 
             // Update HUD with enemies
             _battleHUD.SetupEnemies(_battleManager.Enemies);

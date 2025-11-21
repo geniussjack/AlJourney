@@ -3,6 +3,7 @@ using AlJourney.Scripts.Core;
 using AlJourney.Scripts.Data;
 using AlJourney.Scripts.Managers;
 using AlJourney.Scripts.Match3;
+using AlJourney.Scripts.Utils;
 using Godot;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,6 +34,7 @@ namespace AlJourney.Scripts.Battle
 
         private GridManager _gridManager;
         private ComboSystem _comboSystem;
+        private CameraShake _cameraShake;
 
         /// <summary>
         /// Current battle phase.
@@ -73,11 +75,12 @@ namespace AlJourney.Scripts.Battle
         /// <summary>
         /// Starts a new battle with dual heroes and wave number.
         /// </summary>
-        public void StartBattle(DualHeroSystem heroSystem, int waveNumber)
+        public void StartBattle(DualHeroSystem heroSystem, int waveNumber, CameraShake cameraShake = null)
         {
             HeroSystem = heroSystem;
             CurrentWave = waveNumber;
             _necromancerTurnCount = 0;
+            _cameraShake = cameraShake;
 
             // Connect hero signals
             HeroSystem.BothHeroesDied += OnBothHeroesDied;
@@ -327,9 +330,19 @@ namespace AlJourney.Scripts.Battle
             {
                 // Hit all enemies
                 GD.Print($"[BattleManager] {heroName} uses {elementName} AoE for {damage} damage!");
+
+                // Camera shake for AoE
+                _cameraShake?.ShakeStrong();
+
+                // Spawn combo particles
+                ComboParticles.SpawnComboEffect(this, new Vector2(640, 360), effect.ElementType, effect.ComboLevel);
+
                 foreach (Enemy enemy in Enemies.Where(e => e.IsAlive))
                 {
                     int reflected = enemy.TakeDamage(damage, activeHero.AttackType);
+
+                    // Spawn damage number
+                    ComboParticles.SpawnDamageNumber(this, new Vector2(400, 200), damage);
 
                     // Apply status effect
                     if (effect.StatusEffect != null)
@@ -351,7 +364,17 @@ namespace AlJourney.Scripts.Battle
                 if (target != null)
                 {
                     GD.Print($"[BattleManager] {heroName} attacks {target.CharacterName} with {elementName} for {damage} damage!");
+
+                    // Camera shake for single target
+                    _cameraShake?.ShakeMedium();
+
+                    // Spawn combo particles
+                    ComboParticles.SpawnComboEffect(this, new Vector2(640, 300), effect.ElementType, effect.ComboLevel);
+
                     int reflected = target.TakeDamage(damage, activeHero.AttackType);
+
+                    // Spawn damage number
+                    ComboParticles.SpawnDamageNumber(this, new Vector2(640, 250), damage);
 
                     // Apply status effect
                     if (effect.StatusEffect != null)
@@ -377,9 +400,19 @@ namespace AlJourney.Scripts.Battle
 
             GD.Print($"[BattleManager] {activeHero.CharacterName} heals both heroes for {healing} HP!");
 
+            // Light camera shake for heal
+            _cameraShake?.ShakeLight();
+
+            // Spawn heal particles
+            ComboParticles.SpawnComboEffect(this, new Vector2(640, 360), ElementType.Heal, effect.ComboLevel);
+
             // Heal BOTH heroes
             HeroSystem.Mage.Heal(healing);
             HeroSystem.Warrior.Heal(healing);
+
+            // Spawn heal numbers
+            ComboParticles.SpawnHealNumber(this, new Vector2(200, 100), healing);
+            ComboParticles.SpawnHealNumber(this, new Vector2(1000, 100), healing);
 
             // 4-match: Clear negative effects on both heroes
             if (effect.ComboLevel == 2)
@@ -406,9 +439,19 @@ namespace AlJourney.Scripts.Battle
 
             GD.Print($"[BattleManager] {activeHero.CharacterName} grants {shield} shield to both heroes!");
 
+            // Light camera shake for shield
+            _cameraShake?.ShakeLight();
+
+            // Spawn shield particles
+            ComboParticles.SpawnComboEffect(this, new Vector2(640, 360), ElementType.Shield, effect.ComboLevel);
+
             // Shield BOTH heroes
             HeroSystem.Mage.AddShield(shield);
             HeroSystem.Warrior.AddShield(shield);
+
+            // Spawn shield numbers
+            ComboParticles.SpawnShieldNumber(this, new Vector2(200, 100), shield);
+            ComboParticles.SpawnShieldNumber(this, new Vector2(1000, 100), shield);
 
             // Apply status effect (reflect/immunity) to both heroes
             if (effect.StatusEffect != null)
