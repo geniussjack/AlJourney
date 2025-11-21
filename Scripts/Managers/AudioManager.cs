@@ -154,6 +154,69 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
+        /// Fades out current music over duration.
+        /// </summary>
+        public void FadeOutMusic(float duration = 1.0f)
+        {
+            if (_musicPlayer == null || !_musicPlayer.Playing)
+            {
+                return;
+            }
+
+            Tween tween = CreateTween();
+            _ = tween.TweenProperty(_musicPlayer, "volume_db", -80.0f, duration);
+            _ = tween.TweenCallback(Callable.From(() =>
+            {
+                _musicPlayer.Stop();
+                UpdateVolumes(); // Restore original volume
+            }));
+
+            GD.Print($"[AudioManager] Fading out music over {duration}s");
+        }
+
+        /// <summary>
+        /// Fades in music over duration. Music should already be playing.
+        /// </summary>
+        public void FadeInMusic(float duration = 1.0f)
+        {
+            if (_musicPlayer == null || !_musicPlayer.Playing)
+            {
+                return;
+            }
+
+            // Start at silent
+            _musicPlayer.VolumeDb = -80.0f;
+
+            // Fade to target volume
+            float targetVolume = Mathf.LinearToDb(MusicVolume * MasterVolume);
+            Tween tween = CreateTween();
+            _ = tween.TweenProperty(_musicPlayer, "volume_db", targetVolume, duration);
+
+            GD.Print($"[AudioManager] Fading in music over {duration}s");
+        }
+
+        /// <summary>
+        /// Crossfades from current music to new music.
+        /// </summary>
+        public void CrossfadeMusic(string newMusicPath, float duration = 1.0f, bool loop = true)
+        {
+            // Fade out current
+            if (_musicPlayer.Playing)
+            {
+                FadeOutMusic(duration);
+            }
+
+            // Wait and play new music with fade in
+            GetTree().CreateTimer(duration).Timeout += () =>
+            {
+                PlayMusic(newMusicPath, loop);
+                FadeInMusic(duration);
+            };
+
+            GD.Print($"[AudioManager] Crossfading to: {newMusicPath}");
+        }
+
+        /// <summary>
         /// Updates volume for all audio players.
         /// </summary>
         private void UpdateVolumes()

@@ -41,6 +41,14 @@ namespace AlJourney.Scripts.UI
         private int _warriorDamagePrice;
         private int _warriorDefensePrice;
 
+        // Upgrade amounts (fixed when shop opens to ensure consistency)
+        private int _mageHealthUpgrade;
+        private int _mageDamageUpgrade;
+        private int _mageDefenseUpgrade;
+        private int _warriorHealthUpgrade;
+        private int _warriorDamageUpgrade;
+        private int _warriorDefenseUpgrade;
+
         public override void _Ready()
         {
             // Get UI elements
@@ -103,7 +111,7 @@ namespace AlJourney.Scripts.UI
         }
 
         /// <summary>
-        /// Calculates upgrade prices based on current wave.
+        /// Calculates upgrade prices and amounts based on current wave.
         /// </summary>
         private void CalculatePrices(int wave)
         {
@@ -123,6 +131,14 @@ namespace AlJourney.Scripts.UI
             // Defense upgrades (cheaper)
             _mageDefensePrice = Mathf.CeilToInt(basePrice * scaleFactor * 0.8f);
             _warriorDefensePrice = Mathf.CeilToInt(basePrice * scaleFactor * 0.8f);
+
+            // Generate upgrade amounts (fixed for this shop visit)
+            _mageHealthUpgrade = GD.RandRange(GameConstants.SHOP_UPGRADE_HP_MIN, GameConstants.SHOP_UPGRADE_HP_MAX);
+            _mageDamageUpgrade = GD.RandRange(GameConstants.SHOP_UPGRADE_DAMAGE_MIN, GameConstants.SHOP_UPGRADE_DAMAGE_MAX);
+            _mageDefenseUpgrade = GD.RandRange(GameConstants.SHOP_UPGRADE_DEFENSE_MIN, GameConstants.SHOP_UPGRADE_DEFENSE_MAX);
+            _warriorHealthUpgrade = GD.RandRange(GameConstants.SHOP_UPGRADE_HP_MIN, GameConstants.SHOP_UPGRADE_HP_MAX);
+            _warriorDamageUpgrade = GD.RandRange(GameConstants.SHOP_UPGRADE_DAMAGE_MIN, GameConstants.SHOP_UPGRADE_DAMAGE_MAX);
+            _warriorDefenseUpgrade = GD.RandRange(GameConstants.SHOP_UPGRADE_DEFENSE_MIN, GameConstants.SHOP_UPGRADE_DEFENSE_MAX);
         }
 
         /// <summary>
@@ -131,59 +147,45 @@ namespace AlJourney.Scripts.UI
         private void UpdateShopDisplay()
         {
             int coins = GameStateManager.Instance.Coins;
+            SaveData saveData = GameStateManager.Instance.CurrentSave;
 
-            // Update Mage upgrades
+            if (saveData == null)
+            {
+                GD.PrintErr("[ShopUI] No save data available");
+                return;
+            }
+
+            // Update Mage upgrades with stat preview
             UpdateUpgradeButton(_mageHealthButton, _mageHealthLabel, _mageHealthPrice, coins,
-                $"+{GetHealthUpgradeAmount()} Max HP");
+                saveData.MageMaxHealth, _mageHealthUpgrade, "Max HP");
             UpdateUpgradeButton(_mageDamageButton, _mageDamageLabel, _mageDamagePrice, coins,
-                $"+{GetDamageUpgradeAmount()} Damage");
+                saveData.MageDamage, _mageDamageUpgrade, "Damage");
             UpdateUpgradeButton(_mageDefenseButton, _mageDefenseLabel, _mageDefensePrice, coins,
-                $"+{GetDefenseUpgradeAmount()} Defense");
+                saveData.MageDefense, _mageDefenseUpgrade, "Defense");
 
-            // Update Warrior upgrades
+            // Update Warrior upgrades with stat preview
             UpdateUpgradeButton(_warriorHealthButton, _warriorHealthLabel, _warriorHealthPrice, coins,
-                $"+{GetHealthUpgradeAmount()} Max HP");
+                saveData.WarriorMaxHealth, _warriorHealthUpgrade, "Max HP");
             UpdateUpgradeButton(_warriorDamageButton, _warriorDamageLabel, _warriorDamagePrice, coins,
-                $"+{GetDamageUpgradeAmount()} Damage");
+                saveData.WarriorDamage, _warriorDamageUpgrade, "Damage");
             UpdateUpgradeButton(_warriorDefenseButton, _warriorDefenseLabel, _warriorDefensePrice, coins,
-                $"+{GetDefenseUpgradeAmount()} Defense");
+                saveData.WarriorDefense, _warriorDefenseUpgrade, "Defense");
         }
 
         /// <summary>
-        /// Updates a single upgrade button's state and label.
+        /// Updates a single upgrade button's state and label with stat preview.
         /// </summary>
-        private static void UpdateUpgradeButton(Button button, Label priceLabel, int price, int currentCoins, string upgradeText)
+        private static void UpdateUpgradeButton(Button button, Label priceLabel, int price, int currentCoins, int currentStat, int upgradeAmount, string statName)
         {
             bool canAfford = currentCoins >= price;
             button.Disabled = !canAfford;
-            priceLabel.Text = $"{upgradeText}\n💰 {price}";
+
+            // Display format: "80 → 110 Max HP" instead of "+30 Max HP"
+            int newStat = currentStat + upgradeAmount;
+            priceLabel.Text = $"{currentStat} → {newStat} {statName}\n💰 {price}";
 
             // Visual feedback
             priceLabel.Modulate = canAfford ? Colors.White : Colors.Gray;
-        }
-
-        /// <summary>
-        /// Gets random health upgrade amount.
-        /// </summary>
-        private static int GetHealthUpgradeAmount()
-        {
-            return GD.RandRange(GameConstants.SHOP_UPGRADE_HP_MIN, GameConstants.SHOP_UPGRADE_HP_MAX);
-        }
-
-        /// <summary>
-        /// Gets random damage upgrade amount.
-        /// </summary>
-        private static int GetDamageUpgradeAmount()
-        {
-            return GD.RandRange(GameConstants.SHOP_UPGRADE_DAMAGE_MIN, GameConstants.SHOP_UPGRADE_DAMAGE_MAX);
-        }
-
-        /// <summary>
-        /// Gets random defense upgrade amount.
-        /// </summary>
-        private static int GetDefenseUpgradeAmount()
-        {
-            return GD.RandRange(GameConstants.SHOP_UPGRADE_DEFENSE_MIN, GameConstants.SHOP_UPGRADE_DEFENSE_MAX);
         }
 
         /// <summary>
@@ -283,9 +285,9 @@ namespace AlJourney.Scripts.UI
         }
 
         /// <summary>
-        /// Applies purchased upgrade to save data.
+        /// Applies purchased upgrade to save data using stored upgrade amounts.
         /// </summary>
-        private static void ApplyUpgrade(UpgradeType type)
+        private void ApplyUpgrade(UpgradeType type)
         {
             SaveData saveData = GameStateManager.Instance.CurrentSave;
             if (saveData == null)
@@ -296,41 +298,35 @@ namespace AlJourney.Scripts.UI
             switch (type)
             {
                 case UpgradeType.MageHealth:
-                    int mageHealthUpgrade = GetHealthUpgradeAmount();
-                    saveData.MageMaxHealth += mageHealthUpgrade;
-                    saveData.MageHealth += mageHealthUpgrade; // Also heal by upgrade amount
-                    GD.Print($"[ShopUI] Mage Max HP +{mageHealthUpgrade}");
+                    saveData.MageMaxHealth += _mageHealthUpgrade;
+                    saveData.MageHealth += _mageHealthUpgrade; // Also heal by upgrade amount
+                    GD.Print($"[ShopUI] Mage Max HP: {saveData.MageMaxHealth - _mageHealthUpgrade} → {saveData.MageMaxHealth}");
                     break;
 
                 case UpgradeType.MageDamage:
-                    int mageDamageUpgrade = GetDamageUpgradeAmount();
-                    saveData.MageDamage += mageDamageUpgrade;
-                    GD.Print($"[ShopUI] Mage Damage +{mageDamageUpgrade}");
+                    saveData.MageDamage += _mageDamageUpgrade;
+                    GD.Print($"[ShopUI] Mage Damage: {saveData.MageDamage - _mageDamageUpgrade} → {saveData.MageDamage}");
                     break;
 
                 case UpgradeType.MageDefense:
-                    int mageDefenseUpgrade = GetDefenseUpgradeAmount();
-                    saveData.MageDefense += mageDefenseUpgrade;
-                    GD.Print($"[ShopUI] Mage Defense +{mageDefenseUpgrade}");
+                    saveData.MageDefense += _mageDefenseUpgrade;
+                    GD.Print($"[ShopUI] Mage Defense: {saveData.MageDefense - _mageDefenseUpgrade} → {saveData.MageDefense}");
                     break;
 
                 case UpgradeType.WarriorHealth:
-                    int warriorHealthUpgrade = GetHealthUpgradeAmount();
-                    saveData.WarriorMaxHealth += warriorHealthUpgrade;
-                    saveData.WarriorHealth += warriorHealthUpgrade;
-                    GD.Print($"[ShopUI] Warrior Max HP +{warriorHealthUpgrade}");
+                    saveData.WarriorMaxHealth += _warriorHealthUpgrade;
+                    saveData.WarriorHealth += _warriorHealthUpgrade;
+                    GD.Print($"[ShopUI] Warrior Max HP: {saveData.WarriorMaxHealth - _warriorHealthUpgrade} → {saveData.WarriorMaxHealth}");
                     break;
 
                 case UpgradeType.WarriorDamage:
-                    int warriorDamageUpgrade = GetDamageUpgradeAmount();
-                    saveData.WarriorDamage += warriorDamageUpgrade;
-                    GD.Print($"[ShopUI] Warrior Damage +{warriorDamageUpgrade}");
+                    saveData.WarriorDamage += _warriorDamageUpgrade;
+                    GD.Print($"[ShopUI] Warrior Damage: {saveData.WarriorDamage - _warriorDamageUpgrade} → {saveData.WarriorDamage}");
                     break;
 
                 case UpgradeType.WarriorDefense:
-                    int warriorDefenseUpgrade = GetDefenseUpgradeAmount();
-                    saveData.WarriorDefense += warriorDefenseUpgrade;
-                    GD.Print($"[ShopUI] Warrior Defense +{warriorDefenseUpgrade}");
+                    saveData.WarriorDefense += _warriorDefenseUpgrade;
+                    GD.Print($"[ShopUI] Warrior Defense: {saveData.WarriorDefense - _warriorDefenseUpgrade} → {saveData.WarriorDefense}");
                     break;
             }
 

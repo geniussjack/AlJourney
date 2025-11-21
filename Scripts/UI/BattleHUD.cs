@@ -1,6 +1,7 @@
 using AlJourney.Scripts.Characters;
 using AlJourney.Scripts.Core;
 using AlJourney.Scripts.Managers;
+using AlJourney.Scripts.Match3;
 using Godot;
 using System.Collections.Generic;
 
@@ -39,6 +40,11 @@ namespace AlJourney.Scripts.UI
         private DualHeroSystem _heroSystem;
         private readonly List<EnemyHealthBar> _enemyHealthBars = [];
         private PauseMenu _pauseMenu;
+        private ComboSystem _comboSystem;
+
+        // Hero panels for highlighting
+        private Control _mageInfoContainer;
+        private Control _warriorInfoContainer;
 
         public override void _Ready()
         {
@@ -54,6 +60,10 @@ namespace AlJourney.Scripts.UI
             _warriorHealthLabel = GetNode<Label>("MarginContainer/VBoxContainer/TopBar/HeroesContainer/WarriorInfo/HealthLabel");
             _warriorShieldLabel = GetNode<Label>("MarginContainer/VBoxContainer/TopBar/HeroesContainer/WarriorInfo/ShieldLabel");
 
+            // Get hero info containers for highlighting
+            _mageInfoContainer = GetNode<Control>("MarginContainer/VBoxContainer/TopBar/HeroesContainer/MageInfo");
+            _warriorInfoContainer = GetNode<Control>("MarginContainer/VBoxContainer/TopBar/HeroesContainer/WarriorInfo");
+
             // Get enemy container
             _enemiesContainer = GetNode<HBoxContainer>("MarginContainer/VBoxContainer/TopBar/EnemiesInfo");
 
@@ -65,10 +75,14 @@ namespace AlJourney.Scripts.UI
             // Get buttons
             _pauseButton = GetNode<Button>("MarginContainer/VBoxContainer/TopBar/PauseButton");
 
+            // Get ComboSystem
+            _comboSystem = GetNode<ComboSystem>("/root/ComboSystem");
+
             // Connect signals
             _pauseButton.Pressed += OnPausePressed;
             GameStateManager.Instance.CoinsChanged += OnCoinsChanged;
             GameStateManager.Instance.WaveChanged += OnWaveChanged;
+            _comboSystem.CombosProcessed += OnCombosProcessed;
 
             // Create pause menu
             _pauseMenu = new PauseMenu();
@@ -239,6 +253,83 @@ namespace AlJourney.Scripts.UI
             _pauseMenu?.Pause();
         }
 
+        /// <summary>
+        /// Called when combos are processed to highlight active hero.
+        /// </summary>
+        private void OnCombosProcessed(int comboCount)
+        {
+            if (comboCount == 0 || _comboSystem == null)
+            {
+                return;
+            }
+
+            // Get last processed effects
+            List<ComboEffect> effects = _comboSystem.GetLastProcessedEffects();
+            if (effects == null || effects.Count == 0)
+            {
+                return;
+            }
+
+            // Determine which heroes are active based on element types
+            bool mageActive = false;
+            bool warriorActive = false;
+
+            foreach (ComboEffect effect in effects)
+            {
+                switch (effect.ElementType)
+                {
+                    case ElementType.Fire:
+                    case ElementType.Heal:
+                        mageActive = true;
+                        break;
+
+                    case ElementType.Sword:
+                    case ElementType.Shield:
+                        warriorActive = true;
+                        break;
+                }
+            }
+
+            // Highlight active heroes
+            if (mageActive)
+            {
+                HighlightHero(_mageInfoContainer, new Color(0.5f, 0.8f, 1.0f)); // Cyan glow for Mage
+            }
+
+            if (warriorActive)
+            {
+                HighlightHero(_warriorInfoContainer, new Color(1.0f, 0.7f, 0.3f)); // Orange glow for Warrior
+            }
+        }
+
+        /// <summary>
+        /// Highlights a hero container with a color glow effect.
+        /// </summary>
+        private void HighlightHero(Control container, Color highlightColor)
+        {
+            if (container == null)
+            {
+                return;
+            }
+
+            // Reset to white first
+            container.Modulate = Colors.White;
+
+            // Create highlight animation
+            Tween tween = CreateTween();
+            _ = tween.SetEase(Tween.EaseType.Out);
+            _ = tween.SetTrans(Tween.TransitionType.Cubic);
+
+            // Pulse to highlight color
+            _ = tween.TweenProperty(container, "modulate", highlightColor, 0.2f);
+
+            // Hold for a moment
+            _ = tween.TweenInterval(0.3f);
+
+            // Fade back to white
+            _ = tween.TweenProperty(container, "modulate", Colors.White, 0.5f);
+        }
+
         public override void _ExitTree()
         {
             // Disconnect signals
@@ -246,6 +337,11 @@ namespace AlJourney.Scripts.UI
             {
                 _heroSystem.HeroHealthChanged -= OnHeroHealthChanged;
                 _heroSystem.HeroShieldChanged -= OnHeroShieldChanged;
+            }
+
+            if (_comboSystem != null)
+            {
+                _comboSystem.CombosProcessed -= OnCombosProcessed;
             }
 
             GameStateManager.Instance.CoinsChanged -= OnCoinsChanged;

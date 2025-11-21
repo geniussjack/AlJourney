@@ -59,6 +59,9 @@ namespace AlJourney.Scripts.Scenes
             // Initialize HUD
             _battleHUD.Initialize(_heroSystem);
 
+            // Initialize battle manager with GridUI reference
+            _battleManager.Initialize(_gridUI);
+
             // Connect battle manager signals
             _battleManager.WaveCompleted += OnWaveCompleted;
             _battleManager.BattleEnded += OnBattleEnded;
