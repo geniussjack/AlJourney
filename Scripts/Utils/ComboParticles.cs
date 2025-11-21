@@ -22,7 +22,7 @@ namespace AlJourney.Scripts.Utils
                 Amount = GetParticleAmount(comboLevel),
                 Lifetime = 0.5f,
                 Explosiveness = 0.8f,
-                SpreadDegrees = 360.0f,
+                Spread = 360.0f,  // Fixed: SpreadDegrees -> Spread for Godot 4.5
                 InitialVelocityMin = 50.0f,
                 InitialVelocityMax = 150.0f,
                 ScaleAmountMin = 0.5f,
