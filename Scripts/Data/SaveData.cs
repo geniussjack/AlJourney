@@ -92,7 +92,7 @@ namespace AlJourney.Scripts.Data
         /// </summary>
         public static SaveData CreateNew()
         {
-            var save = new SaveData
+            SaveData save = new()
             {
                 CurrentWave = 1,
                 Coins = 0,

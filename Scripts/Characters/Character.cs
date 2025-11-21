@@ -106,7 +106,7 @@ namespace AlJourney.Scripts.Characters
             _attackType = attackType;
             _activeEffects = [];
 
-            EmitSignal(SignalName.HealthChanged, _currentHealth, _maxHealth);
+            _ = EmitSignal(SignalName.HealthChanged, _currentHealth, _maxHealth);
         }
 
         /// <summary>
@@ -114,7 +114,10 @@ namespace AlJourney.Scripts.Characters
         /// </summary>
         public virtual int TakeDamage(int damage, AttackType attackType)
         {
-            if (!IsAlive) return 0;
+            if (!IsAlive)
+            {
+                return 0;
+            }
 
             // Check immunity
             if (HasStatusEffect(StatusEffect.Immunity))
@@ -135,7 +138,7 @@ namespace AlJourney.Scripts.Characters
                 _currentShield -= shieldAbsorbed;
                 finalDamage -= shieldAbsorbed;
 
-                EmitSignal(SignalName.ShieldChanged, _currentShield);
+                _ = EmitSignal(SignalName.ShieldChanged, _currentShield);
                 GD.Print($"[{_name}] Shield absorbed {shieldAbsorbed} damage. Remaining shield: {_currentShield}");
             }
 
@@ -143,8 +146,8 @@ namespace AlJourney.Scripts.Characters
             if (finalDamage > 0)
             {
                 _currentHealth = Mathf.Max(0, _currentHealth - finalDamage);
-                EmitSignal(SignalName.DamageTaken, finalDamage);
-                EmitSignal(SignalName.HealthChanged, _currentHealth, _maxHealth);
+                _ = EmitSignal(SignalName.DamageTaken, finalDamage);
+                _ = EmitSignal(SignalName.HealthChanged, _currentHealth, _maxHealth);
 
                 GD.Print($"[{_name}] Took {finalDamage} damage. HP: {_currentHealth}/{_maxHealth}");
 
@@ -171,14 +174,17 @@ namespace AlJourney.Scripts.Characters
         /// </summary>
         public virtual void Heal(int amount)
         {
-            if (!IsAlive) return;
+            if (!IsAlive)
+            {
+                return;
+            }
 
             int actualHeal = Mathf.Min(amount, _maxHealth - _currentHealth);
             if (actualHeal > 0)
             {
                 _currentHealth += actualHeal;
-                EmitSignal(SignalName.Healed, actualHeal);
-                EmitSignal(SignalName.HealthChanged, _currentHealth, _maxHealth);
+                _ = EmitSignal(SignalName.Healed, actualHeal);
+                _ = EmitSignal(SignalName.HealthChanged, _currentHealth, _maxHealth);
 
                 GD.Print($"[{_name}] Healed {actualHeal} HP. HP: {_currentHealth}/{_maxHealth}");
             }
@@ -189,10 +195,13 @@ namespace AlJourney.Scripts.Characters
         /// </summary>
         public virtual void AddShield(int amount)
         {
-            if (!IsAlive) return;
+            if (!IsAlive)
+            {
+                return;
+            }
 
             _currentShield += amount;
-            EmitSignal(SignalName.ShieldChanged, _currentShield);
+            _ = EmitSignal(SignalName.ShieldChanged, _currentShield);
 
             GD.Print($"[{_name}] Gained {amount} shield. Total: {_currentShield}");
         }
@@ -202,7 +211,10 @@ namespace AlJourney.Scripts.Characters
         /// </summary>
         public virtual void ApplyStatusEffect(StatusEffectData effect)
         {
-            if (!IsAlive || effect == null) return;
+            if (!IsAlive || effect == null)
+            {
+                return;
+            }
 
             // Check immunity
             if (HasStatusEffect(StatusEffect.Immunity))
@@ -226,7 +238,7 @@ namespace AlJourney.Scripts.Characters
             else
             {
                 _activeEffects.Add(effect);
-                EmitSignal(SignalName.StatusEffectApplied, (int)effect.Type);
+                _ = EmitSignal(SignalName.StatusEffectApplied, (int)effect.Type);
                 GD.Print($"[{_name}] Applied status effect: {effect.Type} for {effect.Duration} turns");
             }
         }
@@ -238,11 +250,11 @@ namespace AlJourney.Scripts.Characters
         {
             StatusEffect[] negativeEffects = [StatusEffect.Burning, StatusEffect.Bleeding, StatusEffect.Weakened, StatusEffect.Stunned];
 
-            var toRemove = _activeEffects.Where(e => negativeEffects.Contains(e.Type)).ToList();
+            List<StatusEffectData> toRemove = [.. _activeEffects.Where(e => negativeEffects.Contains(e.Type))];
             foreach (StatusEffectData effect in toRemove)
             {
-                _activeEffects.Remove(effect);
-                EmitSignal(SignalName.StatusEffectRemoved, (int)effect.Type);
+                _ = _activeEffects.Remove(effect);
+                _ = EmitSignal(SignalName.StatusEffectRemoved, (int)effect.Type);
                 GD.Print($"[{_name}] Removed negative effect: {effect.Type}");
             }
         }
@@ -252,9 +264,12 @@ namespace AlJourney.Scripts.Characters
         /// </summary>
         public virtual void ProcessStatusEffects()
         {
-            if (!IsAlive) return;
+            if (!IsAlive)
+            {
+                return;
+            }
 
-            var effectsToRemove = new List<StatusEffectData>();
+            List<StatusEffectData> effectsToRemove = [];
 
             foreach (StatusEffectData effect in _activeEffects)
             {
@@ -265,8 +280,8 @@ namespace AlJourney.Scripts.Characters
                         // Apply damage over time
                         int dotDamage = effect.Power;
                         _currentHealth = Mathf.Max(0, _currentHealth - dotDamage);
-                        EmitSignal(SignalName.DamageTaken, dotDamage);
-                        EmitSignal(SignalName.HealthChanged, _currentHealth, _maxHealth);
+                        _ = EmitSignal(SignalName.DamageTaken, dotDamage);
+                        _ = EmitSignal(SignalName.HealthChanged, _currentHealth, _maxHealth);
                         GD.Print($"[{_name}] {effect.Type} dealt {dotDamage} damage. HP: {_currentHealth}/{_maxHealth}");
                         break;
 
@@ -286,8 +301,8 @@ namespace AlJourney.Scripts.Characters
             // Remove expired effects
             foreach (StatusEffectData effect in effectsToRemove)
             {
-                _activeEffects.Remove(effect);
-                EmitSignal(SignalName.StatusEffectRemoved, (int)effect.Type);
+                _ = _activeEffects.Remove(effect);
+                _ = EmitSignal(SignalName.StatusEffectRemoved, (int)effect.Type);
                 GD.Print($"[{_name}] Status effect expired: {effect.Type}");
             }
 
@@ -318,7 +333,7 @@ namespace AlJourney.Scripts.Characters
         /// </summary>
         protected virtual void OnDeath()
         {
-            EmitSignal(SignalName.CharacterDied);
+            _ = EmitSignal(SignalName.CharacterDied);
             GD.Print($"[{_name}] has died!");
         }
 
@@ -329,7 +344,7 @@ namespace AlJourney.Scripts.Characters
         {
             _maxHealth += amount;
             _currentHealth += amount; // Also heal by the same amount
-            EmitSignal(SignalName.HealthChanged, _currentHealth, _maxHealth);
+            _ = EmitSignal(SignalName.HealthChanged, _currentHealth, _maxHealth);
         }
 
         /// <summary>

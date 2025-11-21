@@ -33,18 +33,21 @@ namespace AlJourney.Scripts.Match3
         /// <summary>
         /// Gets the last processed combo effects.
         /// </summary>
-        public List<ComboEffect> GetLastProcessedEffects() => _lastProcessedEffects;
+        public List<ComboEffect> GetLastProcessedEffects()
+        {
+            return _lastProcessedEffects;
+        }
 
         /// <summary>
         /// Processes all match results and converts them to combat effects.
         /// </summary>
         public List<ComboEffect> ProcessMatches(List<MatchResult> matches)
         {
-            var comboEffects = new List<ComboEffect>();
+            List<ComboEffect> comboEffects = [];
 
-            foreach (var match in matches)
+            foreach (MatchResult match in matches)
             {
-                var effect = CreateComboEffect(match);
+                ComboEffect effect = CreateComboEffect(match);
                 if (effect != null)
                 {
                     comboEffects.Add(effect);
@@ -54,7 +57,7 @@ namespace AlJourney.Scripts.Match3
             if (comboEffects.Count > 0)
             {
                 _lastProcessedEffects = comboEffects;
-                EmitSignal(SignalName.CombosProcessed, comboEffects.Count);
+                _ = EmitSignal(SignalName.CombosProcessed, comboEffects.Count);
                 GD.Print($"[ComboSystem] Processed {comboEffects.Count} combo effects");
             }
 
@@ -67,9 +70,12 @@ namespace AlJourney.Scripts.Match3
         private static ComboEffect CreateComboEffect(MatchResult match)
         {
             int comboLevel = match.GetComboLevel();
-            if (comboLevel == 0) return null;
+            if (comboLevel == 0)
+            {
+                return null;
+            }
 
-            var effect = new ComboEffect(match.ElementType, comboLevel);
+            ComboEffect effect = new(match.ElementType, comboLevel);
 
             switch (match.ElementType)
             {

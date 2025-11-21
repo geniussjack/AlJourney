@@ -38,7 +38,7 @@ namespace AlJourney.Scripts.Match3
         public static ElementData CreateRandom(int x, int y)
         {
             // Get random element type (1-4, excluding None)
-            var randomType = (ElementType)Godot.GD.RandRange(1, 4);
+            ElementType randomType = (ElementType)Godot.GD.RandRange(1, 4);
             return new ElementData(randomType, x, y);
         }
 
@@ -47,8 +47,7 @@ namespace AlJourney.Scripts.Match3
         /// </summary>
         public bool CanMatchWith(ElementData other)
         {
-            if (other == null) return false;
-            return Type == other.Type && Type != ElementType.None;
+            return other != null && Type == other.Type && Type != ElementType.None;
         }
 
         public override string ToString()

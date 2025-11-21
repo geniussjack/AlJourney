@@ -8,21 +8,19 @@ namespace AlJourney.Scripts.Characters
     /// </summary>
     public partial class PlayerCharacter : Character
     {
-        private CharacterClass _characterClass;
-
         /// <summary>
         /// Character class type.
         /// </summary>
-        public CharacterClass CharacterClass => _characterClass;
+        public CharacterClass CharacterClass { get; private set; }
 
         /// <summary>
         /// Creates a new player character based on class.
         /// </summary>
         public static PlayerCharacter Create(CharacterClass characterClass)
         {
-            var player = new PlayerCharacter
+            PlayerCharacter player = new()
             {
-                _characterClass = characterClass
+                CharacterClass = characterClass
             };
 
             switch (characterClass)
@@ -57,7 +55,7 @@ namespace AlJourney.Scripts.Characters
         /// </summary>
         public void InitializeFromSave(string name, int maxHealth, int currentHealth, int damage, int defense, CharacterClass characterClass)
         {
-            _characterClass = characterClass;
+            CharacterClass = characterClass;
             _name = name;
             _maxHealth = maxHealth;
             _currentHealth = currentHealth;
@@ -66,7 +64,7 @@ namespace AlJourney.Scripts.Characters
             _currentShield = 0;
             _attackType = characterClass == CharacterClass.Mage ? AttackType.Magical : AttackType.Physical;
 
-            EmitSignal(SignalName.HealthChanged, _currentHealth, _maxHealth);
+            _ = EmitSignal(SignalName.HealthChanged, _currentHealth, _maxHealth);
             GD.Print($"[PlayerCharacter] Loaded {_name} from save - HP: {_currentHealth}/{_maxHealth}");
         }
 

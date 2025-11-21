@@ -12,7 +12,7 @@ namespace AlJourney.Scripts.Utils
         /// </summary>
         public static Texture2D CreateColorSquare(Color color, int size = 64)
         {
-            var image = Image.CreateEmpty(size, size, false, Image.Format.Rgba8);
+            Image image = Image.CreateEmpty(size, size, false, Image.Format.Rgba8);
             image.Fill(color);
             return ImageTexture.CreateFromImage(image);
         }
@@ -22,7 +22,7 @@ namespace AlJourney.Scripts.Utils
         /// </summary>
         public static Texture2D CreateColorSquareWithBorder(Color fillColor, Color borderColor, int size = 64, int borderWidth = 4)
         {
-            var image = Image.CreateEmpty(size, size, false, Image.Format.Rgba8);
+            Image image = Image.CreateEmpty(size, size, false, Image.Format.Rgba8);
             image.Fill(fillColor);
 
             // Draw border

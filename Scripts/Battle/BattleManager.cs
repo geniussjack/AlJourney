@@ -29,10 +29,6 @@ namespace AlJourney.Scripts.Battle
         [Signal]
         public delegate void EnemyDefeatedEventHandler(Enemy enemy);
 
-        private DualHeroSystem _heroSystem;
-        private List<Enemy> _enemies;
-        private BattlePhase _currentPhase;
-        private int _currentWave;
         private int _necromancerTurnCount;
 
         private GridManager _gridManager;
@@ -41,27 +37,27 @@ namespace AlJourney.Scripts.Battle
         /// <summary>
         /// Current battle phase.
         /// </summary>
-        public BattlePhase CurrentPhase => _currentPhase;
+        public BattlePhase CurrentPhase { get; private set; }
 
         /// <summary>
         /// Current wave number.
         /// </summary>
-        public int CurrentWave => _currentWave;
+        public int CurrentWave { get; private set; }
 
         /// <summary>
         /// Dual hero system reference.
         /// </summary>
-        public DualHeroSystem HeroSystem => _heroSystem;
+        public DualHeroSystem HeroSystem { get; private set; }
 
         /// <summary>
         /// List of active enemies.
         /// </summary>
-        public List<Enemy> Enemies => _enemies;
+        public List<Enemy> Enemies { get; private set; }
 
         public override void _Ready()
         {
-            _enemies = [];
-            _currentPhase = BattlePhase.PlayerSwap;
+            Enemies = [];
+            CurrentPhase = BattlePhase.PlayerSwap;
             _necromancerTurnCount = 0;
 
             // Get managers
@@ -79,12 +75,12 @@ namespace AlJourney.Scripts.Battle
         /// </summary>
         public void StartBattle(DualHeroSystem heroSystem, int waveNumber)
         {
-            _heroSystem = heroSystem;
-            _currentWave = waveNumber;
+            HeroSystem = heroSystem;
+            CurrentWave = waveNumber;
             _necromancerTurnCount = 0;
 
             // Connect hero signals
-            _heroSystem.BothHeroesDied += OnBothHeroesDied;
+            HeroSystem.BothHeroesDied += OnBothHeroesDied;
 
             // Generate enemies for wave
             GenerateWaveEnemies();
@@ -93,11 +89,11 @@ namespace AlJourney.Scripts.Battle
             _gridManager.InitializeGrid();
 
             // Start player turn
-            _currentPhase = BattlePhase.PlayerSwap;
-            EmitSignal(SignalName.BattleStarted);
-            EmitSignal(SignalName.PhaseChanged, (int)_currentPhase);
+            CurrentPhase = BattlePhase.PlayerSwap;
+            _ = EmitSignal(SignalName.BattleStarted);
+            _ = EmitSignal(SignalName.PhaseChanged, (int)CurrentPhase);
 
-            GD.Print($"[BattleManager] Battle started - Wave {_currentWave}");
+            GD.Print($"[BattleManager] Battle started - Wave {CurrentWave}");
         }
 
         /// <summary>
@@ -105,24 +101,24 @@ namespace AlJourney.Scripts.Battle
         /// </summary>
         private void GenerateWaveEnemies()
         {
-            _enemies.Clear();
+            Enemies.Clear();
 
-            bool isMinibossWave = _currentWave % GameConstants.MINIBOSS_WAVE_INTERVAL == 0;
-            bool isBossWave = _currentWave % GameConstants.BOSS_WAVE_INTERVAL == 0;
+            bool isMinibossWave = CurrentWave % GameConstants.MINIBOSS_WAVE_INTERVAL == 0;
+            bool isBossWave = CurrentWave % GameConstants.BOSS_WAVE_INTERVAL == 0;
 
             if (isBossWave)
             {
                 // Boss wave: Necromancer + 2 minions
-                var boss = Enemy.Create(EnemyType.Necromancer, _currentWave);
+                Enemy boss = Enemy.Create(EnemyType.Necromancer, CurrentWave);
                 boss.CharacterDied += () => OnEnemyDied(boss);
-                _enemies.Add(boss);
+                Enemies.Add(boss);
 
                 // Add 2 random basic enemies
                 for (int i = 0; i < 2; i++)
                 {
-                    var minion = Enemy.Create(GetRandomBasicEnemyType(), _currentWave);
+                    Enemy minion = Enemy.Create(GetRandomBasicEnemyType(), CurrentWave);
                     minion.CharacterDied += () => OnEnemyDied(minion);
-                    _enemies.Add(minion);
+                    Enemies.Add(minion);
                 }
 
                 GD.Print($"[BattleManager] Boss wave! Necromancer + 2 minions");
@@ -130,16 +126,16 @@ namespace AlJourney.Scripts.Battle
             else if (isMinibossWave)
             {
                 // Miniboss wave: 1 miniboss + 2-3 basic enemies
-                var miniboss = Enemy.Create(GetRandomMinibossType(), _currentWave);
+                Enemy miniboss = Enemy.Create(GetRandomMinibossType(), CurrentWave);
                 miniboss.CharacterDied += () => OnEnemyDied(miniboss);
-                _enemies.Add(miniboss);
+                Enemies.Add(miniboss);
 
                 int minionCount = GD.RandRange(2, 3);
                 for (int i = 0; i < minionCount; i++)
                 {
-                    var minion = Enemy.Create(GetRandomBasicEnemyType(), _currentWave);
+                    Enemy minion = Enemy.Create(GetRandomBasicEnemyType(), CurrentWave);
                     minion.CharacterDied += () => OnEnemyDied(minion);
-                    _enemies.Add(minion);
+                    Enemies.Add(minion);
                 }
 
                 GD.Print($"[BattleManager] Miniboss wave! {miniboss.CharacterName} + {minionCount} minions");
@@ -151,9 +147,9 @@ namespace AlJourney.Scripts.Battle
 
                 for (int i = 0; i < enemyCount; i++)
                 {
-                    var enemy = Enemy.Create(GetRandomBasicEnemyType(), _currentWave);
+                    Enemy enemy = Enemy.Create(GetRandomBasicEnemyType(), CurrentWave);
                     enemy.CharacterDied += () => OnEnemyDied(enemy);
-                    _enemies.Add(enemy);
+                    Enemies.Add(enemy);
                 }
 
                 GD.Print($"[BattleManager] Regular wave with {enemyCount} enemies");
@@ -166,7 +162,7 @@ namespace AlJourney.Scripts.Battle
         private int CalculateEnemyCount()
         {
             int baseCount = 3;
-            int additionalEnemies = _currentWave / GameConstants.ENEMY_COUNT_INCREASE_EVERY;
+            int additionalEnemies = CurrentWave / GameConstants.ENEMY_COUNT_INCREASE_EVERY;
             int totalEnemies = Mathf.Min(baseCount + additionalEnemies, GameConstants.MAX_ENEMIES_PER_WAVE);
 
             return GD.RandRange(totalEnemies - 1, totalEnemies);
@@ -203,7 +199,10 @@ namespace AlJourney.Scripts.Battle
         /// </summary>
         private void OnSwapCompleted(bool wasValid)
         {
-            if (!wasValid) return;
+            if (!wasValid)
+            {
+                return;
+            }
 
             // Check if player has remaining swaps
             if (_gridManager.RemainingSwaps <= 0)
@@ -218,11 +217,11 @@ namespace AlJourney.Scripts.Battle
         /// </summary>
         private void ProcessPlayerTurn()
         {
-            _currentPhase = BattlePhase.PlayerCombo;
-            EmitSignal(SignalName.PhaseChanged, (int)_currentPhase);
+            CurrentPhase = BattlePhase.PlayerCombo;
+            _ = EmitSignal(SignalName.PhaseChanged, (int)CurrentPhase);
 
             // Find and process all matches
-            var matches = _gridManager.FindAllMatches();
+            List<MatchResult> matches = _gridManager.FindAllMatches();
 
             if (matches.Count > 0)
             {
@@ -230,7 +229,7 @@ namespace AlJourney.Scripts.Battle
                 _gridManager.ProcessMatches(matches);
 
                 // Process combo effects
-                var comboEffects = _comboSystem.ProcessMatches(matches);
+                List<ComboEffect> comboEffects = _comboSystem.ProcessMatches(matches);
                 OnCombosProcessed(comboEffects);
             }
             else
@@ -246,33 +245,33 @@ namespace AlJourney.Scripts.Battle
         private void OnCombosProcessed(List<ComboEffect> effects)
         {
             // Apply all combo effects
-            foreach (var effect in effects)
+            foreach (ComboEffect effect in effects)
             {
                 ApplyComboEffect(effect);
             }
 
             // Check for cascade matches
-            var cascadeMatches = _gridManager.FindAllMatches();
+            List<MatchResult> cascadeMatches = _gridManager.FindAllMatches();
             if (cascadeMatches.Count > 0)
             {
                 GD.Print("[BattleManager] Cascade detected!");
                 _gridManager.ProcessMatches(cascadeMatches);
 
                 // Process cascade effects
-                var cascadeEffects = _comboSystem.ProcessMatches(cascadeMatches);
+                List<ComboEffect> cascadeEffects = _comboSystem.ProcessMatches(cascadeMatches);
 
                 // Apply cascade effects
-                foreach (var effect in cascadeEffects)
+                foreach (ComboEffect effect in cascadeEffects)
                 {
                     ApplyComboEffect(effect);
                 }
             }
 
             // Process hero status effects (regeneration, etc)
-            _heroSystem.ProcessStatusEffects();
+            HeroSystem.ProcessStatusEffects();
 
             // After all combos, start enemy turn
-            CallDeferred(MethodName.StartEnemyTurn);
+            _ = CallDeferred(MethodName.StartEnemyTurn);
         }
 
         /// <summary>
@@ -282,7 +281,7 @@ namespace AlJourney.Scripts.Battle
         private void ApplyComboEffect(ComboEffect effect)
         {
             // Get the hero responsible for this element
-            PlayerCharacter activeHero = _heroSystem.GetHeroForElement(effect.ElementType);
+            PlayerCharacter activeHero = HeroSystem.GetHeroForElement(effect.ElementType);
 
             if (activeHero == null)
             {
@@ -328,7 +327,7 @@ namespace AlJourney.Scripts.Battle
             {
                 // Hit all enemies
                 GD.Print($"[BattleManager] {heroName} uses {elementName} AoE for {damage} damage!");
-                foreach (Enemy enemy in _enemies.Where(e => e.IsAlive))
+                foreach (Enemy enemy in Enemies.Where(e => e.IsAlive))
                 {
                     int reflected = enemy.TakeDamage(damage, activeHero.AttackType);
 
@@ -341,14 +340,14 @@ namespace AlJourney.Scripts.Battle
                     // Handle reflect damage
                     if (reflected > 0)
                     {
-                        activeHero.TakeDamage(reflected, enemy.AttackType);
+                        _ = activeHero.TakeDamage(reflected, enemy.AttackType);
                     }
                 }
             }
             else
             {
                 // Hit single target (first alive enemy)
-                Enemy target = _enemies.FirstOrDefault(e => e.IsAlive);
+                Enemy target = Enemies.FirstOrDefault(e => e.IsAlive);
                 if (target != null)
                 {
                     GD.Print($"[BattleManager] {heroName} attacks {target.CharacterName} with {elementName} for {damage} damage!");
@@ -363,7 +362,7 @@ namespace AlJourney.Scripts.Battle
                     // Handle reflect damage
                     if (reflected > 0)
                     {
-                        activeHero.TakeDamage(reflected, target.AttackType);
+                        _ = activeHero.TakeDamage(reflected, target.AttackType);
                     }
                 }
             }
@@ -379,22 +378,22 @@ namespace AlJourney.Scripts.Battle
             GD.Print($"[BattleManager] {activeHero.CharacterName} heals both heroes for {healing} HP!");
 
             // Heal BOTH heroes
-            _heroSystem.Mage.Heal(healing);
-            _heroSystem.Warrior.Heal(healing);
+            HeroSystem.Mage.Heal(healing);
+            HeroSystem.Warrior.Heal(healing);
 
             // 4-match: Clear negative effects on both heroes
             if (effect.ComboLevel == 2)
             {
-                _heroSystem.Mage.ClearNegativeEffects();
-                _heroSystem.Warrior.ClearNegativeEffects();
+                HeroSystem.Mage.ClearNegativeEffects();
+                HeroSystem.Warrior.ClearNegativeEffects();
                 GD.Print("[BattleManager] Negative effects cleared from both heroes!");
             }
 
             // Apply status effect (regeneration) to both heroes
             if (effect.StatusEffect != null)
             {
-                _heroSystem.Mage.ApplyStatusEffect(effect.StatusEffect);
-                _heroSystem.Warrior.ApplyStatusEffect(effect.StatusEffect);
+                HeroSystem.Mage.ApplyStatusEffect(effect.StatusEffect);
+                HeroSystem.Warrior.ApplyStatusEffect(effect.StatusEffect);
             }
         }
 
@@ -408,14 +407,14 @@ namespace AlJourney.Scripts.Battle
             GD.Print($"[BattleManager] {activeHero.CharacterName} grants {shield} shield to both heroes!");
 
             // Shield BOTH heroes
-            _heroSystem.Mage.AddShield(shield);
-            _heroSystem.Warrior.AddShield(shield);
+            HeroSystem.Mage.AddShield(shield);
+            HeroSystem.Warrior.AddShield(shield);
 
             // Apply status effect (reflect/immunity) to both heroes
             if (effect.StatusEffect != null)
             {
-                _heroSystem.Mage.ApplyStatusEffect(effect.StatusEffect);
-                _heroSystem.Warrior.ApplyStatusEffect(effect.StatusEffect);
+                HeroSystem.Mage.ApplyStatusEffect(effect.StatusEffect);
+                HeroSystem.Warrior.ApplyStatusEffect(effect.StatusEffect);
             }
         }
 
@@ -424,38 +423,38 @@ namespace AlJourney.Scripts.Battle
         /// </summary>
         private void StartEnemyTurn()
         {
-            _currentPhase = BattlePhase.EnemyTurn;
-            EmitSignal(SignalName.PhaseChanged, (int)_currentPhase);
+            CurrentPhase = BattlePhase.EnemyTurn;
+            _ = EmitSignal(SignalName.PhaseChanged, (int)CurrentPhase);
 
             GD.Print("[BattleManager] Enemy turn starting...");
 
             // Process enemy status effects first
-            foreach (Enemy enemy in _enemies.Where(e => e.IsAlive))
+            foreach (Enemy enemy in Enemies.Where(e => e.IsAlive))
             {
                 enemy.ProcessStatusEffects();
             }
 
             // Each enemy attacks
-            foreach (Enemy enemy in _enemies.Where(e => e.IsAlive))
+            foreach (Enemy enemy in Enemies.Where(e => e.IsAlive))
             {
                 PerformEnemyAction(enemy);
             }
 
             // Check if both heroes died
-            if (!_heroSystem.IsAnyAlive)
+            if (!HeroSystem.IsAnyAlive)
             {
                 return; // OnBothHeroesDied will handle game over
             }
 
             // Check if all enemies dead
-            if (_enemies.All(e => !e.IsAlive))
+            if (Enemies.All(e => !e.IsAlive))
             {
                 OnWaveCompleted();
                 return;
             }
 
             // Start next player turn
-            CallDeferred(MethodName.StartNextTurn);
+            _ = CallDeferred(MethodName.StartNextTurn);
         }
 
         /// <summary>
@@ -466,8 +465,15 @@ namespace AlJourney.Scripts.Battle
         {
             // Get list of alive heroes
             List<PlayerCharacter> aliveHeroes = [];
-            if (_heroSystem.Mage.IsAlive) aliveHeroes.Add(_heroSystem.Mage);
-            if (_heroSystem.Warrior.IsAlive) aliveHeroes.Add(_heroSystem.Warrior);
+            if (HeroSystem.Mage.IsAlive)
+            {
+                aliveHeroes.Add(HeroSystem.Mage);
+            }
+
+            if (HeroSystem.Warrior.IsAlive)
+            {
+                aliveHeroes.Add(HeroSystem.Warrior);
+            }
 
             if (aliveHeroes.Count == 0)
             {
@@ -492,7 +498,7 @@ namespace AlJourney.Scripts.Battle
                     // Handle reflect damage
                     if (reflected > 0)
                     {
-                        enemy.TakeDamage(reflected, target.AttackType);
+                        _ = enemy.TakeDamage(reflected, target.AttackType);
                     }
                 }
             }
@@ -510,11 +516,11 @@ namespace AlJourney.Scripts.Battle
             {
                 case Enemy.NecromancerAbility.SummonSkeleton:
                     // Summon one skeleton if space available
-                    if (_enemies.Count < GameConstants.MAX_ENEMIES_PER_WAVE)
+                    if (Enemies.Count < GameConstants.MAX_ENEMIES_PER_WAVE)
                     {
-                        var skeleton = Enemy.Create(EnemyType.SkeletonWarrior, _currentWave);
+                        Enemy skeleton = Enemy.Create(EnemyType.SkeletonWarrior, CurrentWave);
                         skeleton.CharacterDied += () => OnEnemyDied(skeleton);
-                        _enemies.Add(skeleton);
+                        Enemies.Add(skeleton);
                         GD.Print("[BattleManager] Necromancer summoned a Skeleton!");
                     }
                     break;
@@ -526,15 +532,15 @@ namespace AlJourney.Scripts.Battle
                     int reflected = target.TakeDamage(damage, AttackType.Magical);
                     if (reflected > 0)
                     {
-                        necromancer.TakeDamage(reflected, target.AttackType);
+                        _ = necromancer.TakeDamage(reflected, target.AttackType);
                     }
                     break;
 
                 case Enemy.NecromancerAbility.WeakeningDarkness:
                     // Apply weakness debuff to BOTH heroes
-                    var weakenEffect = new StatusEffectData(StatusEffect.Weakened, 1, 0);
-                    _heroSystem.Mage.ApplyStatusEffect(weakenEffect);
-                    _heroSystem.Warrior.ApplyStatusEffect(weakenEffect);
+                    StatusEffectData weakenEffect = new(StatusEffect.Weakened, 1, 0);
+                    HeroSystem.Mage.ApplyStatusEffect(weakenEffect);
+                    HeroSystem.Warrior.ApplyStatusEffect(weakenEffect);
                     GD.Print("[BattleManager] Necromancer cast Weakening Darkness on both heroes!");
                     break;
             }
@@ -546,8 +552,8 @@ namespace AlJourney.Scripts.Battle
         private void StartNextTurn()
         {
             _gridManager.ResetSwaps();
-            _currentPhase = BattlePhase.PlayerSwap;
-            EmitSignal(SignalName.PhaseChanged, (int)_currentPhase);
+            CurrentPhase = BattlePhase.PlayerSwap;
+            _ = EmitSignal(SignalName.PhaseChanged, (int)CurrentPhase);
 
             GD.Print("[BattleManager] New player turn started");
         }
@@ -557,7 +563,7 @@ namespace AlJourney.Scripts.Battle
         /// </summary>
         private void OnEnemyDied(Enemy enemy)
         {
-            EmitSignal(SignalName.EnemyDefeated, enemy);
+            _ = EmitSignal(SignalName.EnemyDefeated, enemy);
 
             // Award coins
             GameStateManager.Instance.AddCoins(enemy.CoinReward);
@@ -565,9 +571,9 @@ namespace AlJourney.Scripts.Battle
             GD.Print($"[BattleManager] {enemy.CharacterName} defeated! +{enemy.CoinReward} coins");
 
             // Check if all enemies dead
-            if (_enemies.All(e => !e.IsAlive))
+            if (Enemies.All(e => !e.IsAlive))
             {
-                CallDeferred(MethodName.OnWaveCompleted);
+                _ = CallDeferred(MethodName.OnWaveCompleted);
             }
         }
 
@@ -577,7 +583,7 @@ namespace AlJourney.Scripts.Battle
         private void OnBothHeroesDied()
         {
             GD.Print("[BattleManager] Both heroes defeated - Game Over");
-            EmitSignal(SignalName.BattleEnded, false);
+            _ = EmitSignal(SignalName.BattleEnded, false);
 
             // Trigger game over
             SceneManager.GameOver();
@@ -588,14 +594,14 @@ namespace AlJourney.Scripts.Battle
         /// </summary>
         private void OnWaveCompleted()
         {
-            _currentPhase = BattlePhase.WaveTransition;
-            EmitSignal(SignalName.PhaseChanged, (int)_currentPhase);
-            EmitSignal(SignalName.WaveCompleted);
+            CurrentPhase = BattlePhase.WaveTransition;
+            _ = EmitSignal(SignalName.PhaseChanged, (int)CurrentPhase);
+            _ = EmitSignal(SignalName.WaveCompleted);
 
-            GD.Print($"[BattleManager] Wave {_currentWave} completed!");
+            GD.Print($"[BattleManager] Wave {CurrentWave} completed!");
 
             // Update game state with both heroes' stats
-            var (mageHealth, mageMaxHealth, mageDamage, mageDefense, warriorHealth, warriorMaxHealth, warriorDamage, warriorDefense) = _heroSystem.GetCombinedStats();
+            (int mageHealth, int mageMaxHealth, int mageDamage, int mageDefense, int warriorHealth, int warriorMaxHealth, int warriorDamage, int warriorDefense) = HeroSystem.GetCombinedStats();
             GameStateManager.Instance.UpdateHeroStats(
                 mageHealth, mageMaxHealth, mageDamage, mageDefense,
                 warriorHealth, warriorMaxHealth, warriorDamage, warriorDefense
@@ -617,15 +623,15 @@ namespace AlJourney.Scripts.Battle
         public void EndBattle()
         {
             // Cleanup
-            foreach (Enemy enemy in _enemies)
+            foreach (Enemy enemy in Enemies)
             {
                 enemy.QueueFree();
             }
-            _enemies.Clear();
+            Enemies.Clear();
 
-            if (_heroSystem != null)
+            if (HeroSystem != null)
             {
-                _heroSystem.BothHeroesDied -= OnBothHeroesDied;
+                HeroSystem.BothHeroesDied -= OnBothHeroesDied;
             }
 
             GD.Print("[BattleManager] Battle ended");

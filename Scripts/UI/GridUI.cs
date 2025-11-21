@@ -53,8 +53,8 @@ namespace AlJourney.Scripts.UI
             _gridManager.GridRefillCompleted += OnGridRefilled;
 
             CustomMinimumSize = new Vector2(
-                _gridSize * CELL_SIZE + (_gridSize - 1) * CELL_SPACING,
-                _gridSize * CELL_SIZE + (_gridSize - 1) * CELL_SPACING
+                (_gridSize * CELL_SIZE) + ((_gridSize - 1) * CELL_SPACING),
+                (_gridSize * CELL_SIZE) + ((_gridSize - 1) * CELL_SPACING)
             );
 
             GD.Print("[GridUI] Initialized");
@@ -89,7 +89,7 @@ namespace AlJourney.Scripts.UI
             }
 
             // Create colored square placeholder
-            var image = Image.CreateEmpty(64, 64, false, Image.Format.Rgba8);
+            Image image = Image.CreateEmpty(64, 64, false, Image.Format.Rgba8);
             image.Fill(fallbackColor);
             return ImageTexture.CreateFromImage(image);
         }
@@ -124,7 +124,7 @@ namespace AlJourney.Scripts.UI
                     ElementData data = logicalGrid[x, y];
 
                     // Create visual element
-                    var elementSprite = new ElementSprite();
+                    ElementSprite elementSprite = new();
                     _gridContainer.AddChild(elementSprite);
 
                     // Initialize with data and texture
@@ -223,10 +223,10 @@ namespace AlJourney.Scripts.UI
         private void PlayInvalidSwapAnimation(ElementSprite element)
         {
             Vector2 originalPos = element.Position;
-            var tween = CreateTween();
-            tween.TweenProperty(element, "position", originalPos + new Vector2(10, 0), 0.05f);
-            tween.TweenProperty(element, "position", originalPos - new Vector2(10, 0), 0.05f);
-            tween.TweenProperty(element, "position", originalPos, 0.05f);
+            Tween tween = CreateTween();
+            _ = tween.TweenProperty(element, "position", originalPos + new Vector2(10, 0), 0.05f);
+            _ = tween.TweenProperty(element, "position", originalPos - new Vector2(10, 0), 0.05f);
+            _ = tween.TweenProperty(element, "position", originalPos, 0.05f);
         }
 
         /// <summary>
@@ -246,14 +246,14 @@ namespace AlJourney.Scripts.UI
         /// </summary>
         private void ProcessMatches()
         {
-            var matches = _gridManager.FindAllMatches();
+            List<MatchResult> matches = _gridManager.FindAllMatches();
 
             if (matches.Count > 0)
             {
                 // Animate matched elements
-                foreach (var match in matches)
+                foreach (MatchResult match in matches)
                 {
-                    foreach (var (x, y) in match.MatchedPositions)
+                    foreach ((int x, int y) in match.MatchedPositions)
                     {
                         _visualGrid[x, y]?.PlayMatchAnimation();
                         _visualGrid[x, y] = null;
@@ -284,7 +284,7 @@ namespace AlJourney.Scripts.UI
                     {
                         // Create new element
                         ElementData data = logicalGrid[x, y];
-                        var elementSprite = new ElementSprite();
+                        ElementSprite elementSprite = new();
                         _gridContainer.AddChild(elementSprite);
 
                         Texture2D texture = _elementTextures[data.Type];

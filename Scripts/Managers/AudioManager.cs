@@ -9,68 +9,53 @@ namespace AlJourney.Scripts.Managers
     /// </summary>
     public partial class AudioManager : Node
     {
-        private static AudioManager _instance;
-
         /// <summary>
         /// Singleton instance accessor.
         /// </summary>
-        public static AudioManager Instance => _instance;
+        public static AudioManager Instance { get; private set; }
 
         private AudioStreamPlayer _musicPlayer;
         private List<AudioStreamPlayer> _sfxPlayers;
         private const int SFX_POOL_SIZE = 8;
-
-        private float _masterVolume = 1.0f;
-        private float _musicVolume = 0.7f;
-        private float _sfxVolume = 0.8f;
 
         /// <summary>
         /// Master volume level (0.0 to 1.0).
         /// </summary>
         public float MasterVolume
         {
-            get => _masterVolume;
-            set
+            get; set
             {
-                _masterVolume = Mathf.Clamp(value, 0.0f, 1.0f);
+                field = Mathf.Clamp(value, 0.0f, 1.0f);
                 UpdateVolumes();
             }
-        }
+        } = 1.0f;
 
         /// <summary>
         /// Music volume level (0.0 to 1.0).
         /// </summary>
         public float MusicVolume
         {
-            get => _musicVolume;
-            set
+            get; set
             {
-                _musicVolume = Mathf.Clamp(value, 0.0f, 1.0f);
+                field = Mathf.Clamp(value, 0.0f, 1.0f);
                 UpdateVolumes();
             }
-        }
+        } = 0.7f;
 
         /// <summary>
         /// Sound effects volume level (0.0 to 1.0).
         /// </summary>
-        public float SfxVolume
-        {
-            get => _sfxVolume;
-            set
-            {
-                _sfxVolume = Mathf.Clamp(value, 0.0f, 1.0f);
-            }
-        }
+        public float SfxVolume { get; set => field = Mathf.Clamp(value, 0.0f, 1.0f); } = 0.8f;
 
         public override void _Ready()
         {
-            if (_instance != null && _instance != this)
+            if (Instance != null && Instance != this)
             {
                 QueueFree();
                 return;
             }
 
-            _instance = this;
+            Instance = this;
 
             // Setup music player
             _musicPlayer = new AudioStreamPlayer
@@ -84,7 +69,7 @@ namespace AlJourney.Scripts.Managers
             _sfxPlayers = [];
             for (int i = 0; i < SFX_POOL_SIZE; i++)
             {
-                var sfxPlayer = new AudioStreamPlayer
+                AudioStreamPlayer sfxPlayer = new()
                 {
                     Name = $"SFXPlayer_{i}",
                     Bus = "SFX"
@@ -160,17 +145,10 @@ namespace AlJourney.Scripts.Managers
             availablePlayer ??= _sfxPlayers[0];
 
             availablePlayer.Stream = stream;
-            availablePlayer.VolumeDb = Mathf.LinearToDb(_sfxVolume * _masterVolume);
+            availablePlayer.VolumeDb = Mathf.LinearToDb(SfxVolume * MasterVolume);
 
             // Apply pitch variation
-            if (pitchVariation > 0.0f)
-            {
-                availablePlayer.PitchScale = 1.0f + (GD.Randf() * pitchVariation * 2.0f - pitchVariation);
-            }
-            else
-            {
-                availablePlayer.PitchScale = 1.0f;
-            }
+            availablePlayer.PitchScale = pitchVariation > 0.0f ? 1.0f + ((GD.Randf() * pitchVariation * 2.0f) - pitchVariation) : 1.0f;
 
             availablePlayer.Play();
         }
@@ -180,10 +158,7 @@ namespace AlJourney.Scripts.Managers
         /// </summary>
         private void UpdateVolumes()
         {
-            if (_musicPlayer != null)
-            {
-                _musicPlayer.VolumeDb = Mathf.LinearToDb(_musicVolume * _masterVolume);
-            }
+            _ = _musicPlayer?.VolumeDb = Mathf.LinearToDb(MusicVolume * MasterVolume);
         }
     }
 }

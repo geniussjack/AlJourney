@@ -22,7 +22,7 @@ namespace AlJourney.Scripts.UI
                 Name = "Overlay"
             };
             _overlay.SetAnchorsPreset(LayoutPreset.FullRect);
-            var styleBox = new StyleBoxFlat
+            StyleBoxFlat styleBox = new()
             {
                 BgColor = new Color(0, 0, 0, 0.7f)
             };
@@ -30,7 +30,7 @@ namespace AlJourney.Scripts.UI
             AddChild(_overlay);
 
             // Create center container for menu
-            var centerContainer = new CenterContainer
+            CenterContainer centerContainer = new()
             {
                 Name = "CenterContainer"
             };
@@ -38,11 +38,11 @@ namespace AlJourney.Scripts.UI
             AddChild(centerContainer);
 
             // Create menu panel
-            var menuPanel = new PanelContainer();
+            PanelContainer menuPanel = new();
             centerContainer.AddChild(menuPanel);
 
             // Create VBoxContainer for buttons
-            var vbox = new VBoxContainer
+            VBoxContainer vbox = new()
             {
                 CustomMinimumSize = new Vector2(300, 0)
             };
@@ -50,7 +50,7 @@ namespace AlJourney.Scripts.UI
             menuPanel.AddChild(vbox);
 
             // Title
-            var titleLabel = new Label
+            Label titleLabel = new()
             {
                 Text = "PAUSED",
                 HorizontalAlignment = HorizontalAlignment.Center
@@ -59,7 +59,7 @@ namespace AlJourney.Scripts.UI
             vbox.AddChild(titleLabel);
 
             // Spacer
-            var spacer1 = new Control { CustomMinimumSize = new Vector2(0, 20) };
+            Control spacer1 = new() { CustomMinimumSize = new Vector2(0, 20) };
             vbox.AddChild(spacer1);
 
             // Resume button
@@ -127,9 +127,9 @@ namespace AlJourney.Scripts.UI
 
             // Animate fade in
             Modulate = new Color(1, 1, 1, 0);
-            var tween = CreateTween();
-            tween.SetPauseMode(Tween.TweenPauseMode.Process);
-            tween.TweenProperty(this, "modulate:a", 1.0f, 0.2f);
+            Tween tween = CreateTween();
+            _ = tween.SetPauseMode(Tween.TweenPauseMode.Process);
+            _ = tween.TweenProperty(this, "modulate:a", 1.0f, 0.2f);
 
             GD.Print("[PauseMenu] Game paused");
         }
@@ -140,10 +140,10 @@ namespace AlJourney.Scripts.UI
         public void Resume()
         {
             // Animate fade out
-            var tween = CreateTween();
-            tween.SetPauseMode(Tween.TweenPauseMode.Process);
-            tween.TweenProperty(this, "modulate:a", 0.0f, 0.2f);
-            tween.TweenCallback(Callable.From(() =>
+            Tween tween = CreateTween();
+            _ = tween.SetPauseMode(Tween.TweenPauseMode.Process);
+            _ = tween.TweenProperty(this, "modulate:a", 0.0f, 0.2f);
+            _ = tween.TweenCallback(Callable.From(() =>
             {
                 Hide();
                 GetTree().Paused = false;

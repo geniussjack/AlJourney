@@ -9,12 +9,10 @@ namespace AlJourney.Scripts.Managers
     /// </summary>
     public partial class UIManager : Node
     {
-        private static UIManager _instance;
-
         /// <summary>
         /// Singleton instance accessor.
         /// </summary>
-        public static UIManager Instance => _instance;
+        public static UIManager Instance { get; private set; }
 
         [Signal]
         public delegate void MenuOpenedEventHandler(string menuName);
@@ -27,13 +25,13 @@ namespace AlJourney.Scripts.Managers
 
         public override void _Ready()
         {
-            if (_instance != null && _instance != this)
+            if (Instance != null && Instance != this)
             {
                 QueueFree();
                 return;
             }
 
-            _instance = this;
+            Instance = this;
             GD.Print("[UIManager] Initialized");
         }
 
@@ -59,7 +57,7 @@ namespace AlJourney.Scripts.Managers
             _currentMenu = menu;
             _currentMenu.Show();
 
-            EmitSignal(SignalName.MenuOpened, menu.Name);
+            _ = EmitSignal(SignalName.MenuOpened, menu.Name);
             GD.Print($"[UIManager] Opened menu: {menu.Name}");
         }
 
@@ -77,7 +75,7 @@ namespace AlJourney.Scripts.Managers
             string menuName = _currentMenu.Name;
             _currentMenu.Hide();
 
-            EmitSignal(SignalName.MenuClosed, menuName);
+            _ = EmitSignal(SignalName.MenuClosed, menuName);
             GD.Print($"[UIManager] Closed menu: {menuName}");
 
             // Return to previous menu
@@ -102,7 +100,7 @@ namespace AlJourney.Scripts.Managers
 
             while (_menuStack.Count > 0)
             {
-                var menu = _menuStack.Pop();
+                Control menu = _menuStack.Pop();
                 menu.Hide();
             }
 

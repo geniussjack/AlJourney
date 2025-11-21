@@ -34,11 +34,14 @@ namespace AlJourney.Scripts.Utils
         /// <param name="duration">Flash duration in seconds</param>
         public void Flash(Color flashColor, float duration = 0.15f)
         {
-            if (_target == null) return;
+            if (_target == null)
+            {
+                return;
+            }
 
-            var tween = CreateTween();
-            tween.TweenProperty(_target, "modulate", flashColor, duration / 2);
-            tween.TweenProperty(_target, "modulate", _originalModulate, duration / 2);
+            Tween tween = CreateTween();
+            _ = tween.TweenProperty(_target, "modulate", flashColor, duration / 2);
+            _ = tween.TweenProperty(_target, "modulate", _originalModulate, duration / 2);
         }
 
         /// <summary>
