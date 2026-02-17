@@ -33,6 +33,27 @@ namespace AlJourney.Scripts.Match3
         public bool IsFalling { get; set; } = false;
 
         /// <summary>
+        /// Which hero owns this element (Mage or Warrior).
+        /// Fire/Heal belong to Mage, Sword/Shield belong to Warrior.
+        /// </summary>
+        public CharacterClass OwningHero { get; set; } = GetOwnerForElementType(type);
+
+        /// <summary>
+        /// Determines which hero owns a specific element type.
+        /// </summary>
+        private static CharacterClass GetOwnerForElementType(ElementType elementType)
+        {
+            return elementType switch
+            {
+                ElementType.Fire => CharacterClass.Mage,
+                ElementType.Heal => CharacterClass.Mage,
+                ElementType.Sword => CharacterClass.Warrior,
+                ElementType.Shield => CharacterClass.Warrior,
+                _ => CharacterClass.Mage // Default to Mage
+            };
+        }
+
+        /// <summary>
         /// Creates a random element (excluding None).
         /// </summary>
         public static ElementData CreateRandom(int x, int y)
@@ -52,7 +73,7 @@ namespace AlJourney.Scripts.Match3
 
         public override string ToString()
         {
-            return $"Element({Type}, {X},{Y})";
+            return $"Element({Type}, {X},{Y}, Owner:{OwningHero})";
         }
     }
 }

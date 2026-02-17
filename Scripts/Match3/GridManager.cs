@@ -214,7 +214,7 @@ namespace AlJourney.Scripts.Match3
 
             if (allMatches.Count > 0)
             {
-                // FIX: Передаём только количество, а не List
+                // Emit match count as integer (not List)
                 _ = EmitSignal(SignalName.MatchesFound, allMatches.Count);
                 GD.Print($"[GridManager] Found {allMatches.Count} matches");
             }
@@ -275,24 +275,32 @@ namespace AlJourney.Scripts.Match3
         /// </summary>
         public void ProcessMatches(List<MatchResult> matches)
         {
-            // Mark matched elements
+            // Null check for matches parameter
+            if (matches == null || matches.Count == 0)
+            {
+                return;
+            }
+            
+            // Mark matched elements with null checks
             foreach (MatchResult match in matches)
             {
+                if (match?.MatchedPositions == null) continue;
+                
                 foreach ((int x, int y) in match.MatchedPositions)
                 {
-                    if (IsValidPosition(x, y))
+                    if (IsValidPosition(x, y) && _grid[x, y] != null)
                     {
                         _grid[x, y].IsMatched = true;
                     }
                 }
             }
 
-            // Remove matched elements
+            // Remove matched elements with null checks
             for (int x = 0; x < GridSize; x++)
             {
                 for (int y = 0; y < GridSize; y++)
                 {
-                    if (_grid[x, y].IsMatched)
+                    if (_grid[x, y] != null && _grid[x, y].IsMatched)
                     {
                         _grid[x, y] = null;
                     }
@@ -350,6 +358,9 @@ namespace AlJourney.Scripts.Match3
 
             _ = EmitSignal(SignalName.GridRefillCompleted);
             GD.Print("[GridManager] Grid refilled");
+            
+            // Check if board needs reshuffling
+            CheckAndReshuffleIfNeeded();
         }
 
         /// <summary>
@@ -523,6 +534,52 @@ namespace AlJourney.Scripts.Match3
             }
 
             return verticalCount >= GameConstants.MATCH_MIN_LENGTH;
+        }
+
+        /// <summary>
+        /// Checks if board needs reshuffling and performs it if necessary.
+        /// </summary>
+        public void CheckAndReshuffleIfNeeded()
+        {
+            if (!HasValidMoves())
+            {
+                GD.Print("[GridManager] No valid moves - reshuffling board");
+                ReshuffleBoard();
+            }
+        }
+
+        /// <summary>
+        /// Reshuffles the board by regenerating grid without initial matches.
+        /// Preserves remaining swap count.
+        /// </summary>
+        private void ReshuffleBoard()
+        {
+            int attempts = 0;
+            const int maxAttempts = 3;
+            
+            while (attempts < maxAttempts)
+            {
+                // Regenerate grid
+                for (int x = 0; x < GridSize; x++)
+                {
+                    for (int y = 0; y < GridSize; y++)
+                    {
+                        _grid[x, y] = GenerateSafeElement(x, y);
+                    }
+                }
+                
+                // Verify at least one valid move exists
+                if (HasValidMoves())
+                {
+                    EmitSignal(SignalName.GridRefillCompleted);
+                    GD.Print("[GridManager] Board reshuffled successfully");
+                    return;
+                }
+                
+                attempts++;
+            }
+            
+            GD.PrintErr("[GridManager] Failed to reshuffle board after 3 attempts");
         }
 
         /// <summary>
