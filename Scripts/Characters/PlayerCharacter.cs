@@ -78,6 +78,13 @@ namespace AlJourney.Scripts.Characters
         {
             int finalDamage = baseDamage + _baseDamage;
 
+            // Apply Weakened debuff
+            if (HasStatusEffect(StatusEffect.Weakened))
+            {
+                finalDamage = Mathf.CeilToInt(finalDamage * 0.7f); // 30% reduction
+                GD.Print($"[{_name}] Damage reduced by Weakened status: {finalDamage}");
+            }
+
             // Character-specific modifiers (currently none, but ready for artifacts)
             // Example: if (_characterClass == CharacterClass.Mage && elementType == ElementType.Fire)
             //     finalDamage = Mathf.CeilToInt(finalDamage * 1.5f);

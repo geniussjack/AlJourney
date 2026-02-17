@@ -118,14 +118,33 @@ namespace AlJourney.Scripts.Characters
         }
 
         /// <summary>
-        /// Gets combined stats for saving.
+        /// Gets combined stats for both heroes for saving.
+        /// IMPORTANT: Return order is (mageHealth, mageMaxHealth, mageDamage, mageDefense,
+        ///                              warriorHealth, warriorMaxHealth, warriorDamage, warriorDefense)
+        /// Note: GetStats() returns (maxHealth, currentHealth, damage, defense),
+        ///       but this method reorders to (currentHealth, maxHealth, damage, defense) for consistency.
         /// </summary>
+        /// <returns>
+        /// Named tuple with all hero stats:
+        /// - mageHealth: Mage's current HP
+        /// - mageMaxHealth: Mage's maximum HP
+        /// - mageDamage: Mage's damage stat
+        /// - mageDefense: Mage's defense stat
+        /// - warriorHealth: Warrior's current HP
+        /// - warriorMaxHealth: Warrior's maximum HP
+        /// - warriorDamage: Warrior's damage stat
+        /// - warriorDefense: Warrior's defense stat
+        /// </returns>
         public (int mageHealth, int mageMaxHealth, int mageDamage, int mageDefense,
                 int warriorHealth, int warriorMaxHealth, int warriorDamage, int warriorDefense) GetCombinedStats()
         {
+            // Get Mage stats (returns: maxHealth, currentHealth, damage, defense)
             (int maxHealth, int currentHealth, int damage, int defense) = Mage.GetStats();
+            
+            // Get Warrior stats (returns: maxHealth, currentHealth, damage, defense)
             (int maxHealth, int currentHealth, int damage, int defense) warriorStats = Warrior.GetStats();
 
+            // Return in documented order: (currentHealth, maxHealth, damage, defense) for each hero
             return (
                 currentHealth, maxHealth, damage, defense,
                 warriorStats.currentHealth, warriorStats.maxHealth, warriorStats.damage, warriorStats.defense

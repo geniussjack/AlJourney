@@ -80,7 +80,7 @@ namespace AlJourney.Scripts.Characters
         /// <summary>
         /// Is character still alive.
         /// </summary>
-        public bool IsAlive => _currentHealth > 0;
+        public bool IsAlive => CurrentHealth > 0;
 
         /// <summary>
         /// Is character stunned and cannot act.
@@ -112,7 +112,7 @@ namespace AlJourney.Scripts.Characters
         /// <summary>
         /// Takes damage with defense and shield calculation.
         /// </summary>
-        public virtual int TakeDamage(int damage, AttackType attackType)
+        public virtual int TakeDamage(int damage, AttackType attackType, bool canReflect = true)
         {
             if (!IsAlive)
             {
@@ -129,7 +129,16 @@ namespace AlJourney.Scripts.Characters
             int finalDamage = damage;
 
             // Apply defense reduction
-            finalDamage = Mathf.Max(1, finalDamage - _baseDefense);
+            int effectiveDefense = _baseDefense;
+            
+            // Apply Weakened debuff to defense
+            if (HasStatusEffect(StatusEffect.Weakened))
+            {
+                effectiveDefense = Mathf.CeilToInt(effectiveDefense * 0.7f); // 30% reduction
+                GD.Print($"[{_name}] Defense reduced by Weakened status: {effectiveDefense}");
+            }
+            
+            finalDamage = Mathf.Max(1, finalDamage - effectiveDefense);
 
             // Apply shield
             if (_currentShield > 0)
@@ -157,13 +166,16 @@ namespace AlJourney.Scripts.Characters
                 }
             }
 
-            // Check for reflect damage
-            StatusEffectData reflectEffect = _activeEffects.FirstOrDefault(e => e.Type == StatusEffect.ShieldReflect);
-            if (reflectEffect != null && finalDamage > 0)
+            // Check for reflect damage ONLY if reflection is allowed
+            if (canReflect)
             {
-                int reflectedDamage = Mathf.CeilToInt(damage * reflectEffect.ExtraData);
-                GD.Print($"[{_name}] Reflected {reflectedDamage} damage!");
-                return reflectedDamage;
+                StatusEffectData reflectEffect = _activeEffects.FirstOrDefault(e => e.Type == StatusEffect.ShieldReflect);
+                if (reflectEffect != null && finalDamage > 0)
+                {
+                    int reflectedDamage = Mathf.CeilToInt(damage * reflectEffect.ExtraData);
+                    GD.Print($"[{_name}] Reflected {reflectedDamage} damage!");
+                    return reflectedDamage;
+                }
             }
 
             return 0;
@@ -230,9 +242,9 @@ namespace AlJourney.Scripts.Characters
                 // Refresh duration if new effect is longer
                 if (effect.Duration > existingEffect.Duration)
                 {
-                    existingEffect.Duration = effect.Duration;
-                    existingEffect.Power = effect.Power;
-                    existingEffect.ExtraData = effect.ExtraData;
+                    // Replace with new effect (record is immutable)
+                    _ = _activeEffects.Remove(existingEffect);
+                    _activeEffects.Add(effect);
                 }
             }
             else
@@ -292,9 +304,16 @@ namespace AlJourney.Scripts.Characters
                 }
 
                 // Tick duration
-                if (effect.TickDuration())
+                StatusEffectData updatedEffect = effect.TickDuration();
+                if (updatedEffect.ShouldRemove)
                 {
                     effectsToRemove.Add(effect);
+                }
+                else
+                {
+                    // Replace with updated effect
+                    int index = _activeEffects.IndexOf(effect);
+                    _activeEffects[index] = updatedEffect;
                 }
             }
 
