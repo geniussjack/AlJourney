@@ -3,6 +3,7 @@ using AlJourney.Scripts.Data;
 using Godot;
 using System;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace AlJourney.Scripts.Managers
 {
@@ -15,7 +16,7 @@ namespace AlJourney.Scripts.Managers
         /// <summary>
         /// Singleton instance accessor.
         /// </summary>
-        public static SaveSystem Instance { get; private set; }
+        public static SaveSystem Instance { get; private set; } = null!;
 
         [Signal]
         public delegate void SaveCompletedEventHandler(bool success);
@@ -27,7 +28,7 @@ namespace AlJourney.Scripts.Managers
 
         public override void _Ready()
         {
-            if (Instance != null && Instance != this)
+            if (Instance is not null)
             {
                 QueueFree();
                 return;
@@ -37,15 +38,22 @@ namespace AlJourney.Scripts.Managers
             _savePath = GameConstants.SAVE_DIRECTORY + GameConstants.SAVE_FILE_NAME;
 
             // Ensure save directory exists
-            _ = DirAccess.MakeDirRecursiveAbsolute(GameConstants.SAVE_DIRECTORY);
-
-            GD.Print($"[SaveSystem] Initialized. Save path: {_savePath}");
+            if (DirAccess.MakeDirRecursiveAbsolute(GameConstants.SAVE_DIRECTORY) is Error.Ok)
+            {
+                GD.Print($"[SaveSystem] Initialized. Save path: {_savePath}");
+            }
+            else
+            {
+                GD.PrintErr($"[SaveSystem] Failed to create save directory: {GameConstants.SAVE_DIRECTORY}");
+            }
         }
 
-        private static readonly JsonSerializerOptions _jsonOptions = new()
+        private static readonly JsonSerializerOptions JsonOptions = new()
         {
             WriteIndented = true,
-            IncludeFields = false
+            IncludeFields = false,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
         };
 
         /// <summary>
@@ -67,13 +75,7 @@ namespace AlJourney.Scripts.Managers
                 saveData.LastSaveTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
                 // Serialize to JSON
-                JsonSerializerOptions options = new()
-                {
-                    WriteIndented = true,
-                    IncludeFields = false
-                };
-
-                string jsonData = JsonSerializer.Serialize(saveData, _jsonOptions);
+                string jsonData = JsonSerializer.Serialize(saveData, JsonOptions);
 
                 // Write to file
                 using FileAccess file = FileAccess.Open(_savePath, FileAccess.ModeFlags.Write);
@@ -125,33 +127,65 @@ namespace AlJourney.Scripts.Managers
                 string jsonData = file.GetAsText();
                 file.Close();
 
-                // Deserialize
-                SaveData saveData = JsonSerializer.Deserialize<SaveData>(jsonData);
-
-                if (saveData != null)
+                // Validate JSON structure before deserialization
+                if (string.IsNullOrWhiteSpace(jsonData))
                 {
-                    // Validate save data
-                    if (!ValidateSaveData(saveData))
-                    {
-                        GD.PrintErr("[SaveSystem] Save data validation failed - corrupted save");
-                        _ = EmitSignal(SignalName.LoadCompleted, false);
-                        return null;
-                    }
-
-                    GD.Print($"[SaveSystem] Game loaded successfully - Wave {saveData.CurrentWave}");
-                    _ = EmitSignal(SignalName.LoadCompleted, true);
-                    return saveData;
-                }
-                else
-                {
-                    GD.PrintErr("[SaveSystem] Failed to deserialize save data");
+                    GD.PrintErr("[SaveSystem] Save file is empty");
                     _ = EmitSignal(SignalName.LoadCompleted, false);
                     return null;
                 }
+
+                // Attempt deserialization
+                SaveData saveData = null;
+                try
+                {
+                    saveData = JsonSerializer.Deserialize<SaveData>(jsonData, JsonOptions);
+                }
+                catch (JsonException jsonEx)
+                {
+                    GD.PrintErr($"[SaveSystem] JSON deserialization failed: {jsonEx.Message}");
+                    GD.PrintErr("[SaveSystem] Save file may be corrupted");
+                    _ = EmitSignal(SignalName.LoadCompleted, false);
+                    return null;
+                }
+
+                if (saveData == null)
+                {
+                    GD.PrintErr("[SaveSystem] Deserialized save data is null");
+                    _ = EmitSignal(SignalName.LoadCompleted, false);
+                    return null;
+                }
+
+                // Check schema version and migrate if needed
+                if (saveData.SchemaVersion != 1)
+                {
+                    GD.Print($"[SaveSystem] Outdated save schema (v{saveData.SchemaVersion}), attempting migration");
+                    saveData = SaveData.Migrate(saveData);
+
+                    if (saveData == null)
+                    {
+                        GD.PrintErr("[SaveSystem] Save migration failed");
+                        _ = EmitSignal(SignalName.LoadCompleted, false);
+                        return null;
+                    }
+                }
+
+                // Validate save data integrity
+                if (!ValidateSaveData(saveData))
+                {
+                    GD.PrintErr("[SaveSystem] Save data validation failed - corrupted save");
+                    _ = EmitSignal(SignalName.LoadCompleted, false);
+                    return null;
+                }
+
+                GD.Print($"[SaveSystem] Game loaded successfully - Wave {saveData.CurrentWave}");
+                _ = EmitSignal(SignalName.LoadCompleted, true);
+                return saveData;
             }
             catch (Exception e)
             {
-                GD.PrintErr($"[SaveSystem] Load failed: {e.Message}");
+                GD.PrintErr($"[SaveSystem] Load failed with exception: {e.Message}");
+                GD.PrintErr($"[SaveSystem] Stack trace: {e.StackTrace}");
                 _ = EmitSignal(SignalName.LoadCompleted, false);
                 return null;
             }
