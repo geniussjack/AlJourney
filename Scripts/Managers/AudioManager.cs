@@ -158,7 +158,7 @@ namespace AlJourney.Scripts.Managers
         /// </summary>
         public void FadeOutMusic(float duration = 1.0f)
         {
-            if (_musicPlayer == null || !_musicPlayer.Playing)
+            if (_musicPlayer?.Playing != true)
             {
                 return;
             }
@@ -179,7 +179,7 @@ namespace AlJourney.Scripts.Managers
         /// </summary>
         public void FadeInMusic(float duration = 1.0f)
         {
-            if (_musicPlayer == null || !_musicPlayer.Playing)
+            if (_musicPlayer?.Playing != true)
             {
                 return;
             }

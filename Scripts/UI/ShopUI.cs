@@ -115,7 +115,7 @@ namespace AlJourney.Scripts.UI
         /// </summary>
         private void CalculatePrices(int wave)
         {
-            float scaleFactor = GameConstants.SHOP_WAVE_SCALE_FACTOR;
+            const float scaleFactor = GameConstants.SHOP_WAVE_SCALE_FACTOR;
 
             // Base price increases with wave number
             int basePrice = Mathf.CeilToInt(10 * (1 + (wave * 0.5f)));

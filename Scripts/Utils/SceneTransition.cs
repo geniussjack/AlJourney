@@ -53,10 +53,7 @@ namespace AlJourney.Scripts.Utils
                 // Fade in
                 Tween fadeTween = CreateTween();
                 _ = fadeTween.TweenProperty(_fadeRect, "modulate:a", 0.0f, duration / 2);
-                _ = fadeTween.TweenCallback(Callable.From(() =>
-                {
-                    _isTransitioning = false;
-                }));
+                _ = fadeTween.TweenCallback(Callable.From(() => _isTransitioning = false));
             }));
         }
 
@@ -89,10 +86,7 @@ namespace AlJourney.Scripts.Utils
             Tween tween = CreateTween();
             _ = tween.TweenProperty(_fadeRect, "modulate:a", 0.7f, duration / 2);
             _ = tween.TweenProperty(_fadeRect, "modulate:a", 0.0f, duration / 2);
-            _ = tween.TweenCallback(Callable.From(() =>
-            {
-                _fadeRect.Color = originalColor;
-            }));
+            _ = tween.TweenCallback(Callable.From(() => _fadeRect.Color = originalColor));
         }
     }
 }

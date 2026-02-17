@@ -6,7 +6,6 @@ namespace AlJourney.Scripts.Core
     public enum GameState
     {
         MainMenu,
-        CharacterSelect,
         Battle,
         Shop,
         GameOver,
@@ -88,5 +87,51 @@ namespace AlJourney.Scripts.Core
         PlayerCombo,       // Combo effects being applied
         EnemyTurn,         // Enemies attacking
         WaveTransition     // Moving to next wave
+    }
+
+    /// <summary>
+    /// Equipment slots for character customization.
+    /// </summary>
+    public enum EquipmentSlot
+    {
+        Weapon,            // Main weapon
+        Head,              // Helmet/hat
+        Body,              // Armor/clothing
+        Legs,              // Pants/boots
+        Necklace,          // Neck accessory
+        Ring,              // Finger accessory
+        Earring            // Ear accessory
+    }
+
+    /// <summary>
+    /// Rarity levels for equipment drops.
+    /// </summary>
+    public enum EquipmentRarity
+    {
+        Common,            // Gray - 40% drop chance, max level 5
+        Uncommon,          // Green - 30% drop chance, max level 10
+        Rare,              // Blue - 15% drop chance, max level 15
+        Epic,              // Purple - 10% drop chance, max level 20
+        Legendary           // Gold/Orange - 5% drop chance, max level 25
+    }
+
+    /// <summary>
+    /// Types of abilities for character customization.
+    /// </summary>
+    public enum AbilityType
+    {
+        Attack,            // Damage-dealing abilities
+        Support            // Healing, defense, utility abilities
+    }
+
+    /// <summary>
+    /// Elemental affinity for abilities.
+    /// </summary>
+    public enum AbilityElement
+    {
+        Fire,              // Fire-based abilities
+        Heal,              // Healing-based abilities
+        Sword,             // Physical attack abilities
+        Shield             // Defense-based abilities
     }
 }

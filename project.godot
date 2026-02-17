@@ -25,6 +25,9 @@ SettingsManager="*res://Scripts/Managers/SettingsManager.cs"
 UIManager="*res://Scripts/Managers/UIManager.cs"
 GridManager="*res://Scripts/Match3/GridManager.cs"
 ComboSystem="*res://Scripts/Match3/ComboSystem.cs"
+InventoryManager="*res://Scripts/Managers/InventoryManager.cs"
+LootSystem="*res://Scripts/Managers/LootSystem.cs"
+AbilitySystem="*res://Scripts/Managers/AbilitySystem.cs"
 
 [display]
 

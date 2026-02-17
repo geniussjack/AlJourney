@@ -13,7 +13,7 @@ namespace AlJourney.Scripts.Managers
         /// <summary>
         /// Singleton instance accessor.
         /// </summary>
-        public static GameStateManager Instance { get; private set; }
+        public static GameStateManager Instance { get; private set; } = null!;
 
         // Signals
         [Signal]
@@ -69,7 +69,7 @@ namespace AlJourney.Scripts.Managers
 
         public override void _Ready()
         {
-            if (Instance != null && Instance != this)
+            if (Instance is not null)
             {
                 QueueFree();
                 return;
@@ -77,7 +77,7 @@ namespace AlJourney.Scripts.Managers
 
             Instance = this;
             _currentState = GameState.MainMenu;
-            IsGameActive = false;
+            CurrentSave = new SaveData();
 
             GD.Print("[GameStateManager] Initialized");
         }
