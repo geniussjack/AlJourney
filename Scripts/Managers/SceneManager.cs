@@ -77,11 +77,11 @@ namespace AlJourney.Scripts.Managers
                 return;
             }
 
-            // FIX: Используем nameof вместо строки
+            // Use nameof for type safety
             _ = CallDeferred(nameof(DeferredSceneChange), scenePath);
         }
 
-        // FIX: Метод должен быть public для CallDeferred
+        // Method must be public for CallDeferred
         public void DeferredSceneChange(string scenePath)
         {
             _isTransitioning = true;
@@ -132,7 +132,7 @@ namespace AlJourney.Scripts.Managers
         public static void GoToMainMenu()
         {
             GameStateManager.Instance.ReturnToMainMenu();
-            Instance.LoadScene(GameState.MainMenu); // FIX: Через Instance
+            Instance.LoadScene(GameState.MainMenu);
         }
 
         /// <summary>
@@ -153,7 +153,7 @@ namespace AlJourney.Scripts.Managers
             if (saveData != null)
             {
                 GameStateManager.Instance.LoadGame(saveData);
-                Instance.LoadScene(GameState.Battle); // FIX: Через Instance
+                Instance.LoadScene(GameState.Battle);
             }
             else
             {
@@ -167,7 +167,7 @@ namespace AlJourney.Scripts.Managers
         public static void GoToShop()
         {
             GameStateManager.Instance.ChangeState(GameState.Shop);
-            Instance.LoadScene(GameState.Shop); // FIX: Через Instance
+            Instance.LoadScene(GameState.Shop);
         }
 
         /// <summary>
@@ -176,7 +176,7 @@ namespace AlJourney.Scripts.Managers
         public static void ReturnToBattle()
         {
             GameStateManager.Instance.ChangeState(GameState.Battle);
-            Instance.LoadScene(GameState.Battle); // FIX: Через Instance
+            Instance.LoadScene(GameState.Battle);
         }
 
         /// <summary>
@@ -185,7 +185,7 @@ namespace AlJourney.Scripts.Managers
         public static void GameOver()
         {
             GameStateManager.Instance.EndGame(false);
-            Instance.LoadScene(GameState.GameOver); // FIX: Через Instance
+            Instance.LoadScene(GameState.GameOver);
         }
     }
 }
