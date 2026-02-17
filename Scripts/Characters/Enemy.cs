@@ -44,14 +44,16 @@ namespace AlJourney.Scripts.Characters
             // Get base stats
             (string name, int baseHp, int baseDmg, int baseDef, AttackType attackType, int coinReward) = GetEnemyBaseStats(enemyType);
 
-            // Apply wave scaling
-            int scaledHp = Mathf.CeilToInt(baseHp * (1 + (waveNumber * GameConstants.ENEMY_HP_SCALE_PER_WAVE)));
-            int scaledDmg = Mathf.CeilToInt(baseDmg * (1 + (waveNumber * GameConstants.ENEMY_DAMAGE_SCALE_PER_WAVE)));
+            // Use ScalingSystem for consistent scaling
+            int scaledHp = ScalingSystem.ScaleEnemyStat(baseHp, waveNumber);
+            int scaledDmg = ScalingSystem.ScaleEnemyStat(baseDmg, waveNumber);
+            int scaledDefense = ScalingSystem.ScaleEnemyStat(baseDef, waveNumber);
+            int scaledReward = ScalingSystem.ScaleReward(coinReward, waveNumber);
 
-            enemy.Initialize(name, scaledHp, scaledDmg, baseDef, attackType);
-            enemy.CoinReward = coinReward;
+            enemy.Initialize(name, scaledHp, scaledDmg, scaledDefense, attackType);
+            enemy.CoinReward = scaledReward;
 
-            GD.Print($"[Enemy] Created {name} (Wave {waveNumber}) - HP: {scaledHp}, DMG: {scaledDmg}");
+            GD.Print($"[Enemy] Created {name} (Wave {waveNumber}) - HP: {scaledHp}, DMG: {scaledDmg}, DEF: {scaledDefense}, Reward: {scaledReward}");
             return enemy;
         }
 
