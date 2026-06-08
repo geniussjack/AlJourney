@@ -3,7 +3,8 @@ using Godot;
 namespace AlJourney.Scripts.Utils
 {
     /// <summary>
-    /// Основной класс DamageFlash.
+    /// Компонент для кратковременного изменения цвета (модуляции) родительского CanvasItem.
+    /// Используется для создания эффекта "вспышки" при получении урона, лечении или других событиях.
     /// </summary>
     public partial class DamageFlash : Node
     {
@@ -11,7 +12,8 @@ namespace AlJourney.Scripts.Utils
         private Color _originalModulate;
 
         /// <summary>
-        /// Элемент _Ready.
+        /// Инициализирует компонент. Ищет родительский узел типа CanvasItem (например, Sprite2D или Control)
+        /// и сохраняет его исходный цвет (Modulate) для корректного возврата после завершения анимации вспышки.
         /// </summary>
         public override void _Ready()
         {
@@ -29,8 +31,11 @@ namespace AlJourney.Scripts.Utils
         }
 
         /// <summary>
-        /// Элемент Flash.
+        /// Запускает анимацию (Tween) изменения цвета родительского узла на указанный, 
+        /// а затем плавно возвращает его к исходному состоянию.
         /// </summary>
+        /// <param name="flashColor">Цвет, в который окрасится объект во время вспышки.</param>
+        /// <param name="duration">Общая продолжительность эффекта (туда и обратно) в секундах.</param>
         public void Flash(Color flashColor, float duration = 0.15f)
         {
             if (_target == null)
@@ -44,7 +49,8 @@ namespace AlJourney.Scripts.Utils
         }
 
         /// <summary>
-        /// Элемент FlashDamage.
+        /// Запускает вспышку красного цвета. 
+        /// Предназначено для визуализации получения урона.
         /// </summary>
         public void FlashDamage()
         {
@@ -52,7 +58,8 @@ namespace AlJourney.Scripts.Utils
         }
 
         /// <summary>
-        /// Элемент FlashHeal.
+        /// Запускает вспышку зеленого цвета.
+        /// Предназначено для визуализации применения эффектов лечения.
         /// </summary>
         public void FlashHeal()
         {
@@ -60,7 +67,8 @@ namespace AlJourney.Scripts.Utils
         }
 
         /// <summary>
-        /// Элемент FlashShield.
+        /// Запускает вспышку синего цвета.
+        /// Предназначено для визуализации получения щита или магической защиты.
         /// </summary>
         public void FlashShield()
         {
@@ -68,7 +76,8 @@ namespace AlJourney.Scripts.Utils
         }
 
         /// <summary>
-        /// Элемент FlashCritical.
+        /// Запускает яркую белую вспышку.
+        /// Предназначено для визуализации критических попаданий или мощных событий.
         /// </summary>
         public void FlashCritical()
         {
@@ -76,8 +85,11 @@ namespace AlJourney.Scripts.Utils
         }
 
         /// <summary>
-        /// Элемент FlashCustom.
+        /// Запускает вспышку пользовательского цвета с заданными параметрами.
+        /// Позволяет гибко использовать эффект для нестандартных ситуаций.
         /// </summary>
+        /// <param name="color">Специфический цвет вспышки.</param>
+        /// <param name="duration">Длительность вспышки.</param>
         public void FlashCustom(Color color, float duration = 0.15f)
         {
             Flash(color, duration);

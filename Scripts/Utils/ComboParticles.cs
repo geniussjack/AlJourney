@@ -4,13 +4,20 @@ using Godot;
 namespace AlJourney.Scripts.Utils
 {
     /// <summary>
-    /// Основной класс ComboParticles.
+    /// Вспомогательный класс для создания визуальных эффектов (частиц) и всплывающего текста 
+    /// при срабатывании комбо-эффектов, получении урона, лечении и наложении щитов.
     /// </summary>
     public partial class ComboParticles : Node2D
     {
         /// <summary>
-        /// Элемент SpawnComboEffect.
+        /// Создает и запускает эффект частиц (CpuParticles2D) на месте сработавшего комбо.
+        /// Цвет частиц зависит от типа элемента, а их количество — от уровня комбо.
+        /// Частицы автоматически удаляются (QueueFree) после завершения анимации.
         /// </summary>
+        /// <param name="parent">Узел, к которому будут прикреплены частицы.</param>
+        /// <param name="position">Позиция появления частиц.</param>
+        /// <param name="elementType">Тип элемента для определения цвета эффекта.</param>
+        /// <param name="comboLevel">Уровень комбо, определяющий количество частиц.</param>
         public static void SpawnComboEffect(Node parent, Vector2 position, ElementType elementType, int comboLevel)
         {
             CpuParticles2D particles = new()
@@ -61,8 +68,13 @@ namespace AlJourney.Scripts.Utils
         }
 
         /// <summary>
-        /// Элемент SpawnFloatingText.
+        /// Создает анимированный всплывающий текст (Label), который поднимается вверх и постепенно исчезает.
+        /// Текст автоматически удаляется после завершения анимации.
         /// </summary>
+        /// <param name="parent">Узел, к которому будет прикреплен текст.</param>
+        /// <param name="position">Начальная позиция появления текста.</param>
+        /// <param name="text">Строка для отображения.</param>
+        /// <param name="color">Цвет отображаемого текста.</param>
         public static void SpawnFloatingText(Node parent, Vector2 position, string text, Color color)
         {
             Label label = new()
@@ -83,24 +95,33 @@ namespace AlJourney.Scripts.Utils
         }
 
         /// <summary>
-        /// Элемент SpawnDamageNumber.
+        /// Создает всплывающий текст красного цвета для отображения полученного урона.
         /// </summary>
+        /// <param name="parent">Узел-родитель.</param>
+        /// <param name="position">Позиция появления текста.</param>
+        /// <param name="damage">Количество урона (будет показано со знаком минус).</param>
         public static void SpawnDamageNumber(Node parent, Vector2 position, int damage)
         {
             SpawnFloatingText(parent, position, $"-{damage}", new Color(1.0f, 0.3f, 0.3f));
         }
 
         /// <summary>
-        /// Элемент SpawnHealNumber.
+        /// Создает всплывающий текст зеленого цвета для отображения полученного лечения.
         /// </summary>
+        /// <param name="parent">Узел-родитель.</param>
+        /// <param name="position">Позиция появления текста.</param>
+        /// <param name="healing">Количество восстановленных очков здоровья (будет показано со знаком плюс).</param>
         public static void SpawnHealNumber(Node parent, Vector2 position, int healing)
         {
             SpawnFloatingText(parent, position, $"+{healing}", new Color(0.3f, 1.0f, 0.3f));
         }
 
         /// <summary>
-        /// Элемент SpawnShieldNumber.
+        /// Создает всплывающий текст синего цвета для отображения полученного щита (брони).
         /// </summary>
+        /// <param name="parent">Узел-родитель.</param>
+        /// <param name="position">Позиция появления текста.</param>
+        /// <param name="shield">Количество очков щита (будет показано со знаком плюс и словом Shield).</param>
         public static void SpawnShieldNumber(Node parent, Vector2 position, int shield)
         {
             SpawnFloatingText(parent, position, $"+{shield} Shield", new Color(0.3f, 0.5f, 1.0f));

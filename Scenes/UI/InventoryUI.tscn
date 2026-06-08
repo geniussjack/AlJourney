@@ -1,0 +1,120 @@
+[gd_scene load_steps=3 format=3 uid="uid://inventoryui_123"]
+
+[ext_resource type="Script" path="res://Scripts/UI/SimpleInventoryUI.cs" id="1_inv"]
+[ext_resource type="Theme" path="res://Resources/Themes/game_theme.tres" id="2_theme"]
+
+[node name="InventoryUI" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+script = ExtResource("1_inv")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.8)
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 50
+theme_override_constants/margin_top = 50
+theme_override_constants/margin_right = 50
+theme_override_constants/margin_bottom = 50
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="Header" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="CoinsLabel" type="Label" parent="MarginContainer/VBoxContainer/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 32
+text = "Монеты: 0"
+
+[node name="CloseButton" type="Button" parent="MarginContainer/VBoxContainer/Header"]
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 2
+text = "Закрыть"
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="ContentHBox" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 50
+
+[node name="InventorySection" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ContentHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/ContentHBox/InventorySection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "ИНВЕНТАРЬ"
+horizontal_alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer/ContentHBox/InventorySection"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="InventoryContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ContentHBox/InventorySection/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="EquipmentSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ContentHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/ContentHBox/EquipmentSection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "ЭКИПИРОВКА"
+horizontal_alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer/ContentHBox/EquipmentSection"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="EquipmentContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ContentHBox/EquipmentSection/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="DetailsSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ContentHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/ContentHBox/DetailsSection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "ДЕТАЛИ ПРЕДМЕТА"
+horizontal_alignment = 1
+
+[node name="ItemDetailsLabel" type="Label" parent="MarginContainer/VBoxContainer/ContentHBox/DetailsSection"]
+layout_mode = 2
+size_flags_vertical = 3
+text = "Выберите предмет..."
+autowrap_mode = 3
+
+[node name="UpgradeButton" type="Button" parent="MarginContainer/VBoxContainer/ContentHBox/DetailsSection"]
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 2
+size_flags_vertical = 10
+text = "Прокачать"

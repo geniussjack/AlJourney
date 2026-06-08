@@ -7,75 +7,36 @@ using System.Collections.Generic;
 namespace AlJourney.Scripts.UI
 {
     /// <summary>
-    /// UI-компонент SimpleInventoryUI. Отвечает за отображение пользовательского интерфейса.
+    /// UI-компонент SimpleInventoryUI. Отвечает за отображение пользовательского интерфейса инвентаря и экипировки.
+    /// Работает в связке с InventoryUI.tscn.
     /// </summary>
     public partial class SimpleInventoryUI : Control
     {
         private VBoxContainer _inventoryContainer;
         private VBoxContainer _equipmentContainer;
         private Label _coinsLabel;
+        private Label _itemDetailsLabel;
         private Button _closeButton;
         private Button _upgradeButton;
 
         private EquipmentData _selectedItem;
         private CharacterClass _selectedHero = CharacterClass.Mage;
 
-        /// <summary>
-        /// Элемент _Ready.
-        /// </summary>
         public override void _Ready()
         {
-            SetupUI();
-            RefreshUI();
-        }
+            _coinsLabel = GetNode<Label>("MarginContainer/VBoxContainer/Header/CoinsLabel");
+            _closeButton = GetNode<Button>("MarginContainer/VBoxContainer/Header/CloseButton");
+            
+            _inventoryContainer = GetNode<VBoxContainer>("MarginContainer/VBoxContainer/ContentHBox/InventorySection/ScrollContainer/InventoryContainer");
+            _equipmentContainer = GetNode<VBoxContainer>("MarginContainer/VBoxContainer/ContentHBox/EquipmentSection/ScrollContainer/EquipmentContainer");
+            
+            _itemDetailsLabel = GetNode<Label>("MarginContainer/VBoxContainer/ContentHBox/DetailsSection/ItemDetailsLabel");
+            _upgradeButton = GetNode<Button>("MarginContainer/VBoxContainer/ContentHBox/DetailsSection/UpgradeButton");
 
-        private void SetupUI()
-        {
-            VBoxContainer mainContainer = new();
-            AddChild(mainContainer);
-            mainContainer.Size = Size;
-            mainContainer.Position = Vector2.Zero;
-
-            HBoxContainer header = new();
-            mainContainer.AddChild(header);
-
-            _coinsLabel = new Label();
-            header.AddChild(_coinsLabel);
-
-            _closeButton = new Button { Text = "Закрыть" };
-            header.AddChild(_closeButton);
             _closeButton.Pressed += OnClosePressed;
-
-            HBoxContainer contentContainer = new();
-            mainContainer.AddChild(contentContainer);
-
-            VBoxContainer inventorySection = new();
-            contentContainer.AddChild(inventorySection);
-
-            Label inventoryLabel = new() { Text = "ИНВЕНТАРЬ" };
-            inventorySection.AddChild(inventoryLabel);
-
-            _inventoryContainer = new VBoxContainer();
-            inventorySection.AddChild(_inventoryContainer);
-
-            VBoxContainer equipmentSection = new();
-            contentContainer.AddChild(equipmentSection);
-
-            Label equipmentLabel = new() { Text = "ЭКИПИРОВКА" };
-            equipmentSection.AddChild(equipmentLabel);
-
-            _equipmentContainer = new VBoxContainer();
-            equipmentSection.AddChild(_equipmentContainer);
-
-            VBoxContainer detailsSection = new();
-            contentContainer.AddChild(detailsSection);
-
-            Label detailsLabel = new() { Text = "ДЕТАЛИ ПРЕДМЕТА" };
-            detailsSection.AddChild(detailsLabel);
-
-            _upgradeButton = new Button { Text = "Прокачать" };
-            detailsSection.AddChild(_upgradeButton);
             _upgradeButton.Pressed += OnUpgradePressed;
+
+            RefreshUI();
         }
 
         private void RefreshUI()
@@ -90,13 +51,15 @@ namespace AlJourney.Scripts.UI
             IReadOnlyList<EquipmentData> inventory = InventoryManager.Instance.GetInventory();
             foreach (EquipmentData item in inventory)
             {
-                Button itemButton = new()
+                Button itemButton = new Button
                 {
                     Text = $"{item.Name} (Ур. {item.CurrentLevel})",
                     Modulate = item.GetRarityColor()
                 };
                 _inventoryContainer.AddChild(itemButton);
-                itemButton.Pressed += () => OnItemSelected(item);
+                
+                EquipmentData currentItem = item;
+                itemButton.Pressed += () => OnItemSelected(currentItem);
             }
 
             foreach (Node child in _equipmentContainer.GetChildren())
@@ -107,20 +70,35 @@ namespace AlJourney.Scripts.UI
             Dictionary<EquipmentSlot, EquipmentData> equipment = InventoryManager.Instance.GetHeroEquipment(_selectedHero);
             foreach (KeyValuePair<EquipmentSlot, EquipmentData> kvp in equipment)
             {
-                Label slotLabel = new()
+                Label slotLabel = new Label
                 {
                     Text = $"{kvp.Key}: {kvp.Value.Name}",
                     Modulate = kvp.Value.GetRarityColor()
                 };
                 _equipmentContainer.AddChild(slotLabel);
             }
+            
+            UpdateDetailsPanel();
+        }
+
+        private void UpdateDetailsPanel()
+        {
+            if (_selectedItem == null)
+            {
+                _itemDetailsLabel.Text = "Выберите предмет для просмотра деталей.";
+                _upgradeButton.Disabled = true;
+                return;
+            }
+
+            _itemDetailsLabel.Text = $"{_selectedItem.Name}\nРедкость: {_selectedItem.Rarity}\nУровень: {_selectedItem.CurrentLevel}";
+            _upgradeButton.Disabled = false;
         }
 
         private void OnItemSelected(EquipmentData item)
         {
             _selectedItem = item;
             GD.Print($"[SimpleInventoryUI] Selected item: {item.Name}");
-            RefreshUI();
+            UpdateDetailsPanel();
         }
 
         private void OnUpgradePressed()
@@ -145,9 +123,6 @@ namespace AlJourney.Scripts.UI
             QueueFree();
         }
 
-        /// <summary>
-        /// Элемент _Process.
-        /// </summary>
         public override void _Process(double delta)
         {
             if (Engine.GetPhysicsFrames() % 60 == 0) 

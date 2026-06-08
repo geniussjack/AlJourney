@@ -4,30 +4,40 @@ using System.Collections.Generic;
 namespace AlJourney.Scripts.Match3
 {
     /// <summary>
-    /// Основной класс MatchResult.
+    /// Представляет результат успешно собранной комбинации элементов (Match-3).
+    /// Хранит данные о типе собранных элементов, их количестве, направлении комбинации (горизонталь/вертикаль) 
+    /// и точных позициях на игровом поле.
     /// </summary>
     public class MatchResult(ElementType elementType, int matchCount, bool isHorizontal)
     {
         /// <summary>
-        /// Элемент ElementType.
+        /// Тип элементов, из которых была собрана данная комбинация.
         /// </summary>
         public ElementType ElementType { get; set; } = elementType;
 
         /// <summary>
-        /// Элемент MatchCount.
+        /// Общее количество элементов в данной комбинации (обычно 3, 4 или 5).
+        /// Влияет на итоговый уровень комбо.
         /// </summary>
         public int MatchCount { get; set; } = matchCount;
 
+        /// <summary>
+        /// Список координат (X и Y) всех элементов на поле, которые участвуют в этой комбинации.
+        /// Используется для их удаления и создания визуальных эффектов.
+        /// </summary>
         public List<(int x, int y)> MatchedPositions { get; set; } = [];
 
         /// <summary>
-        /// Проверяет, является ли Horizontal.
+        /// Флаг, указывающий на направление собранной линии.
+        /// Если true — комбинация собрана по горизонтали, если false — по вертикали.
         /// </summary>
         public bool IsHorizontal { get; set; } = isHorizontal;
 
         /// <summary>
-        /// Возвращает ComboLevel.
+        /// Вычисляет и возвращает уровень комбо на основе количества собранных элементов в линии.
+        /// 3 элемента = 1 уровень; 4 элемента = 2 уровень; 5 и более = 3 уровень.
         /// </summary>
+        /// <returns>Целое число, представляющее уровень комбо (от 0 до 3).</returns>
         public int GetComboLevel()
         {
             return MatchCount switch
@@ -40,7 +50,8 @@ namespace AlJourney.Scripts.Match3
         }
 
         /// <summary>
-        /// Элемент ToString.
+        /// Возвращает строковое представление результата комбинации, содержащее количество элементов, их тип и направление.
+        /// Используется для логирования и отладки.
         /// </summary>
         public override string ToString()
         {

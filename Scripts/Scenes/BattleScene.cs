@@ -10,7 +10,9 @@ using Godot;
 namespace AlJourney.Scripts.Scenes
 {
     /// <summary>
-    /// Основной класс BattleScene.
+    /// Главный контроллер сцены боя. 
+    /// Объединяет и координирует все системы, связанные с битвой: игровое поле (GridManager),
+    /// пользовательский интерфейс (BattleHUD), систему героев (DualHeroSystem) и менеджер боя (BattleManager).
     /// </summary>
     public partial class BattleScene : Node
     {
@@ -26,7 +28,9 @@ namespace AlJourney.Scripts.Scenes
         private bool _isBattleTransitionQueued;
 
         /// <summary>
-        /// Элемент _Ready.
+        /// Инициализирует сцену боя. Настраивает камеру, загружает данные героев из сохранения, 
+        /// инициализирует интерфейс и подписывается на события (завершение волны, победа/поражение, обмен элементов).
+        /// Запускает начало битвы для текущей волны.
         /// </summary>
         public override void _Ready()
         {
@@ -146,7 +150,9 @@ namespace AlJourney.Scripts.Scenes
         }
 
         /// <summary>
-        /// Элемент _ExitTree.
+        /// Выполняется при удалении сцены боя из дерева узлов (например, при переходе в магазин или главное меню).
+        /// Отписывается от всех событий менеджеров, чтобы избежать утечек памяти и вызовов методов уничтоженных объектов,
+        /// а также корректно завершает бой.
         /// </summary>
         public override void _ExitTree()
         {

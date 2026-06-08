@@ -6,39 +6,67 @@ using System.Collections.Generic;
 namespace AlJourney.Scripts.Match3
 {
     /// <summary>
-    /// Основной класс ComboEffect.
+    /// Представляет эффект, возникающий при сборе комбинации элементов (комбо).
+    /// Хранит информацию о типе элемента, уровне комбо и результирующих значениях урона, лечения, защиты,
+    /// а также о накладываемых статусных эффектах и области действия (AoE).
     /// </summary>
     public class ComboEffect(ElementType elementType, int comboLevel)
     {
         /// <summary>
-        /// Элемент ElementType.
+        /// Тип элемента, из которого было собрано комбо.
         /// </summary>
         public ElementType ElementType { get; set; } = elementType;
+
         /// <summary>
-        /// Элемент ComboLevel.
+        /// Уровень комбо, который зависит от количества собранных элементов (например, 3 элемента = 1 уровень, 4 = 2 уровень и т.д.).
         /// </summary>
         public int ComboLevel { get; set; } = comboLevel;
+
+        /// <summary>
+        /// Количество урона, которое нанесет данное комбо противнику.
+        /// </summary>
         public int Damage { get; set; }
+
+        /// <summary>
+        /// Количество очков здоровья, которое восстановит данное комбо союзникам.
+        /// </summary>
         public int Healing { get; set; }
+
+        /// <summary>
+        /// Количество очков щита (брони), которое данное комбо наложит на союзников.
+        /// </summary>
         public int Shield { get; set; }
+
+        /// <summary>
+        /// Указывает, применяется ли эффект данного комбо по площади (сразу ко всем противникам).
+        /// </summary>
         public bool IsAoE { get; set; }
+
+        /// <summary>
+        /// Данные о дополнительном статусном эффекте (например, горение, кровотечение, оглушение),
+        /// который накладывается в результате этого комбо.
+        /// </summary>
         public StatusEffectData StatusEffect { get; set; }
     }
 
     /// <summary>
-    /// Менеджер ComboSystem. Отвечает за управление соответствующей подсистемой.
+    /// Система управления комбинациями элементов (Match-3).
+    /// Отвечает за преобразование собранных на игровом поле линий в игровые эффекты (урон, лечение, щиты),
+    /// а также за отслеживание и начисление бонусов за каскадные совпадения (цепные реакции).
     /// </summary>
     public partial class ComboSystem : Node
     {
         [Signal]
         /// <summary>
-        /// Элемент CombosProcessedEventHandler.
+        /// Событие, которое вызывается после завершения обработки комбо-эффектов.
+        /// Передает общее количество успешно обработанных комбинаций.
         /// </summary>
         public delegate void CombosProcessedEventHandler(int comboCount);
 
         [Signal]
         /// <summary>
-        /// Элемент CascadeDetectedEventHandler.
+        /// Событие, которое вызывается при обнаружении каскадного совпадения.
+        /// Передает текущий уровень каскада (множитель цепной реакции).
         /// </summary>
         public delegate void CascadeDetectedEventHandler(int cascadeLevel);
 
@@ -46,7 +74,8 @@ namespace AlJourney.Scripts.Match3
         private int _currentCascadeLevel;
 
         /// <summary>
-        /// Возвращает LastProcessedEffects.
+        /// Возвращает список эффектов, полученных после последней обработки комбинаций элементов.
+        /// Используется для передачи данных об эффектах в боевую систему.
         /// </summary>
         public List<ComboEffect> GetLastProcessedEffects()
         {
@@ -54,8 +83,12 @@ namespace AlJourney.Scripts.Match3
         }
 
         /// <summary>
-        /// Обрабатывает Matches.
+        /// Обрабатывает список собранных комбинаций (MatchResult) и превращает их в список боевых эффектов (ComboEffect).
+        /// При наличии каскада (цепной реакции) увеличивает текущий уровень каскада и применяет бонусы к эффектам.
         /// </summary>
+        /// <param name="matches">Список результатов совпадений, собранных на поле.</param>
+        /// <param name="isCascade">Указывает, является ли текущая обработка частью цепной реакции (каскада).</param>
+        /// <returns>Список сгенерированных комбо-эффектов со всеми примененными бонусами.</returns>
         public List<ComboEffect> ProcessMatches(List<MatchResult> matches, bool isCascade = false)
         {
             if (isCascade)
@@ -101,7 +134,8 @@ namespace AlJourney.Scripts.Match3
         }
 
         /// <summary>
-        /// Возвращает CascadeLevel.
+        /// Возвращает текущий уровень каскадных совпадений.
+        /// Чем выше уровень, тем больше бонусный множитель применяется к эффектам (урон, лечение, щиты).
         /// </summary>
         public int GetCascadeLevel()
         {
@@ -109,7 +143,8 @@ namespace AlJourney.Scripts.Match3
         }
 
         /// <summary>
-        /// Сбрасывает Cascade.
+        /// Сбрасывает текущий уровень каскада до нуля.
+        /// Вызывается перед началом нового хода игрока, чтобы обнулить бонусный множитель.
         /// </summary>
         public void ResetCascade()
         {
