@@ -14,66 +14,80 @@ using System.Linq;
 namespace AlJourney.Scripts.Battle
 {
     /// <summary>
-    /// Менеджер BattleManager. Отвечает за управление соответствующей подсистемой.
+    /// Глобальный менеджер боевой системы. Управляет ходами (игрока и врагов),
+    /// волнами противников, обработкой комбо-эффектов от доски Match-3,
+    /// а также начислением урона и выдачей лута.
     /// </summary>
     public partial class BattleManager : Node, IBattleManager
     {
-        [Signal]
         /// <summary>
-        /// Элемент BattleStartedEventHandler.
+        /// Сигнал вызывается в начале новой битвы.
         /// </summary>
+        [Signal]
         public delegate void BattleStartedEventHandler();
 
-        [Signal]
         /// <summary>
-        /// Элемент PhaseChangedEventHandler.
+        /// Сигнал вызывается при смене текущей фазы боя (например, с хода игрока на ход врага).
         /// </summary>
+        /// <param name="newPhase">Новая фаза из перечисления BattlePhase.</param>
+        [Signal]
         public delegate void PhaseChangedEventHandler(BattlePhase newPhase);
 
-        [Signal]
         /// <summary>
-        /// Элемент WaveCompletedEventHandler.
+        /// Сигнал вызывается, когда все враги в текущей волне побеждены.
         /// </summary>
+        [Signal]
         public delegate void WaveCompletedEventHandler();
 
-        [Signal]
         /// <summary>
-        /// Элемент BattleEndedEventHandler.
+        /// Сигнал вызывается при окончании битвы (поражение или победа во всех волнах).
         /// </summary>
+        /// <param name="playerWon">True, если игрок победил.</param>
+        [Signal]
         public delegate void BattleEndedEventHandler(bool playerWon);
 
-        [Signal]
         /// <summary>
-        /// Элемент EnemyDefeatedEventHandler.
+        /// Сигнал вызывается каждый раз, когда погибает один из противников.
         /// </summary>
+        /// <param name="enemy">Ссылка на побежденного врага.</param>
+        [Signal]
         public delegate void EnemyDefeatedEventHandler(Enemy enemy);
 
         private int _necromancerTurnCount;
-
         private GridManager _gridManager;
         private ComboSystem _comboSystem;
         private CameraShake _cameraShake;
         private GridUI _gridUI;
-        
         private bool _isConnectedToGridManager = false;
         private bool _battleEndedSignaled;
+        private readonly List<ComboEffect> _accumulatedEffects = new List<ComboEffect>();
 
-        private readonly List<ComboEffect> _accumulatedEffects = [];
-
+        /// <summary>
+        /// Текущая фаза битвы.
+        /// </summary>
         public BattlePhase CurrentPhase { get; private set; }
 
+        /// <summary>
+        /// Номер текущей волны врагов.
+        /// </summary>
         public int CurrentWave { get; private set; }
 
+        /// <summary>
+        /// Ссылка на систему двух героев (Маг и Воин).
+        /// </summary>
         public DualHeroSystem HeroSystem { get; private set; }
 
+        /// <summary>
+        /// Список всех активных врагов на поле.
+        /// </summary>
         public List<Enemy> Enemies { get; private set; }
 
         /// <summary>
-        /// Элемент _Ready.
+        /// Инициализация менеджера и привязка к глобальным узлам.
         /// </summary>
         public override void _Ready()
         {
-            Enemies = [];
+            Enemies = new List<Enemy>();
             CurrentPhase = BattlePhase.PlayerSwap;
             _necromancerTurnCount = 0;
             _battleEndedSignaled = false;
@@ -91,17 +105,21 @@ namespace AlJourney.Scripts.Battle
         }
 
         /// <summary>
-        /// Инициализирует .
+        /// Привязывает интерфейс сетки (UI) к боевому менеджеру.
+        /// Необходимо для визуализации комбо-эффектов.
         /// </summary>
+        /// <param name="gridUI">Экземпляр UI сетки.</param>
         public void Initialize(GridUI gridUI)
         {
             _gridUI = gridUI;
-            GD.Print("[BattleManager] GridUI reference set");
         }
 
         /// <summary>
-        /// Запускает Battle.
+        /// Запускает битву для указанной волны с переданной системой героев.
         /// </summary>
+        /// <param name="heroSystem">Объект системы героев игрока.</param>
+        /// <param name="waveNumber">Номер волны для генерации сложности.</param>
+        /// <param name="cameraShake">Опциональный контроллер тряски камеры.</param>
         public void StartBattle(DualHeroSystem heroSystem, int waveNumber, CameraShake cameraShake = null)
         {
             HeroSystem = heroSystem;
@@ -113,14 +131,16 @@ namespace AlJourney.Scripts.Battle
             HeroSystem.BothHeroesDied += OnBothHeroesDied;
 
             GenerateWaveEnemies();
-
             _gridManager.InitializeGrid();
 
-            CurrentPhase = BattlePhase.PlayerSwap;
+            ChangePhase(BattlePhase.PlayerSwap);
             _ = EmitSignal(SignalName.BattleStarted);
-            _ = EmitSignal(SignalName.PhaseChanged, (int)CurrentPhase);
+        }
 
-            GD.Print($"[BattleManager] Battle started - Wave {CurrentWave}");
+        private void ChangePhase(BattlePhase newPhase)
+        {
+            CurrentPhase = newPhase;
+            _ = EmitSignal(SignalName.PhaseChanged, (int)CurrentPhase);
         }
 
         private void GenerateWaveEnemies()
@@ -138,28 +158,20 @@ namespace AlJourney.Scripts.Battle
                 Enemies.Add(enemy);
             }
 
-            GD.Print($"[BattleManager] Wave {CurrentWave}: {enemyCount} enemies" +
-                     $" ({(skeletonUnlocked ? "Slime + Skeleton" : "Slime only")})");
+            GD.Print($"[BattleManager] Wave {CurrentWave}: {enemyCount} enemies");
         }
 
         private static EnemyType GetEnemyTypeForWave(bool skeletonUnlocked)
         {
-            if (!skeletonUnlocked)
-                return EnemyType.Slime;
-
+            if (!skeletonUnlocked) return EnemyType.Slime;
             return GD.Randf() < 0.5f ? EnemyType.Slime : EnemyType.SkeletonWarrior;
         }
 
         private async void OnSwapCompleted(bool wasValid)
         {
-            if (!wasValid)
-            {
-                return;
-            }
+            if (!wasValid) return;
 
-            CurrentPhase = BattlePhase.PlayerCombo;
-            _ = EmitSignal(SignalName.PhaseChanged, (int)CurrentPhase);
-            
+            ChangePhase(BattlePhase.PlayerCombo);
             _accumulatedEffects.Clear();
             
             await ProcessMatchesRecursive();
@@ -167,9 +179,7 @@ namespace AlJourney.Scripts.Battle
 
         private async void ProcessPlayerTurn()
         {
-            CurrentPhase = BattlePhase.PlayerCombo;
-            _ = EmitSignal(SignalName.PhaseChanged, (int)CurrentPhase);
-
+            ChangePhase(BattlePhase.PlayerCombo);
             _accumulatedEffects.Clear();
             _comboSystem.ResetCascade();
 
@@ -182,16 +192,14 @@ namespace AlJourney.Scripts.Battle
 
             if (matches.Count == 0)
             {
-                _ = ApplyAccumulatedEffects();
+                await ApplyAccumulatedEffects();
                 return;
             }
 
             List<ComboEffect> comboEffects = _comboSystem.ProcessMatches(matches, isCascade);
-
             _accumulatedEffects.AddRange(comboEffects);
 
             _gridUI?.VisualizeMatchesAndEffects(matches, comboEffects);
-
             _gridManager.ProcessMatches(matches);
 
             await ToSignal(GetTree().CreateTimer(0.6f), SceneTreeTimer.SignalName.Timeout);
@@ -202,22 +210,9 @@ namespace AlJourney.Scripts.Battle
         {
             if (_accumulatedEffects.Count == 0)
             {
-                GD.Print("[BattleManager] No combo effects to apply");
-                
-                if (_gridManager.RemainingSwaps > 0)
-                {
-                    CurrentPhase = BattlePhase.PlayerSwap;
-                    _ = EmitSignal(SignalName.PhaseChanged, (int)CurrentPhase);
-                    GD.Print("[BattleManager] Returning to player swap phase");
-                }
-                else
-                {
-                    await StartEnemyTurn();
-                }
+                await HandleEndOfPlayerTurn();
                 return;
             }
-
-            GD.Print($"[BattleManager] Applying {_accumulatedEffects.Count} accumulated combo effects");
 
             foreach (ComboEffect effect in _accumulatedEffects)
             {
@@ -226,14 +221,16 @@ namespace AlJourney.Scripts.Battle
             }
 
             _accumulatedEffects.Clear();
-
             HeroSystem.ProcessStatusEffects();
 
+            await HandleEndOfPlayerTurn();
+        }
+
+        private async Task HandleEndOfPlayerTurn()
+        {
             if (_gridManager.RemainingSwaps > 0)
             {
-                CurrentPhase = BattlePhase.PlayerSwap;
-                _ = EmitSignal(SignalName.PhaseChanged, (int)CurrentPhase);
-                GD.Print("[BattleManager] Returning to player swap phase");
+                ChangePhase(BattlePhase.PlayerSwap);
             }
             else
             {
@@ -244,48 +241,31 @@ namespace AlJourney.Scripts.Battle
         private void ApplyComboEffect(ComboEffect effect)
         {
             PlayerCharacter activeHero = HeroSystem.GetHeroForElement(effect.ElementType);
+            if (activeHero == null || !activeHero.IsAlive) return;
 
-            if (activeHero == null)
+            if (effect.ElementType == ElementType.Fire || effect.ElementType == ElementType.Sword)
             {
-                GD.PrintErr($"[BattleManager] No hero found for element type: {effect.ElementType}");
-                return;
+                ApplyDamageEffect(effect, activeHero);
             }
-
-            if (!activeHero.IsAlive)
+            else if (effect.ElementType == ElementType.Heal)
             {
-                GD.Print($"[BattleManager] {activeHero.CharacterName} is dead, cannot use {effect.ElementType} combo");
-                return;
+                ApplyHealEffect(effect, activeHero);
             }
-
-            switch (effect.ElementType)
+            else if (effect.ElementType == ElementType.Shield)
             {
-                case ElementType.Fire:
-                case ElementType.Sword:
-                    ApplyDamageEffect(effect, activeHero);
-                    break;
-
-                case ElementType.Heal:
-                    ApplyHealEffect(effect, activeHero);
-                    break;
-
-                case ElementType.Shield:
-                    ApplyShieldEffect(effect, activeHero);
-                    break;
+                ApplyShieldEffect(effect, activeHero);
             }
         }
 
         private void ApplyDamageEffect(ComboEffect effect, PlayerCharacter activeHero)
         {
             int damage = activeHero.CalculateDamage(effect.Damage, effect.ElementType);
-            string heroName = activeHero.CharacterName;
-            string elementName = effect.ElementType == ElementType.Fire ? "Fire" : "Sword";
-
+            
             if (effect.IsAoE)
             {
-                GD.Print($"[BattleManager] {heroName} uses {elementName} AoE for {damage} damage!");
                 _cameraShake?.ShakeStrong();
                 ComboParticles.SpawnComboEffect(this, new Vector2(640, 360), effect.ElementType, effect.ComboLevel);
-
+                
                 foreach (Enemy enemy in Enemies.Where(e => e.IsAlive))
                 {
                     DealDamageToEnemy(enemy, damage, effect, activeHero, isAoE: true);
@@ -296,10 +276,8 @@ namespace AlJourney.Scripts.Battle
                 Enemy target = Enemies.FirstOrDefault(e => e.IsAlive);
                 if (target != null)
                 {
-                    GD.Print($"[BattleManager] {heroName} attacks {target.CharacterName} with {elementName} for {damage} damage!");
                     _cameraShake?.ShakeMedium();
                     ComboParticles.SpawnComboEffect(this, new Vector2(640, 300), effect.ElementType, effect.ComboLevel);
-
                     DealDamageToEnemy(target, damage, effect, activeHero, isAoE: false);
                 }
             }
@@ -308,8 +286,8 @@ namespace AlJourney.Scripts.Battle
         private void DealDamageToEnemy(Enemy target, int damage, ComboEffect effect, PlayerCharacter activeHero, bool isAoE)
         {
             int reflected = target.TakeDamage(damage, activeHero.AttackType, canReflect: true);
-
             Vector2 particlePos = isAoE ? new Vector2(400, 200) : new Vector2(640, 250);
+            
             ComboParticles.SpawnDamageNumber(this, particlePos, damage);
 
             if (effect.StatusEffect != null)
@@ -326,11 +304,7 @@ namespace AlJourney.Scripts.Battle
         private void ApplyHealEffect(ComboEffect effect, PlayerCharacter activeHero)
         {
             int healing = PlayerCharacter.CalculateHealing(effect.Healing);
-
-            GD.Print($"[BattleManager] {activeHero.CharacterName} heals both heroes for {healing} HP!");
-
             _cameraShake?.ShakeLight();
-
             ComboParticles.SpawnComboEffect(this, new Vector2(640, 360), ElementType.Heal, effect.ComboLevel);
 
             HeroSystem.Mage.Heal(healing);
@@ -343,7 +317,6 @@ namespace AlJourney.Scripts.Battle
             {
                 HeroSystem.Mage.ClearNegativeEffects();
                 HeroSystem.Warrior.ClearNegativeEffects();
-                GD.Print("[BattleManager] Negative effects cleared from both heroes!");
             }
 
             if (effect.StatusEffect != null)
@@ -356,11 +329,7 @@ namespace AlJourney.Scripts.Battle
         private void ApplyShieldEffect(ComboEffect effect, PlayerCharacter activeHero)
         {
             int shield = PlayerCharacter.CalculateShield(effect.Shield);
-
-            GD.Print($"[BattleManager] {activeHero.CharacterName} grants {shield} shield to both heroes!");
-
             _cameraShake?.ShakeLight();
-
             ComboParticles.SpawnComboEffect(this, new Vector2(640, 360), ElementType.Shield, effect.ComboLevel);
 
             HeroSystem.Mage.AddShield(shield);
@@ -378,13 +347,9 @@ namespace AlJourney.Scripts.Battle
 
         private async Task StartEnemyTurn()
         {
-            CurrentPhase = BattlePhase.EnemyTurn;
-            _ = EmitSignal(SignalName.PhaseChanged, (int)CurrentPhase);
-
-            GD.Print("[BattleManager] Enemy turn starting...");
-
-            List<Enemy> activeEnemies = [.. Enemies.Where(e => e.IsAlive)];
-
+            ChangePhase(BattlePhase.EnemyTurn);
+            
+            List<Enemy> activeEnemies = Enemies.Where(e => e.IsAlive).ToList();
             foreach (Enemy enemy in activeEnemies)
             {
                 enemy.ProcessStatusEffects();
@@ -392,19 +357,13 @@ namespace AlJourney.Scripts.Battle
 
             foreach (Enemy enemy in activeEnemies)
             {
-                if (!enemy.IsAlive)
-                {
-                    continue;
-                }
+                if (!enemy.IsAlive) continue;
 
                 PerformEnemyAction(enemy);
                 await ToSignal(GetTree().CreateTimer(0.5f), SceneTreeTimer.SignalName.Timeout);
             }
 
-            if (!HeroSystem.IsAnyAlive)
-            {
-                return; 
-            }
+            if (!HeroSystem.IsAnyAlive) return; 
 
             if (Enemies.All(e => !e.IsAlive))
             {
@@ -417,27 +376,13 @@ namespace AlJourney.Scripts.Battle
 
         private void PerformEnemyAction(Enemy enemy)
         {
-            if (enemy.IsStunned)
-            {
-                GD.Print($"[BattleManager] {enemy.CharacterName} is stunned and cannot act");
-                return; 
-            }
+            if (enemy.IsStunned) return; 
             
-            List<PlayerCharacter> aliveHeroes = [];
-            if (HeroSystem.Mage.IsAlive)
-            {
-                aliveHeroes.Add(HeroSystem.Mage);
-            }
+            List<PlayerCharacter> aliveHeroes = new List<PlayerCharacter>();
+            if (HeroSystem.Mage.IsAlive) aliveHeroes.Add(HeroSystem.Mage);
+            if (HeroSystem.Warrior.IsAlive) aliveHeroes.Add(HeroSystem.Warrior);
 
-            if (HeroSystem.Warrior.IsAlive)
-            {
-                aliveHeroes.Add(HeroSystem.Warrior);
-            }
-
-            if (aliveHeroes.Count == 0)
-            {
-                return; 
-            }
+            if (aliveHeroes.Count == 0) return; 
 
             PlayerCharacter target = SelectTarget(aliveHeroes, enemy);
 
@@ -447,22 +392,24 @@ namespace AlJourney.Scripts.Battle
             }
             else
             {
-                int damage = enemy.PerformAttack();
-                if (damage > 0)
+                ExecuteStandardEnemyAttack(enemy, target);
+            }
+        }
+
+        private void ExecuteStandardEnemyAttack(Enemy enemy, PlayerCharacter target)
+        {
+            int damage = enemy.PerformAttack();
+            if (damage > 0)
+            {
+                _cameraShake?.ShakeLight();
+                int reflected = target.TakeDamage(damage, enemy.AttackType, canReflect: true);
+
+                Vector2 targetPos = target == HeroSystem.Mage ? new Vector2(200, 100) : new Vector2(1000, 100);
+                ComboParticles.SpawnDamageNumber(this, targetPos, damage);
+
+                if (reflected > 0)
                 {
-                    GD.Print($"[BattleManager] {enemy.CharacterName} attacks {target.CharacterName}");
-
-                    _cameraShake?.ShakeLight();
-
-                    int reflected = target.TakeDamage(damage, enemy.AttackType, canReflect: true);
-
-                    Vector2 targetPos = target == HeroSystem.Mage ? new Vector2(200, 100) : new Vector2(1000, 100);
-                    ComboParticles.SpawnDamageNumber(this, targetPos, damage);
-
-                    if (reflected > 0)
-                    {
-                        _ = enemy.TakeDamage(reflected, target.AttackType, canReflect: false);
-                    }
+                    _ = enemy.TakeDamage(reflected, target.AttackType, canReflect: false);
                 }
             }
         }
@@ -474,75 +421,68 @@ namespace AlJourney.Scripts.Battle
                 .OrderBy(h => h.CurrentHealth)
                 .FirstOrDefault();
 
-            if (wounded != null)
-            {
-                GD.Print($"[BattleManager] {enemy.CharacterName} targets wounded {wounded.CharacterName}!");
-                return wounded;
-            }
+            if (wounded != null) return wounded;
 
             if (enemy.IsMiniboss || enemy.IsBoss)
             {
-                PlayerCharacter weakestDefense = aliveHeroes
-                    .OrderBy(h => h.BaseDefense)
-                    .First();
-
-                GD.Print($"[BattleManager] {enemy.CharacterName} targets {weakestDefense.CharacterName} (weaker defense)");
-                return weakestDefense;
+                return aliveHeroes.OrderBy(h => h.BaseDefense).First();
             }
 
-            PlayerCharacter randomTarget = aliveHeroes[GD.RandRange(0, aliveHeroes.Count - 1)];
-            return randomTarget;
+            return aliveHeroes[GD.RandRange(0, aliveHeroes.Count - 1)];
         }
 
         private void PerformNecromancerAction(Enemy necromancer, PlayerCharacter target)
         {
-            if (necromancer.IsStunned)
-            {
-                GD.Print($"[BattleManager] {necromancer.CharacterName} is stunned and cannot use abilities");
-                return; 
-            }
+            if (necromancer.IsStunned) return; 
             
             _necromancerTurnCount++;
             Enemy.NecromancerAbility ability = necromancer.GetNecromancerAbility(_necromancerTurnCount);
 
-            switch (ability)
+            if (ability == Enemy.NecromancerAbility.SummonSkeleton)
             {
-                case Enemy.NecromancerAbility.SummonSkeleton:
-                    if (Enemies.Count < GameConstants.MAX_ENEMIES_PER_WAVE)
-                    {
-                        Enemy skeleton = Enemy.Create(EnemyType.SkeletonWarrior, CurrentWave);
-                        skeleton.CharacterDied += () => OnEnemyDied(skeleton);
-                        Enemies.Add(skeleton);
-                        GD.Print("[BattleManager] Necromancer summoned a Skeleton!");
-                    }
-                    break;
-
-                case Enemy.NecromancerAbility.DarkBolt:
-                    int damage = necromancer.PerformAttack();
-                    GD.Print($"[BattleManager] Necromancer casts Dark Bolt at {target.CharacterName}");
-                    int reflected = target.TakeDamage(damage, AttackType.Magical, canReflect: true);
-                    if (reflected > 0)
-                    {
-                        _ = necromancer.TakeDamage(reflected, target.AttackType, canReflect: false);
-                    }
-                    break;
-
-                case Enemy.NecromancerAbility.WeakeningDarkness:
-                    StatusEffectData weakenEffect = new(StatusEffect.Weakened, 1, 0);
-                    HeroSystem.Mage.ApplyStatusEffect(weakenEffect);
-                    HeroSystem.Warrior.ApplyStatusEffect(weakenEffect);
-                    GD.Print("[BattleManager] Necromancer cast Weakening Darkness on both heroes!");
-                    break;
+                ExecuteNecromancerSummon();
             }
+            else if (ability == Enemy.NecromancerAbility.DarkBolt)
+            {
+                ExecuteNecromancerDarkBolt(necromancer, target);
+            }
+            else if (ability == Enemy.NecromancerAbility.WeakeningDarkness)
+            {
+                ExecuteNecromancerWeaken();
+            }
+        }
+
+        private void ExecuteNecromancerSummon()
+        {
+            if (Enemies.Count < GameConstants.MAX_ENEMIES_PER_WAVE)
+            {
+                Enemy skeleton = Enemy.Create(EnemyType.SkeletonWarrior, CurrentWave);
+                skeleton.CharacterDied += () => OnEnemyDied(skeleton);
+                Enemies.Add(skeleton);
+            }
+        }
+
+        private void ExecuteNecromancerDarkBolt(Enemy necromancer, PlayerCharacter target)
+        {
+            int damage = necromancer.PerformAttack();
+            int reflected = target.TakeDamage(damage, AttackType.Magical, canReflect: true);
+            if (reflected > 0)
+            {
+                _ = necromancer.TakeDamage(reflected, target.AttackType, canReflect: false);
+            }
+        }
+
+        private void ExecuteNecromancerWeaken()
+        {
+            StatusEffectData weakenEffect = new StatusEffectData(StatusEffect.Weakened, 1, 0);
+            HeroSystem.Mage.ApplyStatusEffect(weakenEffect);
+            HeroSystem.Warrior.ApplyStatusEffect(weakenEffect);
         }
 
         private void StartNextTurn()
         {
             _gridManager.ResetSwaps();
-            CurrentPhase = BattlePhase.PlayerSwap;
-            _ = EmitSignal(SignalName.PhaseChanged, (int)CurrentPhase);
-
-            GD.Print("[BattleManager] New player turn started");
+            ChangePhase(BattlePhase.PlayerSwap);
         }
 
         private void OnEnemyDied(Enemy enemy)
@@ -550,19 +490,17 @@ namespace AlJourney.Scripts.Battle
             _ = EmitSignal(SignalName.EnemyDefeated, enemy);
 
             GameStateManager.Instance.AddCoins(enemy.CoinReward);
-            GD.Print($"[BattleManager] {enemy.CharacterName} defeated! +{enemy.CoinReward} coins");
 
             if (enemy.IsBoss || enemy.IsMiniboss)
             {
-                GenerateBossLoot(enemy);
+                GenerateBossLoot();
             }
             else if (GD.Randf() <= 0.20f)
             {
                 EquipmentData item = LootSystem.Instance.GenerateNormalLoot(CurrentWave);
                 if (item != null)
                 {
-                    InventoryManager.Instance.AddItems([item]);
-                    GD.Print($"[BattleManager] Normal enemy dropped loot: {item.Name}");
+                    InventoryManager.Instance.AddItems(new List<EquipmentData> { item });
                 }
             }
 
@@ -574,32 +512,22 @@ namespace AlJourney.Scripts.Battle
 
         private void OnBothHeroesDied()
         {
-            if (_battleEndedSignaled)
-            {
-                return;
-            }
+            if (_battleEndedSignaled) return;
 
             _battleEndedSignaled = true;
-            GD.Print("[BattleManager] Both heroes defeated - Game Over");
             _ = EmitSignal(SignalName.BattleEnded, false);
         }
 
-        private void GenerateBossLoot(Enemy _)
+        private void GenerateBossLoot()
         {
             List<EquipmentData> loot = LootSystem.Instance.GenerateBossLoot(CurrentWave);
-
             InventoryManager.Instance.AddItems(loot);
-
-            GD.Print($"[BattleManager] Generated {loot.Count} items from boss at wave {CurrentWave}");
         }
 
         private void OnWaveCompleted()
         {
-            CurrentPhase = BattlePhase.WaveTransition;
-            _ = EmitSignal(SignalName.PhaseChanged, (int)CurrentPhase);
+            ChangePhase(BattlePhase.WaveTransition);
             _ = EmitSignal(SignalName.WaveCompleted);
-
-            GD.Print($"[BattleManager] Wave {CurrentWave} completed!");
 
             (int mageHealth, int mageMaxHealth, int mageDamage, int mageDefense, int warriorHealth, int warriorMaxHealth, int warriorDamage, int warriorDefense) = HeroSystem.GetCombinedStats();
             GameStateManager.Instance.UpdateHeroStats(
@@ -608,13 +536,12 @@ namespace AlJourney.Scripts.Battle
             );
 
             GameStateManager.Instance.NextWave();
-
             SaveSystem.Instance.AutoSave();
-
         }
 
         /// <summary>
-        /// Элемент EndBattle.
+        /// Очищает состояние битвы, отписывается от сигналов и удаляет врагов.
+        /// Вызывается при переходе на экран результатов или меню.
         /// </summary>
         public void EndBattle()
         {
@@ -634,8 +561,6 @@ namespace AlJourney.Scripts.Battle
                 enemy.QueueFree();
             }
             Enemies.Clear();
-
-            GD.Print("[BattleManager] Battle ended, all signals unsubscribed");
         }
     }
 }
