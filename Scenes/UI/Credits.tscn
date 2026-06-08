@@ -1,0 +1,65 @@
+[gd_scene load_steps=3 format=3 uid="uid://credits_uid"]
+
+[ext_resource type="Script" path="res://Scripts/UI/CreditsUI.cs" id="1_credits"]
+[ext_resource type="Texture2D" path="res://Resources/Sprites/UI/atlas_btn_home.tres" id="2_home"]
+
+[node name="CreditsPanel" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_credits")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.9)
+
+[node name="CreditsMenu" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 300
+theme_override_constants/margin_top = 120
+theme_override_constants/margin_right = 300
+theme_override_constants/margin_bottom = 120
+
+[node name="Panel" type="PanelContainer" parent="CreditsMenu"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CreditsMenu/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Title" type="Label" parent="CreditsMenu/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 56
+text = "Титра"
+horizontal_alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="CreditsMenu/Panel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="CreditsText" type="RichTextLabel" parent="CreditsMenu/Panel/VBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+bbcode_enabled = true
+fit_content = true
+
+[node name="BackButton" type="TextureButton" parent="CreditsMenu/Panel/VBoxContainer"]
+custom_minimum_size = Vector2(182, 62)
+layout_mode = 2
+size_flags_horizontal = 4
+texture_normal = ExtResource("2_home")
+ignore_texture_size = true
