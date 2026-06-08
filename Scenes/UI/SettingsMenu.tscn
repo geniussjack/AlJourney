@@ -1,0 +1,193 @@
+[gd_scene load_steps=6 format=3 uid="uid://settings_uid"]
+
+[ext_resource type="Script" path="res://Scripts/UI/SettingsMenuUI.cs" id="1_settings"]
+[ext_resource type="Texture2D" path="res://Resources/Sprites/UI/atlas_btn_resume.tres" id="2_resume"]
+[ext_resource type="Texture2D" path="res://Resources/Sprites/UI/atlas_btn_reset.tres" id="3_reset"]
+[ext_resource type="Texture2D" path="res://Resources/Sprites/UI/atlas_btn_home.tres" id="4_home"]
+
+[node name="SettingsPanel" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_settings")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.9)
+
+[node name="SettingsMenu" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 200
+theme_override_constants/margin_top = 80
+theme_override_constants/margin_right = 200
+theme_override_constants/margin_bottom = 80
+
+[node name="Panel" type="PanelContainer" parent="SettingsMenu"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="SettingsMenu/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Title" type="Label" parent="SettingsMenu/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 56
+text = "Настройки"
+horizontal_alignment = 1
+
+[node name="HSeparator1" type="HSeparator" parent="SettingsMenu/Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="VideoSettings" type="VBoxContainer" parent="SettingsMenu/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="VideoLabel" type="Label" parent="SettingsMenu/Panel/VBoxContainer/VideoSettings"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "Видео"
+
+[node name="ResolutionContainer" type="HBoxContainer" parent="SettingsMenu/Panel/VBoxContainer/VideoSettings"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="SettingsMenu/Panel/VBoxContainer/VideoSettings/ResolutionContainer"]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Разрешение:"
+
+[node name="ResolutionDropdown" type="OptionButton" parent="SettingsMenu/Panel/VBoxContainer/VideoSettings"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+
+[node name="FullscreenContainer" type="HBoxContainer" parent="SettingsMenu/Panel/VBoxContainer/VideoSettings"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="SettingsMenu/Panel/VBoxContainer/VideoSettings/FullscreenContainer"]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Полный экран:"
+
+[node name="FullscreenToggle" type="CheckButton" parent="SettingsMenu/Panel/VBoxContainer/VideoSettings"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+
+[node name="VsyncContainer" type="HBoxContainer" parent="SettingsMenu/Panel/VBoxContainer/VideoSettings"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="SettingsMenu/Panel/VBoxContainer/VideoSettings/VsyncContainer"]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "VSync:"
+
+[node name="VsyncToggle" type="CheckButton" parent="SettingsMenu/Panel/VBoxContainer/VideoSettings"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+
+[node name="FpsContainer" type="HBoxContainer" parent="SettingsMenu/Panel/VBoxContainer/VideoSettings"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="SettingsMenu/Panel/VBoxContainer/VideoSettings/FpsContainer"]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Лимит кадров:"
+
+[node name="FpsLimitDropdown" type="OptionButton" parent="SettingsMenu/Panel/VBoxContainer/VideoSettings"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+
+[node name="HSeparator2" type="HSeparator" parent="SettingsMenu/Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="AudioSettings" type="VBoxContainer" parent="SettingsMenu/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="AudioLabel" type="Label" parent="SettingsMenu/Panel/VBoxContainer/AudioSettings"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "Звук"
+
+[node name="MasterVolumeContainer" type="VBoxContainer" parent="SettingsMenu/Panel/VBoxContainer/AudioSettings"]
+layout_mode = 2
+
+[node name="MasterVolumeLabel" type="Label" parent="SettingsMenu/Panel/VBoxContainer/AudioSettings/MasterVolumeContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Общая: 100%"
+
+[node name="MasterVolumeSlider" type="HSlider" parent="SettingsMenu/Panel/VBoxContainer/AudioSettings"]
+layout_mode = 2
+max_value = 1.0
+step = 0.01
+value = 1.0
+
+[node name="MusicVolumeContainer" type="VBoxContainer" parent="SettingsMenu/Panel/VBoxContainer/AudioSettings"]
+layout_mode = 2
+
+[node name="MusicVolumeLabel" type="Label" parent="SettingsMenu/Panel/VBoxContainer/AudioSettings/MusicVolumeContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Музыка: 70%"
+
+[node name="MusicVolumeSlider" type="HSlider" parent="SettingsMenu/Panel/VBoxContainer/AudioSettings"]
+layout_mode = 2
+max_value = 1.0
+step = 0.01
+value = 0.7
+
+[node name="SfxVolumeContainer" type="VBoxContainer" parent="SettingsMenu/Panel/VBoxContainer/AudioSettings"]
+layout_mode = 2
+
+[node name="SfxVolumeLabel" type="Label" parent="SettingsMenu/Panel/VBoxContainer/AudioSettings/SfxVolumeContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Эффекты: 80%"
+
+[node name="SfxVolumeSlider" type="HSlider" parent="SettingsMenu/Panel/VBoxContainer/AudioSettings"]
+layout_mode = 2
+max_value = 1.0
+step = 0.01
+value = 0.8
+
+[node name="HSeparator3" type="HSeparator" parent="SettingsMenu/Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="ButtonsContainer" type="HBoxContainer" parent="SettingsMenu/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="ApplyButton" type="TextureButton" parent="SettingsMenu/Panel/VBoxContainer/ButtonsContainer"]
+custom_minimum_size = Vector2(246, 62)
+layout_mode = 2
+texture_normal = ExtResource("2_resume")
+ignore_texture_size = true
+
+[node name="ResetButton" type="TextureButton" parent="SettingsMenu/Panel/VBoxContainer/ButtonsContainer"]
+custom_minimum_size = Vector2(182, 62)
+layout_mode = 2
+texture_normal = ExtResource("3_reset")
+ignore_texture_size = true
+
+[node name="BackButton" type="TextureButton" parent="SettingsMenu/Panel/VBoxContainer/ButtonsContainer"]
+custom_minimum_size = Vector2(182, 62)
+layout_mode = 2
+texture_normal = ExtResource("4_home")
+ignore_texture_size = true
