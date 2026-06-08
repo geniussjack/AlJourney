@@ -4,15 +4,21 @@ using Godot;
 namespace AlJourney.Scripts.Characters
 {
     /// <summary>
-    /// Основной класс PlayerCharacter.
+    /// Основной класс игрового персонажа (героя), наследующийся от Character. 
+    /// Управляет базовыми характеристиками, применением экипировки, способностями и расчетом наносимого урона.
     /// </summary>
     public partial class PlayerCharacter : Character
     {
+        /// <summary>
+        /// Класс данного персонажа (например, Маг или Воин). Доступен только для чтения.
+        /// </summary>
         public CharacterClass CharacterClass { get; private set; }
 
         /// <summary>
-        /// Элемент Create.
+        /// Фабричный метод для создания и инициализации нового персонажа определенного класса.
         /// </summary>
+        /// <param name="characterClass">Тип создаваемого класса (Маг или Воин).</param>
+        /// <returns>Новый настроенный экземпляр персонажа.</returns>
         public static PlayerCharacter Create(CharacterClass characterClass)
         {
             PlayerCharacter player = new()
@@ -48,7 +54,7 @@ namespace AlJourney.Scripts.Characters
         }
 
         /// <summary>
-        /// Инициализирует FromSave.
+        /// Инициализирует персонажа данными, полученными из файла сохранения.
         /// </summary>
         public void InitializeFromSave(string name, int maxHealth, int currentHealth, int damage, int defense, CharacterClass characterClass)
         {
@@ -84,10 +90,13 @@ namespace AlJourney.Scripts.Characters
         }
 
         /// <summary>
-        /// Элемент TotalDefense.
+        /// Общий показатель защиты персонажа, включающий базовую защиту и бонусы от экипировки и активных способностей.
         /// </summary>
         public override int TotalDefense => _baseDefense + GetEquipmentStat("defense") + GetAbilityStat("defense");
 
+        /// <summary>
+        /// Общий максимальный запас здоровья персонажа, рассчитываемый с учетом базового здоровья и как плоских, так и процентных бонусов от экипировки и способностей.
+        /// </summary>
         public override int TotalMaxHealth
         {
             get
@@ -100,8 +109,11 @@ namespace AlJourney.Scripts.Characters
         }
 
         /// <summary>
-        /// Элемент CalculateDamage.
+        /// Рассчитывает итоговый урон атаки, учитывая базовый урон, бонусы от экипировки, способностей и статусные эффекты (например, Ослабление).
         /// </summary>
+        /// <param name="baseDamage">Базовый урон, наносимый атакой (зависящий от комбо).</param>
+        /// <param name="elementType">Тип элемента атаки, определяющий, будет ли урон магическим или физическим.</param>
+        /// <returns>Конечное количество урона после всех расчетов.</returns>
         public int CalculateDamage(int baseDamage, ElementType elementType)
         {
             string statName = elementType == ElementType.Fire || elementType == ElementType.Heal ? "magic_damage" : "damage";
@@ -120,8 +132,10 @@ namespace AlJourney.Scripts.Characters
         }
 
         /// <summary>
-        /// Элемент CalculateHealing.
+        /// Рассчитывает итоговое значение лечения, которое может быть усилено дополнительными модификаторами.
         /// </summary>
+        /// <param name="baseHealing">Базовое значение исцеления.</param>
+        /// <returns>Конечное значение исцеления.</returns>
         public static int CalculateHealing(int baseHealing)
         {
             int finalHealing = baseHealing;
@@ -131,8 +145,10 @@ namespace AlJourney.Scripts.Characters
         }
 
         /// <summary>
-        /// Элемент CalculateShield.
+        /// Рассчитывает итоговое значение прочности щита, которое накладывается на персонажа.
         /// </summary>
+        /// <param name="baseShield">Базовое значение щита.</param>
+        /// <returns>Конечное значение прочности щита.</returns>
         public static int CalculateShield(int baseShield)
         {
             int finalShield = baseShield;
@@ -141,6 +157,10 @@ namespace AlJourney.Scripts.Characters
             return finalShield;
         }
 
+        /// <summary>
+        /// Получает текущие характеристики персонажа: максимальное здоровье, текущее здоровье, урон и защиту.
+        /// </summary>
+        /// <returns>Кортеж со значениями характеристик персонажа.</returns>
         public (int maxHealth, int currentHealth, int damage, int defense) GetStats()
         {
             int dmg = _baseDamage + GetEquipmentStat("damage") + GetAbilityStat("damage");

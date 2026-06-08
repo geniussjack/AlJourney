@@ -1,361 +1,358 @@
 namespace AlJourney.Scripts.Core
 {
     /// <summary>
-    /// Игровые константы.
-    /// </summary>
-    /// <summary>
-    /// Основной класс GameConstants.
+    /// Хранилище всех игровых констант, включая настройки сетки, базовые характеристики, формулы урона и параметры врагов.
     /// </summary>
     public static class GameConstants
     {
         /// <summary>
-        /// Элемент GRID_SIZE.
+        /// Размер игрового поля (сетки) в клетках (например, 5x5).
         /// </summary>
         public const int GRID_SIZE = 5;
         /// <summary>
-        /// Воспроизводит ER_SWAPS_PER_TURN.
+        /// Количество перемещений фишек, доступных игроку за один ход.
         /// </summary>
         public const int PLAYER_SWAPS_PER_TURN = 5;             
         /// <summary>
-        /// Элемент MATCH_MIN_LENGTH.
+        /// Минимальное количество одинаковых фишек в ряд для успешного совпадения (комбо).
         /// </summary>
         public const int MATCH_MIN_LENGTH = 3;
 
 
         /// <summary>
-        /// Элемент FIRE_3_DAMAGE.
+        /// Урон от совпадения 3 огненных элементов.
         /// </summary>
         public const int FIRE_3_DAMAGE = 10;
         /// <summary>
-        /// Элемент FIRE_4_DAMAGE.
+        /// Урон от совпадения 4 огненных элементов.
         /// </summary>
         public const int FIRE_4_DAMAGE = 15;
         /// <summary>
-        /// Элемент FIRE_5_DAMAGE.
+        /// Урон от совпадения 5 огненных элементов.
         /// </summary>
         public const int FIRE_5_DAMAGE = 25;
         /// <summary>
-        /// Элемент FIRE_4_BURN_DAMAGE.
+        /// Урон от статуса горения при совпадении 4 огненных элементов.
         /// </summary>
         public const int FIRE_4_BURN_DAMAGE = 3;
         /// <summary>
-        /// Элемент FIRE_4_BURN_DURATION.
+        /// Длительность статуса горения (в ходах) при совпадении 4 огненных элементов.
         /// </summary>
         public const int FIRE_4_BURN_DURATION = 2;
         /// <summary>
-        /// Элемент FIRE_5_BURN_DAMAGE.
+        /// Урон от статуса горения при совпадении 5 огненных элементов.
         /// </summary>
         public const int FIRE_5_BURN_DAMAGE = 5;
         /// <summary>
-        /// Элемент FIRE_5_BURN_DURATION.
+        /// Длительность статуса горения (в ходах) при совпадении 5 огненных элементов.
         /// </summary>
         public const int FIRE_5_BURN_DURATION = 3;
 
         /// <summary>
-        /// Элемент SWORD_3_DAMAGE.
+        /// Урон от совпадения 3 элементов меча.
         /// </summary>
         public const int SWORD_3_DAMAGE = 10;
         /// <summary>
-        /// Элемент SWORD_4_DAMAGE.
+        /// Урон от совпадения 4 элементов меча.
         /// </summary>
         public const int SWORD_4_DAMAGE = 20;
         /// <summary>
-        /// Элемент SWORD_5_DAMAGE.
+        /// Урон от совпадения 5 элементов меча.
         /// </summary>
         public const int SWORD_5_DAMAGE = 35;
         /// <summary>
-        /// Элемент SWORD_4_BLEED_DAMAGE.
+        /// Урон от кровотечения при совпадении 4 элементов меча.
         /// </summary>
         public const int SWORD_4_BLEED_DAMAGE = 4;
         /// <summary>
-        /// Элемент SWORD_4_BLEED_DURATION.
+        /// Длительность кровотечения (в ходах) при совпадении 4 элементов меча.
         /// </summary>
         public const int SWORD_4_BLEED_DURATION = 2;
 
         /// <summary>
-        /// Элемент HEAL_3_AMOUNT.
+        /// Количество восстанавливаемого здоровья при совпадении 3 элементов лечения.
         /// </summary>
         public const int HEAL_3_AMOUNT = 15;
         /// <summary>
-        /// Элемент HEAL_4_AMOUNT.
+        /// Количество восстанавливаемого здоровья при совпадении 4 элементов лечения.
         /// </summary>
         public const int HEAL_4_AMOUNT = 25;
         /// <summary>
-        /// Элемент HEAL_5_AMOUNT.
+        /// Количество восстанавливаемого здоровья при совпадении 5 элементов лечения.
         /// </summary>
         public const int HEAL_5_AMOUNT = 40;
         /// <summary>
-        /// Элемент HEAL_5_REGEN_AMOUNT.
+        /// Объем регенерации здоровья за ход при совпадении 5 элементов лечения.
         /// </summary>
         public const int HEAL_5_REGEN_AMOUNT = 5;
         /// <summary>
-        /// Элемент HEAL_5_REGEN_DURATION.
+        /// Длительность эффекта регенерации (в ходах) при совпадении 5 элементов лечения.
         /// </summary>
         public const int HEAL_5_REGEN_DURATION = 3;
 
         /// <summary>
-        /// Элемент SHIELD_3_AMOUNT.
+        /// Прочность щита при совпадении 3 элементов щита.
         /// </summary>
         public const int SHIELD_3_AMOUNT = 10;
         /// <summary>
-        /// Элемент SHIELD_4_AMOUNT.
+        /// Прочность щита при совпадении 4 элементов щита.
         /// </summary>
         public const int SHIELD_4_AMOUNT = 20;
         /// <summary>
-        /// Элемент SHIELD_5_AMOUNT.
+        /// Прочность щита при совпадении 5 элементов щита.
         /// </summary>
         public const int SHIELD_5_AMOUNT = 35;
         /// <summary>
-        /// Элемент SHIELD_4_REFLECT_PERCENT.
+        /// Процент отражаемого урона при совпадении 4 элементов щита.
         /// </summary>
         public const float SHIELD_4_REFLECT_PERCENT = 0.2f;
 
         /// <summary>
-        /// Элемент ENEMY_HP_SCALE_PER_WAVE.
+        /// Коэффициент увеличения здоровья врагов с каждой новой волной.
         /// </summary>
         public const float ENEMY_HP_SCALE_PER_WAVE = 0.10f;     
         /// <summary>
-        /// Элемент ENEMY_DAMAGE_SCALE_PER_WAVE.
+        /// Коэффициент увеличения урона врагов с каждой новой волной.
         /// </summary>
         public const float ENEMY_DAMAGE_SCALE_PER_WAVE = 0.06f; 
         /// <summary>
-        /// Элемент MAX_ENEMIES_PER_WAVE.
+        /// Максимально допустимое количество врагов в одной волне.
         /// </summary>
         public const int MAX_ENEMIES_PER_WAVE = 5;
 
         /// <summary>
-        /// Элемент ENEMY_COUNT_BASE.
+        /// Базовое количество врагов на начальных волнах.
         /// </summary>
         public const int ENEMY_COUNT_BASE = 1;
         /// <summary>
-        /// Элемент ENEMY_COUNT_INCREASE_EVERY.
+        /// Интервал (в волнах), через который количество врагов увеличивается на 1.
         /// </summary>
         public const int ENEMY_COUNT_INCREASE_EVERY = 2; 
 
         /// <summary>
-        /// Элемент SKELETON_UNLOCK_WAVE.
+        /// Номер волны, начиная с которой могут появляться враги-скелеты.
         /// </summary>
         public const int SKELETON_UNLOCK_WAVE = 21;
 
         /// <summary>
-        /// Элемент MINIBOSS_WAVE_INTERVAL.
+        /// Интервал (в волнах) между появлениями мини-боссов.
         /// </summary>
         public const int MINIBOSS_WAVE_INTERVAL = 999;
         /// <summary>
-        /// Элемент BOSS_WAVE_INTERVAL.
+        /// Интервал (в волнах) между появлениями главных боссов.
         /// </summary>
         public const int BOSS_WAVE_INTERVAL = 999;
 
 
         /// <summary>
-        /// Элемент MAGE_BASE_HP.
+        /// Базовое максимальное здоровье Мага.
         /// </summary>
         public const int MAGE_BASE_HP = 80;
         /// <summary>
-        /// Элемент MAGE_BASE_DAMAGE.
+        /// Базовый урон Мага без учета экипировки.
         /// </summary>
         public const int MAGE_BASE_DAMAGE = 8;
         /// <summary>
-        /// Элемент MAGE_BASE_DEFENSE.
+        /// Базовая защита Мага без учета экипировки.
         /// </summary>
         public const int MAGE_BASE_DEFENSE = 5;
 
         /// <summary>
-        /// Элемент WARRIOR_BASE_HP.
+        /// Базовое максимальное здоровье Воина.
         /// </summary>
         public const int WARRIOR_BASE_HP = 120;
         /// <summary>
-        /// Элемент WARRIOR_BASE_DAMAGE.
+        /// Базовый урон Воина без учета экипировки.
         /// </summary>
         public const int WARRIOR_BASE_DAMAGE = 12;
         /// <summary>
-        /// Элемент WARRIOR_BASE_DEFENSE.
+        /// Базовая защита Воина без учета экипировки.
         /// </summary>
         public const int WARRIOR_BASE_DEFENSE = 8;
 
 
         /// <summary>
-        /// Элемент SKELETON_WARRIOR_HP.
+        /// Здоровье Скелета-воина.
         /// </summary>
         public const int SKELETON_WARRIOR_HP = 30;
         /// <summary>
-        /// Элемент SKELETON_WARRIOR_DAMAGE.
+        /// Урон Скелета-воина.
         /// </summary>
         public const int SKELETON_WARRIOR_DAMAGE = 12;
         /// <summary>
-        /// Элемент SKELETON_WARRIOR_DEFENSE.
+        /// Защита Скелета-воина.
         /// </summary>
         public const int SKELETON_WARRIOR_DEFENSE = 2;
 
         /// <summary>
-        /// Элемент SKELETON_ARCHER_HP.
+        /// Здоровье Скелета-лучника.
         /// </summary>
         public const int SKELETON_ARCHER_HP = 25;
         /// <summary>
-        /// Элемент SKELETON_ARCHER_DAMAGE.
+        /// Урон Скелета-лучника.
         /// </summary>
         public const int SKELETON_ARCHER_DAMAGE = 8;
         /// <summary>
-        /// Элемент SKELETON_ARCHER_DEFENSE.
+        /// Защита Скелета-лучника.
         /// </summary>
         public const int SKELETON_ARCHER_DEFENSE = 1;
 
         /// <summary>
-        /// Элемент ZOMBIE_HP.
+        /// Здоровье Зомби.
         /// </summary>
         public const int ZOMBIE_HP = 60;
         /// <summary>
-        /// Элемент ZOMBIE_DAMAGE.
+        /// Урон Зомби.
         /// </summary>
         public const int ZOMBIE_DAMAGE = 6;
         /// <summary>
-        /// Элемент ZOMBIE_DEFENSE.
+        /// Защита Зомби.
         /// </summary>
         public const int ZOMBIE_DEFENSE = 3;
 
         /// <summary>
-        /// Элемент SLIME_HP.
+        /// Здоровье Слайма.
         /// </summary>
         public const int SLIME_HP = 20;
         /// <summary>
-        /// Элемент SLIME_DAMAGE.
+        /// Урон Слайма.
         /// </summary>
         public const int SLIME_DAMAGE = 4;
         /// <summary>
-        /// Элемент SLIME_DEFENSE.
+        /// Защита Слайма.
         /// </summary>
         public const int SLIME_DEFENSE = 0;
 
         /// <summary>
-        /// Элемент DRAUGR_WARRIOR_HP.
+        /// Здоровье Драугра-воина.
         /// </summary>
         public const int DRAUGR_WARRIOR_HP = 45;
         /// <summary>
-        /// Элемент DRAUGR_WARRIOR_DAMAGE.
+        /// Урон Драугра-воина.
         /// </summary>
         public const int DRAUGR_WARRIOR_DAMAGE = 10;
         /// <summary>
-        /// Элемент DRAUGR_WARRIOR_DEFENSE.
+        /// Защита Драугра-воина.
         /// </summary>
         public const int DRAUGR_WARRIOR_DEFENSE = 4;
 
         /// <summary>
-        /// Элемент DRAUGR_DEFENDER_HP.
+        /// Здоровье Драугра-защитника.
         /// </summary>
         public const int DRAUGR_DEFENDER_HP = 70;
         /// <summary>
-        /// Элемент DRAUGR_DEFENDER_DAMAGE.
+        /// Урон Драугра-защитника.
         /// </summary>
         public const int DRAUGR_DEFENDER_DAMAGE = 7;
         /// <summary>
-        /// Элемент DRAUGR_DEFENDER_DEFENSE.
+        /// Защита Драугра-защитника.
         /// </summary>
         public const int DRAUGR_DEFENDER_DEFENSE = 8;
 
         /// <summary>
-        /// Элемент DRAUGR_CASTER_HP.
+        /// Здоровье Драугра-кастера.
         /// </summary>
         public const int DRAUGR_CASTER_HP = 40;
         /// <summary>
-        /// Элемент DRAUGR_CASTER_DAMAGE.
+        /// Урон Драугра-кастера.
         /// </summary>
         public const int DRAUGR_CASTER_DAMAGE = 11;
         /// <summary>
-        /// Элемент DRAUGR_CASTER_DEFENSE.
+        /// Защита Драугра-кастера.
         /// </summary>
         public const int DRAUGR_CASTER_DEFENSE = 3;
 
         /// <summary>
-        /// Элемент GENERAL_DRAUGR_HP.
+        /// Здоровье Генерала Драугров.
         /// </summary>
         public const int GENERAL_DRAUGR_HP = 150;
         /// <summary>
-        /// Элемент GENERAL_DRAUGR_DAMAGE.
+        /// Урон Генерала Драугров.
         /// </summary>
         public const int GENERAL_DRAUGR_DAMAGE = 18;
         /// <summary>
-        /// Элемент GENERAL_DRAUGR_DEFENSE.
+        /// Защита Генерала Драугров.
         /// </summary>
         public const int GENERAL_DRAUGR_DEFENSE = 10;
 
         /// <summary>
-        /// Элемент ARHISKELETON_HP.
+        /// Здоровье Архискелета.
         /// </summary>
         public const int ARHISKELETON_HP = 120;
         /// <summary>
-        /// Элемент ARHISKELETON_DAMAGE.
+        /// Урон Архискелета.
         /// </summary>
         public const int ARHISKELETON_DAMAGE = 15;
         /// <summary>
-        /// Элемент ARHISKELETON_DEFENSE.
+        /// Защита Архискелета.
         /// </summary>
         public const int ARHISKELETON_DEFENSE = 5;
         /// <summary>
-        /// Элемент ARHISKELETON_ARROWS_PER_TURN.
+        /// Количество выстрелов стрелами за один ход у Архискелета.
         /// </summary>
         public const int ARHISKELETON_ARROWS_PER_TURN = 3;
 
         /// <summary>
-        /// Элемент NECROMANCER_HP.
+        /// Здоровье Некроманта.
         /// </summary>
         public const int NECROMANCER_HP = 300;
         /// <summary>
-        /// Элемент NECROMANCER_DAMAGE.
+        /// Урон Некроманта.
         /// </summary>
         public const int NECROMANCER_DAMAGE = 20;
         /// <summary>
-        /// Элемент NECROMANCER_DEFENSE.
+        /// Защита Некроманта.
         /// </summary>
         public const int NECROMANCER_DEFENSE = 12;
 
         /// <summary>
-        /// Элемент SHOP_UPGRADE_HP_MIN.
+        /// Минимальный прирост здоровья при покупке улучшения в магазине.
         /// </summary>
         public const int SHOP_UPGRADE_HP_MIN = 25;
         /// <summary>
-        /// Элемент SHOP_UPGRADE_HP_MAX.
+        /// Максимальный прирост здоровья при покупке улучшения в магазине.
         /// </summary>
         public const int SHOP_UPGRADE_HP_MAX = 60;
         /// <summary>
-        /// Элемент SHOP_UPGRADE_DAMAGE_MIN.
+        /// Минимальный прирост урона при покупке улучшения в магазине.
         /// </summary>
         public const int SHOP_UPGRADE_DAMAGE_MIN = 2;
         /// <summary>
-        /// Элемент SHOP_UPGRADE_DAMAGE_MAX.
+        /// Максимальный прирост урона при покупке улучшения в магазине.
         /// </summary>
         public const int SHOP_UPGRADE_DAMAGE_MAX = 5;
         /// <summary>
-        /// Элемент SHOP_UPGRADE_DEFENSE_MIN.
+        /// Минимальный прирост защиты при покупке улучшения в магазине.
         /// </summary>
         public const int SHOP_UPGRADE_DEFENSE_MIN = 1;
         /// <summary>
-        /// Элемент SHOP_UPGRADE_DEFENSE_MAX.
+        /// Максимальный прирост защиты при покупке улучшения в магазине.
         /// </summary>
         public const int SHOP_UPGRADE_DEFENSE_MAX = 4;
         /// <summary>
-        /// Элемент SHOP_WAVE_SCALE_FACTOR.
+        /// Коэффициент масштабирования цен в магазине с увеличением номера волны.
         /// </summary>
         public const float SHOP_WAVE_SCALE_FACTOR = 1.8f;       
 
         /// <summary>
-        /// Элемент COINS_PER_BASIC_ENEMY.
+        /// Количество монет, выпадающих за победу над обычным врагом.
         /// </summary>
         public const int COINS_PER_BASIC_ENEMY = 8;             
         /// <summary>
-        /// Элемент COINS_PER_MINIBOSS.
+        /// Количество монет, выпадающих за победу над мини-боссом.
         /// </summary>
         public const int COINS_PER_MINIBOSS = 40;               
         /// <summary>
-        /// Элемент COINS_PER_BOSS.
+        /// Количество монет, выпадающих за победу над главным боссом.
         /// </summary>
         public const int COINS_PER_BOSS = 150;                  
 
         /// <summary>
-        /// Сохраняет _FILE_NAME.
+        /// Имя файла, используемое для сохранения прогресса игрока.
         /// </summary>
         public const string SAVE_FILE_NAME = "save_data.json";
         /// <summary>
-        /// Сохраняет _DIRECTORY.
+        /// Директория, в которой сохраняется файл прогресса (с префиксом user:// для Godot).
         /// </summary>
         public const string SAVE_DIRECTORY = "user://SaveData/";
     }

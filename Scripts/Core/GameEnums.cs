@@ -1,10 +1,7 @@
 namespace AlJourney.Scripts.Core
 {
     /// <summary>
-    /// Состояния игры.
-    /// </summary>
-    /// <summary>
-    /// Основной класс GameState.
+    /// Возможные состояния игры, определяющие текущий экран и логику поведения.
     /// </summary>
     public enum GameState
     {
@@ -16,10 +13,7 @@ namespace AlJourney.Scripts.Core
     }
 
     /// <summary>
-    /// Типы элементов на игровом поле.
-    /// </summary>
-    /// <summary>
-    /// Основной класс ElementType.
+    /// Типы элементов на игровом поле. Каждый элемент соответствует определенной механике (урон огнем, лечение, физическая атака или защита щитом).
     /// </summary>
     public enum ElementType
     {
@@ -31,10 +25,7 @@ namespace AlJourney.Scripts.Core
     }
 
     /// <summary>
-    /// Классы игровых персонажей.
-    /// </summary>
-    /// <summary>
-    /// Основной класс CharacterClass.
+    /// Классы игровых персонажей, определяющие их роли в бою.
     /// </summary>
     public enum CharacterClass
     {
@@ -43,10 +34,7 @@ namespace AlJourney.Scripts.Core
     }
 
     /// <summary>
-    /// Типы врагов.
-    /// </summary>
-    /// <summary>
-    /// Основной класс EnemyType.
+    /// Различные типы врагов, с которыми игрок может столкнуться во время прохождения.
     /// </summary>
     public enum EnemyType
     {
@@ -65,10 +53,7 @@ namespace AlJourney.Scripts.Core
     }
 
     /// <summary>
-    /// Типы атак.
-    /// </summary>
-    /// <summary>
-    /// Основной класс AttackType.
+    /// Типы наносимого урона.
     /// </summary>
     public enum AttackType
     {
@@ -77,10 +62,7 @@ namespace AlJourney.Scripts.Core
     }
 
     /// <summary>
-    /// Статусные эффекты.
-    /// </summary>
-    /// <summary>
-    /// Основной класс StatusEffect.
+    /// Статусные эффекты (баффы и дебаффы), которые могут быть наложены на персонажей или врагов во время боя.
     /// </summary>
     public enum StatusEffect
     {
@@ -95,10 +77,7 @@ namespace AlJourney.Scripts.Core
     }
 
     /// <summary>
-    /// Фазы хода в битве.
-    /// </summary>
-    /// <summary>
-    /// Основной класс BattlePhase.
+    /// Фазы хода в боевой системе. Определяют порядок действий: перемещение фишек, расчет комбо, ход врагов и переход к следующей волне.
     /// </summary>
     public enum BattlePhase
     {
@@ -109,10 +88,7 @@ namespace AlJourney.Scripts.Core
     }
 
     /// <summary>
-    /// Слоты для экипировки.
-    /// </summary>
-    /// <summary>
-    /// UI-компонент EquipmentSlot. Отвечает за отображение пользовательского интерфейса.
+    /// Слоты для экипировки персонажей. Определяют, в какую ячейку можно надеть предмет.
     /// </summary>
     public enum EquipmentSlot
     {
@@ -126,10 +102,7 @@ namespace AlJourney.Scripts.Core
     }
 
     /// <summary>
-    /// Уровни редкости экипировки.
-    /// </summary>
-    /// <summary>
-    /// UI-компонент EquipmentRarity. Отвечает за отображение пользовательского интерфейса.
+    /// Уровни редкости предметов, влияющие на их характеристики, ценность и вероятность выпадения.
     /// </summary>
     public enum EquipmentRarity
     {
@@ -141,10 +114,7 @@ namespace AlJourney.Scripts.Core
     }
 
     /// <summary>
-    /// Типы способностей персонажей.
-    /// </summary>
-    /// <summary>
-    /// Основной класс AbilityType.
+    /// Типы способностей, доступных персонажам (нанесение урона или поддержка).
     /// </summary>
     public enum AbilityType
     {
@@ -153,10 +123,7 @@ namespace AlJourney.Scripts.Core
     }
 
     /// <summary>
-    /// Элементы, связанные со способностями.
-    /// </summary>
-    /// <summary>
-    /// Основной класс AbilityElement.
+    /// Элементы, связанные с активными способностями персонажей.
     /// </summary>
     public enum AbilityElement
     {

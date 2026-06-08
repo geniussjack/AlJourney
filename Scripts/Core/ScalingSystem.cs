@@ -3,10 +3,8 @@ using Godot;
 namespace AlJourney.Scripts.Core
 {
     /// <summary>
-    /// Система масштабирования характеристик, наград и стоимости.
-    /// </summary>
-    /// <summary>
-    /// Менеджер ScalingSystem. Отвечает за управление соответствующей подсистемой.
+    /// Статический класс для расчета масштабирования характеристик врагов, наград и стоимости предметов в зависимости от текущей волны.
+    /// Обеспечивает постепенное повышение сложности и ценности наград по мере прохождения игры.
     /// </summary>
     public static class ScalingSystem
     {
@@ -15,44 +13,44 @@ namespace AlJourney.Scripts.Core
         private const float COST_COEFFICIENT = 0.05f;
 
         /// <summary>
-        /// Масштабирует характеристику врага в зависимости от номера волны.
+        /// Вычисляет масштабированное значение характеристики врага (здоровья, урона и т.д.) для указанной волны.
         /// </summary>
-        /// <summary>
-        /// Элемент ScaleEnemyStat.
-        /// </summary>
+        /// <param name="baseStat">Базовое значение характеристики на первой волне.</param>
+        /// <param name="waveNumber">Номер текущей волны.</param>
+        /// <returns>Рассчитанное значение характеристики с учетом множителя волны.</returns>
         public static int ScaleEnemyStat(int baseStat, int waveNumber)
         {
             return Mathf.CeilToInt(baseStat * (1 + waveNumber * ENEMY_STAT_COEFFICIENT));
         }
 
         /// <summary>
-        /// Масштабирует награду в зависимости от номера волны.
+        /// Вычисляет увеличенный размер награды (например, золота), получаемой игроком на указанной волне.
         /// </summary>
-        /// <summary>
-        /// Элемент ScaleReward.
-        /// </summary>
+        /// <param name="baseReward">Базовый размер награды.</param>
+        /// <param name="waveNumber">Номер текущей волны.</param>
+        /// <returns>Рассчитанное значение награды с учетом множителя.</returns>
         public static int ScaleReward(int baseReward, int waveNumber)
         {
             return Mathf.CeilToInt(baseReward * (1 + waveNumber * REWARD_COEFFICIENT));
         }
 
         /// <summary>
-        /// Масштабирует стоимость в зависимости от номера волны.
+        /// Вычисляет масштабированную стоимость предметов в магазине или улучшений в зависимости от текущей волны.
         /// </summary>
-        /// <summary>
-        /// Элемент ScaleCost.
-        /// </summary>
+        /// <param name="baseCost">Базовая стоимость предмета или улучшения.</param>
+        /// <param name="waveNumber">Номер текущей волны.</param>
+        /// <returns>Рассчитанная стоимость с учетом множителя цены.</returns>
         public static int ScaleCost(int baseCost, int waveNumber)
         {
             return Mathf.CeilToInt(baseCost * (1 + waveNumber * COST_COEFFICIENT));
         }
 
         /// <summary>
-        /// Возвращает количество врагов для указанной волны.
+        /// Определяет количество врагов, которые должны появиться на указанной волне.
+        /// Количество врагов постепенно увеличивается, но не превышает установленный максимум.
         /// </summary>
-        /// <summary>
-        /// Возвращает EnemyCount.
-        /// </summary>
+        /// <param name="waveNumber">Номер текущей волны.</param>
+        /// <returns>Количество врагов для генерации.</returns>
         public static int GetEnemyCount(int waveNumber)
         {
             int count = GameConstants.ENEMY_COUNT_BASE
@@ -61,11 +59,10 @@ namespace AlJourney.Scripts.Core
         }
 
         /// <summary>
-        /// Проверяет, разблокированы ли враги-скелеты на текущей волне.
+        /// Проверяет, достигнута ли волна, на которой начинают появляться враги типа Скелет.
         /// </summary>
-        /// <summary>
-        /// Проверяет, является ли SkeletonUnlocked.
-        /// </summary>
+        /// <param name="waveNumber">Номер текущей волны.</param>
+        /// <returns>True, если текущая волна больше или равна волне разблокировки скелетов.</returns>
         public static bool IsSkeletonUnlocked(int waveNumber)
         {
             return waveNumber >= GameConstants.SKELETON_UNLOCK_WAVE;

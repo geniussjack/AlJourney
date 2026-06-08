@@ -6,12 +6,13 @@ namespace AlJourney.Scripts.Data
 {
     [Serializable]
     /// <summary>
-    /// Класс данных SaveData. Сохраняет информацию и параметры.
+    /// Класс, представляющий структуру данных для сохранения и загрузки прогресса игрока.
+    /// Хранит состояние характеристик героев, инвентарь, экипировку, разблокированные способности и прогресс по волнам.
     /// </summary>
     public class SaveData
     {
         /// <summary>
-        /// Элемент SchemaVersion.
+        /// Версия схемы данных сохранения. Используется для миграции старых сохранений при обновлении игры.
         /// </summary>
         public int SchemaVersion { get; set; } = 1;
 
@@ -69,8 +70,10 @@ namespace AlJourney.Scripts.Data
         }
 
         /// <summary>
-        /// Элемент CreateNew.
+        /// Фабричный метод, создающий новый профиль сохранения со стартовыми значениями по умолчанию.
+        /// Устанавливает начальные характеристики для Мага и Воина, а также сбрасывает прогресс до первой волны.
         /// </summary>
+        /// <returns>Новый экземпляр SaveData с начальными параметрами.</returns>
         public static SaveData CreateNew()
         {
             SaveData save = new()
@@ -93,8 +96,11 @@ namespace AlJourney.Scripts.Data
         }
 
         /// <summary>
-        /// Элемент Migrate.
+        /// Метод для адаптации (миграции) данных из старых версий игры в новую структуру сохранения.
+        /// Если версия схемы устарела, данные преобразуются для обеспечения совместимости.
         /// </summary>
+        /// <param name="oldData">Данные старого сохранения.</param>
+        /// <returns>Обновленный объект SaveData или null, если миграция не удалась.</returns>
         public static SaveData Migrate(SaveData oldData)
         {
             if (oldData.SchemaVersion == 1)

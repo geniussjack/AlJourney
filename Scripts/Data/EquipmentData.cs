@@ -6,7 +6,8 @@ using System.Linq;
 namespace AlJourney.Scripts.Data
 {
     /// <summary>
-    /// Экипирует mentData.
+    /// Структура данных, представляющая предмет экипировки.
+    /// Содержит информацию о типе (слоте), редкости, уровне прокачки, а также базовые характеристики и специальные способности предмета.
     /// </summary>
     public record EquipmentData(
         string Id,
@@ -20,8 +21,10 @@ namespace AlJourney.Scripts.Data
     )
     {
         /// <summary>
-        /// Возвращает RarityColor.
+        /// Возвращает цвет, соответствующий уровню редкости предмета.
+        /// Используется для подсветки предмета в инвентаре или интерфейсе.
         /// </summary>
+        /// <returns>Цвет (Color), соответствующий редкости.</returns>
         public Color GetRarityColor()
         {
             return Rarity switch
@@ -36,8 +39,9 @@ namespace AlJourney.Scripts.Data
         }
 
         /// <summary>
-        /// Возвращает DropChance.
+        /// Возвращает шанс выпадения предмета в зависимости от его редкости (в процентах).
         /// </summary>
+        /// <returns>Вероятность выпадения (float).</returns>
         public float GetDropChance()
         {
             return Rarity switch
@@ -52,8 +56,11 @@ namespace AlJourney.Scripts.Data
         }
 
         /// <summary>
-        /// Возвращает UpgradeCost.
+        /// Вычисляет стоимость улучшения предмета до следующего уровня.
+        /// Стоимость может масштабироваться в зависимости от текущей волны.
         /// </summary>
+        /// <param name="waveNumber">Номер текущей волны для расчёта наценки. При значении 0 возвращается базовая стоимость.</param>
+        /// <returns>Количество монет, необходимое для улучшения, или 0, если достигнут максимальный уровень.</returns>
         public int GetUpgradeCost(int waveNumber = 0)
         {
             if (CurrentLevel >= MaxLevel)
@@ -82,8 +89,10 @@ namespace AlJourney.Scripts.Data
         }
 
         /// <summary>
-        /// Элемент Upgrade.
+        /// Создает и возвращает улучшенную копию предмета, повышая его уровень и базовые характеристики.
+        /// Если предмет уже достиг максимального уровня, возвращается текущий экземпляр.
         /// </summary>
+        /// <returns>Новый экземпляр EquipmentData с повышенным уровнем и характеристиками.</returns>
         public EquipmentData Upgrade()
         {
             if (CurrentLevel >= MaxLevel)
@@ -101,8 +110,9 @@ namespace AlJourney.Scripts.Data
         }
 
         /// <summary>
-        /// Возвращает TotalStats.
+        /// Возвращает итоговые характеристики предмета, учитывающие его базовые значения и текущий уровень улучшения.
         /// </summary>
+        /// <returns>Словарь, содержащий названия характеристик и их итоговые числовые значения.</returns>
         public Dictionary<string, int> GetTotalStats()
         {
             Dictionary<string, int> totalStats = new(BaseStats);
@@ -114,8 +124,9 @@ namespace AlJourney.Scripts.Data
         }
 
         /// <summary>
-        /// Элемент ToString.
+        /// Возвращает строковое представление предмета, включающее его название, редкость и текущий уровень относительно максимального.
         /// </summary>
+        /// <returns>Строка в формате "Название (Редкость) - Level Текущий/Максимальный".</returns>
         public override string ToString()
         {
             return $"{Name} ({Rarity}) - Level {CurrentLevel}/{MaxLevel}";
