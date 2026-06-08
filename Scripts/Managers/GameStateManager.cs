@@ -6,41 +6,47 @@ using AlJourney.Scripts.Interfaces;
 namespace AlJourney.Scripts.Managers
 {
     /// <summary>
-    /// Менеджер GameStateManager. Отвечает за управление соответствующей подсистемой.
+    /// Менеджер состояния игры. Отвечает за управление глобальным состоянием, сохранением данных, волнами и ресурсами.
     /// </summary>
     public partial class GameStateManager : Node, IGameStateManager
     {
         /// <summary>
-        /// Элемент Instance.
+        /// Глобальный экземпляр менеджера состояния игры (паттерн Singleton).
         /// </summary>
         public static GameStateManager Instance { get; private set; } = null!;
 
         [Signal]
         /// <summary>
-        /// Элемент StateChangedEventHandler.
+        /// Событие, вызываемое при изменении глобального состояния игры.
         /// </summary>
+        /// <param name="newState">Новое состояние игры.</param>
         public delegate void StateChangedEventHandler(GameState newState);
 
         [Signal]
         /// <summary>
-        /// Элемент WaveChangedEventHandler.
+        /// Событие, вызываемое при смене текущей волны.
         /// </summary>
+        /// <param name="waveNumber">Номер новой волны.</param>
         public delegate void WaveChangedEventHandler(int waveNumber);
 
         [Signal]
         /// <summary>
-        /// Элемент CoinsChangedEventHandler.
+        /// Событие, вызываемое при изменении количества монет у игрока.
         /// </summary>
+        /// <param name="newAmount">Новое количество монет.</param>
         public delegate void CoinsChangedEventHandler(int newAmount);
 
         [Signal]
         /// <summary>
-        /// Элемент HeroStatsChangedEventHandler.
+        /// Событие, вызываемое при обновлении характеристик героев.
         /// </summary>
         public delegate void HeroStatsChangedEventHandler();
 
         private GameState _currentState;
 
+        /// <summary>
+        /// Текущее глобальное состояние игры.
+        /// </summary>
         public GameState CurrentState
         {
             get => _currentState;
@@ -54,22 +60,28 @@ namespace AlJourney.Scripts.Managers
             }
         }
 
+        /// <summary>
+        /// Текущие данные сохранения игры.
+        /// </summary>
         public SaveData CurrentSave { get; private set; }
 
         /// <summary>
-        /// Элемент CurrentWave.
+        /// Номер текущей волны врагов.
         /// </summary>
         public int CurrentWave => CurrentSave?.CurrentWave ?? 1;
 
         /// <summary>
-        /// Элемент Coins.
+        /// Текущее количество монет у игрока.
         /// </summary>
         public int Coins => CurrentSave?.Coins ?? 0;
 
+        /// <summary>
+        /// Указывает, активна ли игра в данный момент (идет ли битва/прохождение).
+        /// </summary>
         public bool IsGameActive { get; private set; }
 
         /// <summary>
-        /// Элемент _Ready.
+        /// Инициализирует узел менеджера состояния при добавлении в дерево сцены.
         /// </summary>
         public override void _Ready()
         {
@@ -87,7 +99,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Запускает NewGame.
+        /// Запускает новую игру, сбрасывая прогресс и устанавливая начальные значения.
         /// </summary>
         public void StartNewGame()
         {
@@ -105,8 +117,9 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Загружает Game.
+        /// Загружает состояние игры из предоставленных данных сохранения.
         /// </summary>
+        /// <param name="saveData">Данные сохранения для загрузки.</param>
         public void LoadGame(SaveData saveData)
         {
             CurrentSave = saveData;
@@ -123,7 +136,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Элемент NextWave.
+        /// Переходит к следующей волне, обновляя номер текущей волны и рекорд.
         /// </summary>
         public void NextWave()
         {
@@ -146,8 +159,9 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Добавляет Coins.
+        /// Добавляет указанное количество монет в текущее сохранение.
         /// </summary>
+        /// <param name="amount">Количество добавляемых монет.</param>
         public void AddCoins(int amount)
         {
             if (CurrentSave == null || amount <= 0)
@@ -162,8 +176,10 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Элемент SpendCoins.
+        /// Списывает указанное количество монет, если их достаточно на счету.
         /// </summary>
+        /// <param name="amount">Количество монет для списания.</param>
+        /// <returns><c>true</c>, если списание прошло успешно; иначе <c>false</c>.</returns>
         public bool SpendCoins(int amount)
         {
             if (CurrentSave == null || amount <= 0 || CurrentSave.Coins < amount)
@@ -179,8 +195,16 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Обновляет HeroStats.
+        /// Обновляет базовые характеристики обоих героев в данных сохранения.
         /// </summary>
+        /// <param name="mageHealth">Текущее здоровье мага.</param>
+        /// <param name="mageMaxHealth">Максимальное здоровье мага.</param>
+        /// <param name="mageDamage">Урон мага.</param>
+        /// <param name="mageDefense">Защита мага.</param>
+        /// <param name="warriorHealth">Текущее здоровье воина.</param>
+        /// <param name="warriorMaxHealth">Максимальное здоровье воина.</param>
+        /// <param name="warriorDamage">Урон воина.</param>
+        /// <param name="warriorDefense">Защита воина.</param>
         public void UpdateHeroStats(
             int mageHealth, int mageMaxHealth, int mageDamage, int mageDefense,
             int warriorHealth, int warriorMaxHealth, int warriorDamage, int warriorDefense)
@@ -204,8 +228,9 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Элемент ChangeState.
+        /// Изменяет текущее глобальное состояние игры.
         /// </summary>
+        /// <param name="newState">Новое состояние игры, в которое нужно перейти.</param>
         public void ChangeState(GameState newState)
         {
             CurrentState = newState;
@@ -213,8 +238,9 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Элемент EndGame.
+        /// Завершает текущую игру, переводя её в состояние победы или поражения.
         /// </summary>
+        /// <param name="isVictory">Значение <c>true</c>, если игра завершилась победой; иначе <c>false</c>.</param>
         public void EndGame(bool isVictory)
         {
             IsGameActive = false;
@@ -224,7 +250,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Элемент ReturnToMainMenu.
+        /// Возвращает игру в главное меню, сбрасывая активную сессию.
         /// </summary>
         public void ReturnToMainMenu()
         {

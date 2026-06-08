@@ -7,22 +7,27 @@ using System.Collections.Generic;
 namespace AlJourney.Scripts.Managers
 {
     /// <summary>
-    /// Менеджер SceneManager. Отвечает за управление соответствующей подсистемой.
+    /// Менеджер сцен. Отвечает за загрузку и переключение игровых сцен на основе состояния игры.
     /// </summary>
     public partial class SceneManager : Node, ISceneManager
     {
+        /// <summary>
+        /// Глобальный экземпляр менеджера сцен (паттерн Singleton).
+        /// </summary>
         public static SceneManager Instance { get; private set; }
 
         [Signal]
         /// <summary>
-        /// Элемент SceneLoadStartedEventHandler.
+        /// Событие, вызываемое перед началом загрузки новой сцены.
         /// </summary>
+        /// <param name="sceneName">Путь или имя загружаемой сцены.</param>
         public delegate void SceneLoadStartedEventHandler(string sceneName);
 
         [Signal]
         /// <summary>
-        /// Элемент SceneLoadCompletedEventHandler.
+        /// Событие, вызываемое после успешной загрузки новой сцены.
         /// </summary>
+        /// <param name="sceneName">Путь или имя загруженной сцены.</param>
         public delegate void SceneLoadCompletedEventHandler(string sceneName);
 
         private readonly Dictionary<GameState, string> _scenePaths = new()
@@ -38,7 +43,7 @@ namespace AlJourney.Scripts.Managers
         private bool _isTransitioning;
 
         /// <summary>
-        /// Элемент _Ready.
+        /// Инициализирует менеджер сцен при добавлении в дерево. Находит текущую активную сцену.
         /// </summary>
         public override void _Ready()
         {
@@ -58,8 +63,9 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Загружает Scene.
+        /// Инициирует загрузку сцены, соответствующей указанному состоянию игры.
         /// </summary>
+        /// <param name="state">Глобальное состояние игры, для которого нужно загрузить сцену.</param>
         public void LoadScene(GameState state)
         {
             if (!_scenePaths.TryGetValue(state, out string scenePath))
@@ -71,8 +77,9 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Загружает SceneByPath.
+        /// Начинает процесс загрузки сцены по указанному пути. Переключение происходит отложенно (deferred).
         /// </summary>
+        /// <param name="scenePath">Путь к файлу сцены (формат res://).</param>
         public void LoadSceneByPath(string scenePath)
         {
             if (_isTransitioning)
@@ -85,8 +92,10 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Элемент DeferredSceneChange.
+        /// Отложенный метод для безопасной замены текущей сцены на новую.
+        /// Удаляет старую сцену и добавляет новую в корень дерева.
         /// </summary>
+        /// <param name="scenePath">Путь к файлу загружаемой сцены.</param>
         public void DeferredSceneChange(string scenePath)
         {
             _isTransitioning = true;
@@ -113,7 +122,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Элемент ReloadCurrentScene.
+        /// Перезагружает текущую активную сцену.
         /// </summary>
         public void ReloadCurrentScene()
         {
@@ -130,7 +139,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Элемент GoToMainMenu.
+        /// Статический вспомогательный метод: осуществляет переход в Главное меню.
         /// </summary>
         public static void GoToMainMenu()
         {
@@ -139,7 +148,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Запускает NewGame.
+        /// Статический вспомогательный метод: запускает новую игру и переходит на сцену битвы.
         /// </summary>
         public static void StartNewGame()
         {
@@ -148,7 +157,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Элемент ContinueGame.
+        /// Статический вспомогательный метод: загружает сохранение и продолжает игру на сцене битвы.
         /// </summary>
         public static void ContinueGame()
         {
@@ -165,7 +174,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Элемент GoToShop.
+        /// Статический вспомогательный метод: переходит на сцену магазина.
         /// </summary>
         public static void GoToShop()
         {
@@ -174,7 +183,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Элемент ReturnToBattle.
+        /// Статический вспомогательный метод: возвращается из других экранов (например, магазина) на сцену битвы.
         /// </summary>
         public static void ReturnToBattle()
         {
@@ -183,7 +192,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Элемент GameOver.
+        /// Статический вспомогательный метод: завершает игру поражением и переходит на экран "Game Over".
         /// </summary>
         public static void GameOver()
         {

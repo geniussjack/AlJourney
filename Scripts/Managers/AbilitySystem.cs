@@ -8,12 +8,12 @@ using System.Linq;
 namespace AlJourney.Scripts.Managers
 {
     /// <summary>
-    /// Менеджер AbilitySystem. Отвечает за управление соответствующей подсистемой.
+    /// Менеджер системы способностей. Отвечает за управление разблокировкой, экипировкой и применением эффектов способностей для персонажей.
     /// </summary>
     public partial class AbilitySystem : Node, IAbilitySystem
     {
         /// <summary>
-        /// Элемент Instance.
+        /// Глобальный экземпляр менеджера системы способностей (паттерн Singleton).
         /// </summary>
         public static AbilitySystem Instance { get; private set; } = null!;
 
@@ -21,7 +21,8 @@ namespace AlJourney.Scripts.Managers
         private readonly Dictionary<CharacterClass, List<AbilityData>> _equippedAbilities = [];
 
         /// <summary>
-        /// Элемент _Ready.
+        /// Инициализирует узел системы способностей при его добавлении в дерево сцены.
+        /// Гарантирует существование только одного экземпляра менеджера.
         /// </summary>
         public override void _Ready()
         {
@@ -35,24 +36,31 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Возвращает AvailableAbilities.
+        /// Получает список всех способностей, которые доступны для указанного класса персонажа.
         /// </summary>
+        /// <param name="heroClass">Класс персонажа, для которого необходимо получить доступные способности.</param>
+        /// <returns>Список доступных способностей.</returns>
         public List<AbilityData> GetAvailableAbilities(CharacterClass heroClass)
         {
             return [.. _abilityTemplates.Values.Where(ability => IsAbilityForHero(ability, heroClass))];
         }
 
         /// <summary>
-        /// Возвращает EquippedAbilities.
+        /// Получает список способностей, которые в данный момент экипированы указанным классом персонажа.
         /// </summary>
+        /// <param name="heroClass">Класс персонажа, экипированные способности которого нужно получить.</param>
+        /// <returns>Список экипированных способностей или пустой список, если ни одна способность не экипирована.</returns>
         public List<AbilityData> GetEquippedAbilities(CharacterClass heroClass)
         {
             return _equippedAbilities.TryGetValue(heroClass, out List<AbilityData> abilities) ? abilities : [];
         }
 
         /// <summary>
-        /// Элемент UnlockAbility.
+        /// Разблокирует указанную способность для заданного персонажа за игровую валюту (монеты).
         /// </summary>
+        /// <param name="hero">Класс персонажа, для которого разблокируется способность.</param>
+        /// <param name="ability">Данные способности, которую необходимо разблокировать.</param>
+        /// <returns><c>true</c>, если способность была успешно разблокирована; <c>false</c>, если не хватает монет.</returns>
         public bool UnlockAbility(CharacterClass hero, AbilityData ability)
         {
             if (GameStateManager.Instance.Coins < ability.UnlockCost)
@@ -74,8 +82,11 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Экипирует Ability.
+        /// Экипирует указанную способность для заданного персонажа. У одного персонажа не может быть экипировано более 3 способностей.
         /// </summary>
+        /// <param name="hero">Класс персонажа, которому экипируется способность.</param>
+        /// <param name="ability">Способность, которую нужно экипировать.</param>
+        /// <returns><c>true</c>, если способность была успешно экипирована; <c>false</c>, если достигнут лимит в 3 способности.</returns>
         public bool EquipAbility(CharacterClass hero, AbilityData ability)
         {
             if (!_equippedAbilities.TryGetValue(hero, out List<AbilityData> value))
@@ -95,16 +106,21 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Возвращает AbilityEffect.
+        /// Вычисляет и возвращает суммарное значение конкретного эффекта от всех экипированных способностей персонажа.
         /// </summary>
+        /// <param name="hero">Класс персонажа.</param>
+        /// <param name="effectName">Название эффекта для поиска.</param>
+        /// <returns>Суммарное значение эффекта.</returns>
         public int GetAbilityEffect(CharacterClass hero, string effectName)
         {
             return !_equippedAbilities.TryGetValue(hero, out List<AbilityData> abilities) ? 0 : abilities.Sum(ability => ability.GetEffect(effectName));
         }
 
         /// <summary>
-        /// Возвращает TotalAbilityStats.
+        /// Получает словарь с суммарными значениями всех характеристик от экипированных способностей указанного персонажа.
         /// </summary>
+        /// <param name="hero">Класс персонажа.</param>
+        /// <returns>Словарь, где ключ — название характеристики, а значение — её суммарный бонус.</returns>
         public Dictionary<string, int> GetTotalAbilityStats(CharacterClass hero)
         {
             Dictionary<string, int> totalStats = [];

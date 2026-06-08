@@ -5,29 +5,34 @@ using System.Collections.Generic;
 namespace AlJourney.Scripts.Managers
 {
     /// <summary>
-    /// Менеджер UIManager. Отвечает за управление соответствующей подсистемой.
+    /// Менеджер пользовательского интерфейса (UI). Отвечает за открытие, закрытие и управление стеком экранов меню.
     /// </summary>
     public partial class UIManager : Node, IUIManager
     {
+        /// <summary>
+        /// Глобальный экземпляр менеджера интерфейса (паттерн Singleton).
+        /// </summary>
         public static UIManager Instance { get; private set; }
 
         [Signal]
         /// <summary>
-        /// Элемент MenuOpenedEventHandler.
+        /// Событие, вызываемое при открытии нового меню.
         /// </summary>
+        /// <param name="menuName">Имя открытого меню.</param>
         public delegate void MenuOpenedEventHandler(string menuName);
 
         [Signal]
         /// <summary>
-        /// Элемент MenuClosedEventHandler.
+        /// Событие, вызываемое при закрытии меню.
         /// </summary>
+        /// <param name="menuName">Имя закрытого меню.</param>
         public delegate void MenuClosedEventHandler(string menuName);
 
         private readonly Stack<Control> _menuStack = new();
         private Control _currentMenu;
 
         /// <summary>
-        /// Элемент _Ready.
+        /// Инициализирует менеджер интерфейса при добавлении в дерево сцены.
         /// </summary>
         public override void _Ready()
         {
@@ -42,8 +47,9 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Открывает Menu.
+        /// Открывает указанное меню, скрывая текущее (если оно есть) и добавляя его в стек возврата.
         /// </summary>
+        /// <param name="menu">Контрол меню, которое нужно открыть.</param>
         public void OpenMenu(Control menu)
         {
             if (menu == null)
@@ -66,7 +72,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Закрывает CurrentMenu.
+        /// Закрывает текущее активное меню и возвращает на экран предыдущее меню из стека (если оно существует).
         /// </summary>
         public void CloseCurrentMenu()
         {
@@ -94,7 +100,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Закрывает AllMenus.
+        /// Закрывает все открытые меню и очищает стек возврата.
         /// </summary>
         public void CloseAllMenus()
         {

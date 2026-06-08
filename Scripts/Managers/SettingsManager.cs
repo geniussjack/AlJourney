@@ -4,15 +4,18 @@ using AlJourney.Scripts.Interfaces;
 namespace AlJourney.Scripts.Managers
 {
     /// <summary>
-    /// Менеджер SettingsManager. Отвечает за управление соответствующей подсистемой.
+    /// Менеджер настроек. Отвечает за сохранение, загрузку и применение графических и звуковых настроек игры.
     /// </summary>
     public partial class SettingsManager : Node, ISettingsManager
     {
+        /// <summary>
+        /// Глобальный экземпляр менеджера настроек (паттерн Singleton).
+        /// </summary>
         public static SettingsManager Instance { get; private set; }
 
         [Signal]
         /// <summary>
-        /// Устанавливает tingsChangedEventHandler.
+        /// Событие, вызываемое при изменении и применении любых настроек.
         /// </summary>
         public delegate void SettingsChangedEventHandler();
 
@@ -22,42 +25,43 @@ namespace AlJourney.Scripts.Managers
 
 
         /// <summary>
-        /// Элемент Resolution.
+        /// Текущее разрешение экрана.
         /// </summary>
         public Vector2I Resolution => _resolution;
 
         /// <summary>
-        /// Элемент Fullscreen.
+        /// Указывает, включен ли полноэкранный режим.
         /// </summary>
         public bool Fullscreen { get; private set; } = true;
 
         /// <summary>
-        /// Элемент VSync.
+        /// Указывает, включена ли вертикальная синхронизация (VSync).
         /// </summary>
         public bool VSync { get; private set; } = true;
 
         /// <summary>
-        /// Элемент MaxFps.
+        /// Максимальное количество кадров в секунду (FPS).
         /// </summary>
         public int MaxFps { get; private set; } = 60;
 
         /// <summary>
-        /// Элемент MasterVolume.
+        /// Общая (мастер) громкость звука.
         /// </summary>
         public float MasterVolume { get; private set; } = 1.0f;
 
         /// <summary>
-        /// Элемент MusicVolume.
+        /// Громкость фоновой музыки.
         /// </summary>
         public float MusicVolume { get; private set; } = 0.7f;
 
         /// <summary>
-        /// Элемент SfxVolume.
+        /// Громкость звуковых эффектов (SFX).
         /// </summary>
         public float SfxVolume { get; private set; } = 0.8f;
 
         /// <summary>
-        /// Элемент _Ready.
+        /// Инициализирует менеджер настроек при добавлении в дерево сцены.
+        /// Загружает сохраненные настройки и применяет их.
         /// </summary>
         public override void _Ready()
         {
@@ -75,8 +79,10 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Устанавливает Resolution.
+        /// Устанавливает новое разрешение экрана.
         /// </summary>
+        /// <param name="resolution">Новое разрешение.</param>
+        /// <param name="applyImmediately">Если <c>true</c>, видео-настройки применяются немедленно.</param>
         public void SetResolution(Vector2I resolution, bool applyImmediately = true)
         {
             _resolution = resolution;
@@ -90,8 +96,10 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Устанавливает Fullscreen.
+        /// Включает или выключает полноэкранный режим.
         /// </summary>
+        /// <param name="enabled">Состояние полноэкранного режима.</param>
+        /// <param name="applyImmediately">Если <c>true</c>, видео-настройки применяются немедленно.</param>
         public void SetFullscreen(bool enabled, bool applyImmediately = true)
         {
             Fullscreen = enabled;
@@ -105,8 +113,10 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Устанавливает VSync.
+        /// Включает или выключает вертикальную синхронизацию (VSync).
         /// </summary>
+        /// <param name="enabled">Состояние вертикальной синхронизации.</param>
+        /// <param name="applyImmediately">Если <c>true</c>, видео-настройки применяются немедленно.</param>
         public void SetVSync(bool enabled, bool applyImmediately = true)
         {
             VSync = enabled;
@@ -120,8 +130,10 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Устанавливает MaxFps.
+        /// Устанавливает максимальную частоту кадров.
         /// </summary>
+        /// <param name="fps">Максимальное количество кадров в секунду.</param>
+        /// <param name="applyImmediately">Если <c>true</c>, видео-настройки применяются немедленно.</param>
         public void SetMaxFps(int fps, bool applyImmediately = true)
         {
             MaxFps = fps;
@@ -135,8 +147,9 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Устанавливает MasterVolume.
+        /// Устанавливает общую громкость звука и передает её в AudioManager.
         /// </summary>
+        /// <param name="volume">Уровень громкости (от 0.0 до 1.0).</param>
         public void SetMasterVolume(float volume)
         {
             MasterVolume = Mathf.Clamp(volume, 0.0f, 1.0f);
@@ -145,8 +158,9 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Устанавливает MusicVolume.
+        /// Устанавливает громкость фоновой музыки и передает её в AudioManager.
         /// </summary>
+        /// <param name="volume">Уровень громкости (от 0.0 до 1.0).</param>
         public void SetMusicVolume(float volume)
         {
             MusicVolume = Mathf.Clamp(volume, 0.0f, 1.0f);
@@ -155,8 +169,9 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Устанавливает SfxVolume.
+        /// Устанавливает громкость звуковых эффектов (SFX) и передает её в AudioManager.
         /// </summary>
+        /// <param name="volume">Уровень громкости (от 0.0 до 1.0).</param>
         public void SetSfxVolume(float volume)
         {
             SfxVolume = Mathf.Clamp(volume, 0.0f, 1.0f);
@@ -165,7 +180,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Применяет VideoSettings.
+        /// Применяет текущие видео-настройки к движку и окну приложения.
         /// </summary>
         public void ApplyVideoSettings()
         {
@@ -202,7 +217,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Сохраняет Settings.
+        /// Сохраняет текущие настройки в конфигурационный файл на диске.
         /// </summary>
         public void SaveSettings()
         {
@@ -256,7 +271,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Сбрасывает ToDefaults.
+        /// Сбрасывает все настройки до значений по умолчанию, применяет их и сохраняет.
         /// </summary>
         public void ResetToDefaults()
         {
