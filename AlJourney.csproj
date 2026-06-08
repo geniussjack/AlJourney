@@ -1,7 +1,10 @@
 <Project Sdk="Godot.NET.Sdk/4.5.1">
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
+    <DebugType>portable</DebugType>
+    <DebugSymbols>true</DebugSymbols>
     <EnableDynamicLoading>true</EnableDynamicLoading>
+    <NoWarn>$(NoWarn);NU1605</NoWarn>
     <RootNamespace>AlJourney</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
@@ -71,5 +74,14 @@
     <None Include="scenes\ui\MainMenu.tscn" />
     <None Include="scenes\ui\ShopScene.tscn" />
     <None Include="scenes\ui\VictoryScreen.tscn" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Chickensoft.GoDotTest" Version="2.0.35" />
+    <PackageReference Include="coverlet.collector" Version="10.0.1">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Moq" Version="4.20.72" />
+    <PackageReference Include="Shouldly" Version="4.3.0" />
   </ItemGroup>
 </Project>
