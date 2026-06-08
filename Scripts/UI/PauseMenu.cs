@@ -12,6 +12,9 @@ namespace AlJourney.Scripts.UI
         private TextureButton _resumeButton;
         private TextureButton _mainMenuButton;
 
+        /// <summary>
+        /// Вызывается при инициализации узла. Настраивает кнопки продолжения и выхода, скрывает меню по умолчанию и устанавливает режим обработки `Always` (для работы во время паузы).
+        /// </summary>
         public override void _Ready()
         {
             _resumeButton = GetNode<TextureButton>("CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ResumeButton");
@@ -27,6 +30,10 @@ namespace AlJourney.Scripts.UI
             GD.Print("[PauseMenu] Initialized");
         }
 
+        /// <summary>
+        /// Обрабатывает пользовательский ввод. При нажатии клавиши "Отмена" (например, Esc) переключает состояние паузы в игре.
+        /// </summary>
+        /// <param name="event">Событие пользовательского ввода.</param>
         public override void _Input(InputEvent @event)
         {
             if (@event.IsActionPressed("ui_cancel"))
@@ -40,6 +47,9 @@ namespace AlJourney.Scripts.UI
             }
         }
 
+        /// <summary>
+        /// Ставит игру на паузу, отображает пользовательский интерфейс меню паузы с плавной анимацией появления.
+        /// </summary>
         public void Pause()
         {
             Show();
@@ -53,6 +63,9 @@ namespace AlJourney.Scripts.UI
             GD.Print("[PauseMenu] Paused");
         }
 
+        /// <summary>
+        /// Снимает игру с паузы, скрывая меню паузы с плавной анимацией исчезновения.
+        /// </summary>
         public void Resume()
         {
             Tween tween = CreateTween();

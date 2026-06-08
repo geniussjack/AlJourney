@@ -4,7 +4,7 @@ using Godot;
 namespace AlJourney.Scripts.UI
 {
     /// <summary>
-    /// UI-компонент SettingsMenuUI. Отвечает за отображение пользовательского интерфейса.
+    /// Пользовательский интерфейс меню настроек. Управляет изменениями графики (разрешение, полноэкранный режим, VSync, лимит FPS) и звука (общая громкость, музыка, SFX).
     /// </summary>
     public partial class SettingsMenuUI : Control
     {
@@ -35,7 +35,7 @@ namespace AlJourney.Scripts.UI
         private readonly int[] _fpsLimits = [30, 60, 120, 144, 240, 0]; 
 
         /// <summary>
-        /// Элемент _Ready.
+        /// Вызывается при инициализации узла. Настраивает ссылки на элементы управления (слайдеры, выпадающие списки, кнопки), подписывается на их события и загружает текущие настройки.
         /// </summary>
         public override void _Ready()
         {

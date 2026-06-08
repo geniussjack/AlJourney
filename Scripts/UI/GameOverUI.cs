@@ -5,7 +5,7 @@ using Godot;
 namespace AlJourney.Scripts.UI
 {
     /// <summary>
-    /// UI-компонент GameOverUI. Отвечает за отображение пользовательского интерфейса.
+    /// Пользовательский интерфейс экрана завершения игры (Game Over). Отображает финальную статистику (достигнутая волна, собранные монеты, побежденные враги) и предоставляет кнопки для начала новой игры или выхода в главное меню.
     /// </summary>
     public partial class GameOverUI : Control
     {
@@ -16,7 +16,7 @@ namespace AlJourney.Scripts.UI
         private TextureButton _newGameButton;
 
         /// <summary>
-        /// Элемент _Ready.
+        /// Вызывается при инициализации узла. Настраивает ссылки на текстовые метки и кнопки, подписывается на события нажатия и запускает отображение статистики.
         /// </summary>
         public override void _Ready()
         {

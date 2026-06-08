@@ -4,24 +4,65 @@ using AlJourney.Scripts.Match3;
 namespace AlJourney.Scripts.Interfaces
 {
     /// <summary>
-    /// Интерфейс управления полем Match-3.
-    /// </summary>
-    /// <summary>
-    /// Менеджер IGridManager. Отвечает за управление соответствующей подсистемой.
+    /// Интерфейс управления игровым полем Match-3.
+    /// Отвечает за логику сетки, перестановку элементов, поиск совпадений и перемешивание поля.
     /// </summary>
     public interface IGridManager
     {
+        /// <summary>
+        /// Размер игрового поля (одна сторона квадратной сетки).
+        /// </summary>
         int GridSize { get; }
+
+        /// <summary>
+        /// Количество оставшихся у игрока ходов (перестановок).
+        /// </summary>
         int RemainingSwaps { get; }
 
+        /// <summary>
+        /// Инициализирует и заполняет игровое поле элементами перед началом игры.
+        /// </summary>
         void InitializeGrid();
+
+        /// <summary>
+        /// Возвращает данные элемента, расположенного на поле по указанным координатам.
+        /// </summary>
         ElementData GetElement(int x, int y);
+
+        /// <summary>
+        /// Пытается поменять местами два элемента на поле.
+        /// Возвращает true, если перестановка возможна и привела к совпадению (или была разрешена правилами).
+        /// </summary>
         bool TrySwap(int x1, int y1, int x2, int y2);
+
+        /// <summary>
+        /// Ищет все текущие совпадения элементов (линии из 3 и более) на поле.
+        /// </summary>
         List<MatchResult> FindAllMatches();
+
+        /// <summary>
+        /// Обрабатывает найденные совпадения: удаляет элементы, начисляет очки и вызывает падение новых.
+        /// </summary>
         void ProcessMatches(List<MatchResult> matches);
+
+        /// <summary>
+        /// Сбрасывает количество доступных перестановок к начальному значению для текущего уровня/хода.
+        /// </summary>
         void ResetSwaps();
+
+        /// <summary>
+        /// Проверяет, остались ли на поле возможные ходы для сбора комбинаций.
+        /// </summary>
         bool HasValidMoves();
+
+        /// <summary>
+        /// Проверяет наличие возможных ходов, и если их нет — автоматически перемешивает поле.
+        /// </summary>
         void CheckAndReshuffleIfNeeded();
+
+        /// <summary>
+        /// Возвращает двумерный массив всех элементов на игровом поле.
+        /// </summary>
         ElementData[,] GetGrid();
     }
 }

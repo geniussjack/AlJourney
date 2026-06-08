@@ -7,7 +7,7 @@ using System.Collections.Generic;
 namespace AlJourney.Scripts.UI
 {
     /// <summary>
-    /// UI-компонент AbilitiesUI. Отвечает за отображение способностей героев.
+    /// Пользовательский интерфейс способностей. Управляет отображением и взаимодействием со списком способностей мага и воина.
     /// Работает в связке с AbilitiesUI.tscn.
     /// </summary>
     public partial class AbilitiesUI : Control
@@ -16,6 +16,9 @@ namespace AlJourney.Scripts.UI
         private VBoxContainer _mageAbilitiesContainer;
         private VBoxContainer _warriorAbilitiesContainer;
 
+        /// <summary>
+        /// Вызывается при готовности узла. Инициализирует ссылки на элементы интерфейса, подписывается на события и обновляет данные.
+        /// </summary>
         public override void _Ready()
         {
             _closeButton = GetNode<Button>("MarginContainer/VBoxContainer/Header/CloseButton");

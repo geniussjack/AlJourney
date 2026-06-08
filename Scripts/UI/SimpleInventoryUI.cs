@@ -7,7 +7,7 @@ using System.Collections.Generic;
 namespace AlJourney.Scripts.UI
 {
     /// <summary>
-    /// UI-компонент SimpleInventoryUI. Отвечает за отображение пользовательского интерфейса инвентаря и экипировки.
+    /// Упрощенный пользовательский интерфейс инвентаря. Отображает список доступных предметов, текущую экипировку героев, а также предоставляет функционал для просмотра характеристик и улучшения предметов.
     /// Работает в связке с InventoryUI.tscn.
     /// </summary>
     public partial class SimpleInventoryUI : Control
@@ -22,6 +22,9 @@ namespace AlJourney.Scripts.UI
         private EquipmentData _selectedItem;
         private CharacterClass _selectedHero = CharacterClass.Mage;
 
+        /// <summary>
+        /// Вызывается при инициализации узла. Настраивает элементы интерфейса (контейнеры инвентаря и экипировки, метки), подписывается на нажатия кнопок и обновляет отображение данных.
+        /// </summary>
         public override void _Ready()
         {
             _coinsLabel = GetNode<Label>("MarginContainer/VBoxContainer/Header/CoinsLabel");
@@ -123,6 +126,10 @@ namespace AlJourney.Scripts.UI
             QueueFree();
         }
 
+        /// <summary>
+        /// Вызывается каждый кадр. Выполняет периодическое обновление интерфейса инвентаря (раз в 60 физических кадров).
+        /// </summary>
+        /// <param name="delta">Время, прошедшее с предыдущего кадра.</param>
         public override void _Process(double delta)
         {
             if (Engine.GetPhysicsFrames() % 60 == 0) 

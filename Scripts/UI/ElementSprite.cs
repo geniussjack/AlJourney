@@ -4,13 +4,13 @@ using Godot;
 namespace AlJourney.Scripts.UI
 {
     /// <summary>
-    /// Основной класс ElementSprite.
+    /// UI-компонент, представляющий отдельный элемент на игровом поле "три в ряд". Управляет отображением текстуры, анимациями перемещения и выделением.
     /// </summary>
     public partial class ElementSprite : Control
     {
         [Signal]
         /// <summary>
-        /// Элемент ElementClickedEventHandler.
+        /// Делегат для события клика по элементу.
         /// </summary>
         public delegate void ElementClickedEventHandler(ElementSprite element);
 
@@ -22,19 +22,19 @@ namespace AlJourney.Scripts.UI
         public ElementData Data { get; private set; }
 
         /// <summary>
-        /// Элемент GridX.
+        /// Возвращает текущую позицию элемента по оси X в сетке, либо -1, если данные отсутствуют.
         /// </summary>
         public int GridX => Data?.X ?? -1;
 
         /// <summary>
-        /// Элемент GridY.
+        /// Возвращает текущую позицию элемента по оси Y в сетке, либо -1, если данные отсутствуют.
         /// </summary>
         public int GridY => Data?.Y ?? -1;
 
         public bool IsAnimating { get; private set; }
 
         /// <summary>
-        /// Элемент _Ready.
+        /// Вызывается при готовности узла. Создает и настраивает визуальные компоненты (текстуру и панель выделения), а также подписывается на события ввода.
         /// </summary>
         public override void _Ready()
         {
@@ -58,8 +58,10 @@ namespace AlJourney.Scripts.UI
         }
 
         /// <summary>
-        /// Инициализирует .
+        /// Инициализирует спрайт элемента заданными данными и текстурой, устанавливая начальные размеры и позицию.
         /// </summary>
+        /// <param name="data">Данные элемента (тип, позиция в сетке).</param>
+        /// <param name="texture">Текстура для визуального отображения.</param>
         public void Initialize(ElementData data, Texture2D texture)
         {
             Data = data;
@@ -71,24 +73,27 @@ namespace AlJourney.Scripts.UI
         }
 
         /// <summary>
-        /// Обновляет Data.
+        /// Обновляет логические данные элемента (ElementData), связанные с этим визуальным компонентом.
         /// </summary>
+        /// <param name="newData">Новые данные элемента.</param>
         public void UpdateData(ElementData newData)
         {
             Data = newData;
         }
 
         /// <summary>
-        /// Устанавливает Texture.
+        /// Устанавливает новую текстуру для отображения данного элемента.
         /// </summary>
+        /// <param name="texture">Новая текстура.</param>
         public void SetTexture(Texture2D texture)
         {
             _sprite.Texture = texture;
         }
 
         /// <summary>
-        /// Устанавливает Highlight.
+        /// Включает или отключает визуальное выделение элемента (например, при выборе для обмена).
         /// </summary>
+        /// <param name="enabled">True, если элемент должен быть выделен, иначе False.</param>
         public void SetHighlight(bool enabled)
         {
             _highlightPanel.Visible = enabled;
@@ -100,8 +105,9 @@ namespace AlJourney.Scripts.UI
         }
 
         /// <summary>
-        /// Элемент AnimateToPosition.
+        /// Запускает плавную анимацию перемещения элемента к указанной целевой позиции.
         /// </summary>
+        /// <param name="targetPos">Целевая позиция на экране.</param>
         public void AnimateToPosition(Vector2 targetPos)
         {
             _targetPosition = targetPos;
@@ -109,8 +115,9 @@ namespace AlJourney.Scripts.UI
         }
 
         /// <summary>
-        /// Устанавливает GridPosition.
+        /// Мгновенно устанавливает позицию элемента на экране без анимации и обновляет целевую позицию.
         /// </summary>
+        /// <param name="pos">Новая позиция.</param>
         public void SetGridPosition(Vector2 pos)
         {
             Position = pos;
@@ -119,7 +126,7 @@ namespace AlJourney.Scripts.UI
         }
 
         /// <summary>
-        /// Воспроизводит MatchAnimation.
+        /// Воспроизводит анимацию исчезновения элемента при успешном совпадении (матче) "три в ряд", после чего удаляет узел.
         /// </summary>
         public void PlayMatchAnimation()
         {
@@ -131,8 +138,10 @@ namespace AlJourney.Scripts.UI
         }
 
         /// <summary>
-        /// Воспроизводит SwapAnimation.
+        /// Воспроизводит анимацию обмена местами с другим элементом, перемещая данный спрайт в указанную позицию за заданное время.
         /// </summary>
+        /// <param name="targetPos">Позиция, в которую нужно переместиться.</param>
+        /// <param name="duration">Продолжительность анимации в секундах (по умолчанию 0.2f).</param>
         public void PlaySwapAnimation(Vector2 targetPos, float duration = 0.2f)
         {
             Tween tween = CreateTween();
@@ -140,8 +149,9 @@ namespace AlJourney.Scripts.UI
         }
 
         /// <summary>
-        /// Элемент _Process.
+        /// Вызывается каждый кадр. Обрабатывает логику плавной анимации перемещения элемента к целевой позиции.
         /// </summary>
+        /// <param name="delta">Время, прошедшее с предыдущего кадра.</param>
         public override void _Process(double delta)
         {
             if (IsAnimating)

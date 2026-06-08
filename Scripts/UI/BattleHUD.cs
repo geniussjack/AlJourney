@@ -8,7 +8,7 @@ using System.Collections.Generic;
 namespace AlJourney.Scripts.UI
 {
     /// <summary>
-    /// UI-компонент BattleHUD. Отвечает за отображение пользовательского интерфейса.
+    /// Пользовательский интерфейс боевого экрана (HUD). Отвечает за отображение здоровья, щитов героев, информации о врагах, текущей волне и количестве доступных ходов.
     /// </summary>
     public partial class BattleHUD : Control
     {
@@ -42,7 +42,7 @@ namespace AlJourney.Scripts.UI
         private AlJourney.Scripts.Utils.DamageFlash _warriorDamageFlash;
 
         /// <summary>
-        /// Элемент _Ready.
+        /// Вызывается при инициализации узла. Настраивает ссылки на дочерние элементы интерфейса, подписывается на события изменения состояния игры и комбо.
         /// </summary>
         public override void _Ready()
         {
@@ -81,8 +81,9 @@ namespace AlJourney.Scripts.UI
         }
 
         /// <summary>
-        /// Инициализирует .
+        /// Инициализирует HUD для работы с системой двух героев (магом и воином), настраивает начальные значения здоровья, щитов и эффекты получения урона.
         /// </summary>
+        /// <param name="heroSystem">Система управления двумя героями.</param>
         public void Initialize(DualHeroSystem heroSystem)
         {
             _heroSystem = heroSystem;
@@ -156,8 +157,9 @@ namespace AlJourney.Scripts.UI
         }
 
         /// <summary>
-        /// Устанавливает upEnemies.
+        /// Создает и настраивает полоски здоровья для предоставленного списка врагов, предварительно очищая старые данные.
         /// </summary>
+        /// <param name="enemies">Список текущих врагов на уровне.</param>
         public void SetupEnemies(List<Enemy> enemies)
         {
             ClearEnemies();
@@ -183,8 +185,9 @@ namespace AlJourney.Scripts.UI
         }
 
         /// <summary>
-        /// Обновляет Swaps.
+        /// Обновляет текстовое отображение количества оставшихся перемещений (свапов) элементов на поле.
         /// </summary>
+        /// <param name="remainingSwaps">Количество оставшихся перемещений.</param>
         public void UpdateSwaps(int remainingSwaps)
         {
             _swapsLabel.Text = $"Swaps: {remainingSwaps}";
@@ -280,7 +283,7 @@ namespace AlJourney.Scripts.UI
         }
 
         /// <summary>
-        /// Элемент _ExitTree.
+        /// Вызывается при удалении узла из дерева. Отписывается от всех глобальных и локальных событий для предотвращения утечек памяти.
         /// </summary>
         public override void _ExitTree()
         {
@@ -301,7 +304,7 @@ namespace AlJourney.Scripts.UI
     }
 
     /// <summary>
-    /// Основной класс EnemyHealthBar.
+    /// UI-компонент, представляющий полоску здоровья конкретного врага. Отображает имя, текущее здоровье и реагирует на получение урона или лечение.
     /// </summary>
     public partial class EnemyHealthBar : VBoxContainer
     {
@@ -312,7 +315,7 @@ namespace AlJourney.Scripts.UI
         private AlJourney.Scripts.Utils.DamageFlash _damageFlash;
 
         /// <summary>
-        /// Элемент _Ready.
+        /// Вызывается при готовности узла. Создает и настраивает визуальные элементы полоски здоровья: имя, саму полоску и текст здоровья.
         /// </summary>
         public override void _Ready()
         {
@@ -337,8 +340,9 @@ namespace AlJourney.Scripts.UI
         }
 
         /// <summary>
-        /// Инициализирует .
+        /// Инициализирует полоску здоровья данными конкретного врага, подписывается на его события изменения здоровья и смерти, а также настраивает цвет в зависимости от типа врага.
         /// </summary>
+        /// <param name="enemy">Враг, к которому привязывается данная полоска здоровья.</param>
         public void Initialize(Enemy enemy)
         {
             _enemy = enemy;
@@ -376,7 +380,7 @@ namespace AlJourney.Scripts.UI
         }
 
         /// <summary>
-        /// Элемент _ExitTree.
+        /// Вызывается при удалении узла. Отписывается от событий связанного врага.
         /// </summary>
         public override void _ExitTree()
         {

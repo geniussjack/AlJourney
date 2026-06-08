@@ -5,7 +5,7 @@ using Godot;
 namespace AlJourney.Scripts.UI
 {
     /// <summary>
-    /// UI-компонент VictoryUI. Отвечает за отображение пользовательского интерфейса.
+    /// Пользовательский интерфейс победного экрана. Отображает финальную статистику (пройденные волны, собранные монеты, убитые враги) при успешном завершении игры.
     /// </summary>
     public partial class VictoryUI : Control
     {
@@ -17,7 +17,7 @@ namespace AlJourney.Scripts.UI
         private TextureButton _newGameButton;
 
         /// <summary>
-        /// Элемент _Ready.
+        /// Вызывается при готовности узла. Инициализирует ссылки на текстовые метки и кнопки навигации, подписывается на их события и отображает победную статистику.
         /// </summary>
         public override void _Ready()
         {

@@ -6,7 +6,7 @@ using Godot;
 namespace AlJourney.Scripts.UI
 {
     /// <summary>
-    /// UI-компонент ShopUI. Отвечает за отображение пользовательского интерфейса.
+    /// Пользовательский интерфейс внутриигрового магазина. Позволяет игроку тратить монеты на улучшение характеристик героев (здоровье, урон, защита) между волнами.
     /// </summary>
     public partial class ShopUI : Control
     {
@@ -45,7 +45,7 @@ namespace AlJourney.Scripts.UI
         private int _warriorDefenseUpgrade;
 
         /// <summary>
-        /// Элемент _Ready.
+        /// Вызывается при готовности узла. Настраивает все текстовые метки и кнопки для каждого типа улучшений, подписывается на события покупки и инициализирует данные магазина.
         /// </summary>
         public override void _Ready()
         {
