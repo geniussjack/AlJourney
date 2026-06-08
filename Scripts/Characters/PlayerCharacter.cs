@@ -4,17 +4,14 @@ using Godot;
 namespace AlJourney.Scripts.Characters
 {
     /// <summary>
-    /// Represents a player-controlled character (Mage or Warrior).
+    /// Основной класс PlayerCharacter.
     /// </summary>
     public partial class PlayerCharacter : Character
     {
-        /// <summary>
-        /// Character class type.
-        /// </summary>
         public CharacterClass CharacterClass { get; private set; }
 
         /// <summary>
-        /// Creates a new player character based on class.
+        /// Элемент Create.
         /// </summary>
         public static PlayerCharacter Create(CharacterClass characterClass)
         {
@@ -27,7 +24,7 @@ namespace AlJourney.Scripts.Characters
             {
                 case CharacterClass.Mage:
                     player.Initialize(
-                        "Eltarion",
+                        "Altarion",
                         GameConstants.MAGE_BASE_HP,
                         GameConstants.MAGE_BASE_DAMAGE,
                         GameConstants.MAGE_BASE_DEFENSE,
@@ -37,7 +34,7 @@ namespace AlJourney.Scripts.Characters
 
                 case CharacterClass.Warrior:
                     player.Initialize(
-                        "Eldric",
+                        "Aldric",
                         GameConstants.WARRIOR_BASE_HP,
                         GameConstants.WARRIOR_BASE_DAMAGE,
                         GameConstants.WARRIOR_BASE_DEFENSE,
@@ -51,7 +48,7 @@ namespace AlJourney.Scripts.Characters
         }
 
         /// <summary>
-        /// Initializes player from save data.
+        /// Инициализирует FromSave.
         /// </summary>
         public void InitializeFromSave(string name, int maxHealth, int currentHealth, int damage, int defense, CharacterClass characterClass)
         {
@@ -64,68 +61,90 @@ namespace AlJourney.Scripts.Characters
             _currentShield = 0;
             _attackType = characterClass == CharacterClass.Mage ? AttackType.Magical : AttackType.Physical;
 
-            _ = EmitSignal(SignalName.HealthChanged, _currentHealth, _maxHealth);
-            GD.Print($"[PlayerCharacter] Loaded {_name} from save - HP: {_currentHealth}/{_maxHealth}");
+            _ = EmitSignal(SignalName.HealthChanged, _currentHealth, TotalMaxHealth);
+            GD.Print($"[PlayerCharacter] Loaded {_name} from save - HP: {_currentHealth}/{TotalMaxHealth}");
+        }
+
+        private int GetEquipmentStat(string statName)
+        {
+            if (AlJourney.Scripts.Managers.InventoryManager.Instance == null) return 0;
+            var equipment = AlJourney.Scripts.Managers.InventoryManager.Instance.GetHeroEquipment(CharacterClass);
+            int total = 0;
+            foreach (var item in equipment.Values)
+            {
+                if (item.GetTotalStats().TryGetValue(statName, out int value)) total += value;
+            }
+            return total;
+        }
+
+        private int GetAbilityStat(string statName)
+        {
+            if (AlJourney.Scripts.Managers.AbilitySystem.Instance == null) return 0;
+            return AlJourney.Scripts.Managers.AbilitySystem.Instance.GetAbilityEffect(CharacterClass, statName);
         }
 
         /// <summary>
-        /// Applies damage with character-specific modifiers.
-        /// Mage deals +0% bonus to fire damage (base).
-        /// Warrior deals +0% bonus to physical damage (base).
-        /// Future: Can be modified by artifacts/upgrades.
+        /// Элемент TotalDefense.
         /// </summary>
-        public int CalculateDamage(int baseDamage, ElementType _)
-        {
-            int finalDamage = baseDamage + _baseDamage;
+        public override int TotalDefense => _baseDefense + GetEquipmentStat("defense") + GetAbilityStat("defense");
 
-            // Apply Weakened debuff
+        public override int TotalMaxHealth
+        {
+            get
+            {
+                int hpBonus = GetEquipmentStat("hp") + GetAbilityStat("hp");
+                int hpPercent = GetEquipmentStat("hp_percent") + GetAbilityStat("hp_percent");
+                int baseHp = _maxHealth + hpBonus;
+                return baseHp + (baseHp * hpPercent / 100);
+            }
+        }
+
+        /// <summary>
+        /// Элемент CalculateDamage.
+        /// </summary>
+        public int CalculateDamage(int baseDamage, ElementType elementType)
+        {
+            string statName = elementType == ElementType.Fire || elementType == ElementType.Heal ? "magic_damage" : "damage";
+            int equipBonus = GetEquipmentStat(statName) + GetEquipmentStat("damage");
+            int abilityBonus = GetAbilityStat(statName) + GetAbilityStat("damage");
+            int totalBaseDamage = _baseDamage + equipBonus + abilityBonus;
+            int finalDamage = baseDamage + totalBaseDamage;
+
             if (HasStatusEffect(StatusEffect.Weakened))
             {
-                finalDamage = Mathf.CeilToInt(finalDamage * 0.7f); // 30% reduction
+                finalDamage = Mathf.CeilToInt(finalDamage * 0.7f); 
                 GD.Print($"[{_name}] Damage reduced by Weakened status: {finalDamage}");
             }
-
-            // Character-specific modifiers (currently none, but ready for artifacts)
-            // Example: if (_characterClass == CharacterClass.Mage && elementType == ElementType.Fire)
-            //     finalDamage = Mathf.CeilToInt(finalDamage * 1.5f);
 
             return finalDamage;
         }
 
         /// <summary>
-        /// Applies healing with character-specific modifiers.
+        /// Элемент CalculateHealing.
         /// </summary>
         public static int CalculateHealing(int baseHealing)
         {
             int finalHealing = baseHealing;
 
-            // Future: Mage could have healing bonus from artifacts
-            // Example: if (_characterClass == CharacterClass.Mage)
-            //     finalHealing = Mathf.CeilToInt(finalHealing * 1.2f);
 
             return finalHealing;
         }
 
         /// <summary>
-        /// Applies shield with character-specific modifiers.
+        /// Элемент CalculateShield.
         /// </summary>
         public static int CalculateShield(int baseShield)
         {
             int finalShield = baseShield;
 
-            // Future: Warrior could have shield bonus from artifacts
-            // Example: if (_characterClass == CharacterClass.Warrior)
-            //     finalShield = Mathf.CeilToInt(finalShield * 1.5f);
 
             return finalShield;
         }
 
-        /// <summary>
-        /// Gets character stats for saving.
-        /// </summary>
         public (int maxHealth, int currentHealth, int damage, int defense) GetStats()
         {
-            return (_maxHealth, _currentHealth, _baseDamage, _baseDefense);
+            int dmg = _baseDamage + GetEquipmentStat("damage") + GetAbilityStat("damage");
+            return (TotalMaxHealth, _currentHealth, dmg, TotalDefense);
         }
     }
 }

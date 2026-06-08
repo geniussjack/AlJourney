@@ -1,28 +1,30 @@
 using AlJourney.Scripts.Core;
 using AlJourney.Scripts.Data;
 using Godot;
+using AlJourney.Scripts.Interfaces;
 using System.Collections.Generic;
 
 namespace AlJourney.Scripts.Managers
 {
     /// <summary>
-    /// Manages scene transitions and loading.
-    /// Singleton autoload node.
+    /// Менеджер SceneManager. Отвечает за управление соответствующей подсистемой.
     /// </summary>
-    public partial class SceneManager : Node
+    public partial class SceneManager : Node, ISceneManager
     {
-        /// <summary>
-        /// Singleton instance accessor.
-        /// </summary>
         public static SceneManager Instance { get; private set; }
 
         [Signal]
+        /// <summary>
+        /// Элемент SceneLoadStartedEventHandler.
+        /// </summary>
         public delegate void SceneLoadStartedEventHandler(string sceneName);
 
         [Signal]
+        /// <summary>
+        /// Элемент SceneLoadCompletedEventHandler.
+        /// </summary>
         public delegate void SceneLoadCompletedEventHandler(string sceneName);
 
-        // Scene paths - update these when scenes are created
         private readonly Dictionary<GameState, string> _scenePaths = new()
         {
             { GameState.MainMenu, "res://Scenes/UI/MainMenu.tscn" },
@@ -35,6 +37,9 @@ namespace AlJourney.Scripts.Managers
         private Node _currentScene;
         private bool _isTransitioning;
 
+        /// <summary>
+        /// Элемент _Ready.
+        /// </summary>
         public override void _Ready()
         {
             if (Instance != null && Instance != this)
@@ -46,7 +51,6 @@ namespace AlJourney.Scripts.Managers
             Instance = this;
             _isTransitioning = false;
 
-            // Get initial scene
             Window root = GetTree().Root;
             _currentScene = root.GetChild(root.GetChildCount() - 1);
 
@@ -54,7 +58,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Loads scene based on game state.
+        /// Загружает Scene.
         /// </summary>
         public void LoadScene(GameState state)
         {
@@ -67,7 +71,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Loads scene by direct path.
+        /// Загружает SceneByPath.
         /// </summary>
         public void LoadSceneByPath(string scenePath)
         {
@@ -77,20 +81,19 @@ namespace AlJourney.Scripts.Managers
                 return;
             }
 
-            // Use nameof for type safety
             _ = CallDeferred(nameof(DeferredSceneChange), scenePath);
         }
 
-        // Method must be public for CallDeferred
+        /// <summary>
+        /// Элемент DeferredSceneChange.
+        /// </summary>
         public void DeferredSceneChange(string scenePath)
         {
             _isTransitioning = true;
             _ = EmitSignal(SignalName.SceneLoadStarted, scenePath);
 
-            // Free current scene
             _currentScene?.QueueFree();
 
-            // Load new scene
             PackedScene newSceneResource = GD.Load<PackedScene>(scenePath);
             if (newSceneResource is null)
             {
@@ -110,7 +113,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Reloads the current scene.
+        /// Элемент ReloadCurrentScene.
         /// </summary>
         public void ReloadCurrentScene()
         {
@@ -127,7 +130,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Transitions to main menu.
+        /// Элемент GoToMainMenu.
         /// </summary>
         public static void GoToMainMenu()
         {
@@ -136,7 +139,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Starts a new game (no character selection needed).
+        /// Запускает NewGame.
         /// </summary>
         public static void StartNewGame()
         {
@@ -145,7 +148,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Continues from saved game.
+        /// Элемент ContinueGame.
         /// </summary>
         public static void ContinueGame()
         {
@@ -162,7 +165,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Transitions to shop after wave completion.
+        /// Элемент GoToShop.
         /// </summary>
         public static void GoToShop()
         {
@@ -171,7 +174,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Returns to battle from shop.
+        /// Элемент ReturnToBattle.
         /// </summary>
         public static void ReturnToBattle()
         {
@@ -180,7 +183,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Handles game over scenario.
+        /// Элемент GameOver.
         /// </summary>
         public static void GameOver()
         {

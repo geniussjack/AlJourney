@@ -7,21 +7,22 @@ using System.Collections.Generic;
 namespace AlJourney.Scripts.UI
 {
     /// <summary>
-    /// Simple inventory UI for equipment management.
+    /// UI-компонент SimpleInventoryUI. Отвечает за отображение пользовательского интерфейса.
     /// </summary>
     public partial class SimpleInventoryUI : Control
     {
-        // UI Elements
         private VBoxContainer _inventoryContainer;
         private VBoxContainer _equipmentContainer;
         private Label _coinsLabel;
         private Button _closeButton;
         private Button _upgradeButton;
 
-        // Current selected item
         private EquipmentData _selectedItem;
         private CharacterClass _selectedHero = CharacterClass.Mage;
 
+        /// <summary>
+        /// Элемент _Ready.
+        /// </summary>
         public override void _Ready()
         {
             SetupUI();
@@ -30,13 +31,11 @@ namespace AlJourney.Scripts.UI
 
         private void SetupUI()
         {
-            // Main container
             VBoxContainer mainContainer = new();
             AddChild(mainContainer);
             mainContainer.Size = Size;
             mainContainer.Position = Vector2.Zero;
 
-            // Header
             HBoxContainer header = new();
             mainContainer.AddChild(header);
 
@@ -47,11 +46,9 @@ namespace AlJourney.Scripts.UI
             header.AddChild(_closeButton);
             _closeButton.Pressed += OnClosePressed;
 
-            // Content area
             HBoxContainer contentContainer = new();
             mainContainer.AddChild(contentContainer);
 
-            // Inventory section
             VBoxContainer inventorySection = new();
             contentContainer.AddChild(inventorySection);
 
@@ -61,7 +58,6 @@ namespace AlJourney.Scripts.UI
             _inventoryContainer = new VBoxContainer();
             inventorySection.AddChild(_inventoryContainer);
 
-            // Equipment section
             VBoxContainer equipmentSection = new();
             contentContainer.AddChild(equipmentSection);
 
@@ -71,7 +67,6 @@ namespace AlJourney.Scripts.UI
             _equipmentContainer = new VBoxContainer();
             equipmentSection.AddChild(_equipmentContainer);
 
-            // Item details section
             VBoxContainer detailsSection = new();
             contentContainer.AddChild(detailsSection);
 
@@ -85,16 +80,13 @@ namespace AlJourney.Scripts.UI
 
         private void RefreshUI()
         {
-            // Update coins
             _coinsLabel.Text = $"Монеты: {GameStateManager.Instance.Coins}";
 
-            // Clear inventory
             foreach (Node child in _inventoryContainer.GetChildren())
             {
                 child.QueueFree();
             }
 
-            // Display inventory items
             IReadOnlyList<EquipmentData> inventory = InventoryManager.Instance.GetInventory();
             foreach (EquipmentData item in inventory)
             {
@@ -107,13 +99,11 @@ namespace AlJourney.Scripts.UI
                 itemButton.Pressed += () => OnItemSelected(item);
             }
 
-            // Clear equipment
             foreach (Node child in _equipmentContainer.GetChildren())
             {
                 child.QueueFree();
             }
 
-            // Display equipment for selected hero
             Dictionary<EquipmentSlot, EquipmentData> equipment = InventoryManager.Instance.GetHeroEquipment(_selectedHero);
             foreach (KeyValuePair<EquipmentSlot, EquipmentData> kvp in equipment)
             {
@@ -155,10 +145,12 @@ namespace AlJourney.Scripts.UI
             QueueFree();
         }
 
+        /// <summary>
+        /// Элемент _Process.
+        /// </summary>
         public override void _Process(double delta)
         {
-            // Refresh UI periodically
-            if (Engine.GetPhysicsFrames() % 60 == 0) // Every second
+            if (Engine.GetPhysicsFrames() % 60 == 0) 
             {
                 RefreshUI();
             }

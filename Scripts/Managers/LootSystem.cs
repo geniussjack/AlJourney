@@ -1,20 +1,27 @@
 using AlJourney.Scripts.Core;
 using AlJourney.Scripts.Data;
 using Godot;
+using AlJourney.Scripts.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace AlJourney.Scripts.Managers
 {
     /// <summary>
-    /// Simple working loot system without signal issues.
+    /// Менеджер LootSystem. Отвечает за управление соответствующей подсистемой.
     /// </summary>
-    public partial class LootSystem : Node
+    public partial class LootSystem : Node, ILootSystem
     {
+        /// <summary>
+        /// Элемент Instance.
+        /// </summary>
         public static LootSystem Instance { get; private set; } = null!;
 
-        private readonly Dictionary<string, EquipmentData> _equipmentTemplates = [];
+        private readonly Dictionary<string, EquipmentData> _equipmentTemplates = EquipmentDatabase.Templates;
 
+        /// <summary>
+        /// Элемент _Ready.
+        /// </summary>
         public override void _Ready()
         {
             if (Instance is not null)
@@ -23,76 +30,12 @@ namespace AlJourney.Scripts.Managers
                 return;
             }
             Instance = this;
-            InitializeEquipmentTemplates();
             GD.Print("[LootSystem] Initialized");
         }
 
-        private void InitializeEquipmentTemplates()
-        {
-            // Common items
-            _equipmentTemplates["rusty_sword"] = new EquipmentData(
-                "rusty_sword", "Ржавый меч", EquipmentSlot.Weapon, EquipmentRarity.Common, 1, 5,
-                new Dictionary<string, int> { ["damage"] = 2 }, []);
-
-            _equipmentTemplates["old_staff"] = new EquipmentData(
-                "old_staff", "Старый посох", EquipmentSlot.Weapon, EquipmentRarity.Common, 1, 5,
-                new Dictionary<string, int> { ["magic_damage"] = 2 }, []);
-
-            // Uncommon items
-            _equipmentTemplates["steel_blade"] = new EquipmentData(
-                "steel_blade", "Стальной клинок", EquipmentSlot.Weapon, EquipmentRarity.Uncommon, 1, 10,
-                new Dictionary<string, int> { ["damage"] = 5, ["crit_chance"] = 10 }, []);
-
-            _equipmentTemplates["apprentice_staff"] = new EquipmentData(
-                "apprentice_staff", "Посох ученика", EquipmentSlot.Weapon, EquipmentRarity.Uncommon, 1, 10,
-                new Dictionary<string, int> { ["magic_damage"] = 5, ["mana_regen"] = 1 }, []);
-
-            // Rare items
-            _equipmentTemplates["ice_sword"] = new EquipmentData(
-                "ice_sword", "Ледяной меч", EquipmentSlot.Weapon, EquipmentRarity.Rare, 1, 15,
-                new Dictionary<string, int> { ["damage"] = 8, ["slow"] = 20 }, []);
-
-            _equipmentTemplates["fire_staff"] = new EquipmentData(
-                "fire_staff", "Огненный посох", EquipmentSlot.Weapon, EquipmentRarity.Rare, 1, 15,
-                new Dictionary<string, int> { ["magic_damage"] = 8, ["burn"] = 25 }, []);
-
-            // Epic items
-            _equipmentTemplates["shadow_blade"] = new EquipmentData(
-                "shadow_blade", "Меч теней", EquipmentSlot.Weapon, EquipmentRarity.Epic, 1, 20,
-                new Dictionary<string, int> { ["damage"] = 12, ["invisibility"] = 30 }, []);
-
-            _equipmentTemplates["elemental_staff"] = new EquipmentData(
-                "elemental_staff", "Посох стихий", EquipmentSlot.Weapon, EquipmentRarity.Epic, 1, 20,
-                new Dictionary<string, int> { ["magic_damage"] = 12, ["random_element"] = 50 }, []);
-
-            // Legendary items
-            _equipmentTemplates["excalibur"] = new EquipmentData(
-                "excalibur", "Экскалибур", EquipmentSlot.Weapon, EquipmentRarity.Legendary, 1, 25,
-                new Dictionary<string, int> { ["damage"] = 20, ["lifesteal"] = 15 }, []);
-
-            _equipmentTemplates["archmage_staff"] = new EquipmentData(
-                "archmage_staff", "Посох архимага", EquipmentSlot.Weapon, EquipmentRarity.Legendary, 1, 25,
-                new Dictionary<string, int> { ["magic_damage"] = 20, ["double_spells"] = 100 }, []);
-
-            // Armor items
-            _equipmentTemplates["leather_armor"] = new EquipmentData(
-                "leather_armor", "Кожаная броня", EquipmentSlot.Body, EquipmentRarity.Common, 1, 5,
-                new Dictionary<string, int> { ["defense"] = 3 }, []);
-
-            _equipmentTemplates["dragon_scales"] = new EquipmentData(
-                "dragon_scales", "Драконья чешуя", EquipmentSlot.Body, EquipmentRarity.Legendary, 1, 25,
-                new Dictionary<string, int> { ["defense"] = 15, ["immunity_burn"] = 100 }, []);
-
-            // Accessories
-            _equipmentTemplates["power_ring"] = new EquipmentData(
-                "power_ring", "Кольцо силы", EquipmentSlot.Ring, EquipmentRarity.Rare, 1, 15,
-                new Dictionary<string, int> { ["damage"] = 10 }, []);
-
-            _equipmentTemplates["life_amulet"] = new EquipmentData(
-                "life_amulet", "Амулет жизни", EquipmentSlot.Necklace, EquipmentRarity.Epic, 1, 20,
-                new Dictionary<string, int> { ["hp_percent"] = 20 }, []);
-        }
-
+        /// <summary>
+        /// Генерирует BossLoot.
+        /// </summary>
         public List<EquipmentData> GenerateBossLoot(int waveNumber)
         {
             int dropCount = GD.RandRange(3, 11);
@@ -113,6 +56,23 @@ namespace AlJourney.Scripts.Managers
             }
 
             return loot;
+        }
+
+        /// <summary>
+        /// Генерирует NormalLoot.
+        /// </summary>
+        public EquipmentData GenerateNormalLoot(int waveNumber)
+        {
+            EquipmentRarity rarity = DetermineRarity();
+            // Demote rarity slightly for normal enemies
+            if (rarity == EquipmentRarity.Legendary) rarity = EquipmentRarity.Epic;
+            if (rarity == EquipmentRarity.Epic && GD.Randf() > 0.1f) rarity = EquipmentRarity.Rare;
+
+            EquipmentSlot slot = DetermineSlot();
+            EquipmentData item = GenerateEquipment(rarity, slot);
+            
+            GD.Print($"[LootSystem] Generated normal loot: {item.Name} at wave {waveNumber}");
+            return item;
         }
 
         private static EquipmentRarity DetermineRarity()

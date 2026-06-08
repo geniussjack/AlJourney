@@ -5,8 +5,7 @@ using Godot;
 namespace AlJourney.Scripts.UI
 {
     /// <summary>
-    /// Victory screen UI controller.
-    /// Displayed when player defeats the final boss (optional implementation).
+    /// UI-компонент VictoryUI. Отвечает за отображение пользовательского интерфейса.
     /// </summary>
     public partial class VictoryUI : Control
     {
@@ -14,95 +13,73 @@ namespace AlJourney.Scripts.UI
         private Label _totalCoinsLabel;
         private Label _totalEnemiesLabel;
         private Label _survivalTimeLabel;
-        private Button _mainMenuButton;
-        private Button _newGameButton;
+        private TextureButton _mainMenuButton;
+        private TextureButton _newGameButton;
 
+        /// <summary>
+        /// Элемент _Ready.
+        /// </summary>
         public override void _Ready()
         {
-            // Get UI elements
-            _finalWaveLabel = GetNode<Label>("CenterContainer/VBoxContainer/StatsContainer/WaveLabel");
-            _totalCoinsLabel = GetNode<Label>("CenterContainer/VBoxContainer/StatsContainer/CoinsLabel");
+            _finalWaveLabel    = GetNode<Label>("CenterContainer/VBoxContainer/StatsContainer/WaveLabel");
+            _totalCoinsLabel   = GetNode<Label>("CenterContainer/VBoxContainer/StatsContainer/CoinsLabel");
             _totalEnemiesLabel = GetNode<Label>("CenterContainer/VBoxContainer/StatsContainer/EnemiesLabel");
             _survivalTimeLabel = GetNode<Label>("CenterContainer/VBoxContainer/StatsContainer/TimeLabel");
-            _mainMenuButton = GetNode<Button>("CenterContainer/VBoxContainer/ButtonsContainer/MainMenuButton");
-            _newGameButton = GetNode<Button>("CenterContainer/VBoxContainer/ButtonsContainer/NewGameButton");
+            _mainMenuButton    = GetNode<TextureButton>("CenterContainer/VBoxContainer/ButtonsContainer/MainMenuButton");
+            _newGameButton     = GetNode<TextureButton>("CenterContainer/VBoxContainer/ButtonsContainer/NewGameButton");
 
-            // Connect signals
             _mainMenuButton.Pressed += OnMainMenuPressed;
-            _newGameButton.Pressed += OnNewGamePressed;
+            _newGameButton.Pressed  += OnNewGamePressed;
 
-            // Display stats
             DisplayStats();
 
             GD.Print("[VictoryUI] Initialized");
         }
 
-        /// <summary>
-        /// Displays final victory statistics.
-        /// </summary>
         private void DisplayStats()
         {
             SaveData saveData = GameStateManager.Instance.CurrentSave;
 
             if (saveData != null)
             {
-                int finalWave = saveData.CurrentWave;
-                int totalCoins = saveData.Coins;
+                int finalWave       = saveData.CurrentWave;
+                int totalCoins      = saveData.Coins;
                 int enemiesDefeated = CalculateEnemiesDefeated(finalWave);
 
-                _finalWaveLabel.Text = $"Final Wave: {finalWave}";
-                _totalCoinsLabel.Text = $"Total Coins: 💰 {totalCoins}";
-                _totalEnemiesLabel.Text = $"Enemies Defeated: ⚔️ {enemiesDefeated}";
-                _survivalTimeLabel.Text = "🏆 Victory Achieved!";
+                _finalWaveLabel.Text    = $"Final Wave: {finalWave}";
+                _totalCoinsLabel.Text   = $"Coins: {totalCoins}";
+                _totalEnemiesLabel.Text = $"Enemies Defeated: {enemiesDefeated}";
+                _survivalTimeLabel.Text = "Victory Achieved!";
 
                 GD.Print($"[VictoryUI] Victory! Wave: {finalWave}, Coins: {totalCoins}, Enemies: {enemiesDefeated}");
             }
             else
             {
-                _finalWaveLabel.Text = "Final Wave: 1";
-                _totalCoinsLabel.Text = "Total Coins: 💰 0";
-                _totalEnemiesLabel.Text = "Enemies Defeated: ⚔️ 0";
-                _survivalTimeLabel.Text = "🏆 Victory!";
+                _finalWaveLabel.Text    = "Final Wave: 1";
+                _totalCoinsLabel.Text   = "Coins: 0";
+                _totalEnemiesLabel.Text = "Enemies Defeated: 0";
+                _survivalTimeLabel.Text = "Victory!";
             }
         }
 
-        /// <summary>
-        /// Calculates total enemies defeated.
-        /// </summary>
         private static int CalculateEnemiesDefeated(int wave)
         {
             return wave * 4;
         }
 
-        /// <summary>
-        /// Called when Main Menu button is pressed.
-        /// </summary>
         private void OnMainMenuPressed()
         {
             GD.Print("[VictoryUI] Returning to main menu");
-
-            AudioManager.Instance.PlaySfx("res://Resources/Audio/SFX/button_click.wav");
-
-            // Clear save (optional)
+            AudioManager.Instance?.TryPlaySfx("res://Resources/Audio/SFX/button_click.wav");
             _ = SaveSystem.Instance.DeleteSave();
-
-            // Return to main menu
             SceneManager.GoToMainMenu();
         }
 
-        /// <summary>
-        /// Called when New Game button is pressed.
-        /// </summary>
         private void OnNewGamePressed()
         {
             GD.Print("[VictoryUI] Starting new game");
-
-            AudioManager.Instance.PlaySfx("res://Resources/Audio/SFX/button_click.wav");
-
-            // Delete old save
+            AudioManager.Instance?.TryPlaySfx("res://Resources/Audio/SFX/button_click.wav");
             _ = SaveSystem.Instance.DeleteSave();
-
-            // Start new game
             GameStateManager.Instance.StartNewGame();
             SceneManager.Instance.LoadScene(Core.GameState.Battle);
         }

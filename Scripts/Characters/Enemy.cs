@@ -4,34 +4,28 @@ using Godot;
 namespace AlJourney.Scripts.Characters
 {
     /// <summary>
-    /// Represents an enemy character with wave-based scaling.
+    /// Основной класс Enemy.
     /// </summary>
     public partial class Enemy : Character
     {
         private int _waveNumber;
 
-        /// <summary>
-        /// Type of enemy.
-        /// </summary>
         public EnemyType EnemyType { get; private set; }
 
-        /// <summary>
-        /// Coin reward for defeating this enemy.
-        /// </summary>
         public int CoinReward { get; private set; }
 
         /// <summary>
-        /// Is this a miniboss.
+        /// Проверяет, является ли Miniboss.
         /// </summary>
         public bool IsMiniboss => EnemyType is EnemyType.GeneralOfDraugr or EnemyType.Arhiskeleton;
 
         /// <summary>
-        /// Is this the boss.
+        /// Проверяет, является ли Boss.
         /// </summary>
         public bool IsBoss => EnemyType == EnemyType.Necromancer;
 
         /// <summary>
-        /// Creates an enemy of specified type scaled to wave number.
+        /// Элемент Create.
         /// </summary>
         public static Enemy Create(EnemyType enemyType, int waveNumber)
         {
@@ -41,10 +35,8 @@ namespace AlJourney.Scripts.Characters
                 _waveNumber = waveNumber
             };
 
-            // Get base stats
             (string name, int baseHp, int baseDmg, int baseDef, AttackType attackType, int coinReward) = GetEnemyBaseStats(enemyType);
 
-            // Use ScalingSystem for consistent scaling
             int scaledHp = ScalingSystem.ScaleEnemyStat(baseHp, waveNumber);
             int scaledDmg = ScalingSystem.ScaleEnemyStat(baseDmg, waveNumber);
             int scaledDefense = ScalingSystem.ScaleEnemyStat(baseDef, waveNumber);
@@ -57,9 +49,6 @@ namespace AlJourney.Scripts.Characters
             return enemy;
         }
 
-        /// <summary>
-        /// Gets base stats for each enemy type.
-        /// </summary>
         private static (string name, int hp, int damage, int defense, AttackType attackType, int coinReward) GetEnemyBaseStats(EnemyType type)
         {
             return type switch
@@ -87,6 +76,15 @@ namespace AlJourney.Scripts.Characters
                     GameConstants.ZOMBIE_HP,
                     GameConstants.ZOMBIE_DAMAGE,
                     GameConstants.ZOMBIE_DEFENSE,
+                    AttackType.Physical,
+                    GameConstants.COINS_PER_BASIC_ENEMY
+                ),
+
+                EnemyType.Slime => (
+                    "Slime",
+                    GameConstants.SLIME_HP,
+                    GameConstants.SLIME_DAMAGE,
+                    GameConstants.SLIME_DEFENSE,
                     AttackType.Physical,
                     GameConstants.COINS_PER_BASIC_ENEMY
                 ),
@@ -150,8 +148,7 @@ namespace AlJourney.Scripts.Characters
         }
 
         /// <summary>
-        /// Performs enemy attack action.
-        /// Returns damage to deal to player.
+        /// Элемент PerformAttack.
         /// </summary>
         public int PerformAttack()
         {
@@ -162,17 +159,14 @@ namespace AlJourney.Scripts.Characters
 
             int damage = _baseDamage;
 
-            // Special enemy abilities
             switch (EnemyType)
             {
                 case EnemyType.Arhiskeleton:
-                    // Fires multiple arrows
                     damage = _baseDamage * GameConstants.ARHISKELETON_ARROWS_PER_TURN;
                     GD.Print($"[{_name}] fires {GameConstants.ARHISKELETON_ARROWS_PER_TURN} arrows for {damage} damage!");
                     break;
 
                 case EnemyType.GeneralOfDraugr:
-                    // Can use magic attack occasionally (25% chance)
                     if (GD.Randf() < 0.25f)
                     {
                         damage = Mathf.CeilToInt(_baseDamage * 1.5f);
@@ -185,7 +179,6 @@ namespace AlJourney.Scripts.Characters
                     break;
 
                 case EnemyType.Necromancer:
-                    // Boss has rotating abilities (handled in BattleManager)
                     GD.Print($"[{_name}] prepares dark magic...");
                     break;
 
@@ -198,8 +191,7 @@ namespace AlJourney.Scripts.Characters
         }
 
         /// <summary>
-        /// Gets special ability type for bosses (Necromancer).
-        /// Rotates between abilities.
+        /// Возвращает NecromancerAbility.
         /// </summary>
         public NecromancerAbility GetNecromancerAbility(int turnNumber)
         {
@@ -208,19 +200,18 @@ namespace AlJourney.Scripts.Characters
                 return NecromancerAbility.None;
             }
 
-            // Rotate abilities every turn
             return (NecromancerAbility)((turnNumber % 3) + 1);
         }
 
         /// <summary>
-        /// Necromancer special abilities.
+        /// Основной класс NecromancerAbility.
         /// </summary>
         public enum NecromancerAbility
         {
             None,
-            SummonSkeleton,    // Summons one skeleton
-            DarkBolt,          // Magic damage
-            WeakeningDarkness  // Reduces player damage/defense for 1 turn
+            SummonSkeleton,    
+            DarkBolt,          
+            WeakeningDarkness  
         }
     }
 }

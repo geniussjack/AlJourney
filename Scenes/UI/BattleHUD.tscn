@@ -1,6 +1,9 @@
-[gd_scene load_steps=2 format=3 uid="uid://cgmssg1q3f8r3"]
+[gd_scene load_steps=5 format=3 uid="uid://cgmssg1q3f8r3"]
 
 [ext_resource type="Script" uid="uid://vykqe4gaplol" path="res://Scripts/UI/BattleHUD.cs" id="1_hud"]
+[ext_resource type="Theme" path="res://Resources/Themes/game_theme.tres" id="2_theme"]
+[ext_resource type="Texture2D" path="res://Resources/Sprites/UI/coin_icon.png" id="3_coin"]
+[ext_resource type="AtlasTexture" path="res://Resources/Sprites/UI/atlas_btn_resume.tres" id="4_pause"]
 
 [node name="BattleHUD" type="Control"]
 layout_mode = 3
@@ -10,6 +13,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
+theme = ExtResource("2_theme")
 script = ExtResource("1_hud")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
@@ -38,58 +42,58 @@ layout_mode = 2
 theme_override_constants/separation = 30
 
 [node name="MageInfo" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TopBar/HeroesContainer"]
-custom_minimum_size = Vector2(250, 0)
+custom_minimum_size = Vector2(260, 0)
 layout_mode = 2
 theme_override_constants/separation = 5
 
 [node name="MageName" type="Label" parent="MarginContainer/VBoxContainer/TopBar/HeroesContainer/MageInfo"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 20
-text = "Eltarion 🧙"
+theme_override_font_sizes/font_size = 28
+text = "Altarion"
 
 [node name="HealthBar" type="ProgressBar" parent="MarginContainer/VBoxContainer/TopBar/HeroesContainer/MageInfo"]
-custom_minimum_size = Vector2(0, 25)
+custom_minimum_size = Vector2(0, 28)
 layout_mode = 2
 value = 80.0
 show_percentage = false
 
 [node name="HealthLabel" type="Label" parent="MarginContainer/VBoxContainer/TopBar/HeroesContainer/MageInfo"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 22
 text = "80 / 80"
 
 [node name="ShieldLabel" type="Label" parent="MarginContainer/VBoxContainer/TopBar/HeroesContainer/MageInfo"]
 visible = false
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
-text = "🛡️ 0"
+theme_override_font_sizes/font_size = 22
+text = "Shield: 0"
 
 [node name="WarriorInfo" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TopBar/HeroesContainer"]
-custom_minimum_size = Vector2(250, 0)
+custom_minimum_size = Vector2(260, 0)
 layout_mode = 2
 theme_override_constants/separation = 5
 
 [node name="WarriorName" type="Label" parent="MarginContainer/VBoxContainer/TopBar/HeroesContainer/WarriorInfo"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 20
-text = "Eldric ⚔️"
+theme_override_font_sizes/font_size = 28
+text = "Aldric"
 
 [node name="HealthBar" type="ProgressBar" parent="MarginContainer/VBoxContainer/TopBar/HeroesContainer/WarriorInfo"]
-custom_minimum_size = Vector2(0, 25)
+custom_minimum_size = Vector2(0, 28)
 layout_mode = 2
-value = 100.0
+value = 120.0
 show_percentage = false
 
 [node name="HealthLabel" type="Label" parent="MarginContainer/VBoxContainer/TopBar/HeroesContainer/WarriorInfo"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 22
 text = "120 / 120"
 
 [node name="ShieldLabel" type="Label" parent="MarginContainer/VBoxContainer/TopBar/HeroesContainer/WarriorInfo"]
 visible = false
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
-text = "🛡️ 0"
+theme_override_font_sizes/font_size = 22
+text = "Shield: 0"
 
 [node name="EnemiesInfo" type="HBoxContainer" parent="MarginContainer/VBoxContainer/TopBar"]
 layout_mode = 2
@@ -97,11 +101,12 @@ size_flags_horizontal = 3
 theme_override_constants/separation = 15
 alignment = 2
 
-[node name="PauseButton" type="Button" parent="MarginContainer/VBoxContainer/TopBar"]
-custom_minimum_size = Vector2(80, 60)
+[node name="PauseButton" type="TextureButton" parent="MarginContainer/VBoxContainer/TopBar"]
+texture_normal = ExtResource("4_pause")
+ignore_texture_size = true
+stretch_mode = 2
+custom_minimum_size = Vector2(123, 62)
 layout_mode = 2
-theme_override_font_sizes/font_size = 20
-text = "⏸"
 
 [node name="Spacer" type="Control" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
@@ -114,17 +119,27 @@ theme_override_constants/separation = 30
 
 [node name="WaveLabel" type="Label" parent="MarginContainer/VBoxContainer/BottomBar"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 30
 text = "Wave: 1"
 
-[node name="CoinsLabel" type="Label" parent="MarginContainer/VBoxContainer/BottomBar"]
+[node name="CoinsContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/BottomBar"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 24
-text = "💰 0"
+theme_override_constants/separation = 8
+
+[node name="CoinIcon" type="TextureRect" parent="MarginContainer/VBoxContainer/BottomBar/CoinsContainer"]
+layout_mode = 2
+texture = ExtResource("3_coin")
+custom_minimum_size = Vector2(36, 36)
+stretch_mode = 5
+
+[node name="CoinsLabel" type="Label" parent="MarginContainer/VBoxContainer/BottomBar/CoinsContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "0"
 
 [node name="SwapsLabel" type="Label" parent="MarginContainer/VBoxContainer/BottomBar"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 24
-text = "Swaps: 3"
+theme_override_font_sizes/font_size = 30
+text = "Swaps: 5"
 horizontal_alignment = 2

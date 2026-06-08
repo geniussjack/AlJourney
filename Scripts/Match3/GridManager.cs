@@ -1,38 +1,54 @@
 using AlJourney.Scripts.Core;
 using Godot;
+using AlJourney.Scripts.Interfaces;
 using System.Collections.Generic;
 
 namespace AlJourney.Scripts.Match3
 {
     /// <summary>
-    /// Manages the match-3 grid logic including swaps, matches, and cascades.
+    /// Менеджер GridManager. Отвечает за управление соответствующей подсистемой.
     /// </summary>
-    public partial class GridManager : Node
+    public partial class GridManager : Node, IGridManager
     {
         [Signal]
+        /// <summary>
+        /// Элемент GridInitializedEventHandler.
+        /// </summary>
         public delegate void GridInitializedEventHandler();
 
         [Signal]
+        /// <summary>
+        /// Элемент SwapCompletedEventHandler.
+        /// </summary>
         public delegate void SwapCompletedEventHandler(bool wasValid);
 
         [Signal]
+        /// <summary>
+        /// Элемент MatchesFoundEventHandler.
+        /// </summary>
         public delegate void MatchesFoundEventHandler(int matchCount);
 
         [Signal]
+        /// <summary>
+        /// Элемент GridRefillCompletedEventHandler.
+        /// </summary>
         public delegate void GridRefillCompletedEventHandler();
 
         private ElementData[,] _grid;
 
         /// <summary>
-        /// Current grid size (5x5).
+        /// Размер игрового поля (NxN).
         /// </summary>
         public int GridSize { get; private set; }
 
         /// <summary>
-        /// Remaining swaps for current turn.
+        /// Оставшееся количество ходов (свапов) игрока.
         /// </summary>
         public int RemainingSwaps { get; private set; }
 
+        /// <summary>
+        /// Элемент _Ready.
+        /// </summary>
         public override void _Ready()
         {
             GridSize = GameConstants.GRID_SIZE;
@@ -43,11 +59,14 @@ namespace AlJourney.Scripts.Match3
         }
 
         /// <summary>
-        /// Initializes the grid with random elements ensuring no initial matches.
+        /// Инициализирует сетку безопасными элементами (без совпадений 3-в-ряд на старте).
+        /// Сбрасывает количество доступных свапов.
+        /// </summary>
+        /// <summary>
+        /// Инициализирует Grid.
         /// </summary>
         public void InitializeGrid()
         {
-            // Fill grid with random elements
             for (int x = 0; x < GridSize; x++)
             {
                 for (int y = 0; y < GridSize; y++)
@@ -62,53 +81,55 @@ namespace AlJourney.Scripts.Match3
             GD.Print("[GridManager] Grid initialized with no initial matches");
         }
 
-        /// <summary>
-        /// Generates an element that won't create immediate matches.
-        /// </summary>
         private ElementData GenerateSafeElement(int x, int y)
         {
-            List<ElementType> availableTypes =
-            [
-                ElementType.Fire,
-                ElementType.Heal,
-                ElementType.Sword,
-                ElementType.Shield
-            ];
+            ElementType[] allTypes = [ElementType.Fire, ElementType.Heal, ElementType.Sword, ElementType.Shield];
+            ElementType exclude1 = ElementType.None;
+            ElementType exclude2 = ElementType.None;
 
-            // Remove types that would create horizontal match
             if (x >= 2)
             {
                 ElementType? type1 = _grid[x - 1, y]?.Type;
                 ElementType? type2 = _grid[x - 2, y]?.Type;
                 if (type1 != null && type1 == type2 && type1 != ElementType.None)
                 {
-                    _ = availableTypes.Remove(type1.Value);
+                    exclude1 = type1.Value;
                 }
             }
 
-            // Remove types that would create vertical match
             if (y >= 2)
             {
                 ElementType? type1 = _grid[x, y - 1]?.Type;
                 ElementType? type2 = _grid[x, y - 2]?.Type;
                 if (type1 != null && type1 == type2 && type1 != ElementType.None)
                 {
-                    _ = availableTypes.Remove(type1.Value);
+                    exclude2 = type1.Value;
                 }
             }
 
-            // If all types removed (rare), pick random
-            if (availableTypes.Count == 0)
+            List<ElementType> validTypes = [];
+            foreach (ElementType t in allTypes)
             {
-                availableTypes.Add((ElementType)GD.RandRange(1, 4));
+                if (t != exclude1 && t != exclude2)
+                {
+                    validTypes.Add(t);
+                }
             }
 
-            ElementType selectedType = availableTypes[GD.RandRange(0, availableTypes.Count - 1)];
+            if (validTypes.Count == 0)
+            {
+                validTypes.Add((ElementType)GD.RandRange(1, 4));
+            }
+
+            ElementType selectedType = validTypes[GD.RandRange(0, validTypes.Count - 1)];
             return new ElementData(selectedType, x, y);
         }
 
         /// <summary>
-        /// Gets element at position.
+        /// Возвращает элемент сетки по координатам.
+        /// </summary>
+        /// <summary>
+        /// Возвращает Element.
         /// </summary>
         public ElementData GetElement(int x, int y)
         {
@@ -116,7 +137,11 @@ namespace AlJourney.Scripts.Match3
         }
 
         /// <summary>
-        /// Attempts to swap two adjacent elements.
+        /// Пытается поменять местами два элемента на сетке.
+        /// Если обмен не приводит к совпадению, элементы возвращаются на исходные позиции.
+        /// </summary>
+        /// <summary>
+        /// Пытается выполнить Swap.
         /// </summary>
         public bool TrySwap(int x1, int y1, int x2, int y2)
         {
@@ -132,15 +157,12 @@ namespace AlJourney.Scripts.Match3
                 return false;
             }
 
-            // Check if adjacent
             int deltaX = Mathf.Abs(x2 - x1);
             int deltaY = Mathf.Abs(y2 - y1);
             if ((deltaX == 1 && deltaY == 0) || (deltaX == 0 && deltaY == 1))
             {
-                // Perform swap
                 SwapElements(x1, y1, x2, y2);
 
-                // Check if swap creates matches
                 List<MatchResult> matches = FindAllMatches();
                 if (matches.Count > 0)
                 {
@@ -151,7 +173,6 @@ namespace AlJourney.Scripts.Match3
                 }
                 else
                 {
-                    // Revert swap
                     SwapElements(x1, y1, x2, y2);
                     _ = EmitSignal(SignalName.SwapCompleted, false);
                     GD.Print("[GridManager] Invalid swap - no matches created");
@@ -163,14 +184,10 @@ namespace AlJourney.Scripts.Match3
             return false;
         }
 
-        /// <summary>
-        /// Swaps two elements in the grid.
-        /// </summary>
         private void SwapElements(int x1, int y1, int x2, int y2)
         {
             (_grid[x1, y1], _grid[x2, y2]) = (_grid[x2, y2], _grid[x1, y1]);
 
-            // Update positions
             _grid[x1, y1].X = x1;
             _grid[x1, y1].Y = y1;
             _grid[x2, y2].X = x2;
@@ -178,43 +195,44 @@ namespace AlJourney.Scripts.Match3
         }
 
         /// <summary>
-        /// Finds all current matches on the grid.
+        /// Сканирует всю сетку и находит все линии из 3 и более одинаковых элементов.
+        /// </summary>
+        /// <returns>Список найденных совпадений.</returns>
+        /// <summary>
+        /// Элемент FindAllMatches.
         /// </summary>
         public List<MatchResult> FindAllMatches()
         {
             List<MatchResult> allMatches = [];
 
-            // Check horizontal matches
             for (int y = 0; y < GridSize; y++)
             {
                 for (int x = 0; x < GridSize - 2; x++)
                 {
-                    MatchResult matches = CheckLineMatch(x, y, 1, 0); // horizontal
+                    MatchResult matches = CheckLineMatch(x, y, 1, 0); 
                     if (matches != null)
                     {
                         allMatches.Add(matches);
-                        x += matches.MatchCount - 1; // Skip matched elements
+                        x += matches.MatchCount - 1; 
                     }
                 }
             }
 
-            // Check vertical matches
             for (int x = 0; x < GridSize; x++)
             {
                 for (int y = 0; y < GridSize - 2; y++)
                 {
-                    MatchResult matches = CheckLineMatch(x, y, 0, 1); // vertical
+                    MatchResult matches = CheckLineMatch(x, y, 0, 1); 
                     if (matches != null)
                     {
                         allMatches.Add(matches);
-                        y += matches.MatchCount - 1; // Skip matched elements
+                        y += matches.MatchCount - 1; 
                     }
                 }
             }
 
             if (allMatches.Count > 0)
             {
-                // Emit match count as integer (not List)
                 _ = EmitSignal(SignalName.MatchesFound, allMatches.Count);
                 GD.Print($"[GridManager] Found {allMatches.Count} matches");
             }
@@ -222,9 +240,6 @@ namespace AlJourney.Scripts.Match3
             return allMatches;
         }
 
-        /// <summary>
-        /// Checks for matches in a specific direction.
-        /// </summary>
         private MatchResult CheckLineMatch(int startX, int startY, int deltaX, int deltaY)
         {
             ElementData startElement = _grid[startX, startY];
@@ -236,7 +251,6 @@ namespace AlJourney.Scripts.Match3
             int matchCount = 1;
             List<(int, int)> matchedPositions = [(startX, startY)];
 
-            // Count consecutive matches
             for (int i = 1; i < GridSize; i++)
             {
                 int x = startX + (i * deltaX);
@@ -257,7 +271,6 @@ namespace AlJourney.Scripts.Match3
                 matchedPositions.Add((x, y));
             }
 
-            // Valid match is 3 or more
             if (matchCount >= GameConstants.MATCH_MIN_LENGTH)
             {
                 MatchResult result = new(startElement.Type, matchCount, deltaX == 1)
@@ -271,17 +284,18 @@ namespace AlJourney.Scripts.Match3
         }
 
         /// <summary>
-        /// Removes matched elements and applies gravity.
+        /// Обрабатывает найденные совпадения: удаляет элементы, применяет гравитацию и заполняет пустые ячейки.
+        /// </summary>
+        /// <summary>
+        /// Обрабатывает Matches.
         /// </summary>
         public void ProcessMatches(List<MatchResult> matches)
         {
-            // Null check for matches parameter
             if (matches == null || matches.Count == 0)
             {
                 return;
             }
             
-            // Mark matched elements with null checks
             foreach (MatchResult match in matches)
             {
                 if (match?.MatchedPositions == null) continue;
@@ -295,7 +309,6 @@ namespace AlJourney.Scripts.Match3
                 }
             }
 
-            // Remove matched elements with null checks
             for (int x = 0; x < GridSize; x++)
             {
                 for (int y = 0; y < GridSize; y++)
@@ -307,21 +320,15 @@ namespace AlJourney.Scripts.Match3
                 }
             }
 
-            // Apply gravity
             ApplyGravity();
 
-            // Refill empty spaces
             RefillGrid();
         }
 
-        /// <summary>
-        /// Applies gravity to make elements fall down.
-        /// </summary>
         private void ApplyGravity()
         {
             for (int x = 0; x < GridSize; x++)
             {
-                // Start from bottom
                 int writePos = GridSize - 1;
 
                 for (int y = GridSize - 1; y >= 0; y--)
@@ -340,9 +347,6 @@ namespace AlJourney.Scripts.Match3
             }
         }
 
-        /// <summary>
-        /// Fills empty spaces with new random elements.
-        /// </summary>
         private void RefillGrid()
         {
             for (int x = 0; x < GridSize; x++)
@@ -359,12 +363,14 @@ namespace AlJourney.Scripts.Match3
             _ = EmitSignal(SignalName.GridRefillCompleted);
             GD.Print("[GridManager] Grid refilled");
             
-            // Check if board needs reshuffling
             CheckAndReshuffleIfNeeded();
         }
 
         /// <summary>
-        /// Resets swaps for new turn.
+        /// Сбрасывает количество свапов игрока в начале нового хода.
+        /// </summary>
+        /// <summary>
+        /// Сбрасывает Swaps.
         /// </summary>
         public void ResetSwaps()
         {
@@ -372,21 +378,19 @@ namespace AlJourney.Scripts.Match3
             GD.Print($"[GridManager] Swaps reset to {RemainingSwaps}");
         }
 
-        /// <summary>
-        /// Checks if position is valid on grid.
-        /// </summary>
         private bool IsValidPosition(int x, int y)
         {
             return x >= 0 && x < GridSize && y >= 0 && y < GridSize;
         }
 
         /// <summary>
-        /// Checks if there are any valid moves available on the grid.
-        /// If no valid moves exist, grid should be refilled.
+        /// Проверяет, существуют ли на доске возможные ходы (потенциальные совпадения).
+        /// </summary>
+        /// <summary>
+        /// Проверяет наличие ValidMoves.
         /// </summary>
         public bool HasValidMoves()
         {
-            // Check horizontal swaps
             for (int x = 0; x < GridSize - 1; x++)
             {
                 for (int y = 0; y < GridSize; y++)
@@ -398,7 +402,6 @@ namespace AlJourney.Scripts.Match3
                 }
             }
 
-            // Check vertical swaps
             for (int x = 0; x < GridSize; x++)
             {
                 for (int y = 0; y < GridSize - 1; y++)
@@ -414,9 +417,6 @@ namespace AlJourney.Scripts.Match3
             return false;
         }
 
-        /// <summary>
-        /// Checks if swapping two elements would create a match.
-        /// </summary>
         private bool WouldCreateMatch(int x1, int y1, int x2, int y2)
         {
             if (!IsValidPosition(x1, y1) || !IsValidPosition(x2, y2))
@@ -432,7 +432,6 @@ namespace AlJourney.Scripts.Match3
                 return false;
             }
 
-            // Temporarily swap
             _grid[x1, y1] = elem2;
             _grid[x2, y2] = elem1;
             elem2.X = x1;
@@ -440,10 +439,8 @@ namespace AlJourney.Scripts.Match3
             elem1.X = x2;
             elem1.Y = y2;
 
-            // Check if swap creates match
             bool createsMatch = CheckMatchAtPosition(x1, y1) || CheckMatchAtPosition(x2, y2);
 
-            // Swap back
             _grid[x1, y1] = elem1;
             _grid[x2, y2] = elem2;
             elem1.X = x1;
@@ -454,9 +451,6 @@ namespace AlJourney.Scripts.Match3
             return createsMatch;
         }
 
-        /// <summary>
-        /// Checks if element at position is part of a match.
-        /// </summary>
         private bool CheckMatchAtPosition(int x, int y)
         {
             if (!IsValidPosition(x, y))
@@ -470,10 +464,8 @@ namespace AlJourney.Scripts.Match3
                 return false;
             }
 
-            // Check horizontal
             int horizontalCount = 1;
 
-            // Count left
             for (int i = x - 1; i >= 0; i--)
             {
                 if (_grid[i, y] != null && element.CanMatchWith(_grid[i, y]))
@@ -486,7 +478,6 @@ namespace AlJourney.Scripts.Match3
                 }
             }
 
-            // Count right
             for (int i = x + 1; i < GridSize; i++)
             {
                 if (_grid[i, y] != null && element.CanMatchWith(_grid[i, y]))
@@ -504,10 +495,8 @@ namespace AlJourney.Scripts.Match3
                 return true;
             }
 
-            // Check vertical
             int verticalCount = 1;
 
-            // Count up
             for (int i = y - 1; i >= 0; i--)
             {
                 if (_grid[x, i] != null && element.CanMatchWith(_grid[x, i]))
@@ -520,7 +509,6 @@ namespace AlJourney.Scripts.Match3
                 }
             }
 
-            // Count down
             for (int i = y + 1; i < GridSize; i++)
             {
                 if (_grid[x, i] != null && element.CanMatchWith(_grid[x, i]))
@@ -537,7 +525,10 @@ namespace AlJourney.Scripts.Match3
         }
 
         /// <summary>
-        /// Checks if board needs reshuffling and performs it if necessary.
+        /// Проверяет наличие доступных ходов, и если их нет — перетасовывает доску.
+        /// </summary>
+        /// <summary>
+        /// Проверяет AndReshuffleIfNeeded.
         /// </summary>
         public void CheckAndReshuffleIfNeeded()
         {
@@ -548,10 +539,6 @@ namespace AlJourney.Scripts.Match3
             }
         }
 
-        /// <summary>
-        /// Reshuffles the board by regenerating grid without initial matches.
-        /// Preserves remaining swap count.
-        /// </summary>
         private void ReshuffleBoard()
         {
             int attempts = 0;
@@ -559,7 +546,6 @@ namespace AlJourney.Scripts.Match3
             
             while (attempts < maxAttempts)
             {
-                // Regenerate grid
                 for (int x = 0; x < GridSize; x++)
                 {
                     for (int y = 0; y < GridSize; y++)
@@ -568,7 +554,6 @@ namespace AlJourney.Scripts.Match3
                     }
                 }
                 
-                // Verify at least one valid move exists
                 if (HasValidMoves())
                 {
                     EmitSignal(SignalName.GridRefillCompleted);
@@ -583,7 +568,10 @@ namespace AlJourney.Scripts.Match3
         }
 
         /// <summary>
-        /// Gets the entire grid (for debugging/visualization).
+        /// Возвращает текущее состояние двумерного массива сетки.
+        /// </summary>
+        /// <summary>
+        /// Возвращает Grid.
         /// </summary>
         public ElementData[,] GetGrid()
         {

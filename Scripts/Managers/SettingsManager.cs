@@ -1,64 +1,64 @@
 using Godot;
+using AlJourney.Scripts.Interfaces;
 
 namespace AlJourney.Scripts.Managers
 {
     /// <summary>
-    /// Manages game settings (video, audio, controls).
-    /// Singleton autoload node.
+    /// Менеджер SettingsManager. Отвечает за управление соответствующей подсистемой.
     /// </summary>
-    public partial class SettingsManager : Node
+    public partial class SettingsManager : Node, ISettingsManager
     {
-        /// <summary>
-        /// Singleton instance accessor.
-        /// </summary>
         public static SettingsManager Instance { get; private set; }
 
         [Signal]
+        /// <summary>
+        /// Устанавливает tingsChangedEventHandler.
+        /// </summary>
         public delegate void SettingsChangedEventHandler();
 
-        // Settings file path
         private const string SettingsPath = "user://settings.cfg";
 
-        // Video settings
         private Vector2I _resolution = new(1920, 1080);
 
-        // Audio settings
 
         /// <summary>
-        /// Current screen resolution.
+        /// Элемент Resolution.
         /// </summary>
         public Vector2I Resolution => _resolution;
 
         /// <summary>
-        /// Is fullscreen enabled.
+        /// Элемент Fullscreen.
         /// </summary>
         public bool Fullscreen { get; private set; } = true;
 
         /// <summary>
-        /// Is VSync enabled.
+        /// Элемент VSync.
         /// </summary>
         public bool VSync { get; private set; } = true;
 
         /// <summary>
-        /// Maximum FPS limit (0 = unlimited).
+        /// Элемент MaxFps.
         /// </summary>
         public int MaxFps { get; private set; } = 60;
 
         /// <summary>
-        /// Master volume (0.0 to 1.0).
+        /// Элемент MasterVolume.
         /// </summary>
         public float MasterVolume { get; private set; } = 1.0f;
 
         /// <summary>
-        /// Music volume (0.0 to 1.0).
+        /// Элемент MusicVolume.
         /// </summary>
         public float MusicVolume { get; private set; } = 0.7f;
 
         /// <summary>
-        /// SFX volume (0.0 to 1.0).
+        /// Элемент SfxVolume.
         /// </summary>
         public float SfxVolume { get; private set; } = 0.8f;
 
+        /// <summary>
+        /// Элемент _Ready.
+        /// </summary>
         public override void _Ready()
         {
             if (Instance != null && Instance != this)
@@ -75,7 +75,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Sets screen resolution.
+        /// Устанавливает Resolution.
         /// </summary>
         public void SetResolution(Vector2I resolution, bool applyImmediately = true)
         {
@@ -90,7 +90,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Sets fullscreen mode.
+        /// Устанавливает Fullscreen.
         /// </summary>
         public void SetFullscreen(bool enabled, bool applyImmediately = true)
         {
@@ -105,7 +105,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Sets VSync mode.
+        /// Устанавливает VSync.
         /// </summary>
         public void SetVSync(bool enabled, bool applyImmediately = true)
         {
@@ -120,7 +120,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Sets maximum FPS limit.
+        /// Устанавливает MaxFps.
         /// </summary>
         public void SetMaxFps(int fps, bool applyImmediately = true)
         {
@@ -135,7 +135,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Sets master volume.
+        /// Устанавливает MasterVolume.
         /// </summary>
         public void SetMasterVolume(float volume)
         {
@@ -145,7 +145,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Sets music volume.
+        /// Устанавливает MusicVolume.
         /// </summary>
         public void SetMusicVolume(float volume)
         {
@@ -155,7 +155,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Sets SFX volume.
+        /// Устанавливает SfxVolume.
         /// </summary>
         public void SetSfxVolume(float volume)
         {
@@ -165,16 +165,14 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Applies all video settings to the window.
+        /// Применяет VideoSettings.
         /// </summary>
         public void ApplyVideoSettings()
         {
             Window window = GetWindow();
 
-            // Set resolution
             window.Size = _resolution;
 
-            // Set fullscreen mode
             if (Fullscreen)
             {
                 window.Mode = Window.ModeEnum.Fullscreen;
@@ -185,21 +183,16 @@ namespace AlJourney.Scripts.Managers
                 window.Position = (DisplayServer.ScreenGetSize() - _resolution) / 2;
             }
 
-            // Set VSync
             DisplayServer.WindowSetVsyncMode(VSync
                 ? DisplayServer.VSyncMode.Enabled
                 : DisplayServer.VSyncMode.Disabled);
 
-            // Set FPS limit
             Engine.MaxFps = MaxFps;
 
             _ = EmitSignal(SignalName.SettingsChanged);
             GD.Print("[SettingsManager] Video settings applied");
         }
 
-        /// <summary>
-        /// Applies all settings.
-        /// </summary>
         private void ApplySettings()
         {
             ApplyVideoSettings();
@@ -209,20 +202,18 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Saves settings to file.
+        /// Сохраняет Settings.
         /// </summary>
         public void SaveSettings()
         {
             ConfigFile config = new();
 
-            // Video
             config.SetValue("video", "resolution_x", _resolution.X);
             config.SetValue("video", "resolution_y", _resolution.Y);
             config.SetValue("video", "fullscreen", Fullscreen);
             config.SetValue("video", "vsync", VSync);
             config.SetValue("video", "max_fps", MaxFps);
 
-            // Audio
             config.SetValue("audio", "master_volume", MasterVolume);
             config.SetValue("audio", "music_volume", MusicVolume);
             config.SetValue("audio", "sfx_volume", SfxVolume);
@@ -238,9 +229,6 @@ namespace AlJourney.Scripts.Managers
             }
         }
 
-        /// <summary>
-        /// Loads settings from file.
-        /// </summary>
         private void LoadSettings()
         {
             ConfigFile config = new();
@@ -252,7 +240,6 @@ namespace AlJourney.Scripts.Managers
                 return;
             }
 
-            // Video
             _resolution = new Vector2I(
                 (int)config.GetValue("video", "resolution_x", 1920),
                 (int)config.GetValue("video", "resolution_y", 1080)
@@ -261,7 +248,6 @@ namespace AlJourney.Scripts.Managers
             VSync = (bool)config.GetValue("video", "vsync", true);
             MaxFps = (int)config.GetValue("video", "max_fps", 60);
 
-            // Audio
             MasterVolume = (float)config.GetValue("audio", "master_volume", 1.0f);
             MusicVolume = (float)config.GetValue("audio", "music_volume", 0.7f);
             SfxVolume = (float)config.GetValue("audio", "sfx_volume", 0.8f);
@@ -270,7 +256,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Resets all settings to default.
+        /// Сбрасывает ToDefaults.
         /// </summary>
         public void ResetToDefaults()
         {

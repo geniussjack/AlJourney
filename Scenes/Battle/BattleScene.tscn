@@ -1,28 +1,347 @@
-[gd_scene load_steps=4 format=3 uid="uid://battle_scene_main"]
+[gd_scene load_steps=12 format=3 uid="uid://do01lwwh5yf6i"]
 
-[ext_resource type="Script" path="res://Scripts/Scenes/BattleScene.cs" id="1_battle"]
-[ext_resource type="PackedScene" uid="uid://dkj3h5k2l9m8n" path="res://Scenes/UI/BattleHUD.tscn" id="2_hud"]
-[ext_resource type="Script" path="res://Scripts/UI/GridUI.cs" id="3_grid"]
+[ext_resource type="Script" uid="uid://bb6df84rte67u" path="res://Scripts/Scenes/BattleScene.cs" id="1_battle"]
+[ext_resource type="PackedScene" uid="uid://cgmssg1q3f8r3" path="res://Scenes/UI/BattleHUD.tscn" id="2_hud"]
+[ext_resource type="Script" uid="uid://cy2w0fdga4ede" path="res://Scripts/Battle/BattleManager.cs" id="3_manager"]
+[ext_resource type="Script" uid="uid://ckrrtak4uv7w1" path="res://Scripts/UI/GridUI.cs" id="4_grid"]
+[ext_resource type="Theme" uid="uid://d0twkb22dvira" path="res://Resources/Themes/game_theme.tres" id="5_theme"]
+[ext_resource type="Texture2D" uid="uid://3emm2y0omi4k" path="res://Resources/Sprites/Backgrounds/battle_background.png" id="6_bg"]
+[ext_resource type="Texture2D" uid="uid://gnpobh3ck1bi" path="res://Resources/Sprites/UI/panel_background.png" id="7_panel"]
+[ext_resource type="Texture2D" uid="uid://clo7xrj4xv47n" path="res://Resources/Sprites/Characters/mage_sprite.png" id="8_mage"]
+[ext_resource type="Texture2D" uid="uid://ba6gml0jon51d" path="res://Resources/Sprites/Characters/warrior_sprite.png" id="9_warrior"]
+[ext_resource type="Texture2D" uid="uid://d2yc4np3she1n" path="res://Resources/Sprites/Characters/slime_sprite.png" id="10_slime"]
+[ext_resource type="Texture2D" uid="uid://b3lfrm3bgs04i" path="res://Resources/Sprites/Characters/skeleton_sprite.png" id="11_skeleton"]
 
 [node name="BattleScene" type="Node"]
 script = ExtResource("1_battle")
+metadata/_edit_horizontal_guides_ = [-11.0]
 
 [node name="BattleManager" type="Node" parent="."]
-script = ExtResource("res://Scripts/Battle/BattleManager.cs")
+script = ExtResource("3_manager")
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="Background" type="TextureRect" parent="."]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_right = 1280.0
-offset_bottom = 720.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.12, 0.12, 0.18, 1)
+texture = ExtResource("6_bg")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="DimOverlay" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.05, 0.04, 0.08, 0.45)
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
+[node name="DecorativeLayer" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="TopBanner" type="PanelContainer" parent="CanvasLayer/DecorativeLayer"]
+z_index = -20
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 130.0
+grow_horizontal = 2
+mouse_filter = 2
+theme = ExtResource("5_theme")
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/DecorativeLayer/TopBanner"]
+layout_mode = 2
+theme_override_constants/margin_left = 30
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 30
+theme_override_constants/margin_bottom = 18
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/DecorativeLayer/TopBanner/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Spacer" type="Control" parent="CanvasLayer/DecorativeLayer/TopBanner/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="StatusBlock" type="VBoxContainer" parent="CanvasLayer/DecorativeLayer/TopBanner/MarginContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 4
+alignment = 2
+
+[node name="StatusLabel" type="Label" parent="CanvasLayer/DecorativeLayer/TopBanner/MarginContainer/HBoxContainer/StatusBlock"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "5x5 match-3 arena"
+horizontal_alignment = 2
+
+[node name="HintLabel" type="Label" parent="CanvasLayer/DecorativeLayer/TopBanner/MarginContainer/HBoxContainer/StatusBlock"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Hero portraits, enemies, grid, HUD"
+horizontal_alignment = 2
+
+[node name="ArenaGlow" type="ColorRect" parent="CanvasLayer/DecorativeLayer"]
+z_index = -18
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -410.0
+offset_top = -330.0
+offset_right = 410.0
+offset_bottom = 390.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.18, 0.12, 0.28, 0.22)
+
+[node name="ArenaFrame" type="TextureRect" parent="CanvasLayer/DecorativeLayer"]
+modulate = Color(1, 1, 1, 0.9)
+z_index = -17
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -385.0
+offset_top = -305.0
+offset_right = 385.0
+offset_bottom = 375.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("7_panel")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="ArenaFrameOverlay" type="PanelContainer" parent="CanvasLayer/DecorativeLayer"]
+z_index = -16
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -355.0
+offset_top = -285.0
+offset_right = 355.0
+offset_bottom = 355.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("5_theme")
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/DecorativeLayer/ArenaFrameOverlay"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 12
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/DecorativeLayer/ArenaFrameOverlay/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ArenaLabel" type="Label" parent="CanvasLayer/DecorativeLayer/ArenaFrameOverlay/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Combat Arena"
+horizontal_alignment = 1
+
+[node name="LeftPanel" type="PanelContainer" parent="CanvasLayer/DecorativeLayer"]
+z_index = -15
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 28.0
+offset_top = -185.0
+offset_right = 302.0
+offset_bottom = 185.0
+grow_horizontal = 0
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("5_theme")
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/DecorativeLayer/LeftPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 12
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/DecorativeLayer/LeftPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="SectionTitle" type="Label" parent="CanvasLayer/DecorativeLayer/LeftPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Heroes"
+horizontal_alignment = 1
+
+[node name="MageRow" type="HBoxContainer" parent="CanvasLayer/DecorativeLayer/LeftPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="MagePortrait" type="TextureRect" parent="CanvasLayer/DecorativeLayer/LeftPanel/MarginContainer/VBoxContainer/MageRow"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+texture = ExtResource("8_mage")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="MageText" type="VBoxContainer" parent="CanvasLayer/DecorativeLayer/LeftPanel/MarginContainer/VBoxContainer/MageRow"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="MageName" type="Label" parent="CanvasLayer/DecorativeLayer/LeftPanel/MarginContainer/VBoxContainer/MageRow/MageText"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Mage"
+
+[node name="MageNote" type="Label" parent="CanvasLayer/DecorativeLayer/LeftPanel/MarginContainer/VBoxContainer/MageRow/MageText"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Fire / Heal combos"
+
+[node name="WarriorRow" type="HBoxContainer" parent="CanvasLayer/DecorativeLayer/LeftPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="WarriorPortrait" type="TextureRect" parent="CanvasLayer/DecorativeLayer/LeftPanel/MarginContainer/VBoxContainer/WarriorRow"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+texture = ExtResource("9_warrior")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="WarriorText" type="VBoxContainer" parent="CanvasLayer/DecorativeLayer/LeftPanel/MarginContainer/VBoxContainer/WarriorRow"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="WarriorName" type="Label" parent="CanvasLayer/DecorativeLayer/LeftPanel/MarginContainer/VBoxContainer/WarriorRow/WarriorText"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Warrior"
+
+[node name="WarriorNote" type="Label" parent="CanvasLayer/DecorativeLayer/LeftPanel/MarginContainer/VBoxContainer/WarriorRow/WarriorText"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Sword / Shield combos"
+
+[node name="LeftInfo" type="Label" parent="CanvasLayer/DecorativeLayer/LeftPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "HP, shield and status effects"
+horizontal_alignment = 1
+
+[node name="RightPanel" type="PanelContainer" parent="CanvasLayer/DecorativeLayer"]
+z_index = -15
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -302.0
+offset_top = -185.0
+offset_right = -28.0
+offset_bottom = 185.0
+grow_horizontal = 0
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("5_theme")
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/DecorativeLayer/RightPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 12
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/DecorativeLayer/RightPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="SectionTitle" type="Label" parent="CanvasLayer/DecorativeLayer/RightPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Enemies"
+horizontal_alignment = 1
+
+[node name="SlimeRow" type="HBoxContainer" parent="CanvasLayer/DecorativeLayer/RightPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="SlimePortrait" type="TextureRect" parent="CanvasLayer/DecorativeLayer/RightPanel/MarginContainer/VBoxContainer/SlimeRow"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+texture = ExtResource("10_slime")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SlimeText" type="VBoxContainer" parent="CanvasLayer/DecorativeLayer/RightPanel/MarginContainer/VBoxContainer/SlimeRow"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="SlimeName" type="Label" parent="CanvasLayer/DecorativeLayer/RightPanel/MarginContainer/VBoxContainer/SlimeRow/SlimeText"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Slime"
+
+[node name="SlimeNote" type="Label" parent="CanvasLayer/DecorativeLayer/RightPanel/MarginContainer/VBoxContainer/SlimeRow/SlimeText"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Basic wave enemy"
+
+[node name="SkeletonRow" type="HBoxContainer" parent="CanvasLayer/DecorativeLayer/RightPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="SkeletonPortrait" type="TextureRect" parent="CanvasLayer/DecorativeLayer/RightPanel/MarginContainer/VBoxContainer/SkeletonRow"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+texture = ExtResource("11_skeleton")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SkeletonText" type="VBoxContainer" parent="CanvasLayer/DecorativeLayer/RightPanel/MarginContainer/VBoxContainer/SkeletonRow"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="SkeletonName" type="Label" parent="CanvasLayer/DecorativeLayer/RightPanel/MarginContainer/VBoxContainer/SkeletonRow/SkeletonText"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Skeleton"
+
+[node name="SkeletonNote" type="Label" parent="CanvasLayer/DecorativeLayer/RightPanel/MarginContainer/VBoxContainer/SkeletonRow/SkeletonText"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Unlocked later"
+
+[node name="RightInfo" type="Label" parent="CanvasLayer/DecorativeLayer/RightPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Bosses drop loot and coins"
+horizontal_alignment = 1
+
 [node name="BattleHUD" parent="CanvasLayer" instance=ExtResource("2_hud")]
+z_index = 20
 
 [node name="CenterContainer" type="CenterContainer" parent="CanvasLayer"]
 anchors_preset = 8
@@ -30,13 +349,14 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -225.0
-offset_top = -225.0
-offset_right = 225.0
-offset_bottom = 225.0
+offset_left = -320.0
+offset_top = -330.0
+offset_right = 320.0
+offset_bottom = 390.0
 grow_horizontal = 2
 grow_vertical = 2
 
 [node name="GridUI" type="Control" parent="CanvasLayer/CenterContainer"]
+z_index = 15
 layout_mode = 2
-script = ExtResource("3_grid")
+script = ExtResource("4_grid")

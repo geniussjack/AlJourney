@@ -3,17 +3,18 @@ using Godot;
 namespace AlJourney.Scripts.Utils
 {
     /// <summary>
-    /// Provides damage flash effects for visual feedback.
-    /// Can be applied to any CanvasItem (Control, Sprite2D, etc.).
+    /// Основной класс DamageFlash.
     /// </summary>
     public partial class DamageFlash : Node
     {
         private CanvasItem _target;
         private Color _originalModulate;
 
+        /// <summary>
+        /// Элемент _Ready.
+        /// </summary>
         public override void _Ready()
         {
-            // Get target (parent by default)
             _target = GetParentOrNull<CanvasItem>();
 
             if (_target != null)
@@ -28,10 +29,8 @@ namespace AlJourney.Scripts.Utils
         }
 
         /// <summary>
-        /// Triggers damage flash effect.
+        /// Элемент Flash.
         /// </summary>
-        /// <param name="flashColor">Color to flash</param>
-        /// <param name="duration">Flash duration in seconds</param>
         public void Flash(Color flashColor, float duration = 0.15f)
         {
             if (_target == null)
@@ -45,7 +44,7 @@ namespace AlJourney.Scripts.Utils
         }
 
         /// <summary>
-        /// Triggers red damage flash (for taking damage).
+        /// Элемент FlashDamage.
         /// </summary>
         public void FlashDamage()
         {
@@ -53,7 +52,7 @@ namespace AlJourney.Scripts.Utils
         }
 
         /// <summary>
-        /// Triggers green heal flash (for healing).
+        /// Элемент FlashHeal.
         /// </summary>
         public void FlashHeal()
         {
@@ -61,7 +60,7 @@ namespace AlJourney.Scripts.Utils
         }
 
         /// <summary>
-        /// Triggers blue shield flash (for gaining shield).
+        /// Элемент FlashShield.
         /// </summary>
         public void FlashShield()
         {
@@ -69,7 +68,7 @@ namespace AlJourney.Scripts.Utils
         }
 
         /// <summary>
-        /// Triggers white critical flash (for critical hits).
+        /// Элемент FlashCritical.
         /// </summary>
         public void FlashCritical()
         {
@@ -77,7 +76,7 @@ namespace AlJourney.Scripts.Utils
         }
 
         /// <summary>
-        /// Triggers custom flash with color.
+        /// Элемент FlashCustom.
         /// </summary>
         public void FlashCustom(Color color, float duration = 0.15f)
         {

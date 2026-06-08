@@ -409,3 +409,6 @@ SaveData/
 
 # Documentation build
 docs/_build/
+# Temp reports
+temp/
+

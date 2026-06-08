@@ -3,8 +3,7 @@ using Godot;
 namespace AlJourney.Scripts.Utils
 {
     /// <summary>
-    /// Provides camera shake effects for visual feedback.
-    /// Attach to a Camera2D node.
+    /// Основной класс CameraShake.
     /// </summary>
     public partial class CameraShake : Node
     {
@@ -15,9 +14,11 @@ namespace AlJourney.Scripts.Utils
         private float _shakeTimer;
         private bool _isShaking;
 
+        /// <summary>
+        /// Элемент _Ready.
+        /// </summary>
         public override void _Ready()
         {
-            // Get camera (can be parent or specified)
             _camera = GetParentOrNull<Camera2D>();
 
             if (_camera != null)
@@ -31,6 +32,9 @@ namespace AlJourney.Scripts.Utils
             }
         }
 
+        /// <summary>
+        /// Элемент _Process.
+        /// </summary>
         public override void _Process(double delta)
         {
             if (!_isShaking || _camera == null)
@@ -42,13 +46,11 @@ namespace AlJourney.Scripts.Utils
 
             if (_shakeTimer <= 0)
             {
-                // Stop shaking
                 _isShaking = false;
                 _camera.Offset = _originalOffset;
             }
             else
             {
-                // Apply shake
                 float currentIntensity = _shakeIntensity * (_shakeTimer / _shakeDuration);
                 Vector2 randomOffset = new(
                     (GD.Randf() * currentIntensity * 2) - currentIntensity,
@@ -59,10 +61,8 @@ namespace AlJourney.Scripts.Utils
         }
 
         /// <summary>
-        /// Triggers camera shake effect.
+        /// Элемент Shake.
         /// </summary>
-        /// <param name="intensity">Shake intensity (pixel displacement)</param>
-        /// <param name="duration">Shake duration in seconds</param>
         public void Shake(float intensity = 10.0f, float duration = 0.3f)
         {
             if (_camera == null)
@@ -79,7 +79,7 @@ namespace AlJourney.Scripts.Utils
         }
 
         /// <summary>
-        /// Triggers light shake (for minor events).
+        /// Элемент ShakeLight.
         /// </summary>
         public void ShakeLight()
         {
@@ -87,7 +87,7 @@ namespace AlJourney.Scripts.Utils
         }
 
         /// <summary>
-        /// Triggers medium shake (for normal attacks).
+        /// Элемент ShakeMedium.
         /// </summary>
         public void ShakeMedium()
         {
@@ -95,7 +95,7 @@ namespace AlJourney.Scripts.Utils
         }
 
         /// <summary>
-        /// Triggers strong shake (for critical hits/boss attacks).
+        /// Элемент ShakeStrong.
         /// </summary>
         public void ShakeStrong()
         {
@@ -103,7 +103,7 @@ namespace AlJourney.Scripts.Utils
         }
 
         /// <summary>
-        /// Stops shake immediately.
+        /// Останавливает Shake.
         /// </summary>
         public void StopShake()
         {

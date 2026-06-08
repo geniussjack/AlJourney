@@ -6,7 +6,7 @@ using System.Linq;
 namespace AlJourney.Scripts.Data
 {
     /// <summary>
-    /// Represents an ability that can be equipped by characters.
+    /// Элемент AbilityData.
     /// </summary>
     public record AbilityData(
         string Id,
@@ -20,7 +20,7 @@ namespace AlJourney.Scripts.Data
     )
     {
         /// <summary>
-        /// Gets the color associated with this element.
+        /// Возвращает ElementColor.
         /// </summary>
         public Color GetElementColor()
         {
@@ -35,17 +35,17 @@ namespace AlJourney.Scripts.Data
         }
 
         /// <summary>
-        /// Checks if this ability is an attack type.
+        /// Проверяет, является ли AttackAbility.
         /// </summary>
         public bool IsAttackAbility => Type == AbilityType.Attack;
 
         /// <summary>
-        /// Checks if this ability is a support type.
+        /// Проверяет, является ли SupportAbility.
         /// </summary>
         public bool IsSupportAbility => Type == AbilityType.Support;
 
         /// <summary>
-        /// Gets the primary effect value.
+        /// Возвращает PrimaryEffect.
         /// </summary>
         public int GetPrimaryEffect()
         {
@@ -53,13 +53,16 @@ namespace AlJourney.Scripts.Data
         }
 
         /// <summary>
-        /// Gets a specific effect value.
+        /// Возвращает Effect.
         /// </summary>
         public int GetEffect(string effectName)
         {
             return Effects.TryGetValue(effectName, out int value) ? value : 0;
         }
 
+        /// <summary>
+        /// Элемент ToString.
+        /// </summary>
         public override string ToString()
         {
             return $"{Name} ({Type} - {Element})";

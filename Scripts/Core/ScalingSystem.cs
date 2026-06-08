@@ -3,49 +3,72 @@ using Godot;
 namespace AlJourney.Scripts.Core
 {
     /// <summary>
-    /// Centralized system for dynamic scaling of game values based on wave progression.
+    /// Система масштабирования характеристик, наград и стоимости.
+    /// </summary>
+    /// <summary>
+    /// Менеджер ScalingSystem. Отвечает за управление соответствующей подсистемой.
     /// </summary>
     public static class ScalingSystem
     {
-        // Scaling coefficients
-        private const float ENEMY_STAT_COEFFICIENT = 0.15f;
+        private const float ENEMY_STAT_COEFFICIENT = 0.10f;
         private const float REWARD_COEFFICIENT = 0.1f;
         private const float COST_COEFFICIENT = 0.05f;
 
         /// <summary>
-        /// Calculates scaled enemy stat based on wave number.
-        /// Formula: baseStat * (1 + wave * 0.15)
+        /// Масштабирует характеристику врага в зависимости от номера волны.
         /// </summary>
-        /// <param name="baseStat">Base stat value</param>
-        /// <param name="waveNumber">Current wave number</param>
-        /// <returns>Scaled stat value rounded up</returns>
+        /// <summary>
+        /// Элемент ScaleEnemyStat.
+        /// </summary>
         public static int ScaleEnemyStat(int baseStat, int waveNumber)
         {
             return Mathf.CeilToInt(baseStat * (1 + waveNumber * ENEMY_STAT_COEFFICIENT));
         }
 
         /// <summary>
-        /// Calculates scaled coin reward based on wave number.
-        /// Formula: baseReward * (1 + wave * 0.1)
+        /// Масштабирует награду в зависимости от номера волны.
         /// </summary>
-        /// <param name="baseReward">Base reward value</param>
-        /// <param name="waveNumber">Current wave number</param>
-        /// <returns>Scaled reward value rounded up</returns>
+        /// <summary>
+        /// Элемент ScaleReward.
+        /// </summary>
         public static int ScaleReward(int baseReward, int waveNumber)
         {
             return Mathf.CeilToInt(baseReward * (1 + waveNumber * REWARD_COEFFICIENT));
         }
 
         /// <summary>
-        /// Calculates scaled upgrade cost based on wave number.
-        /// Formula: baseCost * (1 + wave * 0.05)
+        /// Масштабирует стоимость в зависимости от номера волны.
         /// </summary>
-        /// <param name="baseCost">Base cost value</param>
-        /// <param name="waveNumber">Current wave number</param>
-        /// <returns>Scaled cost value rounded up</returns>
+        /// <summary>
+        /// Элемент ScaleCost.
+        /// </summary>
         public static int ScaleCost(int baseCost, int waveNumber)
         {
             return Mathf.CeilToInt(baseCost * (1 + waveNumber * COST_COEFFICIENT));
+        }
+
+        /// <summary>
+        /// Возвращает количество врагов для указанной волны.
+        /// </summary>
+        /// <summary>
+        /// Возвращает EnemyCount.
+        /// </summary>
+        public static int GetEnemyCount(int waveNumber)
+        {
+            int count = GameConstants.ENEMY_COUNT_BASE
+                + (waveNumber - 1) / GameConstants.ENEMY_COUNT_INCREASE_EVERY;
+            return Mathf.Min(count, GameConstants.MAX_ENEMIES_PER_WAVE);
+        }
+
+        /// <summary>
+        /// Проверяет, разблокированы ли враги-скелеты на текущей волне.
+        /// </summary>
+        /// <summary>
+        /// Проверяет, является ли SkeletonUnlocked.
+        /// </summary>
+        public static bool IsSkeletonUnlocked(int waveNumber)
+        {
+            return waveNumber >= GameConstants.SKELETON_UNLOCK_WAVE;
         }
     }
 }

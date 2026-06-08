@@ -3,12 +3,12 @@ using Godot;
 namespace AlJourney.Scripts.Utils
 {
     /// <summary>
-    /// Utility for creating placeholder textures.
+    /// Основной класс TextureGenerator.
     /// </summary>
     public static class TextureGenerator
     {
         /// <summary>
-        /// Creates a solid color square texture.
+        /// Элемент CreateColorSquare.
         /// </summary>
         public static Texture2D CreateColorSquare(Color color, int size = 64)
         {
@@ -18,14 +18,13 @@ namespace AlJourney.Scripts.Utils
         }
 
         /// <summary>
-        /// Creates a colored square with border.
+        /// Элемент CreateColorSquareWithBorder.
         /// </summary>
         public static Texture2D CreateColorSquareWithBorder(Color fillColor, Color borderColor, int size = 64, int borderWidth = 4)
         {
             Image image = Image.CreateEmpty(size, size, false, Image.Format.Rgba8);
             image.Fill(fillColor);
 
-            // Draw border
             for (int i = 0; i < borderWidth; i++)
             {
                 DrawRectOutline(image, i, borderColor);
@@ -39,14 +38,12 @@ namespace AlJourney.Scripts.Utils
             int width = image.GetWidth();
             int height = image.GetHeight();
 
-            // Top and bottom
             for (int x = offset; x < width - offset; x++)
             {
                 image.SetPixel(x, offset, color);
                 image.SetPixel(x, height - 1 - offset, color);
             }
 
-            // Left and right
             for (int y = offset; y < height - offset; y++)
             {
                 image.SetPixel(offset, y, color);

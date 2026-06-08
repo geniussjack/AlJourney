@@ -1,26 +1,21 @@
 using Godot;
+using AlJourney.Scripts.Interfaces;
 using System.Collections.Generic;
 
 namespace AlJourney.Scripts.Managers
 {
     /// <summary>
-    /// Manages game audio including music and sound effects.
-    /// Singleton autoload node.
+    /// Менеджер AudioManager. Отвечает за управление соответствующей подсистемой.
     /// </summary>
-    public partial class AudioManager : Node
+    public partial class AudioManager : Node, IAudioManager
     {
-        /// <summary>
-        /// Singleton instance accessor.
-        /// </summary>
         public static AudioManager Instance { get; private set; }
 
         private AudioStreamPlayer _musicPlayer;
         private List<AudioStreamPlayer> _sfxPlayers;
         private const int SFX_POOL_SIZE = 8;
+        private readonly HashSet<string> _missingResourceWarnings = [];
 
-        /// <summary>
-        /// Master volume level (0.0 to 1.0).
-        /// </summary>
         public float MasterVolume
         {
             get; set
@@ -30,9 +25,6 @@ namespace AlJourney.Scripts.Managers
             }
         } = 1.0f;
 
-        /// <summary>
-        /// Music volume level (0.0 to 1.0).
-        /// </summary>
         public float MusicVolume
         {
             get; set
@@ -43,10 +35,13 @@ namespace AlJourney.Scripts.Managers
         } = 0.7f;
 
         /// <summary>
-        /// Sound effects volume level (0.0 to 1.0).
+        /// Элемент SfxVolume.
         /// </summary>
         public float SfxVolume { get; set => field = Mathf.Clamp(value, 0.0f, 1.0f); } = 0.8f;
 
+        /// <summary>
+        /// Элемент _Ready.
+        /// </summary>
         public override void _Ready()
         {
             if (Instance != null && Instance != this)
@@ -57,7 +52,6 @@ namespace AlJourney.Scripts.Managers
 
             Instance = this;
 
-            // Setup music player
             _musicPlayer = new AudioStreamPlayer
             {
                 Name = "MusicPlayer",
@@ -65,7 +59,6 @@ namespace AlJourney.Scripts.Managers
             };
             AddChild(_musicPlayer);
 
-            // Setup SFX player pool
             _sfxPlayers = [];
             for (int i = 0; i < SFX_POOL_SIZE; i++)
             {
@@ -83,20 +76,27 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Plays background music from path. Loops by default.
+        /// Воспроизводит Music.
         /// </summary>
         public void PlayMusic(string musicPath, bool loop = true)
+        {
+            _ = TryPlayMusic(musicPath, loop);
+        }
+
+        /// <summary>
+        /// Пытается выполнить PlayMusic.
+        /// </summary>
+        public bool TryPlayMusic(string musicPath, bool loop = true)
         {
             AudioStream stream = GD.Load<AudioStream>(musicPath);
             if (stream == null)
             {
-                GD.PrintErr($"[AudioManager] Failed to load music: {musicPath}");
-                return;
+                WarnMissingResourceOnce("music", musicPath);
+                return false;
             }
 
             _musicPlayer.Stream = stream;
 
-            // Enable looping if supported
             if (stream is AudioStreamOggVorbis oggStream)
             {
                 oggStream.Loop = loop;
@@ -108,10 +108,11 @@ namespace AlJourney.Scripts.Managers
 
             _musicPlayer.Play();
             GD.Print($"[AudioManager] Playing music: {musicPath}");
+            return true;
         }
 
         /// <summary>
-        /// Stops current music.
+        /// Останавливает Music.
         /// </summary>
         public void StopMusic()
         {
@@ -119,18 +120,25 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Plays a sound effect from path.
+        /// Воспроизводит Sfx.
         /// </summary>
         public void PlaySfx(string sfxPath, float pitchVariation = 0.0f)
+        {
+            _ = TryPlaySfx(sfxPath, pitchVariation);
+        }
+
+        /// <summary>
+        /// Пытается выполнить PlaySfx.
+        /// </summary>
+        public bool TryPlaySfx(string sfxPath, float pitchVariation = 0.0f)
         {
             AudioStream stream = GD.Load<AudioStream>(sfxPath);
             if (stream == null)
             {
-                GD.PrintErr($"[AudioManager] Failed to load SFX: {sfxPath}");
-                return;
+                WarnMissingResourceOnce("sfx", sfxPath);
+                return false;
             }
 
-            // Find available player
             AudioStreamPlayer availablePlayer = null;
             foreach (AudioStreamPlayer player in _sfxPlayers)
             {
@@ -141,20 +149,19 @@ namespace AlJourney.Scripts.Managers
                 }
             }
 
-            // If all busy, use first one
             availablePlayer ??= _sfxPlayers[0];
 
             availablePlayer.Stream = stream;
             availablePlayer.VolumeDb = Mathf.LinearToDb(SfxVolume * MasterVolume);
 
-            // Apply pitch variation
             availablePlayer.PitchScale = pitchVariation > 0.0f ? 1.0f + ((GD.Randf() * pitchVariation * 2.0f) - pitchVariation) : 1.0f;
 
             availablePlayer.Play();
+            return true;
         }
 
         /// <summary>
-        /// Fades out current music over duration.
+        /// Элемент FadeOutMusic.
         /// </summary>
         public void FadeOutMusic(float duration = 1.0f)
         {
@@ -168,14 +175,14 @@ namespace AlJourney.Scripts.Managers
             _ = tween.TweenCallback(Callable.From(() =>
             {
                 _musicPlayer.Stop();
-                UpdateVolumes(); // Restore original volume
+                UpdateVolumes(); 
             }));
 
             GD.Print($"[AudioManager] Fading out music over {duration}s");
         }
 
         /// <summary>
-        /// Fades in music over duration. Music should already be playing.
+        /// Элемент FadeInMusic.
         /// </summary>
         public void FadeInMusic(float duration = 1.0f)
         {
@@ -184,10 +191,8 @@ namespace AlJourney.Scripts.Managers
                 return;
             }
 
-            // Start at silent
             _musicPlayer.VolumeDb = -80.0f;
 
-            // Fade to target volume
             float targetVolume = Mathf.LinearToDb(MusicVolume * MasterVolume);
             Tween tween = CreateTween();
             _ = tween.TweenProperty(_musicPlayer, "volume_db", targetVolume, duration);
@@ -196,17 +201,15 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Crossfades from current music to new music.
+        /// Элемент CrossfadeMusic.
         /// </summary>
         public void CrossfadeMusic(string newMusicPath, float duration = 1.0f, bool loop = true)
         {
-            // Fade out current
             if (_musicPlayer.Playing)
             {
                 FadeOutMusic(duration);
             }
 
-            // Wait and play new music with fade in
             GetTree().CreateTimer(duration).Timeout += () =>
             {
                 PlayMusic(newMusicPath, loop);
@@ -216,12 +219,21 @@ namespace AlJourney.Scripts.Managers
             GD.Print($"[AudioManager] Crossfading to: {newMusicPath}");
         }
 
-        /// <summary>
-        /// Updates volume for all audio players.
-        /// </summary>
         private void UpdateVolumes()
         {
             _ = _musicPlayer?.VolumeDb = Mathf.LinearToDb(MusicVolume * MasterVolume);
+        }
+
+        private void WarnMissingResourceOnce(string resourceType, string resourcePath)
+        {
+            string warningKey = $"{resourceType}:{resourcePath}";
+            if (_missingResourceWarnings.Contains(warningKey))
+            {
+                return;
+            }
+
+            _missingResourceWarnings.Add(warningKey);
+            GD.PrintErr($"[AudioManager] Missing {resourceType} resource: {resourcePath}");
         }
     }
 }

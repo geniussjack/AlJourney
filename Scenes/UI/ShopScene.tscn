@@ -1,6 +1,10 @@
-[gd_scene load_steps=2 format=3 uid="uid://cdmiad6sigfpe"]
+[gd_scene load_steps=6 format=3 uid="uid://cdmiad6sigfpe"]
 
 [ext_resource type="Script" uid="uid://bdltufdw3l4ui" path="res://Scripts/UI/ShopUI.cs" id="1_shop"]
+[ext_resource type="Theme" path="res://Resources/Themes/game_theme.tres" id="2_theme"]
+[ext_resource type="Texture2D" path="res://Resources/Sprites/Backgrounds/menu_background.png" id="3_bg"]
+[ext_resource type="AtlasTexture" path="res://Resources/Sprites/UI/atlas_btn_resume.tres" id="4_resume"]
+[ext_resource type="AtlasTexture" path="res://Resources/Sprites/UI/atlas_btn_home.tres" id="5_home"]
 
 [node name="ShopScene" type="Control"]
 layout_mode = 3
@@ -9,16 +13,29 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("2_theme")
 script = ExtResource("1_shop")
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="Background" type="TextureRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.1, 0.15, 0.2, 1)
+texture = ExtResource("3_bg")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="DimOverlay" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.45)
+mouse_filter = 2
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 1
@@ -27,29 +44,29 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 50
-theme_override_constants/margin_top = 50
-theme_override_constants/margin_right = 50
-theme_override_constants/margin_bottom = 50
+theme_override_constants/margin_left = 60
+theme_override_constants/margin_top = 40
+theme_override_constants/margin_right = 60
+theme_override_constants/margin_bottom = 40
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
 layout_mode = 2
-theme_override_constants/separation = 30
+theme_override_constants/separation = 24
 
 [node name="Header" type="VBoxContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 8
 
 [node name="WaveLabel" type="Label" parent="MarginContainer/VBoxContainer/Header"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 48
+theme_override_font_sizes/font_size = 52
 text = "Wave X Complete!"
 horizontal_alignment = 1
 
 [node name="CoinsLabel" type="Label" parent="MarginContainer/VBoxContainer/Header"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 32
-text = "💰 0"
+theme_override_font_sizes/font_size = 36
+text = "0"
 horizontal_alignment = 1
 
 [node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer"]
@@ -57,140 +74,152 @@ layout_mode = 2
 
 [node name="ShopTitle" type="Label" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 36
-text = "🛒 Upgrade Shop"
+theme_override_font_sizes/font_size = 40
+text = "Upgrade Shop"
 horizontal_alignment = 1
 
 [node name="ShopContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_constants/separation = 50
+theme_override_constants/separation = 60
 alignment = 1
 
 [node name="MageUpgrades" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ShopContainer"]
-custom_minimum_size = Vector2(400, 0)
+custom_minimum_size = Vector2(420, 0)
 layout_mode = 2
-theme_override_constants/separation = 20
+theme_override_constants/separation = 16
 
 [node name="MageTitle" type="Label" parent="MarginContainer/VBoxContainer/ShopContainer/MageUpgrades"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 32
-text = "🧙 Eltarion (Mage)"
+theme_override_font_sizes/font_size = 36
+text = "Altarion (Mage)"
 horizontal_alignment = 1
 
 [node name="HealthUpgrade" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ShopContainer/MageUpgrades"]
 layout_mode = 2
 
-[node name="BuyButton" type="Button" parent="MarginContainer/VBoxContainer/ShopContainer/MageUpgrades/HealthUpgrade"]
-custom_minimum_size = Vector2(0, 80)
+[node name="BuyButton" type="TextureButton" parent="MarginContainer/VBoxContainer/ShopContainer/MageUpgrades/HealthUpgrade"]
+texture_normal = ExtResource("4_resume")
+ignore_texture_size = true
+stretch_mode = 2
+custom_minimum_size = Vector2(369, 80)
 layout_mode = 2
-theme_override_font_sizes/font_size = 24
-text = "Upgrade Health"
 
 [node name="PriceLabel" type="Label" parent="MarginContainer/VBoxContainer/ShopContainer/MageUpgrades/HealthUpgrade"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "+X Max HP
-💰 XX"
+theme_override_font_sizes/font_size = 22
+text = "+X Max HP"
 horizontal_alignment = 1
 
 [node name="DamageUpgrade" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ShopContainer/MageUpgrades"]
 layout_mode = 2
 
-[node name="BuyButton" type="Button" parent="MarginContainer/VBoxContainer/ShopContainer/MageUpgrades/DamageUpgrade"]
-custom_minimum_size = Vector2(0, 80)
+[node name="BuyButton" type="TextureButton" parent="MarginContainer/VBoxContainer/ShopContainer/MageUpgrades/DamageUpgrade"]
+texture_normal = ExtResource("4_resume")
+ignore_texture_size = true
+stretch_mode = 2
+custom_minimum_size = Vector2(369, 80)
 layout_mode = 2
-theme_override_font_sizes/font_size = 24
-text = "Upgrade Damage"
 
 [node name="PriceLabel" type="Label" parent="MarginContainer/VBoxContainer/ShopContainer/MageUpgrades/DamageUpgrade"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "+X Damage
-💰 XX"
+theme_override_font_sizes/font_size = 22
+text = "+X Damage"
 horizontal_alignment = 1
 
 [node name="DefenseUpgrade" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ShopContainer/MageUpgrades"]
 layout_mode = 2
 
-[node name="BuyButton" type="Button" parent="MarginContainer/VBoxContainer/ShopContainer/MageUpgrades/DefenseUpgrade"]
-custom_minimum_size = Vector2(0, 80)
+[node name="BuyButton" type="TextureButton" parent="MarginContainer/VBoxContainer/ShopContainer/MageUpgrades/DefenseUpgrade"]
+texture_normal = ExtResource("4_resume")
+ignore_texture_size = true
+stretch_mode = 2
+custom_minimum_size = Vector2(369, 80)
 layout_mode = 2
-theme_override_font_sizes/font_size = 24
-text = "Upgrade Defense"
 
 [node name="PriceLabel" type="Label" parent="MarginContainer/VBoxContainer/ShopContainer/MageUpgrades/DefenseUpgrade"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "+X Defense
-💰 XX"
+theme_override_font_sizes/font_size = 22
+text = "+X Defense"
 horizontal_alignment = 1
 
 [node name="WarriorUpgrades" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ShopContainer"]
-custom_minimum_size = Vector2(400, 0)
+custom_minimum_size = Vector2(420, 0)
 layout_mode = 2
-theme_override_constants/separation = 20
+theme_override_constants/separation = 16
 
 [node name="WarriorTitle" type="Label" parent="MarginContainer/VBoxContainer/ShopContainer/WarriorUpgrades"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 32
-text = "⚔️ Eldric (Warrior)"
+theme_override_font_sizes/font_size = 36
+text = "Aldric (Warrior)"
 horizontal_alignment = 1
 
 [node name="HealthUpgrade" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ShopContainer/WarriorUpgrades"]
 layout_mode = 2
 
-[node name="BuyButton" type="Button" parent="MarginContainer/VBoxContainer/ShopContainer/WarriorUpgrades/HealthUpgrade"]
-custom_minimum_size = Vector2(0, 80)
+[node name="BuyButton" type="TextureButton" parent="MarginContainer/VBoxContainer/ShopContainer/WarriorUpgrades/HealthUpgrade"]
+texture_normal = ExtResource("4_resume")
+ignore_texture_size = true
+stretch_mode = 2
+custom_minimum_size = Vector2(369, 80)
 layout_mode = 2
-theme_override_font_sizes/font_size = 24
-text = "Upgrade Health"
 
 [node name="PriceLabel" type="Label" parent="MarginContainer/VBoxContainer/ShopContainer/WarriorUpgrades/HealthUpgrade"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "+X Max HP
-💰 XX"
+theme_override_font_sizes/font_size = 22
+text = "+X Max HP"
 horizontal_alignment = 1
 
 [node name="DamageUpgrade" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ShopContainer/WarriorUpgrades"]
 layout_mode = 2
 
-[node name="BuyButton" type="Button" parent="MarginContainer/VBoxContainer/ShopContainer/WarriorUpgrades/DamageUpgrade"]
-custom_minimum_size = Vector2(0, 80)
+[node name="BuyButton" type="TextureButton" parent="MarginContainer/VBoxContainer/ShopContainer/WarriorUpgrades/DamageUpgrade"]
+texture_normal = ExtResource("4_resume")
+ignore_texture_size = true
+stretch_mode = 2
+custom_minimum_size = Vector2(369, 80)
 layout_mode = 2
-theme_override_font_sizes/font_size = 24
-text = "Upgrade Damage"
 
 [node name="PriceLabel" type="Label" parent="MarginContainer/VBoxContainer/ShopContainer/WarriorUpgrades/DamageUpgrade"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "+X Damage
-💰 XX"
+theme_override_font_sizes/font_size = 22
+text = "+X Damage"
 horizontal_alignment = 1
 
 [node name="DefenseUpgrade" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ShopContainer/WarriorUpgrades"]
 layout_mode = 2
 
-[node name="BuyButton" type="Button" parent="MarginContainer/VBoxContainer/ShopContainer/WarriorUpgrades/DefenseUpgrade"]
-custom_minimum_size = Vector2(0, 80)
+[node name="BuyButton" type="TextureButton" parent="MarginContainer/VBoxContainer/ShopContainer/WarriorUpgrades/DefenseUpgrade"]
+texture_normal = ExtResource("4_resume")
+ignore_texture_size = true
+stretch_mode = 2
+custom_minimum_size = Vector2(369, 80)
 layout_mode = 2
-theme_override_font_sizes/font_size = 24
-text = "Upgrade Defense"
 
 [node name="PriceLabel" type="Label" parent="MarginContainer/VBoxContainer/ShopContainer/WarriorUpgrades/DefenseUpgrade"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "+X Defense
-💰 XX"
+theme_override_font_sizes/font_size = 22
+text = "+X Defense"
 horizontal_alignment = 1
 
 [node name="HSeparator2" type="HSeparator" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="ContinueButton" type="Button" parent="MarginContainer/VBoxContainer"]
-custom_minimum_size = Vector2(300, 80)
+[node name="BottomRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
-size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 32
-text = "Continue to Next Wave"
+alignment = 1
+theme_override_constants/separation = 40
+
+[node name="ContinueButton" type="TextureButton" parent="MarginContainer/VBoxContainer/BottomRow"]
+texture_normal = ExtResource("4_resume")
+ignore_texture_size = true
+stretch_mode = 2
+custom_minimum_size = Vector2(369, 93)
+layout_mode = 2
+
+[node name="HomeButton" type="TextureButton" parent="MarginContainer/VBoxContainer/BottomRow"]
+texture_normal = ExtResource("5_home")
+ignore_texture_size = true
+stretch_mode = 2
+custom_minimum_size = Vector2(273, 93)
+layout_mode = 2

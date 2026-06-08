@@ -6,11 +6,17 @@ using System.Collections.Generic;
 namespace AlJourney.Scripts.Match3
 {
     /// <summary>
-    /// Data structure representing a combo effect to be applied in battle.
+    /// Основной класс ComboEffect.
     /// </summary>
     public class ComboEffect(ElementType elementType, int comboLevel)
     {
+        /// <summary>
+        /// Элемент ElementType.
+        /// </summary>
         public ElementType ElementType { get; set; } = elementType;
+        /// <summary>
+        /// Элемент ComboLevel.
+        /// </summary>
         public int ComboLevel { get; set; } = comboLevel;
         public int Damage { get; set; }
         public int Healing { get; set; }
@@ -20,22 +26,27 @@ namespace AlJourney.Scripts.Match3
     }
 
     /// <summary>
-    /// Processes match-3 combos and converts them into battle effects.
+    /// Менеджер ComboSystem. Отвечает за управление соответствующей подсистемой.
     /// </summary>
     public partial class ComboSystem : Node
     {
         [Signal]
+        /// <summary>
+        /// Элемент CombosProcessedEventHandler.
+        /// </summary>
         public delegate void CombosProcessedEventHandler(int comboCount);
 
         [Signal]
+        /// <summary>
+        /// Элемент CascadeDetectedEventHandler.
+        /// </summary>
         public delegate void CascadeDetectedEventHandler(int cascadeLevel);
 
-        // Кэш последних обработанных эффектов для доступа из других систем
         private List<ComboEffect> _lastProcessedEffects = [];
         private int _currentCascadeLevel;
 
         /// <summary>
-        /// Gets the last processed combo effects.
+        /// Возвращает LastProcessedEffects.
         /// </summary>
         public List<ComboEffect> GetLastProcessedEffects()
         {
@@ -43,11 +54,10 @@ namespace AlJourney.Scripts.Match3
         }
 
         /// <summary>
-        /// Processes all match results and converts them to combat effects.
+        /// Обрабатывает Matches.
         /// </summary>
         public List<ComboEffect> ProcessMatches(List<MatchResult> matches, bool isCascade = false)
         {
-            // Track cascade level
             if (isCascade)
             {
                 _currentCascadeLevel++;
@@ -66,10 +76,9 @@ namespace AlJourney.Scripts.Match3
                 ComboEffect effect = CreateComboEffect(match);
                 if (effect != null)
                 {
-                    // Bonus damage/healing for cascades
                     if (_currentCascadeLevel > 0)
                     {
-                        float cascadeBonus = 1.0f + (_currentCascadeLevel * 0.2f); // +20% per cascade level
+                        float cascadeBonus = 1.0f + (_currentCascadeLevel * 0.2f); 
                         effect.Damage = Mathf.CeilToInt(effect.Damage * cascadeBonus);
                         effect.Healing = Mathf.CeilToInt(effect.Healing * cascadeBonus);
                         effect.Shield = Mathf.CeilToInt(effect.Shield * cascadeBonus);
@@ -92,7 +101,7 @@ namespace AlJourney.Scripts.Match3
         }
 
         /// <summary>
-        /// Gets current cascade level.
+        /// Возвращает CascadeLevel.
         /// </summary>
         public int GetCascadeLevel()
         {
@@ -100,16 +109,13 @@ namespace AlJourney.Scripts.Match3
         }
 
         /// <summary>
-        /// Resets cascade counter (call at start of turn).
+        /// Сбрасывает Cascade.
         /// </summary>
         public void ResetCascade()
         {
             _currentCascadeLevel = 0;
         }
 
-        /// <summary>
-        /// Creates a combo effect based on match result.
-        /// </summary>
         private static ComboEffect CreateComboEffect(MatchResult match)
         {
             int comboLevel = match.GetComboLevel();
@@ -142,19 +148,16 @@ namespace AlJourney.Scripts.Match3
             return effect;
         }
 
-        /// <summary>
-        /// Processes Fire (Fireball) combo effects.
-        /// </summary>
         private static void ProcessFireCombo(ComboEffect effect, int level)
         {
             switch (level)
             {
-                case 1: // 3-match
+                case 1: 
                     effect.Damage = GameConstants.FIRE_3_DAMAGE;
                     effect.IsAoE = false;
                     break;
 
-                case 2: // 4-match
+                case 2: 
                     effect.Damage = GameConstants.FIRE_4_DAMAGE;
                     effect.IsAoE = false;
                     effect.StatusEffect = new StatusEffectData(
@@ -164,9 +167,9 @@ namespace AlJourney.Scripts.Match3
                     );
                     break;
 
-                case 3: // 5-match
+                case 3: 
                     effect.Damage = GameConstants.FIRE_5_DAMAGE;
-                    effect.IsAoE = true; // Hits all enemies
+                    effect.IsAoE = true; 
                     effect.StatusEffect = new StatusEffectData(
                         StatusEffect.Burning,
                         GameConstants.FIRE_5_BURN_DURATION,
@@ -180,19 +183,16 @@ namespace AlJourney.Scripts.Match3
                      (effect.StatusEffect != null ? " + Burning" : ""));
         }
 
-        /// <summary>
-        /// Processes Sword (Axe) combo effects.
-        /// </summary>
         private static void ProcessSwordCombo(ComboEffect effect, int level)
         {
             switch (level)
             {
-                case 1: // 3-match
+                case 1: 
                     effect.Damage = GameConstants.SWORD_3_DAMAGE;
                     effect.IsAoE = false;
                     break;
 
-                case 2: // 4-match
+                case 2: 
                     effect.Damage = GameConstants.SWORD_4_DAMAGE;
                     effect.IsAoE = false;
                     effect.StatusEffect = new StatusEffectData(
@@ -202,12 +202,12 @@ namespace AlJourney.Scripts.Match3
                     );
                     break;
 
-                case 3: // 5-match
+                case 3: 
                     effect.Damage = GameConstants.SWORD_5_DAMAGE;
                     effect.IsAoE = false;
                     effect.StatusEffect = new StatusEffectData(
                         StatusEffect.Stunned,
-                        1, // 1 turn stun
+                        1, 
                         0
                     );
                     break;
@@ -218,23 +218,19 @@ namespace AlJourney.Scripts.Match3
                      (effect.StatusEffect?.Type == StatusEffect.Stunned ? " + Stun" : ""));
         }
 
-        /// <summary>
-        /// Processes Heal combo effects.
-        /// </summary>
         private static void ProcessHealCombo(ComboEffect effect, int level)
         {
             switch (level)
             {
-                case 1: // 3-match
+                case 1: 
                     effect.Healing = GameConstants.HEAL_3_AMOUNT;
                     break;
 
-                case 2: // 4-match
+                case 2: 
                     effect.Healing = GameConstants.HEAL_4_AMOUNT;
-                    // Also removes negative effects (handled in battle system)
                     break;
 
-                case 3: // 5-match
+                case 3: 
                     effect.Healing = GameConstants.HEAL_5_AMOUNT;
                     effect.StatusEffect = new StatusEffectData(
                         StatusEffect.Regeneration,
@@ -249,32 +245,29 @@ namespace AlJourney.Scripts.Match3
                      (effect.StatusEffect != null ? " + Regeneration" : ""));
         }
 
-        /// <summary>
-        /// Processes Shield combo effects.
-        /// </summary>
         private static void ProcessShieldCombo(ComboEffect effect, int level)
         {
             switch (level)
             {
-                case 1: // 3-match
+                case 1: 
                     effect.Shield = GameConstants.SHIELD_3_AMOUNT;
                     break;
 
-                case 2: // 4-match
+                case 2: 
                     effect.Shield = GameConstants.SHIELD_4_AMOUNT;
                     effect.StatusEffect = new StatusEffectData(
                         StatusEffect.ShieldReflect,
-                        1, // Lasts 1 turn
+                        1, 
                         0,
                         GameConstants.SHIELD_4_REFLECT_PERCENT
                     );
                     break;
 
-                case 3: // 5-match
+                case 3: 
                     effect.Shield = GameConstants.SHIELD_5_AMOUNT;
                     effect.StatusEffect = new StatusEffectData(
                         StatusEffect.Immunity,
-                        1, // Lasts 1 turn
+                        1, 
                         0
                     );
                     break;

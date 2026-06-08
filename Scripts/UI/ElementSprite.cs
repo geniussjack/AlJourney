@@ -4,12 +4,14 @@ using Godot;
 namespace AlJourney.Scripts.UI
 {
     /// <summary>
-    /// Visual representation of a match-3 grid element.
-    /// Handles animations and user interactions.
+    /// Основной класс ElementSprite.
     /// </summary>
     public partial class ElementSprite : Control
     {
         [Signal]
+        /// <summary>
+        /// Элемент ElementClickedEventHandler.
+        /// </summary>
         public delegate void ElementClickedEventHandler(ElementSprite element);
 
         private TextureRect _sprite;
@@ -17,38 +19,33 @@ namespace AlJourney.Scripts.UI
         private Vector2 _targetPosition;
         private float _animationSpeed = 10.0f;
 
-        /// <summary>
-        /// Associated element data.
-        /// </summary>
         public ElementData Data { get; private set; }
 
         /// <summary>
-        /// Grid X position.
+        /// Элемент GridX.
         /// </summary>
         public int GridX => Data?.X ?? -1;
 
         /// <summary>
-        /// Grid Y position.
+        /// Элемент GridY.
         /// </summary>
         public int GridY => Data?.Y ?? -1;
 
-        /// <summary>
-        /// Is element currently animating.
-        /// </summary>
         public bool IsAnimating { get; private set; }
 
+        /// <summary>
+        /// Элемент _Ready.
+        /// </summary>
         public override void _Ready()
         {
-            // Create sprite
             _sprite = new TextureRect
             {
                 ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
                 StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered,
-                CustomMinimumSize = new Vector2(64, 64)
+                CustomMinimumSize = new Vector2(128, 128)
             };
             AddChild(_sprite);
 
-            // Create highlight panel
             _highlightPanel = new Panel
             {
                 Visible = false
@@ -56,13 +53,12 @@ namespace AlJourney.Scripts.UI
             _highlightPanel.SetAnchorsPreset(LayoutPreset.FullRect);
             AddChild(_highlightPanel);
 
-            // Setup interaction
             MouseFilter = MouseFilterEnum.Stop;
             GuiInput += OnGuiInput;
         }
 
         /// <summary>
-        /// Initializes element with data and texture.
+        /// Инициализирует .
         /// </summary>
         public void Initialize(ElementData data, Texture2D texture)
         {
@@ -70,12 +66,12 @@ namespace AlJourney.Scripts.UI
             _sprite.Texture = texture;
             _targetPosition = Position;
 
-            CustomMinimumSize = new Vector2(64, 64);
-            Size = new Vector2(64, 64);
+            CustomMinimumSize = new Vector2(128, 128);
+            Size = new Vector2(128, 128);
         }
 
         /// <summary>
-        /// Updates element data (for refills/swaps).
+        /// Обновляет Data.
         /// </summary>
         public void UpdateData(ElementData newData)
         {
@@ -83,7 +79,7 @@ namespace AlJourney.Scripts.UI
         }
 
         /// <summary>
-        /// Sets element texture based on type.
+        /// Устанавливает Texture.
         /// </summary>
         public void SetTexture(Texture2D texture)
         {
@@ -91,7 +87,7 @@ namespace AlJourney.Scripts.UI
         }
 
         /// <summary>
-        /// Shows/hides selection highlight.
+        /// Устанавливает Highlight.
         /// </summary>
         public void SetHighlight(bool enabled)
         {
@@ -99,12 +95,12 @@ namespace AlJourney.Scripts.UI
 
             if (enabled)
             {
-                _highlightPanel.Modulate = new Color(1, 1, 0, 0.5f); // Yellow highlight
+                _highlightPanel.Modulate = new Color(1, 1, 0, 0.5f); 
             }
         }
 
         /// <summary>
-        /// Animates element to target position.
+        /// Элемент AnimateToPosition.
         /// </summary>
         public void AnimateToPosition(Vector2 targetPos)
         {
@@ -113,7 +109,7 @@ namespace AlJourney.Scripts.UI
         }
 
         /// <summary>
-        /// Instantly sets position without animation.
+        /// Устанавливает GridPosition.
         /// </summary>
         public void SetGridPosition(Vector2 pos)
         {
@@ -123,11 +119,10 @@ namespace AlJourney.Scripts.UI
         }
 
         /// <summary>
-        /// Plays match animation and destroys element.
+        /// Воспроизводит MatchAnimation.
         /// </summary>
         public void PlayMatchAnimation()
         {
-            // Scale down animation
             Tween tween = CreateTween();
             _ = tween.SetParallel(true);
             _ = tween.TweenProperty(this, "scale", Vector2.Zero, 0.3f).SetEase(Tween.EaseType.In);
@@ -136,7 +131,7 @@ namespace AlJourney.Scripts.UI
         }
 
         /// <summary>
-        /// Plays swap animation.
+        /// Воспроизводит SwapAnimation.
         /// </summary>
         public void PlaySwapAnimation(Vector2 targetPos, float duration = 0.2f)
         {
@@ -144,14 +139,15 @@ namespace AlJourney.Scripts.UI
             _ = tween.TweenProperty(this, "position", targetPos, duration).SetEase(Tween.EaseType.InOut);
         }
 
+        /// <summary>
+        /// Элемент _Process.
+        /// </summary>
         public override void _Process(double delta)
         {
             if (IsAnimating)
             {
-                // Smooth movement to target position
                 Position = Position.Lerp(_targetPosition, _animationSpeed * (float)delta);
 
-                // Check if reached target
                 if (Position.DistanceTo(_targetPosition) < 1.0f)
                 {
                     Position = _targetPosition;
@@ -160,9 +156,6 @@ namespace AlJourney.Scripts.UI
             }
         }
 
-        /// <summary>
-        /// Handles mouse input for element selection.
-        /// </summary>
         private void OnGuiInput(InputEvent @event)
         {
             if (@event is InputEventMouseButton mouseButton)

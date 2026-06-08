@@ -9,8 +9,14 @@ namespace AlJourney.Scripts.Test
     /// <summary>
     /// Test script to verify equipment and ability systems are working.
     /// </summary>
+    /// <summary>
+    /// Менеджер TestSystems. Отвечает за управление соответствующей подсистемой.
+    /// </summary>
     public partial class TestSystems : Node
     {
+        /// <summary>
+        /// Элемент _Ready.
+        /// </summary>
         public override void _Ready()
         {
             GD.Print("=== TESTING EQUIPMENT AND ABILITY SYSTEMS ===");

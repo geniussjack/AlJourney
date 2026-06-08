@@ -1,0 +1,3 @@
+[gd_scene format=3 uid="uid://char_enemy"]
+
+[node name="Enemy" type="Node"]

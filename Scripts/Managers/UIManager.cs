@@ -1,28 +1,34 @@
 using Godot;
+using AlJourney.Scripts.Interfaces;
 using System.Collections.Generic;
 
 namespace AlJourney.Scripts.Managers
 {
     /// <summary>
-    /// Manages UI panels, popups, and transitions.
-    /// Singleton autoload node.
+    /// Менеджер UIManager. Отвечает за управление соответствующей подсистемой.
     /// </summary>
-    public partial class UIManager : Node
+    public partial class UIManager : Node, IUIManager
     {
-        /// <summary>
-        /// Singleton instance accessor.
-        /// </summary>
         public static UIManager Instance { get; private set; }
 
         [Signal]
+        /// <summary>
+        /// Элемент MenuOpenedEventHandler.
+        /// </summary>
         public delegate void MenuOpenedEventHandler(string menuName);
 
         [Signal]
+        /// <summary>
+        /// Элемент MenuClosedEventHandler.
+        /// </summary>
         public delegate void MenuClosedEventHandler(string menuName);
 
         private readonly Stack<Control> _menuStack = new();
         private Control _currentMenu;
 
+        /// <summary>
+        /// Элемент _Ready.
+        /// </summary>
         public override void _Ready()
         {
             if (Instance != null && Instance != this)
@@ -36,7 +42,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Opens a menu and adds it to the stack.
+        /// Открывает Menu.
         /// </summary>
         public void OpenMenu(Control menu)
         {
@@ -46,14 +52,12 @@ namespace AlJourney.Scripts.Managers
                 return;
             }
 
-            // Hide current menu
             if (_currentMenu != null)
             {
                 _menuStack.Push(_currentMenu);
                 _currentMenu.Hide();
             }
 
-            // Show new menu
             _currentMenu = menu;
             _currentMenu.Show();
 
@@ -62,7 +66,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Closes current menu and returns to previous.
+        /// Закрывает CurrentMenu.
         /// </summary>
         public void CloseCurrentMenu()
         {
@@ -78,7 +82,6 @@ namespace AlJourney.Scripts.Managers
             _ = EmitSignal(SignalName.MenuClosed, menuName);
             GD.Print($"[UIManager] Closed menu: {menuName}");
 
-            // Return to previous menu
             if (_menuStack.Count > 0)
             {
                 _currentMenu = _menuStack.Pop();
@@ -91,7 +94,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Closes all menus and clears stack.
+        /// Закрывает AllMenus.
         /// </summary>
         public void CloseAllMenus()
         {

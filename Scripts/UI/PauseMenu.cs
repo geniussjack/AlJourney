@@ -4,183 +4,153 @@ using Godot;
 namespace AlJourney.Scripts.UI
 {
     /// <summary>
-    /// Pause menu controller for battle scene.
-    /// Provides options to resume, restart, or return to main menu.
+    /// UI-компонент PauseMenu. Отвечает за отображение пользовательского интерфейса.
     /// </summary>
     public partial class PauseMenu : Control
     {
-        private Button _resumeButton;
-        private Button _settingsButton;
-        private Button _mainMenuButton;
-        private Panel _overlay;
+        private TextureButton _resumeButton;
+        private TextureButton _mainMenuButton;
 
+        /// <summary>
+        /// Элемент _Ready.
+        /// </summary>
         public override void _Ready()
         {
-            // Create semi-transparent overlay
-            _overlay = new Panel
-            {
-                Name = "Overlay"
-            };
-            _overlay.SetAnchorsPreset(LayoutPreset.FullRect);
+            SetAnchorsPreset(LayoutPreset.FullRect);
+            MouseFilter = MouseFilterEnum.Stop;
+
+            Panel overlay = new();
+            overlay.SetAnchorsPreset(LayoutPreset.FullRect);
             StyleBoxFlat styleBox = new()
             {
-                BgColor = new Color(0, 0, 0, 0.7f)
+                BgColor = new Color(0f, 0f, 0f, 0.7f)
             };
-            _overlay.AddThemeStyleboxOverride("panel", styleBox);
-            AddChild(_overlay);
+            overlay.AddThemeStyleboxOverride("panel", styleBox);
+            overlay.MouseFilter = MouseFilterEnum.Ignore;
+            AddChild(overlay);
 
-            // Create center container for menu
-            CenterContainer centerContainer = new()
-            {
-                Name = "CenterContainer"
-            };
+            CenterContainer centerContainer = new();
             centerContainer.SetAnchorsPreset(LayoutPreset.FullRect);
             AddChild(centerContainer);
 
-            // Create menu panel
             PanelContainer menuPanel = new();
             centerContainer.AddChild(menuPanel);
 
-            // Create VBoxContainer for buttons
             VBoxContainer vbox = new()
             {
-                CustomMinimumSize = new Vector2(300, 0)
+                CustomMinimumSize = new Vector2(400, 0)
             };
-            vbox.AddThemeConstantOverride("separation", 15);
+            vbox.AddThemeConstantOverride("separation", 20);
             menuPanel.AddChild(vbox);
 
-            // Title
+            MarginContainer margin = new();
+            margin.AddThemeConstantOverride("margin_left", 30);
+            margin.AddThemeConstantOverride("margin_right", 30);
+            margin.AddThemeConstantOverride("margin_top", 30);
+            margin.AddThemeConstantOverride("margin_bottom", 30);
+            vbox.AddChild(margin);
+
+            VBoxContainer innerVbox = new();
+            innerVbox.AddThemeConstantOverride("separation", 24);
+            margin.AddChild(innerVbox);
+
             Label titleLabel = new()
             {
                 Text = "PAUSED",
                 HorizontalAlignment = HorizontalAlignment.Center
             };
-            titleLabel.AddThemeFontSizeOverride("font_size", 32);
-            vbox.AddChild(titleLabel);
+            titleLabel.AddThemeFontSizeOverride("font_size", 40);
+            innerVbox.AddChild(titleLabel);
 
-            // Spacer
-            Control spacer1 = new() { CustomMinimumSize = new Vector2(0, 20) };
-            vbox.AddChild(spacer1);
+            HSeparator sep = new();
+            innerVbox.AddChild(sep);
 
-            // Resume button
-            _resumeButton = new Button
+            _resumeButton = new TextureButton
             {
-                Text = "Resume",
-                CustomMinimumSize = new Vector2(0, 50)
+                TextureNormal = GD.Load<Texture2D>("res://Resources/Sprites/UI/atlas_btn_resume.tres"),
+                IgnoreTextureSize = true,
+                StretchMode = TextureButton.StretchModeEnum.Scale,
+                CustomMinimumSize = new Vector2(369, 93)
             };
-            vbox.AddChild(_resumeButton);
+            innerVbox.AddChild(_resumeButton);
 
-            // Settings button
-            _settingsButton = new Button
+            _mainMenuButton = new TextureButton
             {
-                Text = "Settings",
-                CustomMinimumSize = new Vector2(0, 50)
+                TextureNormal = GD.Load<Texture2D>("res://Resources/Sprites/UI/atlas_btn_home.tres"),
+                IgnoreTextureSize = true,
+                StretchMode = TextureButton.StretchModeEnum.Scale,
+                CustomMinimumSize = new Vector2(273, 93)
             };
-            vbox.AddChild(_settingsButton);
+            innerVbox.AddChild(_mainMenuButton);
 
-            // Main Menu button
-            _mainMenuButton = new Button
-            {
-                Text = "Main Menu",
-                CustomMinimumSize = new Vector2(0, 50)
-            };
-            vbox.AddChild(_mainMenuButton);
-
-            // Connect signals
             _resumeButton.Pressed += OnResumePressed;
-            _settingsButton.Pressed += OnSettingsPressed;
             _mainMenuButton.Pressed += OnMainMenuPressed;
 
-            // Initially hidden
             Hide();
 
-            // Set process mode to always (works even when paused)
             ProcessMode = ProcessModeEnum.Always;
 
             GD.Print("[PauseMenu] Initialized");
         }
 
+        /// <summary>
+        /// Элемент _Input.
+        /// </summary>
         public override void _Input(InputEvent @event)
         {
-            // Toggle pause with ESC key
             if (@event.IsActionPressed("ui_cancel"))
             {
                 if (Visible)
-                {
                     Resume();
-                }
                 else
-                {
                     Pause();
-                }
+
                 GetViewport().SetInputAsHandled();
             }
         }
 
         /// <summary>
-        /// Shows pause menu and pauses game.
+        /// Элемент Pause.
         /// </summary>
         public void Pause()
         {
             Show();
             GetTree().Paused = true;
 
-            // Animate fade in
             Modulate = new Color(1, 1, 1, 0);
             Tween tween = CreateTween();
-            _ = tween.SetPauseMode(Tween.TweenPauseMode.Process);
-            _ = tween.TweenProperty(this, "modulate:a", 1.0f, 0.2f);
+            tween.SetPauseMode(Tween.TweenPauseMode.Process);
+            tween.TweenProperty(this, "modulate:a", 1.0f, 0.15f);
 
-            GD.Print("[PauseMenu] Game paused");
+            GD.Print("[PauseMenu] Paused");
         }
 
         /// <summary>
-        /// Hides pause menu and resumes game.
+        /// Элемент Resume.
         /// </summary>
         public void Resume()
         {
-            // Animate fade out
             Tween tween = CreateTween();
-            _ = tween.SetPauseMode(Tween.TweenPauseMode.Process);
-            _ = tween.TweenProperty(this, "modulate:a", 0.0f, 0.2f);
-            _ = tween.TweenCallback(Callable.From(() =>
+            tween.SetPauseMode(Tween.TweenPauseMode.Process);
+            tween.TweenProperty(this, "modulate:a", 0.0f, 0.15f);
+            tween.TweenCallback(Callable.From(() =>
             {
                 Hide();
                 GetTree().Paused = false;
-                GD.Print("[PauseMenu] Game resumed");
+                GD.Print("[PauseMenu] Resumed");
             }));
         }
 
-        /// <summary>
-        /// Called when Resume button is pressed.
-        /// </summary>
         private void OnResumePressed()
         {
-            AudioManager.Instance?.PlaySfx("res://Resources/Audio/SFX/button_click.wav");
+            AudioManager.Instance?.TryPlaySfx("res://Resources/Audio/SFX/button_click.wav");
             Resume();
         }
 
-        /// <summary>
-        /// Called when Settings button is pressed.
-        /// </summary>
-        private void OnSettingsPressed()
-        {
-            AudioManager.Instance?.PlaySfx("res://Resources/Audio/SFX/button_click.wav");
-            GD.Print("[PauseMenu] Settings button pressed (not implemented yet)");
-            // TODO: Show settings overlay
-        }
-
-        /// <summary>
-        /// Called when Main Menu button is pressed.
-        /// </summary>
         private void OnMainMenuPressed()
         {
-            AudioManager.Instance?.PlaySfx("res://Resources/Audio/SFX/button_click.wav");
-
-            // Unpause before scene transition
+            AudioManager.Instance?.TryPlaySfx("res://Resources/Audio/SFX/button_click.wav");
             GetTree().Paused = false;
-
-            // Return to main menu
             SceneManager.GoToMainMenu();
         }
     }

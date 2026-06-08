@@ -7,29 +7,50 @@ using System.Linq;
 namespace AlJourney.Scripts.Characters
 {
     /// <summary>
-    /// Base class for all battle characters (players and enemies).
+    /// Основной класс Character.
     /// </summary>
     public partial class Character : Node
     {
         [Signal]
+        /// <summary>
+        /// Элемент HealthChangedEventHandler.
+        /// </summary>
         public delegate void HealthChangedEventHandler(int currentHealth, int maxHealth);
 
         [Signal]
+        /// <summary>
+        /// Элемент DamageTakenEventHandler.
+        /// </summary>
         public delegate void DamageTakenEventHandler(int amount);
 
         [Signal]
+        /// <summary>
+        /// Элемент HealedEventHandler.
+        /// </summary>
         public delegate void HealedEventHandler(int amount);
 
         [Signal]
+        /// <summary>
+        /// Элемент ShieldChangedEventHandler.
+        /// </summary>
         public delegate void ShieldChangedEventHandler(int amount);
 
         [Signal]
+        /// <summary>
+        /// Элемент StatusEffectAppliedEventHandler.
+        /// </summary>
         public delegate void StatusEffectAppliedEventHandler(StatusEffect effect);
 
         [Signal]
+        /// <summary>
+        /// Элемент StatusEffectRemovedEventHandler.
+        /// </summary>
         public delegate void StatusEffectRemovedEventHandler(StatusEffect effect);
 
         [Signal]
+        /// <summary>
+        /// Элемент CharacterDiedEventHandler.
+        /// </summary>
         public delegate void CharacterDiedEventHandler();
 
         protected string _name;
@@ -43,57 +64,70 @@ namespace AlJourney.Scripts.Characters
         protected List<StatusEffectData> _activeEffects;
 
         /// <summary>
-        /// Character's display name.
+        /// Элемент CharacterName.
         /// </summary>
         public string CharacterName => _name;
 
         /// <summary>
-        /// Maximum health points.
+        /// Элемент MaxHealth.
         /// </summary>
         public int MaxHealth => _maxHealth;
 
         /// <summary>
-        /// Current health points.
+        /// Элемент CurrentHealth.
         /// </summary>
         public int CurrentHealth => _currentHealth;
 
         /// <summary>
-        /// Base damage value.
+        /// Элемент BaseDamage.
         /// </summary>
         public int BaseDamage => _baseDamage;
 
         /// <summary>
-        /// Base defense value.
+        /// Элемент BaseDefense.
         /// </summary>
         public int BaseDefense => _baseDefense;
 
         /// <summary>
-        /// Current shield/armor points.
+        /// Элемент TotalDefense.
+        /// </summary>
+        public virtual int TotalDefense => _baseDefense;
+
+        /// <summary>
+        /// Элемент TotalMaxHealth.
+        /// </summary>
+        public virtual int TotalMaxHealth => _maxHealth;
+
+        /// <summary>
+        /// Элемент CurrentShield.
         /// </summary>
         public int CurrentShield => _currentShield;
 
         /// <summary>
-        /// Type of attack (Physical or Magical).
+        /// Элемент AttackType.
         /// </summary>
         public AttackType AttackType => _attackType;
 
         /// <summary>
-        /// Is character still alive.
+        /// Проверяет, является ли Alive.
         /// </summary>
         public bool IsAlive => CurrentHealth > 0;
 
         /// <summary>
-        /// Is character stunned and cannot act.
+        /// Проверяет, является ли Stunned.
         /// </summary>
         public bool IsStunned => _activeEffects.Any(e => e.Type == StatusEffect.Stunned);
 
+        /// <summary>
+        /// Элемент _Ready.
+        /// </summary>
         public override void _Ready()
         {
             _activeEffects = [];
         }
 
         /// <summary>
-        /// Initializes character with base stats.
+        /// Инициализирует .
         /// </summary>
         public virtual void Initialize(string name, int maxHealth, int damage, int defense, AttackType attackType = AttackType.Physical)
         {
@@ -106,11 +140,11 @@ namespace AlJourney.Scripts.Characters
             _attackType = attackType;
             _activeEffects = [];
 
-            _ = EmitSignal(SignalName.HealthChanged, _currentHealth, _maxHealth);
+            _ = EmitSignal(SignalName.HealthChanged, _currentHealth, TotalMaxHealth);
         }
 
         /// <summary>
-        /// Takes damage with defense and shield calculation.
+        /// Элемент TakeDamage.
         /// </summary>
         public virtual int TakeDamage(int damage, AttackType attackType, bool canReflect = true)
         {
@@ -119,7 +153,6 @@ namespace AlJourney.Scripts.Characters
                 return 0;
             }
 
-            // Check immunity
             if (HasStatusEffect(StatusEffect.Immunity))
             {
                 GD.Print($"[{_name}] Immune to damage!");
@@ -128,19 +161,16 @@ namespace AlJourney.Scripts.Characters
 
             int finalDamage = damage;
 
-            // Apply defense reduction
-            int effectiveDefense = _baseDefense;
+            int effectiveDefense = TotalDefense;
             
-            // Apply Weakened debuff to defense
             if (HasStatusEffect(StatusEffect.Weakened))
             {
-                effectiveDefense = Mathf.CeilToInt(effectiveDefense * 0.7f); // 30% reduction
+                effectiveDefense = Mathf.CeilToInt(effectiveDefense * 0.7f); 
                 GD.Print($"[{_name}] Defense reduced by Weakened status: {effectiveDefense}");
             }
             
             finalDamage = Mathf.Max(1, finalDamage - effectiveDefense);
 
-            // Apply shield
             if (_currentShield > 0)
             {
                 int shieldAbsorbed = Mathf.Min(_currentShield, finalDamage);
@@ -151,14 +181,13 @@ namespace AlJourney.Scripts.Characters
                 GD.Print($"[{_name}] Shield absorbed {shieldAbsorbed} damage. Remaining shield: {_currentShield}");
             }
 
-            // Apply remaining damage to health
             if (finalDamage > 0)
             {
                 _currentHealth = Mathf.Max(0, _currentHealth - finalDamage);
                 _ = EmitSignal(SignalName.DamageTaken, finalDamage);
-                _ = EmitSignal(SignalName.HealthChanged, _currentHealth, _maxHealth);
+                _ = EmitSignal(SignalName.HealthChanged, _currentHealth, TotalMaxHealth);
 
-                GD.Print($"[{_name}] Took {finalDamage} damage. HP: {_currentHealth}/{_maxHealth}");
+                GD.Print($"[{_name}] Took {finalDamage} damage. HP: {_currentHealth}/{TotalMaxHealth}");
 
                 if (!IsAlive)
                 {
@@ -166,7 +195,6 @@ namespace AlJourney.Scripts.Characters
                 }
             }
 
-            // Check for reflect damage ONLY if reflection is allowed
             if (canReflect)
             {
                 StatusEffectData reflectEffect = _activeEffects.FirstOrDefault(e => e.Type == StatusEffect.ShieldReflect);
@@ -182,7 +210,7 @@ namespace AlJourney.Scripts.Characters
         }
 
         /// <summary>
-        /// Heals the character.
+        /// Элемент Heal.
         /// </summary>
         public virtual void Heal(int amount)
         {
@@ -191,19 +219,19 @@ namespace AlJourney.Scripts.Characters
                 return;
             }
 
-            int actualHeal = Mathf.Min(amount, _maxHealth - _currentHealth);
+            int actualHeal = Mathf.Min(amount, TotalMaxHealth - _currentHealth);
             if (actualHeal > 0)
             {
                 _currentHealth += actualHeal;
                 _ = EmitSignal(SignalName.Healed, actualHeal);
-                _ = EmitSignal(SignalName.HealthChanged, _currentHealth, _maxHealth);
+                _ = EmitSignal(SignalName.HealthChanged, _currentHealth, TotalMaxHealth);
 
-                GD.Print($"[{_name}] Healed {actualHeal} HP. HP: {_currentHealth}/{_maxHealth}");
+                GD.Print($"[{_name}] Healed {actualHeal} HP. HP: {_currentHealth}/{TotalMaxHealth}");
             }
         }
 
         /// <summary>
-        /// Adds shield/armor points.
+        /// Добавляет Shield.
         /// </summary>
         public virtual void AddShield(int amount)
         {
@@ -219,7 +247,7 @@ namespace AlJourney.Scripts.Characters
         }
 
         /// <summary>
-        /// Applies a status effect to the character.
+        /// Применяет StatusEffect.
         /// </summary>
         public virtual void ApplyStatusEffect(StatusEffectData effect)
         {
@@ -228,21 +256,17 @@ namespace AlJourney.Scripts.Characters
                 return;
             }
 
-            // Check immunity
             if (HasStatusEffect(StatusEffect.Immunity))
             {
                 GD.Print($"[{_name}] Immune to status effect: {effect.Type}");
                 return;
             }
 
-            // Check if effect already exists
             StatusEffectData existingEffect = _activeEffects.FirstOrDefault(e => e.Type == effect.Type);
             if (existingEffect != null)
             {
-                // Refresh duration if new effect is longer
                 if (effect.Duration > existingEffect.Duration)
                 {
-                    // Replace with new effect (record is immutable)
                     _ = _activeEffects.Remove(existingEffect);
                     _activeEffects.Add(effect);
                 }
@@ -256,7 +280,7 @@ namespace AlJourney.Scripts.Characters
         }
 
         /// <summary>
-        /// Removes all negative status effects (for 4-match heal).
+        /// Элемент ClearNegativeEffects.
         /// </summary>
         public virtual void ClearNegativeEffects()
         {
@@ -272,7 +296,7 @@ namespace AlJourney.Scripts.Characters
         }
 
         /// <summary>
-        /// Processes status effects at start of turn (DoT effects).
+        /// Обрабатывает StatusEffects.
         /// </summary>
         public virtual void ProcessStatusEffects()
         {
@@ -289,21 +313,18 @@ namespace AlJourney.Scripts.Characters
                 {
                     case StatusEffect.Burning:
                     case StatusEffect.Bleeding:
-                        // Apply damage over time
                         int dotDamage = effect.Power;
                         _currentHealth = Mathf.Max(0, _currentHealth - dotDamage);
                         _ = EmitSignal(SignalName.DamageTaken, dotDamage);
-                        _ = EmitSignal(SignalName.HealthChanged, _currentHealth, _maxHealth);
-                        GD.Print($"[{_name}] {effect.Type} dealt {dotDamage} damage. HP: {_currentHealth}/{_maxHealth}");
+                        _ = EmitSignal(SignalName.HealthChanged, _currentHealth, TotalMaxHealth);
+                        GD.Print($"[{_name}] {effect.Type} dealt {dotDamage} damage. HP: {_currentHealth}/{TotalMaxHealth}");
                         break;
 
                     case StatusEffect.Regeneration:
-                        // Apply healing over time
                         Heal(effect.Power);
                         break;
                 }
 
-                // Tick duration
                 StatusEffectData updatedEffect = effect.TickDuration();
                 if (updatedEffect.ShouldRemove)
                 {
@@ -311,13 +332,11 @@ namespace AlJourney.Scripts.Characters
                 }
                 else
                 {
-                    // Replace with updated effect
                     int index = _activeEffects.IndexOf(effect);
                     _activeEffects[index] = updatedEffect;
                 }
             }
 
-            // Remove expired effects
             foreach (StatusEffectData effect in effectsToRemove)
             {
                 _ = _activeEffects.Remove(effect);
@@ -332,7 +351,7 @@ namespace AlJourney.Scripts.Characters
         }
 
         /// <summary>
-        /// Checks if character has a specific status effect.
+        /// Проверяет наличие StatusEffect.
         /// </summary>
         public bool HasStatusEffect(StatusEffect effectType)
         {
@@ -340,16 +359,13 @@ namespace AlJourney.Scripts.Characters
         }
 
         /// <summary>
-        /// Gets all active status effects.
+        /// Возвращает ActiveEffects.
         /// </summary>
         public List<StatusEffectData> GetActiveEffects()
         {
             return [.. _activeEffects];
         }
 
-        /// <summary>
-        /// Called when character dies.
-        /// </summary>
         protected virtual void OnDeath()
         {
             _ = EmitSignal(SignalName.CharacterDied);
@@ -357,17 +373,17 @@ namespace AlJourney.Scripts.Characters
         }
 
         /// <summary>
-        /// Increases max health permanently.
+        /// Элемент IncreaseMaxHealth.
         /// </summary>
         public void IncreaseMaxHealth(int amount)
         {
             _maxHealth += amount;
-            _currentHealth += amount; // Also heal by the same amount
-            _ = EmitSignal(SignalName.HealthChanged, _currentHealth, _maxHealth);
+            _currentHealth += amount; 
+            _ = EmitSignal(SignalName.HealthChanged, _currentHealth, TotalMaxHealth);
         }
 
         /// <summary>
-        /// Increases base damage permanently.
+        /// Элемент IncreaseDamage.
         /// </summary>
         public void IncreaseDamage(int amount)
         {
@@ -375,7 +391,7 @@ namespace AlJourney.Scripts.Characters
         }
 
         /// <summary>
-        /// Increases base defense permanently.
+        /// Элемент IncreaseDefense.
         /// </summary>
         public void IncreaseDefense(int amount)
         {

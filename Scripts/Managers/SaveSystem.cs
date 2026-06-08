@@ -1,6 +1,7 @@
 using AlJourney.Scripts.Core;
 using AlJourney.Scripts.Data;
 using Godot;
+using AlJourney.Scripts.Interfaces;
 using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -8,24 +9,32 @@ using System.Text.Json.Serialization;
 namespace AlJourney.Scripts.Managers
 {
     /// <summary>
-    /// Handles saving and loading game data to/from JSON files.
-    /// Singleton autoload node.
+    /// Менеджер SaveSystem. Отвечает за управление соответствующей подсистемой.
     /// </summary>
-    public partial class SaveSystem : Node
+    public partial class SaveSystem : Node, ISaveSystem
     {
         /// <summary>
-        /// Singleton instance accessor.
+        /// Элемент Instance.
         /// </summary>
         public static SaveSystem Instance { get; private set; } = null!;
 
         [Signal]
+        /// <summary>
+        /// Сохраняет CompletedEventHandler.
+        /// </summary>
         public delegate void SaveCompletedEventHandler(bool success);
 
         [Signal]
+        /// <summary>
+        /// Загружает CompletedEventHandler.
+        /// </summary>
         public delegate void LoadCompletedEventHandler(bool success);
 
         private string _savePath;
 
+        /// <summary>
+        /// Элемент _Ready.
+        /// </summary>
         public override void _Ready()
         {
             if (Instance is not null)
@@ -37,7 +46,6 @@ namespace AlJourney.Scripts.Managers
             Instance = this;
             _savePath = GameConstants.SAVE_DIRECTORY + GameConstants.SAVE_FILE_NAME;
 
-            // Ensure save directory exists
             if (DirAccess.MakeDirRecursiveAbsolute(GameConstants.SAVE_DIRECTORY) is Error.Ok)
             {
                 GD.Print($"[SaveSystem] Initialized. Save path: {_savePath}");
@@ -57,7 +65,7 @@ namespace AlJourney.Scripts.Managers
         };
 
         /// <summary>
-        /// Saves current game state to JSON file.
+        /// Сохраняет Game.
         /// </summary>
         public bool SaveGame()
         {
@@ -71,13 +79,12 @@ namespace AlJourney.Scripts.Managers
                     return false;
                 }
 
-                // Update timestamp
+                InventoryManager.Instance?.SaveToData(saveData);
+
                 saveData.LastSaveTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
-                // Serialize to JSON
                 string jsonData = JsonSerializer.Serialize(saveData, JsonOptions);
 
-                // Write to file
                 using FileAccess file = FileAccess.Open(_savePath, FileAccess.ModeFlags.Write);
                 if (file == null)
                 {
@@ -102,7 +109,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Loads game state from JSON file.
+        /// Загружает Game.
         /// </summary>
         public SaveData LoadGame()
         {
@@ -115,7 +122,6 @@ namespace AlJourney.Scripts.Managers
                     return null;
                 }
 
-                // Read file
                 using FileAccess file = FileAccess.Open(_savePath, FileAccess.ModeFlags.Read);
                 if (file == null)
                 {
@@ -127,7 +133,6 @@ namespace AlJourney.Scripts.Managers
                 string jsonData = file.GetAsText();
                 file.Close();
 
-                // Validate JSON structure before deserialization
                 if (string.IsNullOrWhiteSpace(jsonData))
                 {
                     GD.PrintErr("[SaveSystem] Save file is empty");
@@ -135,7 +140,6 @@ namespace AlJourney.Scripts.Managers
                     return null;
                 }
 
-                // Attempt deserialization
                 SaveData saveData = null;
                 try
                 {
@@ -156,7 +160,6 @@ namespace AlJourney.Scripts.Managers
                     return null;
                 }
 
-                // Check schema version and migrate if needed
                 if (saveData.SchemaVersion != 1)
                 {
                     GD.Print($"[SaveSystem] Outdated save schema (v{saveData.SchemaVersion}), attempting migration");
@@ -170,7 +173,6 @@ namespace AlJourney.Scripts.Managers
                     }
                 }
 
-                // Validate save data integrity
                 if (!ValidateSaveData(saveData))
                 {
                     GD.PrintErr("[SaveSystem] Save data validation failed - corrupted save");
@@ -192,7 +194,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Checks if a save file exists.
+        /// Сохраняет FileExists.
         /// </summary>
         public bool SaveFileExists()
         {
@@ -200,7 +202,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Deletes the current save file.
+        /// Удаляет Save.
         /// </summary>
         public bool DeleteSave()
         {
@@ -223,9 +225,6 @@ namespace AlJourney.Scripts.Managers
             }
         }
 
-        /// <summary>
-        /// Validates save data integrity.
-        /// </summary>
         private static bool ValidateSaveData(SaveData data)
         {
             if (data == null)
@@ -234,14 +233,12 @@ namespace AlJourney.Scripts.Managers
                 return false;
             }
 
-            // Validate wave number
             if (data.CurrentWave < 1)
             {
                 GD.PrintErr($"[SaveSystem] Validation failed: Invalid wave number ({data.CurrentWave})");
                 return false;
             }
 
-            // Validate mage stats
             if (data.MageMaxHealth <= 0 || data.MageHealth < 0 || data.MageHealth > data.MageMaxHealth)
             {
                 GD.PrintErr($"[SaveSystem] Validation failed: Invalid Mage health ({data.MageHealth}/{data.MageMaxHealth})");
@@ -254,7 +251,6 @@ namespace AlJourney.Scripts.Managers
                 return false;
             }
 
-            // Validate warrior stats
             if (data.WarriorMaxHealth <= 0 || data.WarriorHealth < 0 || data.WarriorHealth > data.WarriorMaxHealth)
             {
                 GD.PrintErr($"[SaveSystem] Validation failed: Invalid Warrior health ({data.WarriorHealth}/{data.WarriorMaxHealth})");
@@ -267,14 +263,12 @@ namespace AlJourney.Scripts.Managers
                 return false;
             }
 
-            // Validate coins
             if (data.Coins < 0)
             {
                 GD.PrintErr($"[SaveSystem] Validation failed: Invalid coins ({data.Coins})");
                 return false;
             }
 
-            // Validate highest wave
             if (data.HighestWave < 1 || data.HighestWave < data.CurrentWave)
             {
                 GD.PrintErr($"[SaveSystem] Validation failed: Invalid highest wave ({data.HighestWave})");
@@ -286,7 +280,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Auto-saves the game (called after wave completion).
+        /// Элемент AutoSave.
         /// </summary>
         public void AutoSave()
         {

@@ -1,7 +1,10 @@
 namespace AlJourney.Scripts.Core
 {
     /// <summary>
-    /// Represents the current state of the game flow.
+    /// Состояния игры.
+    /// </summary>
+    /// <summary>
+    /// Основной класс GameState.
     /// </summary>
     public enum GameState
     {
@@ -13,49 +16,59 @@ namespace AlJourney.Scripts.Core
     }
 
     /// <summary>
-    /// Types of match-3 grid elements.
+    /// Типы элементов на игровом поле.
+    /// </summary>
+    /// <summary>
+    /// Основной класс ElementType.
     /// </summary>
     public enum ElementType
     {
         None,
-        Fire,      // Fireball - damage
-        Heal,      // Healing sphere
-        Sword,     // Axe for warrior, sword mechanic
-        Shield     // Shield - defense
+        Fire,      
+        Heal,      
+        Sword,     
+        Shield     
     }
 
     /// <summary>
-    /// Player character classes.
+    /// Классы игровых персонажей.
+    /// </summary>
+    /// <summary>
+    /// Основной класс CharacterClass.
     /// </summary>
     public enum CharacterClass
     {
-        Mage,      // Eltarion - AoE + Support
-        Warrior    // Eldric - Single target + Defense
+        Mage,      
+        Warrior    
     }
 
     /// <summary>
-    /// Enemy types in the necromancer's undead army.
+    /// Типы врагов.
+    /// </summary>
+    /// <summary>
+    /// Основной класс EnemyType.
     /// </summary>
     public enum EnemyType
     {
-        // Basic enemies
         SkeletonWarrior,
         SkeletonArcher,
         Zombie,
+        Slime,             
         DraugrWarrior,
         DraugrDefender,
         DraugrCaster,
 
-        // Minibosses
         GeneralOfDraugr,
         Arhiskeleton,
 
-        // Boss
         Necromancer
     }
 
     /// <summary>
-    /// Attack type for damage calculation.
+    /// Типы атак.
+    /// </summary>
+    /// <summary>
+    /// Основной класс AttackType.
     /// </summary>
     public enum AttackType
     {
@@ -64,74 +77,92 @@ namespace AlJourney.Scripts.Core
     }
 
     /// <summary>
-    /// Status effects that can be applied to characters.
+    /// Статусные эффекты.
+    /// </summary>
+    /// <summary>
+    /// Основной класс StatusEffect.
     /// </summary>
     public enum StatusEffect
     {
         None,
-        Burning,           // Fire DoT
-        Bleeding,          // Physical DoT
-        Regeneration,      // Healing over time
-        ShieldReflect,     // Reflects damage
-        Immunity,          // Immune to effects
-        Stunned,           // Cannot act
-        Weakened           // Reduced damage/defense
+        Burning,           
+        Bleeding,          
+        Regeneration,      
+        ShieldReflect,     
+        Immunity,          
+        Stunned,           
+        Weakened           
     }
 
     /// <summary>
-    /// Current phase of battle turn.
+    /// Фазы хода в битве.
+    /// </summary>
+    /// <summary>
+    /// Основной класс BattlePhase.
     /// </summary>
     public enum BattlePhase
     {
-        PlayerSwap,        // Player making match-3 moves
-        PlayerCombo,       // Combo effects being applied
-        EnemyTurn,         // Enemies attacking
-        WaveTransition     // Moving to next wave
+        PlayerSwap,        
+        PlayerCombo,       
+        EnemyTurn,         
+        WaveTransition     
     }
 
     /// <summary>
-    /// Equipment slots for character customization.
+    /// Слоты для экипировки.
+    /// </summary>
+    /// <summary>
+    /// UI-компонент EquipmentSlot. Отвечает за отображение пользовательского интерфейса.
     /// </summary>
     public enum EquipmentSlot
     {
-        Weapon,            // Main weapon
-        Head,              // Helmet/hat
-        Body,              // Armor/clothing
-        Legs,              // Pants/boots
-        Necklace,          // Neck accessory
-        Ring,              // Finger accessory
-        Earring            // Ear accessory
+        Weapon,            
+        Head,              
+        Body,              
+        Legs,              
+        Necklace,          
+        Ring,              
+        Earring            
     }
 
     /// <summary>
-    /// Rarity levels for equipment drops.
+    /// Уровни редкости экипировки.
+    /// </summary>
+    /// <summary>
+    /// UI-компонент EquipmentRarity. Отвечает за отображение пользовательского интерфейса.
     /// </summary>
     public enum EquipmentRarity
     {
-        Common,            // Gray - 40% drop chance, max level 5
-        Uncommon,          // Green - 30% drop chance, max level 10
-        Rare,              // Blue - 15% drop chance, max level 15
-        Epic,              // Purple - 10% drop chance, max level 20
-        Legendary           // Gold/Orange - 5% drop chance, max level 25
+        Common,            
+        Uncommon,          
+        Rare,              
+        Epic,              
+        Legendary           
     }
 
     /// <summary>
-    /// Types of abilities for character customization.
+    /// Типы способностей персонажей.
+    /// </summary>
+    /// <summary>
+    /// Основной класс AbilityType.
     /// </summary>
     public enum AbilityType
     {
-        Attack,            // Damage-dealing abilities
-        Support            // Healing, defense, utility abilities
+        Attack,            
+        Support            
     }
 
     /// <summary>
-    /// Elemental affinity for abilities.
+    /// Элементы, связанные со способностями.
+    /// </summary>
+    /// <summary>
+    /// Основной класс AbilityElement.
     /// </summary>
     public enum AbilityElement
     {
-        Fire,              // Fire-based abilities
-        Heal,              // Healing-based abilities
-        Sword,             // Physical attack abilities
-        Shield             // Defense-based abilities
+        Fire,              
+        Heal,              
+        Sword,             
+        Shield             
     }
 }

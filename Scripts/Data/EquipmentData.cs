@@ -6,7 +6,7 @@ using System.Linq;
 namespace AlJourney.Scripts.Data
 {
     /// <summary>
-    /// Represents an equipment item with stats and abilities.
+    /// Экипирует mentData.
     /// </summary>
     public record EquipmentData(
         string Id,
@@ -20,7 +20,7 @@ namespace AlJourney.Scripts.Data
     )
     {
         /// <summary>
-        /// Gets the color associated with this rarity.
+        /// Возвращает RarityColor.
         /// </summary>
         public Color GetRarityColor()
         {
@@ -36,7 +36,7 @@ namespace AlJourney.Scripts.Data
         }
 
         /// <summary>
-        /// Gets the drop chance percentage for this rarity.
+        /// Возвращает DropChance.
         /// </summary>
         public float GetDropChance()
         {
@@ -52,9 +52,8 @@ namespace AlJourney.Scripts.Data
         }
 
         /// <summary>
-        /// Gets the upgrade cost for the next level, scaled by wave number.
+        /// Возвращает UpgradeCost.
         /// </summary>
-        /// <param name="waveNumber">Current wave number for scaling</param>
         public int GetUpgradeCost(int waveNumber = 0)
         {
             if (CurrentLevel >= MaxLevel)
@@ -74,7 +73,6 @@ namespace AlJourney.Scripts.Data
 
             int levelCost = baseCost * CurrentLevel;
             
-            // Apply wave scaling if wave number is provided
             if (waveNumber > 0)
             {
                 return ScalingSystem.ScaleCost(levelCost, waveNumber);
@@ -84,7 +82,7 @@ namespace AlJourney.Scripts.Data
         }
 
         /// <summary>
-        /// Upgrades the equipment to the next level.
+        /// Элемент Upgrade.
         /// </summary>
         public EquipmentData Upgrade()
         {
@@ -96,25 +94,28 @@ namespace AlJourney.Scripts.Data
             Dictionary<string, int> newStats = new(BaseStats);
             foreach (string stat in newStats.Keys.ToList())
             {
-                newStats[stat]++; // Each level adds +1 to each stat
+                newStats[stat]++; 
             }
 
             return this with { CurrentLevel = CurrentLevel + 1, BaseStats = newStats };
         }
 
         /// <summary>
-        /// Gets the total stats including level bonuses.
+        /// Возвращает TotalStats.
         /// </summary>
         public Dictionary<string, int> GetTotalStats()
         {
             Dictionary<string, int> totalStats = new(BaseStats);
             foreach (string stat in totalStats.Keys.ToList())
             {
-                totalStats[stat] += CurrentLevel - 1; // Add level bonuses
+                totalStats[stat] += CurrentLevel - 1; 
             }
             return totalStats;
         }
 
+        /// <summary>
+        /// Элемент ToString.
+        /// </summary>
         public override string ToString()
         {
             return $"{Name} ({Rarity}) - Level {CurrentLevel}/{MaxLevel}";

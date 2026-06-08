@@ -1,39 +1,46 @@
 using AlJourney.Scripts.Core;
 using AlJourney.Scripts.Data;
 using Godot;
+using AlJourney.Scripts.Interfaces;
 
 namespace AlJourney.Scripts.Managers
 {
     /// <summary>
-    /// Central manager for game state, progression, and runtime data.
-    /// Singleton autoload node.
+    /// Менеджер GameStateManager. Отвечает за управление соответствующей подсистемой.
     /// </summary>
-    public partial class GameStateManager : Node
+    public partial class GameStateManager : Node, IGameStateManager
     {
         /// <summary>
-        /// Singleton instance accessor.
+        /// Элемент Instance.
         /// </summary>
         public static GameStateManager Instance { get; private set; } = null!;
 
-        // Signals
         [Signal]
+        /// <summary>
+        /// Элемент StateChangedEventHandler.
+        /// </summary>
         public delegate void StateChangedEventHandler(GameState newState);
 
         [Signal]
+        /// <summary>
+        /// Элемент WaveChangedEventHandler.
+        /// </summary>
         public delegate void WaveChangedEventHandler(int waveNumber);
 
         [Signal]
+        /// <summary>
+        /// Элемент CoinsChangedEventHandler.
+        /// </summary>
         public delegate void CoinsChangedEventHandler(int newAmount);
 
         [Signal]
+        /// <summary>
+        /// Элемент HeroStatsChangedEventHandler.
+        /// </summary>
         public delegate void HeroStatsChangedEventHandler();
 
-        // Current game state
         private GameState _currentState;
 
-        /// <summary>
-        /// Current game flow state.
-        /// </summary>
         public GameState CurrentState
         {
             get => _currentState;
@@ -47,26 +54,23 @@ namespace AlJourney.Scripts.Managers
             }
         }
 
-        /// <summary>
-        /// Active save data reference.
-        /// </summary>
         public SaveData CurrentSave { get; private set; }
 
         /// <summary>
-        /// Current wave number.
+        /// Элемент CurrentWave.
         /// </summary>
         public int CurrentWave => CurrentSave?.CurrentWave ?? 1;
 
         /// <summary>
-        /// Player's total coins.
+        /// Элемент Coins.
         /// </summary>
         public int Coins => CurrentSave?.Coins ?? 0;
 
-        /// <summary>
-        /// Is a game session currently active.
-        /// </summary>
         public bool IsGameActive { get; private set; }
 
+        /// <summary>
+        /// Элемент _Ready.
+        /// </summary>
         public override void _Ready()
         {
             if (Instance is not null)
@@ -83,7 +87,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Starts a new game with both heroes.
+        /// Запускает NewGame.
         /// </summary>
         public void StartNewGame()
         {
@@ -95,11 +99,13 @@ namespace AlJourney.Scripts.Managers
             _ = EmitSignal(SignalName.CoinsChanged, CurrentSave.Coins);
             _ = EmitSignal(SignalName.HeroStatsChanged);
 
+            InventoryManager.Instance?.LoadFromData(CurrentSave);
+
             GD.Print("[GameStateManager] New game started with dual heroes - Wave 1");
         }
 
         /// <summary>
-        /// Loads existing save data.
+        /// Загружает Game.
         /// </summary>
         public void LoadGame(SaveData saveData)
         {
@@ -111,11 +117,13 @@ namespace AlJourney.Scripts.Managers
             _ = EmitSignal(SignalName.CoinsChanged, CurrentSave.Coins);
             _ = EmitSignal(SignalName.HeroStatsChanged);
 
+            InventoryManager.Instance?.LoadFromData(CurrentSave);
+
             GD.Print($"[GameStateManager] Game loaded - Wave {CurrentSave.CurrentWave}");
         }
 
         /// <summary>
-        /// Advances to the next wave.
+        /// Элемент NextWave.
         /// </summary>
         public void NextWave()
         {
@@ -126,7 +134,6 @@ namespace AlJourney.Scripts.Managers
 
             CurrentSave.CurrentWave++;
 
-            // Update highest wave if current wave is higher
             if (CurrentSave.CurrentWave > CurrentSave.HighestWave)
             {
                 CurrentSave.HighestWave = CurrentSave.CurrentWave;
@@ -139,7 +146,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Adds coins to player's total.
+        /// Добавляет Coins.
         /// </summary>
         public void AddCoins(int amount)
         {
@@ -155,7 +162,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Removes coins from player's total. Returns true if successful.
+        /// Элемент SpendCoins.
         /// </summary>
         public bool SpendCoins(int amount)
         {
@@ -172,7 +179,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Updates hero stats in save data.
+        /// Обновляет HeroStats.
         /// </summary>
         public void UpdateHeroStats(
             int mageHealth, int mageMaxHealth, int mageDamage, int mageDefense,
@@ -197,7 +204,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Transitions to a new game state.
+        /// Элемент ChangeState.
         /// </summary>
         public void ChangeState(GameState newState)
         {
@@ -206,7 +213,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Ends current game session (permadeath or victory).
+        /// Элемент EndGame.
         /// </summary>
         public void EndGame(bool isVictory)
         {
@@ -217,7 +224,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Returns to main menu and clears active session.
+        /// Элемент ReturnToMainMenu.
         /// </summary>
         public void ReturnToMainMenu()
         {

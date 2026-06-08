@@ -1,21 +1,28 @@
 using AlJourney.Scripts.Core;
 using AlJourney.Scripts.Data;
 using Godot;
+using AlJourney.Scripts.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace AlJourney.Scripts.Managers
 {
     /// <summary>
-    /// Simple working ability system without signal issues.
+    /// Менеджер AbilitySystem. Отвечает за управление соответствующей подсистемой.
     /// </summary>
-    public partial class AbilitySystem : Node
+    public partial class AbilitySystem : Node, IAbilitySystem
     {
+        /// <summary>
+        /// Элемент Instance.
+        /// </summary>
         public static AbilitySystem Instance { get; private set; } = null!;
 
-        private readonly Dictionary<string, AbilityData> _abilityTemplates = [];
+        private readonly Dictionary<string, AbilityData> _abilityTemplates = AbilityDatabase.Templates;
         private readonly Dictionary<CharacterClass, List<AbilityData>> _equippedAbilities = [];
 
+        /// <summary>
+        /// Элемент _Ready.
+        /// </summary>
         public override void _Ready()
         {
             if (Instance is not null)
@@ -24,91 +31,28 @@ namespace AlJourney.Scripts.Managers
                 return;
             }
             Instance = this;
-            InitializeAbilityTemplates();
             GD.Print("[AbilitySystem] Initialized");
         }
 
-        private void InitializeAbilityTemplates()
-        {
-            // Fire Attack Abilities
-            _abilityTemplates["fire_storm"] = new AbilityData(
-                "fire_storm", "Огненный шторм", AbilityType.Attack, AbilityElement.Fire,
-                "res://Assets/Sprites/Abilities/fire_storm.png",
-                "Массовая атака огненными шарами по всем врагам",
-                100,
-                new Dictionary<string, int> { ["damage"] = 25, ["aoe_radius"] = 3 }
-            );
-
-            _abilityTemplates["meteor_rain"] = new AbilityData(
-                "meteor_rain", "Метеоритный дождь", AbilityType.Attack, AbilityElement.Fire,
-                "res://Assets/Sprites/Abilities/meteor_rain.png",
-                "Призыв метеоритов, которые наносят урон по области",
-                150,
-                new Dictionary<string, int> { ["damage"] = 40, ["impact_radius"] = 2 }
-            );
-
-            // Sword Attack Abilities
-            _abilityTemplates["whirlwind"] = new AbilityData(
-                "whirlwind", "Вихрь клинков", AbilityType.Attack, AbilityElement.Sword,
-                "res://Assets/Sprites/Abilities/whirlwind.png",
-                "Атака множественными клинками вокруг героя",
-                80,
-                new Dictionary<string, int> { ["damage"] = 15, ["hits"] = 5 }
-            );
-
-            _abilityTemplates["champion_strike"] = new AbilityData(
-                "champion_strike", "Удар чемпиона", AbilityType.Attack, AbilityElement.Sword,
-                "res://Assets/Sprites/Abilities/champion_strike.png",
-                "Мощный одиночный удар с высоким крит.шансом",
-                120,
-                new Dictionary<string, int> { ["damage"] = 35, ["crit_chance"] = 50 }
-            );
-
-            // Heal Support Abilities
-            _abilityTemplates["healing_wave"] = new AbilityData(
-                "healing_wave", "Волна жизни", AbilityType.Support, AbilityElement.Heal,
-                "res://Assets/Sprites/Abilities/healing_wave.png",
-                "Массовое лечение обоих героев",
-                60,
-                new Dictionary<string, int> { ["heal"] = 30, ["aoe_radius"] = 5 }
-            );
-
-            _abilityTemplates["regeneration_aura"] = new AbilityData(
-                "regeneration_aura", "Аура регенерации", AbilityType.Support, AbilityElement.Heal,
-                "res://Assets/Sprites/Abilities/regeneration_aura.png",
-                "Включает регенерацию здоровья для обоих героев",
-                80,
-                new Dictionary<string, int> { ["hp_regen"] = 5, ["duration"] = 10 }
-            );
-
-            // Shield Support Abilities
-            _abilityTemplates["bone_wall"] = new AbilityData(
-                "bone_wall", "Стена костей", AbilityType.Support, AbilityElement.Shield,
-                "res://Assets/Sprites/Abilities/bone_wall.png",
-                "Создает защитную стену, блокирующую урон",
-                100,
-                new Dictionary<string, int> { ["defense"] = 20, ["duration"] = 5 }
-            );
-
-            _abilityTemplates["guardian_summon"] = new AbilityData(
-                "guardian_summon", "Призыв стража", AbilityType.Support, AbilityElement.Shield,
-                "res://Assets/Sprites/Abilities/guardian_summon.png",
-                "Призывает временного стража для защиты",
-                150,
-                new Dictionary<string, int> { ["guardian_hp"] = 50, ["duration"] = 8 }
-            );
-        }
-
+        /// <summary>
+        /// Возвращает AvailableAbilities.
+        /// </summary>
         public List<AbilityData> GetAvailableAbilities(CharacterClass heroClass)
         {
             return [.. _abilityTemplates.Values.Where(ability => IsAbilityForHero(ability, heroClass))];
         }
 
+        /// <summary>
+        /// Возвращает EquippedAbilities.
+        /// </summary>
         public List<AbilityData> GetEquippedAbilities(CharacterClass heroClass)
         {
             return _equippedAbilities.TryGetValue(heroClass, out List<AbilityData> abilities) ? abilities : [];
         }
 
+        /// <summary>
+        /// Элемент UnlockAbility.
+        /// </summary>
         public bool UnlockAbility(CharacterClass hero, AbilityData ability)
         {
             if (GameStateManager.Instance.Coins < ability.UnlockCost)
@@ -129,6 +73,9 @@ namespace AlJourney.Scripts.Managers
             return true;
         }
 
+        /// <summary>
+        /// Экипирует Ability.
+        /// </summary>
         public bool EquipAbility(CharacterClass hero, AbilityData ability)
         {
             if (!_equippedAbilities.TryGetValue(hero, out List<AbilityData> value))
@@ -147,11 +94,17 @@ namespace AlJourney.Scripts.Managers
             return true;
         }
 
+        /// <summary>
+        /// Возвращает AbilityEffect.
+        /// </summary>
         public int GetAbilityEffect(CharacterClass hero, string effectName)
         {
             return !_equippedAbilities.TryGetValue(hero, out List<AbilityData> abilities) ? 0 : abilities.Sum(ability => ability.GetEffect(effectName));
         }
 
+        /// <summary>
+        /// Возвращает TotalAbilityStats.
+        /// </summary>
         public Dictionary<string, int> GetTotalAbilityStats(CharacterClass hero)
         {
             Dictionary<string, int> totalStats = [];

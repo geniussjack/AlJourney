@@ -7,70 +7,68 @@ using System.Collections.Generic;
 namespace AlJourney.Scripts.UI
 {
     /// <summary>
-    /// Visual controller for the match-3 grid.
-    /// Handles rendering, animations, and user input.
+    /// UI-компонент GridUI. Отвечает за отображение пользовательского интерфейса.
     /// </summary>
     public partial class GridUI : Control
     {
         [Signal]
+        /// <summary>
+        /// Элемент SwapAttemptedEventHandler.
+        /// </summary>
         public delegate void SwapAttemptedEventHandler(int x1, int y1, int x2, int y2);
 
-        private const int CELL_SIZE = 80;
-        private const int CELL_SPACING = 10;
+        private const int CELL_SIZE = 128;
+        private const int CELL_SPACING = 0;
+        private const int GRID_TOP_OFFSET = 40;
 
         private GridContainer _gridContainer;
         private ElementSprite[,] _visualGrid;
         private ElementSprite _selectedElement;
 
-        // Element textures
         private Dictionary<ElementType, Texture2D> _elementTextures;
 
         private GridManager _gridManager;
         private ComboSystem _comboSystem;
         private int _gridSize;
 
+        /// <summary>
+        /// Элемент _Ready.
+        /// </summary>
         public override void _Ready()
         {
             _gridManager = GetNode<GridManager>("/root/GridManager");
             _comboSystem = GetNode<ComboSystem>("/root/ComboSystem");
             _gridSize = GameConstants.GRID_SIZE;
 
-            // Create grid container
             _gridContainer = new GridContainer
             {
                 Columns = _gridSize
             };
             _gridContainer.AddThemeConstantOverride("h_separation", CELL_SPACING);
             _gridContainer.AddThemeConstantOverride("v_separation", CELL_SPACING);
+            _gridContainer.Position = new Vector2(0, GRID_TOP_OFFSET);
             AddChild(_gridContainer);
 
-            // Initialize visual grid
             _visualGrid = new ElementSprite[_gridSize, _gridSize];
 
-            // Load element textures
             LoadElementTextures();
 
-            // Connect grid manager signals
             _gridManager.GridInitialized += OnGridInitialized;
             _gridManager.SwapCompleted += OnSwapCompleted;
             _gridManager.GridRefillCompleted += OnGridRefilled;
 
             CustomMinimumSize = new Vector2(
                 (_gridSize * CELL_SIZE) + ((_gridSize - 1) * CELL_SPACING),
-                (_gridSize * CELL_SIZE) + ((_gridSize - 1) * CELL_SPACING)
+                GRID_TOP_OFFSET + (_gridSize * CELL_SIZE) + ((_gridSize - 1) * CELL_SPACING)
             );
 
             GD.Print("[GridUI] Initialized");
         }
 
-        /// <summary>
-        /// Loads element textures (placeholders for now).
-        /// </summary>
         private void LoadElementTextures()
         {
             _elementTextures = new Dictionary<ElementType, Texture2D>
             {
-                // Try to load textures, fallback to colored squares if not found
                 [ElementType.Fire] = LoadOrCreateTexture("res://Resources/Sprites/Elements/fire_icon.png", Colors.Red),
                 [ElementType.Heal] = LoadOrCreateTexture("res://Resources/Sprites/Elements/heal_icon.png", Colors.Green),
                 [ElementType.Sword] = LoadOrCreateTexture("res://Resources/Sprites/Elements/sword_icon.png", Colors.Orange),
@@ -80,134 +78,86 @@ namespace AlJourney.Scripts.UI
             GD.Print("[GridUI] Element textures loaded");
         }
 
-        /// <summary>
-        /// Loads texture or creates colored placeholder.
-        /// </summary>
         private static Texture2D LoadOrCreateTexture(string path, Color fallbackColor)
         {
-            // Try to load texture
             if (ResourceLoader.Exists(path))
             {
                 return GD.Load<Texture2D>(path);
             }
 
-            // Create colored square placeholder
             Image image = Image.CreateEmpty(64, 64, false, Image.Format.Rgba8);
             image.Fill(fallbackColor);
             return ImageTexture.CreateFromImage(image);
         }
 
-        /// <summary>
-        /// Called when grid is initialized.
-        /// </summary>
         private void OnGridInitialized()
         {
             CreateVisualGrid();
             GD.Print("[GridUI] Visual grid created");
         }
 
-        /// <summary>
-        /// Creates visual representation of the grid.
-        /// </summary>
         private void CreateVisualGrid()
         {
-            // Clear existing elements
-            foreach (Node child in _gridContainer.GetChildren())
-            {
-                child.QueueFree();
-            }
-
-            ElementData[,] logicalGrid = _gridManager.GetGrid();
-
-            // Create visual elements
-            for (int y = 0; y < _gridSize; y++)
-            {
-                for (int x = 0; x < _gridSize; x++)
-                {
-                    ElementData data = logicalGrid[x, y];
-
-                    // Create visual element
-                    ElementSprite elementSprite = new();
-                    _gridContainer.AddChild(elementSprite);
-
-                    // Initialize with data and texture
-                    Texture2D texture = _elementTextures[data.Type];
-                    elementSprite.Initialize(data, texture);
-                    elementSprite.ElementClicked += OnElementClicked;
-
-                    _visualGrid[x, y] = elementSprite;
-                }
-            }
+            SyncVisualGridFromLogicalGrid(animateElements: false);
         }
 
-        /// <summary>
-        /// Called when an element is clicked.
-        /// </summary>
         private void OnElementClicked(ElementSprite clickedElement)
         {
             if (_selectedElement == null)
             {
-                // First selection
                 _selectedElement = clickedElement;
                 _selectedElement.SetHighlight(true);
                 GD.Print($"[GridUI] Selected element at ({clickedElement.GridX}, {clickedElement.GridY})");
             }
             else
             {
-                // Second selection - attempt swap
                 if (clickedElement == _selectedElement)
                 {
-                    // Deselect if clicking same element
                     _selectedElement.SetHighlight(false);
                     _selectedElement = null;
                     return;
                 }
 
-                // Check if elements are adjacent
                 int deltaX = Mathf.Abs(clickedElement.GridX - _selectedElement.GridX);
                 int deltaY = Mathf.Abs(clickedElement.GridY - _selectedElement.GridY);
 
                 if ((deltaX == 1 && deltaY == 0) || (deltaX == 0 && deltaY == 1))
                 {
-                    // Valid adjacent swap
                     GD.Print($"[GridUI] Attempting swap: ({_selectedElement.GridX},{_selectedElement.GridY}) <-> ({clickedElement.GridX},{clickedElement.GridY})");
 
-                    // Try swap
+                    int fromX = _selectedElement.GridX;
+                    int fromY = _selectedElement.GridY;
+                    int toX = clickedElement.GridX;
+                    int toY = clickedElement.GridY;
+
                     bool swapSuccessful = _gridManager.TrySwap(
-                        _selectedElement.GridX, _selectedElement.GridY,
-                        clickedElement.GridX, clickedElement.GridY
+                        fromX, fromY,
+                        toX, toY
                     );
 
                     if (swapSuccessful)
                     {
-                        // Animate swap
-                        AnimateSwap(_selectedElement, clickedElement);
+                        AnimateSwap(_selectedElement, clickedElement, fromX, fromY, toX, toY);
                     }
                     else
                     {
-                        // Invalid swap - shake animation
                         PlayInvalidSwapAnimation(_selectedElement);
                         PlayInvalidSwapAnimation(clickedElement);
                     }
                 }
                 else
                 {
-                    // Not adjacent - select new element
                     _selectedElement.SetHighlight(false);
                     _selectedElement = clickedElement;
                     _selectedElement.SetHighlight(true);
                 }
 
-                // Deselect
                 _selectedElement?.SetHighlight(false);
                 _selectedElement = null;
             }
         }
 
-        /// <summary>
-        /// Animates element swap.
-        /// </summary>
-        private void AnimateSwap(ElementSprite element1, ElementSprite element2)
+        private void AnimateSwap(ElementSprite element1, ElementSprite element2, int fromX, int fromY, int toX, int toY)
         {
             Vector2 pos1 = element1.Position;
             Vector2 pos2 = element2.Position;
@@ -215,14 +165,10 @@ namespace AlJourney.Scripts.UI
             element1.PlaySwapAnimation(pos2);
             element2.PlaySwapAnimation(pos1);
 
-            // Swap visual references
-            (_visualGrid[element1.GridX, element1.GridY], _visualGrid[element2.GridX, element2.GridY]) =
-                (_visualGrid[element2.GridX, element2.GridY], _visualGrid[element1.GridX, element1.GridY]);
+            (_visualGrid[fromX, fromY], _visualGrid[toX, toY]) =
+                (_visualGrid[toX, toY], _visualGrid[fromX, fromY]);
         }
 
-        /// <summary>
-        /// Plays invalid swap shake animation.
-        /// </summary>
         private void PlayInvalidSwapAnimation(ElementSprite element)
         {
             Vector2 originalPos = element.Position;
@@ -232,32 +178,18 @@ namespace AlJourney.Scripts.UI
             _ = tween.TweenProperty(element, "position", originalPos, 0.05f);
         }
 
-        /// <summary>
-        /// Called when swap is completed in grid manager.
-        /// </summary>
         private void OnSwapCompleted(bool wasValid)
         {
-            if (wasValid)
+            if (!wasValid)
             {
-                // Find matches for visualization only (don't process them yet)
-                List<MatchResult> matches = _gridManager.FindAllMatches();
-
-                if (matches.Count > 0)
-                {
-                    // Animate matched elements (visual feedback only)
-                    foreach (MatchResult match in matches)
-                    {
-                        foreach ((int x, int y) in match.MatchedPositions)
-                        {
-                            _visualGrid[x, y]?.PlayMatchAnimation();
-                        }
-                    }
-                }
+                return;
             }
+
+            GD.Print("[GridUI] Swap completed, waiting for BattleManager match processing");
         }
 
         /// <summary>
-        /// Visualizes combo effects (called by BattleManager).
+        /// Элемент VisualizeMatchesAndEffects.
         /// </summary>
         public void VisualizeMatchesAndEffects(List<MatchResult> matches, List<ComboEffect> effects)
         {
@@ -266,17 +198,14 @@ namespace AlJourney.Scripts.UI
                 return;
             }
 
-            // Visualize combo effects
             VisualizeComboEffects(effects, matches);
 
-            // Show cascade indicator if applicable
             int cascadeLevel = _comboSystem.GetCascadeLevel();
             if (cascadeLevel > 0)
             {
                 ShowCascadeIndicator(cascadeLevel);
             }
 
-            // Animate matched elements disappearing
             foreach (MatchResult match in matches)
             {
                 foreach ((int x, int y) in match.MatchedPositions)
@@ -287,9 +216,6 @@ namespace AlJourney.Scripts.UI
             }
         }
 
-        /// <summary>
-        /// Visualizes combo effects on the grid.
-        /// </summary>
         private void VisualizeComboEffects(List<ComboEffect> effects, List<MatchResult> matches)
         {
             for (int i = 0; i < effects.Count && i < matches.Count; i++)
@@ -297,25 +223,18 @@ namespace AlJourney.Scripts.UI
                 ComboEffect effect = effects[i];
                 MatchResult match = matches[i];
 
-                // Calculate center position of match
                 Vector2 centerPos = CalculateMatchCenter(match);
 
-                // Spawn particles at match location
                 ComboParticles.SpawnComboEffect(this, centerPos, effect.ElementType, effect.ComboLevel);
 
-                // Flash cells
                 FlashMatchedCells(match, effect.ElementType);
 
-                // Spawn effect text
                 string effectText = GetEffectText(effect);
                 Color effectColor = GetEffectColor(effect.ElementType);
                 ComboParticles.SpawnFloatingText(this, centerPos - new Vector2(0, 40), effectText, effectColor);
             }
         }
 
-        /// <summary>
-        /// Calculates center position of a match.
-        /// </summary>
         private static Vector2 CalculateMatchCenter(MatchResult match)
         {
             if (match.MatchedPositions.Count == 0)
@@ -339,9 +258,6 @@ namespace AlJourney.Scripts.UI
             );
         }
 
-        /// <summary>
-        /// Flashes matched cells with color.
-        /// </summary>
         private void FlashMatchedCells(MatchResult match, ElementType elementType)
         {
             Color flashColor = GetEffectColor(elementType);
@@ -351,7 +267,6 @@ namespace AlJourney.Scripts.UI
                 ElementSprite sprite = _visualGrid[x, y];
                 if (sprite != null)
                 {
-                    // Quick flash animation
                     Tween tween = CreateTween();
                     _ = tween.TweenProperty(sprite, "modulate", flashColor * 1.5f, 0.1f);
                     _ = tween.TweenProperty(sprite, "modulate", Colors.White, 0.1f);
@@ -359,9 +274,6 @@ namespace AlJourney.Scripts.UI
             }
         }
 
-        /// <summary>
-        /// Gets effect text for combo.
-        /// </summary>
         private static string GetEffectText(ComboEffect effect)
         {
             return effect.ElementType switch
@@ -374,9 +286,6 @@ namespace AlJourney.Scripts.UI
             };
         }
 
-        /// <summary>
-        /// Gets effect color for element type.
-        /// </summary>
         private static Color GetEffectColor(ElementType elementType)
         {
             return elementType switch
@@ -389,46 +298,138 @@ namespace AlJourney.Scripts.UI
             };
         }
 
-        /// <summary>
-        /// Called when grid is refilled after matches.
-        /// </summary>
         private void OnGridRefilled()
         {
-            // Update visual grid with new elements
+            SyncVisualGridFromLogicalGrid(animateElements: true);
+
+            GD.Print("[GridUI] Grid refilled and visualized");
+        }
+
+        private void SyncVisualGridFromLogicalGrid(bool animateElements)
+        {
             ElementData[,] logicalGrid = _gridManager.GetGrid();
+            ElementSprite[,] previousGrid = _visualGrid;
+            ElementSprite[,] syncedGrid = new ElementSprite[_gridSize, _gridSize];
+
+            HashSet<ElementSprite> reusedSprites = [];
+            HashSet<ElementSprite> previousSprites = [];
+
+            if (previousGrid != null)
+            {
+                for (int x = 0; x < _gridSize; x++)
+                {
+                    for (int y = 0; y < _gridSize; y++)
+                    {
+                        ElementSprite sprite = previousGrid[x, y];
+                        if (sprite != null)
+                        {
+                            previousSprites.Add(sprite);
+                        }
+                    }
+                }
+            }
+
+            for (int y = 0; y < _gridSize; y++)
+            {
+                for (int x = 0; x < _gridSize; x++)
+                {
+                    ElementData data = logicalGrid[x, y];
+                    if (data == null)
+                    {
+                        continue;
+                    }
+
+                    ElementSprite sprite = FindExistingSpriteForData(previousGrid, data, reusedSprites);
+                    Vector2 targetPos = GetElementPosition(x, y);
+
+                    if (sprite == null)
+                    {
+                        sprite = CreateElementSprite(data);
+
+                        if (animateElements)
+                        {
+                            sprite.SetGridPosition(targetPos - new Vector2(0, 400));
+                            sprite.AnimateToPosition(targetPos);
+                        }
+                        else
+                        {
+                            sprite.SetGridPosition(targetPos);
+                        }
+                    }
+                    else
+                    {
+                        sprite.UpdateData(data);
+                        sprite.SetTexture(_elementTextures[data.Type]);
+
+                        if (animateElements)
+                        {
+                            sprite.AnimateToPosition(targetPos);
+                        }
+                        else
+                        {
+                            sprite.SetGridPosition(targetPos);
+                        }
+                    }
+
+                    reusedSprites.Add(sprite);
+                    syncedGrid[x, y] = sprite;
+                }
+            }
+
+            foreach (ElementSprite previousSprite in previousSprites)
+            {
+                if (!reusedSprites.Contains(previousSprite))
+                {
+                    previousSprite.QueueFree();
+                }
+            }
+
+            if (_selectedElement != null && !reusedSprites.Contains(_selectedElement))
+            {
+                _selectedElement = null;
+            }
+
+            _visualGrid = syncedGrid;
+        }
+
+        private ElementSprite FindExistingSpriteForData(ElementSprite[,] previousGrid, ElementData data, HashSet<ElementSprite> reusedSprites)
+        {
+            if (previousGrid == null)
+            {
+                return null;
+            }
 
             for (int x = 0; x < _gridSize; x++)
             {
                 for (int y = 0; y < _gridSize; y++)
                 {
-                    if (_visualGrid[x, y] == null)
+                    ElementSprite sprite = previousGrid[x, y];
+                    if (sprite == null || reusedSprites.Contains(sprite))
                     {
-                        // Create new element
-                        ElementData data = logicalGrid[x, y];
-                        ElementSprite elementSprite = new();
-                        _gridContainer.AddChild(elementSprite);
+                        continue;
+                    }
 
-                        Texture2D texture = _elementTextures[data.Type];
-                        elementSprite.Initialize(data, texture);
-                        elementSprite.ElementClicked += OnElementClicked;
-
-                        // Position above grid for fall animation
-                        Vector2 targetPos = GetElementPosition(x, y);
-                        elementSprite.SetGridPosition(targetPos - new Vector2(0, 400));
-                        elementSprite.AnimateToPosition(targetPos);
-
-                        _visualGrid[x, y] = elementSprite;
+                    if (ReferenceEquals(sprite.Data, data))
+                    {
+                        return sprite;
                     }
                 }
             }
 
-            // BattleManager now handles cascade detection and processing
-            GD.Print("[GridUI] Grid refilled and visualized");
+            return null;
         }
 
-        /// <summary>
-        /// Shows cascade level indicator.
-        /// </summary>
+        private ElementSprite CreateElementSprite(ElementData data)
+        {
+            ElementSprite elementSprite = new();
+            _gridContainer.AddChild(elementSprite);
+
+            Texture2D texture = _elementTextures[data.Type];
+            elementSprite.Initialize(data, texture);
+            elementSprite.ElementClicked += OnElementClicked;
+            return elementSprite;
+        }
+
         private void ShowCascadeIndicator(int cascadeLevel)
         {
             Vector2 centerPos = new(
@@ -437,15 +438,12 @@ namespace AlJourney.Scripts.UI
             );
 
             string cascadeText = $"⚡ CASCADE x{cascadeLevel}! ⚡";
-            Color cascadeColor = new(1.0f, 0.8f, 0.0f); // Golden yellow
+            Color cascadeColor = new(1.0f, 0.8f, 0.0f); 
 
             ComboParticles.SpawnFloatingText(this, centerPos, cascadeText, cascadeColor);
             GD.Print($"[GridUI] Cascade x{cascadeLevel} displayed!");
         }
 
-        /// <summary>
-        /// Gets screen position for grid coordinates.
-        /// </summary>
         private static Vector2 GetElementPosition(int gridX, int gridY)
         {
             return new Vector2(
@@ -454,6 +452,9 @@ namespace AlJourney.Scripts.UI
             );
         }
 
+        /// <summary>
+        /// Элемент _ExitTree.
+        /// </summary>
         public override void _ExitTree()
         {
             if (_gridManager != null)

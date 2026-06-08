@@ -4,32 +4,29 @@ using System.Collections.Generic;
 namespace AlJourney.Scripts.Match3
 {
     /// <summary>
-    /// Represents the result of a match detection.
+    /// Основной класс MatchResult.
     /// </summary>
     public class MatchResult(ElementType elementType, int matchCount, bool isHorizontal)
     {
         /// <summary>
-        /// Type of element that was matched.
+        /// Элемент ElementType.
         /// </summary>
         public ElementType ElementType { get; set; } = elementType;
 
         /// <summary>
-        /// Number of elements in the match (3, 4, or 5).
+        /// Элемент MatchCount.
         /// </summary>
         public int MatchCount { get; set; } = matchCount;
 
-        /// <summary>
-        /// List of matched element positions.
-        /// </summary>
         public List<(int x, int y)> MatchedPositions { get; set; } = [];
 
         /// <summary>
-        /// Is this a horizontal match.
+        /// Проверяет, является ли Horizontal.
         /// </summary>
         public bool IsHorizontal { get; set; } = isHorizontal;
 
         /// <summary>
-        /// Returns the combo level (0 for no match, 1 for 3-match, 2 for 4-match, 3 for 5-match).
+        /// Возвращает ComboLevel.
         /// </summary>
         public int GetComboLevel()
         {
@@ -42,6 +39,9 @@ namespace AlJourney.Scripts.Match3
             };
         }
 
+        /// <summary>
+        /// Элемент ToString.
+        /// </summary>
         public override string ToString()
         {
             return $"Match: {MatchCount}x {ElementType} ({(IsHorizontal ? "H" : "V")})";

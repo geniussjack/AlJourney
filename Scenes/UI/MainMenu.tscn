@@ -1,6 +1,17 @@
-[gd_scene load_steps=2 format=3 uid="uid://cmutdu1urtub0"]
+[gd_scene load_steps=13 format=3 uid="uid://cmutdu1urtub0"]
 
 [ext_resource type="Script" uid="uid://c7wem1c34vp64" path="res://Scripts/UI/MainMenuUI.cs" id="1_main"]
+[ext_resource type="Script" uid="uid://denji2vl47j8k" path="res://Scripts/UI/SettingsMenuUI.cs" id="2_settings"]
+[ext_resource type="Script" uid="uid://etn4ci8fbhk7" path="res://Scripts/UI/CreditsUI.cs" id="3_credits"]
+[ext_resource type="Theme" uid="uid://d0twkb22dvira" path="res://Resources/Themes/game_theme.tres" id="4_theme"]
+[ext_resource type="Texture2D" uid="uid://cq4jbitxuh616" path="res://Resources/Sprites/Backgrounds/menu_background.png" id="5_bg"]
+[ext_resource type="Texture2D" uid="uid://gr30g6rbcfoe" path="res://Resources/Sprites/UI/logo.png" id="6_logo"]
+[ext_resource type="Texture2D" path="res://Resources/Sprites/UI/atlas_btn_settings.tres" id="7_settings"]
+[ext_resource type="Texture2D" path="res://Resources/Sprites/UI/atlas_btn_quit.tres" id="9_quit"]
+[ext_resource type="Texture2D" path="res://Resources/Sprites/UI/atlas_btn_reset.tres" id="10_reset"]
+[ext_resource type="Texture2D" path="res://Resources/Sprites/UI/atlas_btn_audio.tres" id="11_audio"]
+[ext_resource type="Texture2D" path="res://Resources/Sprites/UI/atlas_btn_home.tres" id="12_home"]
+[ext_resource type="Texture2D" path="res://Resources/Sprites/UI/atlas_btn_resume.tres" id="13_resume"]
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3
@@ -9,6 +20,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("4_theme")
 script = ExtResource("1_main")
 
 [node name="Background" type="TextureRect" parent="."]
@@ -18,60 +30,68 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+texture = ExtResource("5_bg")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="MainMenuPanel" type="CenterContainer" parent="."]
+[node name="DimOverlay" type="ColorRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.55)
+
+[node name="MainMenuPanel" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -125.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MainMenuPanel"]
 layout_mode = 2
-theme_override_constants/separation = 20
+theme_override_constants/separation = 12
 
-[node name="Title" type="Label" parent="MainMenuPanel/VBoxContainer"]
+[node name="Logo" type="TextureRect" parent="MainMenuPanel/VBoxContainer"]
+custom_minimum_size = Vector2(512, 512)
 layout_mode = 2
-theme_override_font_sizes/font_size = 64
-text = "AlJourney"
-horizontal_alignment = 1
+texture = ExtResource("6_logo")
+expand_mode = 1
+stretch_mode = 5
 
-[node name="Spacer1" type="Control" parent="MainMenuPanel/VBoxContainer"]
-custom_minimum_size = Vector2(0, 40)
+[node name="ContinueButton" type="TextureButton" parent="MainMenuPanel/VBoxContainer"]
+custom_minimum_size = Vector2(500, 125)
 layout_mode = 2
+texture_normal = ExtResource("13_resume")
+ignore_texture_size = true
+stretch_mode = 5
 
-[node name="NewGameButton" type="Button" parent="MainMenuPanel/VBoxContainer"]
-custom_minimum_size = Vector2(300, 60)
+[node name="SettingsButton" type="TextureButton" parent="MainMenuPanel/VBoxContainer"]
+custom_minimum_size = Vector2(500, 125)
 layout_mode = 2
-theme_override_font_sizes/font_size = 24
-text = "New Game"
+texture_normal = ExtResource("7_settings")
+ignore_texture_size = true
+stretch_mode = 5
 
-[node name="ContinueButton" type="Button" parent="MainMenuPanel/VBoxContainer"]
-custom_minimum_size = Vector2(300, 60)
+[node name="CreditsButton" type="TextureButton" parent="MainMenuPanel/VBoxContainer"]
+custom_minimum_size = Vector2(500, 125)
 layout_mode = 2
-theme_override_font_sizes/font_size = 24
-text = "Continue"
+texture_normal = ExtResource("11_audio")
+ignore_texture_size = true
+stretch_mode = 5
 
-[node name="SettingsButton" type="Button" parent="MainMenuPanel/VBoxContainer"]
-custom_minimum_size = Vector2(300, 60)
+[node name="QuitButton" type="TextureButton" parent="MainMenuPanel/VBoxContainer"]
+custom_minimum_size = Vector2(370, 125)
 layout_mode = 2
-theme_override_font_sizes/font_size = 24
-text = "Settings"
-
-[node name="CreditsButton" type="Button" parent="MainMenuPanel/VBoxContainer"]
-custom_minimum_size = Vector2(300, 60)
-layout_mode = 2
-theme_override_font_sizes/font_size = 24
-text = "Credits"
-
-[node name="QuitButton" type="Button" parent="MainMenuPanel/VBoxContainer"]
-custom_minimum_size = Vector2(300, 60)
-layout_mode = 2
-theme_override_font_sizes/font_size = 24
-text = "Quit"
+texture_normal = ExtResource("9_quit")
+ignore_texture_size = true
+stretch_mode = 5
 
 [node name="SettingsPanel" type="Control" parent="."]
 visible = false
@@ -81,6 +101,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("2_settings")
 
 [node name="SettingsMenu" type="MarginContainer" parent="SettingsPanel"]
 layout_mode = 1
@@ -89,10 +110,10 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 100
-theme_override_constants/margin_top = 50
-theme_override_constants/margin_right = 100
-theme_override_constants/margin_bottom = 50
+theme_override_constants/margin_left = 200
+theme_override_constants/margin_top = 80
+theme_override_constants/margin_right = 200
+theme_override_constants/margin_bottom = 80
 
 [node name="Panel" type="PanelContainer" parent="SettingsPanel/SettingsMenu"]
 layout_mode = 2
@@ -103,7 +124,7 @@ theme_override_constants/separation = 20
 
 [node name="Title" type="Label" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 48
+theme_override_font_sizes/font_size = 56
 text = "Settings"
 horizontal_alignment = 1
 
@@ -116,60 +137,60 @@ theme_override_constants/separation = 15
 
 [node name="VideoLabel" type="Label" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/VideoSettings"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 32
-text = "Video Settings"
+theme_override_font_sizes/font_size = 40
+text = "Video"
 
 [node name="ResolutionContainer" type="HBoxContainer" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/VideoSettings"]
 layout_mode = 2
 
 [node name="Label" type="Label" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/VideoSettings/ResolutionContainer"]
-custom_minimum_size = Vector2(200, 0)
+custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 28
 text = "Resolution:"
 
 [node name="ResolutionDropdown" type="OptionButton" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/VideoSettings"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 28
 
 [node name="FullscreenContainer" type="HBoxContainer" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/VideoSettings"]
 layout_mode = 2
 
 [node name="Label" type="Label" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/VideoSettings/FullscreenContainer"]
-custom_minimum_size = Vector2(200, 0)
+custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 28
 text = "Fullscreen:"
 
 [node name="FullscreenToggle" type="CheckButton" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/VideoSettings"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 28
 
 [node name="VsyncContainer" type="HBoxContainer" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/VideoSettings"]
 layout_mode = 2
 
 [node name="Label" type="Label" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/VideoSettings/VsyncContainer"]
-custom_minimum_size = Vector2(200, 0)
+custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 28
 text = "VSync:"
 
 [node name="VsyncToggle" type="CheckButton" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/VideoSettings"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 28
 
 [node name="FpsContainer" type="HBoxContainer" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/VideoSettings"]
 layout_mode = 2
 
 [node name="Label" type="Label" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/VideoSettings/FpsContainer"]
-custom_minimum_size = Vector2(200, 0)
+custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 28
 text = "FPS Limit:"
 
 [node name="FpsLimitDropdown" type="OptionButton" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/VideoSettings"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 28
 
 [node name="HSeparator2" type="HSeparator" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer"]
 layout_mode = 2
@@ -180,15 +201,15 @@ theme_override_constants/separation = 15
 
 [node name="AudioLabel" type="Label" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/AudioSettings"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 32
-text = "Audio Settings"
+theme_override_font_sizes/font_size = 40
+text = "Audio"
 
 [node name="MasterVolumeContainer" type="VBoxContainer" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/AudioSettings"]
 layout_mode = 2
 
 [node name="MasterVolumeLabel" type="Label" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/AudioSettings/MasterVolumeContainer"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 28
 text = "Master: 100%"
 
 [node name="MasterVolumeSlider" type="HSlider" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/AudioSettings"]
@@ -202,7 +223,7 @@ layout_mode = 2
 
 [node name="MusicVolumeLabel" type="Label" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/AudioSettings/MusicVolumeContainer"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 28
 text = "Music: 70%"
 
 [node name="MusicVolumeSlider" type="HSlider" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/AudioSettings"]
@@ -216,7 +237,7 @@ layout_mode = 2
 
 [node name="SfxVolumeLabel" type="Label" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/AudioSettings/SfxVolumeContainer"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 28
 text = "SFX: 80%"
 
 [node name="SfxVolumeSlider" type="HSlider" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/AudioSettings"]
@@ -233,23 +254,23 @@ layout_mode = 2
 theme_override_constants/separation = 20
 alignment = 1
 
-[node name="ApplyButton" type="Button" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/ButtonsContainer"]
-custom_minimum_size = Vector2(150, 50)
+[node name="ApplyButton" type="TextureButton" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/ButtonsContainer"]
+custom_minimum_size = Vector2(246, 62)
 layout_mode = 2
-theme_override_font_sizes/font_size = 20
-text = "Apply"
+texture_normal = ExtResource("13_resume")
+ignore_texture_size = true
 
-[node name="ResetButton" type="Button" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/ButtonsContainer"]
-custom_minimum_size = Vector2(150, 50)
+[node name="ResetButton" type="TextureButton" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/ButtonsContainer"]
+custom_minimum_size = Vector2(182, 62)
 layout_mode = 2
-theme_override_font_sizes/font_size = 20
-text = "Reset"
+texture_normal = ExtResource("10_reset")
+ignore_texture_size = true
 
-[node name="BackButton" type="Button" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/ButtonsContainer"]
-custom_minimum_size = Vector2(150, 50)
+[node name="BackButton" type="TextureButton" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/ButtonsContainer"]
+custom_minimum_size = Vector2(182, 62)
 layout_mode = 2
-theme_override_font_sizes/font_size = 20
-text = "Back"
+texture_normal = ExtResource("12_home")
+ignore_texture_size = true
 
 [node name="CreditsPanel" type="Control" parent="."]
 visible = false
@@ -259,6 +280,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("3_credits")
 
 [node name="CreditsMenu" type="MarginContainer" parent="CreditsPanel"]
 layout_mode = 1
@@ -267,20 +289,21 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 200
-theme_override_constants/margin_top = 100
-theme_override_constants/margin_right = 200
-theme_override_constants/margin_bottom = 100
+theme_override_constants/margin_left = 300
+theme_override_constants/margin_top = 120
+theme_override_constants/margin_right = 300
+theme_override_constants/margin_bottom = 120
 
 [node name="Panel" type="PanelContainer" parent="CreditsPanel/CreditsMenu"]
 layout_mode = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CreditsPanel/CreditsMenu/Panel"]
 layout_mode = 2
+theme_override_constants/separation = 20
 
 [node name="Title" type="Label" parent="CreditsPanel/CreditsMenu/Panel/VBoxContainer"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 48
+theme_override_font_sizes/font_size = 56
 text = "Credits"
 horizontal_alignment = 1
 
@@ -295,9 +318,9 @@ size_flags_vertical = 3
 bbcode_enabled = true
 fit_content = true
 
-[node name="BackButton" type="Button" parent="CreditsPanel/CreditsMenu/Panel/VBoxContainer"]
-custom_minimum_size = Vector2(200, 60)
+[node name="BackButton" type="TextureButton" parent="CreditsPanel/CreditsMenu/Panel/VBoxContainer"]
+custom_minimum_size = Vector2(182, 62)
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 24
-text = "Back"
+texture_normal = ExtResource("12_home")
+ignore_texture_size = true
