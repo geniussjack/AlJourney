@@ -7,14 +7,21 @@ using System.Collections.Generic;
 namespace AlJourney.Scripts.UI
 {
     /// <summary>
-    /// UI-компонент GridUI. Отвечает за отображение пользовательского интерфейса.
+    /// Главный компонент пользовательского интерфейса для игрового поля (Match-3).
+    /// Отвечает за визуализацию сетки, обработку кликов игрока, анимацию перемещения
+    /// (свапа) и эффекты уничтожения камней. Связывает логику GridManager с визуальными узлами.
     /// </summary>
     public partial class GridUI : Control
     {
-        [Signal]
         /// <summary>
-        /// Элемент SwapAttemptedEventHandler.
+        /// Вызывается при попытке игрока перетащить (поменять местами) два элемента.
+        /// Используется для передачи координат в логический менеджер.
         /// </summary>
+        /// <param name="x1">Координата X первого элемента.</param>
+        /// <param name="y1">Координата Y первого элемента.</param>
+        /// <param name="x2">Координата X второго элемента.</param>
+        /// <param name="y2">Координата Y второго элемента.</param>
+        [Signal]
         public delegate void SwapAttemptedEventHandler(int x1, int y1, int x2, int y2);
 
         private const int CELL_SIZE = 128;
@@ -26,13 +33,14 @@ namespace AlJourney.Scripts.UI
         private ElementSprite _selectedElement;
 
         private Dictionary<ElementType, Texture2D> _elementTextures;
+        private Dictionary<ElementData, ElementSprite> _spriteMap = new Dictionary<ElementData, ElementSprite>();
 
         private GridManager _gridManager;
         private ComboSystem _comboSystem;
         private int _gridSize;
 
         /// <summary>
-        /// Элемент _Ready.
+        /// Инициализация компонента, загрузка текстур и подписка на сигналы логики поля.
         /// </summary>
         public override void _Ready()
         {
@@ -105,56 +113,69 @@ namespace AlJourney.Scripts.UI
         {
             if (_selectedElement == null)
             {
-                _selectedElement = clickedElement;
-                _selectedElement.SetHighlight(true);
-                GD.Print($"[GridUI] Selected element at ({clickedElement.GridX}, {clickedElement.GridY})");
+                SelectElement(clickedElement);
+            }
+            else if (clickedElement == _selectedElement)
+            {
+                DeselectCurrentElement();
             }
             else
             {
-                if (clickedElement == _selectedElement)
-                {
-                    _selectedElement.SetHighlight(false);
-                    _selectedElement = null;
-                    return;
-                }
-
-                int deltaX = Mathf.Abs(clickedElement.GridX - _selectedElement.GridX);
-                int deltaY = Mathf.Abs(clickedElement.GridY - _selectedElement.GridY);
-
-                if ((deltaX == 1 && deltaY == 0) || (deltaX == 0 && deltaY == 1))
-                {
-                    GD.Print($"[GridUI] Attempting swap: ({_selectedElement.GridX},{_selectedElement.GridY}) <-> ({clickedElement.GridX},{clickedElement.GridY})");
-
-                    int fromX = _selectedElement.GridX;
-                    int fromY = _selectedElement.GridY;
-                    int toX = clickedElement.GridX;
-                    int toY = clickedElement.GridY;
-
-                    bool swapSuccessful = _gridManager.TrySwap(
-                        fromX, fromY,
-                        toX, toY
-                    );
-
-                    if (swapSuccessful)
-                    {
-                        AnimateSwap(_selectedElement, clickedElement, fromX, fromY, toX, toY);
-                    }
-                    else
-                    {
-                        PlayInvalidSwapAnimation(_selectedElement);
-                        PlayInvalidSwapAnimation(clickedElement);
-                    }
-                }
-                else
-                {
-                    _selectedElement.SetHighlight(false);
-                    _selectedElement = clickedElement;
-                    _selectedElement.SetHighlight(true);
-                }
-
-                _selectedElement?.SetHighlight(false);
-                _selectedElement = null;
+                HandleElementSwap(clickedElement);
             }
+        }
+
+        private void SelectElement(ElementSprite element)
+        {
+            _selectedElement = element;
+            _selectedElement.SetHighlight(true);
+            GD.Print($"[GridUI] Selected element at ({element.GridX}, {element.GridY})");
+        }
+
+        private void DeselectCurrentElement()
+        {
+            _selectedElement?.SetHighlight(false);
+            _selectedElement = null;
+        }
+
+        private void HandleElementSwap(ElementSprite clickedElement)
+        {
+            int deltaX = Mathf.Abs(clickedElement.GridX - _selectedElement.GridX);
+            int deltaY = Mathf.Abs(clickedElement.GridY - _selectedElement.GridY);
+
+            if ((deltaX == 1 && deltaY == 0) || (deltaX == 0 && deltaY == 1))
+            {
+                ProcessSwapAction(clickedElement);
+            }
+            else
+            {
+                DeselectCurrentElement();
+                SelectElement(clickedElement);
+            }
+        }
+
+        private void ProcessSwapAction(ElementSprite clickedElement)
+        {
+            GD.Print($"[GridUI] Attempting swap: ({_selectedElement.GridX},{_selectedElement.GridY}) <-> ({clickedElement.GridX},{clickedElement.GridY})");
+
+            int fromX = _selectedElement.GridX;
+            int fromY = _selectedElement.GridY;
+            int toX = clickedElement.GridX;
+            int toY = clickedElement.GridY;
+
+            bool swapSuccessful = _gridManager.TrySwap(fromX, fromY, toX, toY);
+
+            if (swapSuccessful)
+            {
+                AnimateSwap(_selectedElement, clickedElement, fromX, fromY, toX, toY);
+            }
+            else
+            {
+                PlayInvalidSwapAnimation(_selectedElement);
+                PlayInvalidSwapAnimation(clickedElement);
+            }
+            
+            DeselectCurrentElement();
         }
 
         private void AnimateSwap(ElementSprite element1, ElementSprite element2, int fromX, int fromY, int toX, int toY)
@@ -180,23 +201,18 @@ namespace AlJourney.Scripts.UI
 
         private void OnSwapCompleted(bool wasValid)
         {
-            if (!wasValid)
-            {
-                return;
-            }
-
+            if (!wasValid) return;
             GD.Print("[GridUI] Swap completed, waiting for BattleManager match processing");
         }
 
         /// <summary>
-        /// Элемент VisualizeMatchesAndEffects.
+        /// Анимирует процесс уничтожения совпадений и появления эффектов комбо.
         /// </summary>
+        /// <param name="matches">Список линий, которые нужно уничтожить.</param>
+        /// <param name="effects">Эффекты (урон/лечение), связанные с этими линиями.</param>
         public void VisualizeMatchesAndEffects(List<MatchResult> matches, List<ComboEffect> effects)
         {
-            if (matches == null || effects == null || matches.Count == 0)
-            {
-                return;
-            }
+            if (matches == null || effects == null || matches.Count == 0) return;
 
             VisualizeComboEffects(effects, matches);
 
@@ -211,6 +227,7 @@ namespace AlJourney.Scripts.UI
                 foreach ((int x, int y) in match.MatchedPositions)
                 {
                     _visualGrid[x, y]?.PlayMatchAnimation();
+                    _spriteMap.Remove(_visualGrid[x, y].Data);
                     _visualGrid[x, y] = null;
                 }
             }
@@ -226,7 +243,6 @@ namespace AlJourney.Scripts.UI
                 Vector2 centerPos = CalculateMatchCenter(match);
 
                 ComboParticles.SpawnComboEffect(this, centerPos, effect.ElementType, effect.ComboLevel);
-
                 FlashMatchedCells(match, effect.ElementType);
 
                 string effectText = GetEffectText(effect);
@@ -237,10 +253,7 @@ namespace AlJourney.Scripts.UI
 
         private static Vector2 CalculateMatchCenter(MatchResult match)
         {
-            if (match.MatchedPositions.Count == 0)
-            {
-                return Vector2.Zero;
-            }
+            if (match.MatchedPositions.Count == 0) return Vector2.Zero;
 
             float sumX = 0;
             float sumY = 0;
@@ -301,122 +314,91 @@ namespace AlJourney.Scripts.UI
         private void OnGridRefilled()
         {
             SyncVisualGridFromLogicalGrid(animateElements: true);
-
             GD.Print("[GridUI] Grid refilled and visualized");
         }
 
         private void SyncVisualGridFromLogicalGrid(bool animateElements)
         {
             ElementData[,] logicalGrid = _gridManager.GetGrid();
-            ElementSprite[,] previousGrid = _visualGrid;
             ElementSprite[,] syncedGrid = new ElementSprite[_gridSize, _gridSize];
-
-            HashSet<ElementSprite> reusedSprites = [];
-            HashSet<ElementSprite> previousSprites = [];
-
-            if (previousGrid != null)
-            {
-                for (int x = 0; x < _gridSize; x++)
-                {
-                    for (int y = 0; y < _gridSize; y++)
-                    {
-                        ElementSprite sprite = previousGrid[x, y];
-                        if (sprite != null)
-                        {
-                            previousSprites.Add(sprite);
-                        }
-                    }
-                }
-            }
+            HashSet<ElementSprite> activeSprites = new HashSet<ElementSprite>();
 
             for (int y = 0; y < _gridSize; y++)
             {
                 for (int x = 0; x < _gridSize; x++)
                 {
                     ElementData data = logicalGrid[x, y];
-                    if (data == null)
-                    {
-                        continue;
-                    }
+                    if (data == null) continue;
 
-                    ElementSprite sprite = FindExistingSpriteForData(previousGrid, data, reusedSprites);
-                    Vector2 targetPos = GetElementPosition(x, y);
-
-                    if (sprite == null)
-                    {
-                        sprite = CreateElementSprite(data);
-
-                        if (animateElements)
-                        {
-                            sprite.SetGridPosition(targetPos - new Vector2(0, 400));
-                            sprite.AnimateToPosition(targetPos);
-                        }
-                        else
-                        {
-                            sprite.SetGridPosition(targetPos);
-                        }
-                    }
-                    else
-                    {
-                        sprite.UpdateData(data);
-                        sprite.SetTexture(_elementTextures[data.Type]);
-
-                        if (animateElements)
-                        {
-                            sprite.AnimateToPosition(targetPos);
-                        }
-                        else
-                        {
-                            sprite.SetGridPosition(targetPos);
-                        }
-                    }
-
-                    reusedSprites.Add(sprite);
+                    ElementSprite sprite = ProcessGridElement(data, x, y, animateElements);
                     syncedGrid[x, y] = sprite;
+                    activeSprites.Add(sprite);
                 }
             }
 
-            foreach (ElementSprite previousSprite in previousSprites)
-            {
-                if (!reusedSprites.Contains(previousSprite))
-                {
-                    previousSprite.QueueFree();
-                }
-            }
-
-            if (_selectedElement != null && !reusedSprites.Contains(_selectedElement))
-            {
-                _selectedElement = null;
-            }
-
+            CleanupOldSprites(activeSprites);
             _visualGrid = syncedGrid;
         }
 
-        private ElementSprite FindExistingSpriteForData(ElementSprite[,] previousGrid, ElementData data, HashSet<ElementSprite> reusedSprites)
+        private ElementSprite ProcessGridElement(ElementData data, int x, int y, bool animateElements)
         {
-            if (previousGrid == null)
+            Vector2 targetPos = GetElementPosition(x, y);
+            
+            if (!_spriteMap.TryGetValue(data, out ElementSprite sprite))
             {
-                return null;
-            }
-
-            for (int x = 0; x < _gridSize; x++)
-            {
-                for (int y = 0; y < _gridSize; y++)
+                sprite = CreateElementSprite(data);
+                _spriteMap[data] = sprite;
+                
+                if (animateElements)
                 {
-                    ElementSprite sprite = previousGrid[x, y];
-                    if (sprite == null || reusedSprites.Contains(sprite))
-                    {
-                        continue;
-                    }
+                    sprite.SetGridPosition(targetPos - new Vector2(0, 400));
+                    sprite.AnimateToPosition(targetPos);
+                }
+                else
+                {
+                    sprite.SetGridPosition(targetPos);
+                }
+            }
+            else
+            {
+                sprite.UpdateData(data);
+                sprite.SetTexture(_elementTextures[data.Type]);
 
-                    if (ReferenceEquals(sprite.Data, data))
-                    {
-                        return sprite;
-                    }
+                if (animateElements)
+                {
+                    sprite.AnimateToPosition(targetPos);
+                }
+                else
+                {
+                    sprite.SetGridPosition(targetPos);
                 }
             }
 
-            return null;
+            return sprite;
+        }
+
+        private void CleanupOldSprites(HashSet<ElementSprite> activeSprites)
+        {
+            List<ElementData> keysToRemove = new List<ElementData>();
+
+            foreach (var kvp in _spriteMap)
+            {
+                if (!activeSprites.Contains(kvp.Value))
+                {
+                    kvp.Value.QueueFree();
+                    keysToRemove.Add(kvp.Key);
+                }
+            }
+
+            foreach (var key in keysToRemove)
+            {
+                _spriteMap.Remove(key);
+            }
+
+            if (_selectedElement != null && !activeSprites.Contains(_selectedElement))
+            {
+                _selectedElement = null;
+            }
         }
 
         private ElementSprite CreateElementSprite(ElementData data)
@@ -453,7 +435,7 @@ namespace AlJourney.Scripts.UI
         }
 
         /// <summary>
-        /// Элемент _ExitTree.
+        /// Очистка подписок на события при удалении узла (предотвращает утечки памяти).
         /// </summary>
         public override void _ExitTree()
         {
