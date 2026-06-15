@@ -1,16 +1,16 @@
-using AlJourney.Scripts.Managers;
+﻿using AlJourney.Scripts.Managers;
 using Godot;
 
 namespace AlJourney.Scripts.UI
 {
     /// <summary>
-    /// Пользовательский интерфейс меню настроек. Управляет изменениями графики (разрешение, полноэкранный режим, VSync, лимит FPS) и звука (общая громкость, музыка, SFX).
+    /// Пользовательский интерфейс меню настроек. Управляет изменениями графики и звука.
     /// </summary>
     public partial class SettingsMenuUI : Control
     {
         private OptionButton _resolutionDropdown;
         private CheckButton _fullscreenToggle;
-        private CheckButton _vsyncToggle;
+        private OptionButton _languageDropdown;
         private OptionButton _fpsLimitDropdown;
 
         private HSlider _masterVolumeSlider;
@@ -35,13 +35,13 @@ namespace AlJourney.Scripts.UI
         private readonly int[] _fpsLimits = [30, 60, 120, 144, 240, 0]; 
 
         /// <summary>
-        /// Вызывается при инициализации узла. Настраивает ссылки на элементы управления (слайдеры, выпадающие списки, кнопки), подписывается на их события и загружает текущие настройки.
+        /// Вызывается при инициализации узла. Настраивает ссылки на элементы управления, подписывается на их события и загружает текущие настройки.
         /// </summary>
         public override void _Ready()
         {
             _resolutionDropdown = GetNode<OptionButton>("SettingsMenu/Panel/VBoxContainer/VideoSettings/ResolutionDropdown");
             _fullscreenToggle = GetNode<CheckButton>("SettingsMenu/Panel/VBoxContainer/VideoSettings/FullscreenToggle");
-            _vsyncToggle = GetNode<CheckButton>("SettingsMenu/Panel/VBoxContainer/VideoSettings/VsyncToggle");
+            _languageDropdown = GetNode<OptionButton>("SettingsMenu/Panel/VBoxContainer/VideoSettings/LanguageDropdown");
             _fpsLimitDropdown = GetNode<OptionButton>("SettingsMenu/Panel/VBoxContainer/VideoSettings/FpsLimitDropdown");
 
             _masterVolumeSlider = GetNode<HSlider>("SettingsMenu/Panel/VBoxContainer/AudioSettings/MasterVolumeSlider");
@@ -57,9 +57,10 @@ namespace AlJourney.Scripts.UI
 
             SetupResolutionDropdown();
             SetupFpsDropdown();
+            SetupLanguageDropdown();
 
             _fullscreenToggle.Toggled += OnFullscreenToggled;
-            _vsyncToggle.Toggled += OnVsyncToggled;
+            _languageDropdown.ItemSelected += OnLanguageSelected;
             _resolutionDropdown.ItemSelected += OnResolutionSelected;
             _fpsLimitDropdown.ItemSelected += OnFpsLimitSelected;
 
@@ -74,6 +75,13 @@ namespace AlJourney.Scripts.UI
             LoadCurrentSettings();
 
             GD.Print("[SettingsMenuUI] Initialized");
+        }
+
+        private void SetupLanguageDropdown()
+        {
+            _languageDropdown.Clear();
+            _languageDropdown.AddItem("English", 0);
+            _languageDropdown.AddItem("Русский", 1);
         }
 
         private void SetupResolutionDropdown()
@@ -102,7 +110,7 @@ namespace AlJourney.Scripts.UI
             SettingsManager settings = SettingsManager.Instance;
 
             _fullscreenToggle.ButtonPressed = settings.Fullscreen;
-            _vsyncToggle.ButtonPressed = settings.VSync;
+            _languageDropdown.Selected = settings.Language == "ru" ? 1 : 0;
 
             Vector2I currentRes = settings.Resolution;
             for (int i = 0; i < _resolutions.Length; i++)
@@ -143,9 +151,10 @@ namespace AlJourney.Scripts.UI
             SettingsManager.Instance.SetFullscreen(toggled, false);
         }
 
-        private void OnVsyncToggled(bool toggled)
+        private void OnLanguageSelected(long index)
         {
-            SettingsManager.Instance.SetVSync(toggled, false);
+            string lang = index == 1 ? "ru" : "en";
+            SettingsManager.Instance.SetLanguage(lang);
         }
 
         private void OnResolutionSelected(long index)

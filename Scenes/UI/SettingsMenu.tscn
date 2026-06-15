@@ -1,9 +1,6 @@
-[gd_scene load_steps=6 format=3 uid="uid://settings_uid"]
+[gd_scene load_steps=2 format=3 uid="uid://settings_uid"]
 
 [ext_resource type="Script" path="res://Scripts/UI/SettingsMenuUI.cs" id="1_settings"]
-[ext_resource type="Texture2D" path="res://Resources/Sprites/UI/atlas_btn_resume.tres" id="2_resume"]
-[ext_resource type="Texture2D" path="res://Resources/Sprites/UI/atlas_btn_reset.tres" id="3_reset"]
-[ext_resource type="Texture2D" path="res://Resources/Sprites/UI/atlas_btn_home.tres" id="4_home"]
 
 [node name="SettingsPanel" type="Control"]
 layout_mode = 3
@@ -45,7 +42,7 @@ theme_override_constants/separation = 20
 [node name="Title" type="Label" parent="SettingsMenu/Panel/VBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 56
-text = "Настройки"
+text = "Settings"
 horizontal_alignment = 1
 
 [node name="HSeparator1" type="HSeparator" parent="SettingsMenu/Panel/VBoxContainer"]
@@ -58,7 +55,7 @@ theme_override_constants/separation = 15
 [node name="VideoLabel" type="Label" parent="SettingsMenu/Panel/VBoxContainer/VideoSettings"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 40
-text = "Видео"
+text = "Video"
 
 [node name="ResolutionContainer" type="HBoxContainer" parent="SettingsMenu/Panel/VBoxContainer/VideoSettings"]
 layout_mode = 2
@@ -67,7 +64,7 @@ layout_mode = 2
 custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
-text = "Разрешение:"
+text = "Resolution:"
 
 [node name="ResolutionDropdown" type="OptionButton" parent="SettingsMenu/Panel/VBoxContainer/VideoSettings"]
 layout_mode = 2
@@ -76,37 +73,37 @@ theme_override_font_sizes/font_size = 28
 [node name="FullscreenContainer" type="HBoxContainer" parent="SettingsMenu/Panel/VBoxContainer/VideoSettings"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="SettingsMenu/Panel/VBoxContainer/VideoSettings/FullscreenContainer"]
+[node name="Label2" type="Label" parent="SettingsMenu/Panel/VBoxContainer/VideoSettings/FullscreenContainer"]
 custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
-text = "Полный экран:"
+text = "Fullscreen:"
 
 [node name="FullscreenToggle" type="CheckButton" parent="SettingsMenu/Panel/VBoxContainer/VideoSettings"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
 
-[node name="VsyncContainer" type="HBoxContainer" parent="SettingsMenu/Panel/VBoxContainer/VideoSettings"]
+[node name="LanguageContainer" type="HBoxContainer" parent="SettingsMenu/Panel/VBoxContainer/VideoSettings"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="SettingsMenu/Panel/VBoxContainer/VideoSettings/VsyncContainer"]
+[node name="LanguageLabel" type="Label" parent="SettingsMenu/Panel/VBoxContainer/VideoSettings/LanguageContainer"]
 custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
-text = "VSync:"
+text = "Language:"
 
-[node name="VsyncToggle" type="CheckButton" parent="SettingsMenu/Panel/VBoxContainer/VideoSettings"]
+[node name="LanguageDropdown" type="OptionButton" parent="SettingsMenu/Panel/VBoxContainer/VideoSettings"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
 
 [node name="FpsContainer" type="HBoxContainer" parent="SettingsMenu/Panel/VBoxContainer/VideoSettings"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="SettingsMenu/Panel/VBoxContainer/VideoSettings/FpsContainer"]
+[node name="Label4" type="Label" parent="SettingsMenu/Panel/VBoxContainer/VideoSettings/FpsContainer"]
 custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
-text = "Лимит кадров:"
+text = "FPS Limit:"
 
 [node name="FpsLimitDropdown" type="OptionButton" parent="SettingsMenu/Panel/VBoxContainer/VideoSettings"]
 layout_mode = 2
@@ -122,7 +119,7 @@ theme_override_constants/separation = 15
 [node name="AudioLabel" type="Label" parent="SettingsMenu/Panel/VBoxContainer/AudioSettings"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 40
-text = "Звук"
+text = "Audio"
 
 [node name="MasterVolumeContainer" type="VBoxContainer" parent="SettingsMenu/Panel/VBoxContainer/AudioSettings"]
 layout_mode = 2
@@ -130,7 +127,7 @@ layout_mode = 2
 [node name="MasterVolumeLabel" type="Label" parent="SettingsMenu/Panel/VBoxContainer/AudioSettings/MasterVolumeContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
-text = "Общая: 100%"
+text = "Master: 100%"
 
 [node name="MasterVolumeSlider" type="HSlider" parent="SettingsMenu/Panel/VBoxContainer/AudioSettings"]
 layout_mode = 2
@@ -144,7 +141,7 @@ layout_mode = 2
 [node name="MusicVolumeLabel" type="Label" parent="SettingsMenu/Panel/VBoxContainer/AudioSettings/MusicVolumeContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
-text = "Музыка: 70%"
+text = "Music: 70%"
 
 [node name="MusicVolumeSlider" type="HSlider" parent="SettingsMenu/Panel/VBoxContainer/AudioSettings"]
 layout_mode = 2
@@ -158,7 +155,7 @@ layout_mode = 2
 [node name="SfxVolumeLabel" type="Label" parent="SettingsMenu/Panel/VBoxContainer/AudioSettings/SfxVolumeContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
-text = "Эффекты: 80%"
+text = "SFX: 80%"
 
 [node name="SfxVolumeSlider" type="HSlider" parent="SettingsMenu/Panel/VBoxContainer/AudioSettings"]
 layout_mode = 2
@@ -174,20 +171,17 @@ layout_mode = 2
 theme_override_constants/separation = 20
 alignment = 1
 
-[node name="ApplyButton" type="TextureButton" parent="SettingsMenu/Panel/VBoxContainer/ButtonsContainer"]
-custom_minimum_size = Vector2(246, 62)
+[node name="ApplyButton" type="Button" parent="SettingsMenu/Panel/VBoxContainer/ButtonsContainer"]
 layout_mode = 2
-texture_normal = ExtResource("2_resume")
-ignore_texture_size = true
+custom_minimum_size = Vector2(140, 48)
+text = "Apply"
 
-[node name="ResetButton" type="TextureButton" parent="SettingsMenu/Panel/VBoxContainer/ButtonsContainer"]
-custom_minimum_size = Vector2(182, 62)
+[node name="ResetButton" type="Button" parent="SettingsMenu/Panel/VBoxContainer/ButtonsContainer"]
 layout_mode = 2
-texture_normal = ExtResource("3_reset")
-ignore_texture_size = true
+custom_minimum_size = Vector2(140, 48)
+text = "Reset"
 
-[node name="BackButton" type="TextureButton" parent="SettingsMenu/Panel/VBoxContainer/ButtonsContainer"]
-custom_minimum_size = Vector2(182, 62)
+[node name="BackButton" type="Button" parent="SettingsMenu/Panel/VBoxContainer/ButtonsContainer"]
 layout_mode = 2
-texture_normal = ExtResource("4_home")
-ignore_texture_size = true
+custom_minimum_size = Vector2(140, 48)
+text = "Back"

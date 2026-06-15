@@ -1,5 +1,5 @@
+﻿using AlJourney.Scripts.Interfaces;
 using Godot;
-using AlJourney.Scripts.Interfaces;
 
 namespace AlJourney.Scripts.Managers
 {
@@ -9,7 +9,7 @@ namespace AlJourney.Scripts.Managers
     public partial class SettingsManager : Node, ISettingsManager
     {
         /// <summary>
-        /// Глобальный экземпляр менеджера настроек (паттерн Singleton).
+        /// Глобальный экземпляр менеджера настроек.
         /// </summary>
         public static SettingsManager Instance { get; private set; }
 
@@ -35,17 +35,17 @@ namespace AlJourney.Scripts.Managers
         public bool Fullscreen { get; private set; } = true;
 
         /// <summary>
-        /// Указывает, включена ли вертикальная синхронизация (VSync).
+        /// Текущий язык игры.
         /// </summary>
-        public bool VSync { get; private set; } = true;
+        public string Language { get; private set; } = "en";
 
         /// <summary>
-        /// Максимальное количество кадров в секунду (FPS).
+        /// Максимальное количество кадров в секунду.
         /// </summary>
         public int MaxFps { get; private set; } = 60;
 
         /// <summary>
-        /// Общая (мастер) громкость звука.
+        /// Общая громкость звука.
         /// </summary>
         public float MasterVolume { get; private set; } = 1.0f;
 
@@ -55,7 +55,7 @@ namespace AlJourney.Scripts.Managers
         public float MusicVolume { get; private set; } = 0.7f;
 
         /// <summary>
-        /// Громкость звуковых эффектов (SFX).
+        /// Громкость звуковых эффектов.
         /// </summary>
         public float SfxVolume { get; private set; } = 0.8f;
 
@@ -113,20 +113,17 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Включает или выключает вертикальную синхронизацию (VSync).
+        /// Изменяет язык игры.
         /// </summary>
-        /// <param name="enabled">Состояние вертикальной синхронизации.</param>
-        /// <param name="applyImmediately">Если <c>true</c>, видео-настройки применяются немедленно.</param>
-        public void SetVSync(bool enabled, bool applyImmediately = true)
+        /// <param name="lang">Код языка.</param>
+        public void SetLanguage(string lang, bool applyImmediately = true)
         {
-            VSync = enabled;
-
+            Language = lang;
             if (applyImmediately)
             {
-                ApplyVideoSettings();
+                TranslationServer.SetLocale(lang);
             }
-
-            GD.Print($"[SettingsManager] VSync: {enabled}");
+            GD.Print($"[SettingsManager] Language: {lang}");
         }
 
         /// <summary>
@@ -149,7 +146,7 @@ namespace AlJourney.Scripts.Managers
         /// <summary>
         /// Устанавливает общую громкость звука и передает её в AudioManager.
         /// </summary>
-        /// <param name="volume">Уровень громкости (от 0.0 до 1.0).</param>
+        /// <param name="volume">Уровень громкости.</param>
         public void SetMasterVolume(float volume)
         {
             MasterVolume = Mathf.Clamp(volume, 0.0f, 1.0f);
@@ -160,7 +157,7 @@ namespace AlJourney.Scripts.Managers
         /// <summary>
         /// Устанавливает громкость фоновой музыки и передает её в AudioManager.
         /// </summary>
-        /// <param name="volume">Уровень громкости (от 0.0 до 1.0).</param>
+        /// <param name="volume">Уровень громкости.</param>
         public void SetMusicVolume(float volume)
         {
             MusicVolume = Mathf.Clamp(volume, 0.0f, 1.0f);
@@ -169,9 +166,9 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Устанавливает громкость звуковых эффектов (SFX) и передает её в AudioManager.
+        /// Устанавливает громкость звуковых эффектов и передает её в AudioManager.
         /// </summary>
-        /// <param name="volume">Уровень громкости (от 0.0 до 1.0).</param>
+        /// <param name="volume">Уровень громкости.</param>
         public void SetSfxVolume(float volume)
         {
             SfxVolume = Mathf.Clamp(volume, 0.0f, 1.0f);
@@ -186,8 +183,6 @@ namespace AlJourney.Scripts.Managers
         {
             Window window = GetWindow();
 
-            window.Size = _resolution;
-
             if (Fullscreen)
             {
                 window.Mode = Window.ModeEnum.Fullscreen;
@@ -195,12 +190,9 @@ namespace AlJourney.Scripts.Managers
             else
             {
                 window.Mode = Window.ModeEnum.Windowed;
+                window.Size = _resolution;
                 window.Position = (DisplayServer.ScreenGetSize() - _resolution) / 2;
             }
-
-            DisplayServer.WindowSetVsyncMode(VSync
-                ? DisplayServer.VSyncMode.Enabled
-                : DisplayServer.VSyncMode.Disabled);
 
             Engine.MaxFps = MaxFps;
 
@@ -226,7 +218,7 @@ namespace AlJourney.Scripts.Managers
             config.SetValue("video", "resolution_x", _resolution.X);
             config.SetValue("video", "resolution_y", _resolution.Y);
             config.SetValue("video", "fullscreen", Fullscreen);
-            config.SetValue("video", "vsync", VSync);
+            config.SetValue("video", "language", Language);
             config.SetValue("video", "max_fps", MaxFps);
 
             config.SetValue("audio", "master_volume", MasterVolume);
@@ -260,7 +252,7 @@ namespace AlJourney.Scripts.Managers
                 (int)config.GetValue("video", "resolution_y", 1080)
             );
             Fullscreen = (bool)config.GetValue("video", "fullscreen", true);
-            VSync = (bool)config.GetValue("video", "vsync", true);
+            Language = (string)config.GetValue("video", "language", "en");
             MaxFps = (int)config.GetValue("video", "max_fps", 60);
 
             MasterVolume = (float)config.GetValue("audio", "master_volume", 1.0f);
@@ -277,7 +269,7 @@ namespace AlJourney.Scripts.Managers
         {
             _resolution = new Vector2I(1920, 1080);
             Fullscreen = true;
-            VSync = true;
+            Language = "en";
             MaxFps = 60;
             MasterVolume = 1.0f;
             MusicVolume = 0.7f;
