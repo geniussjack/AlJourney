@@ -1,16 +1,16 @@
+﻿using AlJourney.Scripts.Interfaces;
 using Godot;
-using AlJourney.Scripts.Interfaces;
 using System.Collections.Generic;
 
 namespace AlJourney.Scripts.Managers
 {
     /// <summary>
-    /// Менеджер аудиосистемы. Отвечает за воспроизведение музыки и звуковых эффектов (SFX), а также управление их громкостью.
+    /// Менеджер аудиосистемы. Отвечает за воспроизведение музыки и звуковых эффектов, а также управление их громкостью.
     /// </summary>
     public partial class AudioManager : Node, IAudioManager
     {
         /// <summary>
-        /// Глобальный экземпляр менеджера аудио (паттерн Singleton).
+        /// Глобальный экземпляр менеджера аудио.
         /// </summary>
         public static AudioManager Instance { get; private set; }
 
@@ -20,7 +20,7 @@ namespace AlJourney.Scripts.Managers
         private readonly HashSet<string> _missingResourceWarnings = [];
 
         /// <summary>
-        /// Общая (мастер) громкость для всех звуков в игре. Значение от 0.0 до 1.0.
+        /// Общая громкость для всех звуков в игре. Значение от 0.0 до 1.0.
         /// </summary>
         public float MasterVolume
         {
@@ -44,7 +44,7 @@ namespace AlJourney.Scripts.Managers
         } = 0.7f;
 
         /// <summary>
-        /// Громкость звуковых эффектов (SFX). Значение от 0.0 до 1.0.
+        /// Громкость звуковых эффектов. Значение от 0.0 до 1.0.
         /// </summary>
         public float SfxVolume { get; set => field = Mathf.Clamp(value, 0.0f, 1.0f); } = 0.8f;
 
@@ -89,7 +89,7 @@ namespace AlJourney.Scripts.Managers
         /// Воспроизводит фоновую музыку по указанному пути к ресурсу.
         /// </summary>
         /// <param name="musicPath">Путь к файлу аудиоресурса музыки.</param>
-        /// <param name="loop">Указывает, должна ли музыка воспроизводиться в цикле (по умолчанию true).</param>
+        /// <param name="loop">Указывает, должна ли музыка воспроизводиться в цикле.</param>
         public void PlayMusic(string musicPath, bool loop = true)
         {
             _ = TryPlayMusic(musicPath, loop);
@@ -135,10 +135,10 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Воспроизводит звуковой эффект (SFX) по указанному пути.
+        /// Воспроизводит звуковой эффект по указанному пути.
         /// </summary>
         /// <param name="sfxPath">Путь к ресурсу звукового эффекта.</param>
-        /// <param name="pitchVariation">Случайная вариация высоты тона для разнообразия звучания (по умолчанию 0.0).</param>
+        /// <param name="pitchVariation">Случайная вариация высоты тона для разнообразия звучания.</param>
         public void PlaySfx(string sfxPath, float pitchVariation = 0.0f)
         {
             _ = TryPlaySfx(sfxPath, pitchVariation);
@@ -152,10 +152,15 @@ namespace AlJourney.Scripts.Managers
         /// <returns><c>true</c>, если эффект найден и начал воспроизводиться; иначе <c>false</c>.</returns>
         public bool TryPlaySfx(string sfxPath, float pitchVariation = 0.0f)
         {
+            if (!ResourceLoader.Exists(sfxPath))
+            {
+                WarnMissingResourceOnce("sfx", sfxPath);
+                return false;
+            }
+
             AudioStream stream = GD.Load<AudioStream>(sfxPath);
             if (stream == null)
             {
-                WarnMissingResourceOnce("sfx", sfxPath);
                 return false;
             }
 
@@ -180,10 +185,35 @@ namespace AlJourney.Scripts.Managers
             return true;
         }
 
+        public void PlaySwapSound()
+        {
+            PlaySfx("res://Resources/Audio/SFX/swap.wav", 0.1f);
+        }
+
+        public void PlayMatchSound()
+        {
+            PlaySfx("res://Resources/Audio/SFX/match.wav", 0.15f);
+        }
+
+        public void PlayAttackSound()
+        {
+            PlaySfx("res://Resources/Audio/SFX/attack.wav", 0.1f);
+        }
+
+        public void PlayHitSound()
+        {
+            PlaySfx("res://Resources/Audio/SFX/hit.wav", 0.1f);
+        }
+
+        public void PlayNewGameSound()
+        {
+            PlaySfx("res://Resources/Audio/SFX/new_game.wav");
+        }
+
         /// <summary>
         /// Плавно уменьшает громкость текущей музыки до полного затухания, а затем останавливает её.
         /// </summary>
-        /// <param name="duration">Продолжительность затухания в секундах (по умолчанию 1.0).</param>
+        /// <param name="duration">Продолжительность затухания в секундах.</param>
         public void FadeOutMusic(float duration = 1.0f)
         {
             if (_musicPlayer?.Playing != true)
@@ -196,7 +226,7 @@ namespace AlJourney.Scripts.Managers
             _ = tween.TweenCallback(Callable.From(() =>
             {
                 _musicPlayer.Stop();
-                UpdateVolumes(); 
+                UpdateVolumes();
             }));
 
             GD.Print($"[AudioManager] Fading out music over {duration}s");
@@ -205,7 +235,7 @@ namespace AlJourney.Scripts.Managers
         /// <summary>
         /// Плавно увеличивает громкость музыки от минимального значения до целевого.
         /// </summary>
-        /// <param name="duration">Продолжительность нарастания звука в секундах (по умолчанию 1.0).</param>
+        /// <param name="duration">Продолжительность нарастания звука в секундах.</param>
         public void FadeInMusic(float duration = 1.0f)
         {
             if (_musicPlayer?.Playing != true)
@@ -223,10 +253,10 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Выполняет плавный переход между текущей музыкой и новым треком (кроссфейд).
+        /// Выполняет плавный переход между текущей музыкой и новым треком.
         /// </summary>
         /// <param name="newMusicPath">Путь к новому музыкальному треку.</param>
-        /// <param name="duration">Длительность перехода в секундах (по умолчанию 1.0).</param>
+        /// <param name="duration">Длительность перехода в секундах.</param>
         /// <param name="loop">Указывает, должен ли новый трек воспроизводиться в цикле.</param>
         public void CrossfadeMusic(string newMusicPath, float duration = 1.0f, bool loop = true)
         {
@@ -257,7 +287,7 @@ namespace AlJourney.Scripts.Managers
                 return;
             }
 
-            _missingResourceWarnings.Add(warningKey);
+            _ = _missingResourceWarnings.Add(warningKey);
             GD.PrintErr($"[AudioManager] Missing {resourceType} resource: {resourcePath}");
         }
     }

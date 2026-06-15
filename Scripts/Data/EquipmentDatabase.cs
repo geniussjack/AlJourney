@@ -14,59 +14,59 @@ namespace AlJourney.Scripts.Data
         public static readonly Dictionary<string, EquipmentData> Templates = new()
         {
             ["rusty_sword"] = new EquipmentData(
-                "rusty_sword", "Ржавый меч", EquipmentSlot.Weapon, EquipmentRarity.Common, 1, 5,
+                "rusty_sword", "Rusty Sword", EquipmentSlot.Weapon, EquipmentRarity.Common, 1, 5,
                 new Dictionary<string, int> { ["damage"] = 2 }, []),
 
             ["old_staff"] = new EquipmentData(
-                "old_staff", "Старый посох", EquipmentSlot.Weapon, EquipmentRarity.Common, 1, 5,
+                "old_staff", "Old Staff", EquipmentSlot.Weapon, EquipmentRarity.Common, 1, 5,
                 new Dictionary<string, int> { ["magic_damage"] = 2 }, []),
 
             ["steel_blade"] = new EquipmentData(
-                "steel_blade", "Стальной клинок", EquipmentSlot.Weapon, EquipmentRarity.Uncommon, 1, 10,
+                "steel_blade", "Steel Blade", EquipmentSlot.Weapon, EquipmentRarity.Uncommon, 1, 10,
                 new Dictionary<string, int> { ["damage"] = 5, ["crit_chance"] = 10 }, []),
 
             ["apprentice_staff"] = new EquipmentData(
-                "apprentice_staff", "Посох ученика", EquipmentSlot.Weapon, EquipmentRarity.Uncommon, 1, 10,
+                "apprentice_staff", "Apprentice Staff", EquipmentSlot.Weapon, EquipmentRarity.Uncommon, 1, 10,
                 new Dictionary<string, int> { ["magic_damage"] = 5, ["mana_regen"] = 1 }, []),
 
             ["ice_sword"] = new EquipmentData(
-                "ice_sword", "Ледяной меч", EquipmentSlot.Weapon, EquipmentRarity.Rare, 1, 15,
+                "ice_sword", "Ice Sword", EquipmentSlot.Weapon, EquipmentRarity.Rare, 1, 15,
                 new Dictionary<string, int> { ["damage"] = 8, ["slow"] = 20 }, []),
 
             ["fire_staff"] = new EquipmentData(
-                "fire_staff", "Огненный посох", EquipmentSlot.Weapon, EquipmentRarity.Rare, 1, 15,
+                "fire_staff", "Fire Staff", EquipmentSlot.Weapon, EquipmentRarity.Rare, 1, 15,
                 new Dictionary<string, int> { ["magic_damage"] = 8, ["burn"] = 25 }, []),
 
             ["shadow_blade"] = new EquipmentData(
-                "shadow_blade", "Меч теней", EquipmentSlot.Weapon, EquipmentRarity.Epic, 1, 20,
+                "shadow_blade", "Shadow Blade", EquipmentSlot.Weapon, EquipmentRarity.Epic, 1, 20,
                 new Dictionary<string, int> { ["damage"] = 12, ["invisibility"] = 30 }, []),
 
             ["elemental_staff"] = new EquipmentData(
-                "elemental_staff", "Посох стихий", EquipmentSlot.Weapon, EquipmentRarity.Epic, 1, 20,
+                "elemental_staff", "Elemental Staff", EquipmentSlot.Weapon, EquipmentRarity.Epic, 1, 20,
                 new Dictionary<string, int> { ["magic_damage"] = 12, ["random_element"] = 50 }, []),
 
             ["excalibur"] = new EquipmentData(
-                "excalibur", "Экскалибур", EquipmentSlot.Weapon, EquipmentRarity.Legendary, 1, 25,
+                "excalibur", "Excalibur", EquipmentSlot.Weapon, EquipmentRarity.Legendary, 1, 25,
                 new Dictionary<string, int> { ["damage"] = 20, ["lifesteal"] = 15 }, []),
 
             ["archmage_staff"] = new EquipmentData(
-                "archmage_staff", "Посох архимага", EquipmentSlot.Weapon, EquipmentRarity.Legendary, 1, 25,
+                "archmage_staff", "Archmage Staff", EquipmentSlot.Weapon, EquipmentRarity.Legendary, 1, 25,
                 new Dictionary<string, int> { ["magic_damage"] = 20, ["double_spells"] = 100 }, []),
 
             ["leather_armor"] = new EquipmentData(
-                "leather_armor", "Кожаная броня", EquipmentSlot.Body, EquipmentRarity.Common, 1, 5,
+                "leather_armor", "Leather Armor", EquipmentSlot.Body, EquipmentRarity.Common, 1, 5,
                 new Dictionary<string, int> { ["defense"] = 3 }, []),
 
             ["dragon_scales"] = new EquipmentData(
-                "dragon_scales", "Драконья чешуя", EquipmentSlot.Body, EquipmentRarity.Legendary, 1, 25,
+                "dragon_scales", "Dragon Scales", EquipmentSlot.Body, EquipmentRarity.Legendary, 1, 25,
                 new Dictionary<string, int> { ["defense"] = 15, ["immunity_burn"] = 100 }, []),
 
             ["power_ring"] = new EquipmentData(
-                "power_ring", "Кольцо силы", EquipmentSlot.Ring, EquipmentRarity.Rare, 1, 15,
+                "power_ring", "Ring of Power", EquipmentSlot.Ring, EquipmentRarity.Rare, 1, 15,
                 new Dictionary<string, int> { ["damage"] = 10 }, []),
 
             ["life_amulet"] = new EquipmentData(
-                "life_amulet", "Амулет жизни", EquipmentSlot.Necklace, EquipmentRarity.Epic, 1, 20,
+                "life_amulet", "Amulet of Life", EquipmentSlot.Necklace, EquipmentRarity.Epic, 1, 20,
                 new Dictionary<string, int> { ["hp_percent"] = 20 }, [])
         };
     }

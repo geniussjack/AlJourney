@@ -1,4 +1,4 @@
-using AlJourney.Scripts.Core;
+﻿using AlJourney.Scripts.Core;
 using Godot;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +7,7 @@ namespace AlJourney.Scripts.Data
 {
     /// <summary>
     /// Структура данных, представляющая предмет экипировки.
-    /// Содержит информацию о типе (слоте), редкости, уровне прокачки, а также базовые характеристики и специальные способности предмета.
+    /// Содержит информацию о типе, редкости, уровне прокачки, а также базовые характеристики и специальные способности предмета.
     /// </summary>
     public record EquipmentData(
         string Id,
@@ -24,7 +24,7 @@ namespace AlJourney.Scripts.Data
         /// Возвращает цвет, соответствующий уровню редкости предмета.
         /// Используется для подсветки предмета в инвентаре или интерфейсе.
         /// </summary>
-        /// <returns>Цвет (Color), соответствующий редкости.</returns>
+        /// <returns>Цвет, соответствующий редкости.</returns>
         public Color GetRarityColor()
         {
             return Rarity switch
@@ -39,9 +39,9 @@ namespace AlJourney.Scripts.Data
         }
 
         /// <summary>
-        /// Возвращает шанс выпадения предмета в зависимости от его редкости (в процентах).
+        /// Возвращает шанс выпадения предмета в зависимости от его редкости.
         /// </summary>
-        /// <returns>Вероятность выпадения (float).</returns>
+        /// <returns>Вероятность выпадения.</returns>
         public float GetDropChance()
         {
             return Rarity switch
@@ -79,13 +79,8 @@ namespace AlJourney.Scripts.Data
             };
 
             int levelCost = baseCost * CurrentLevel;
-            
-            if (waveNumber > 0)
-            {
-                return ScalingSystem.ScaleCost(levelCost, waveNumber);
-            }
-            
-            return levelCost;
+
+            return waveNumber > 0 ? ScalingSystem.ScaleCost(levelCost, waveNumber) : levelCost;
         }
 
         /// <summary>
@@ -103,7 +98,7 @@ namespace AlJourney.Scripts.Data
             Dictionary<string, int> newStats = new(BaseStats);
             foreach (string stat in newStats.Keys.ToList())
             {
-                newStats[stat]++; 
+                newStats[stat]++;
             }
 
             return this with { CurrentLevel = CurrentLevel + 1, BaseStats = newStats };
@@ -118,7 +113,7 @@ namespace AlJourney.Scripts.Data
             Dictionary<string, int> totalStats = new(BaseStats);
             foreach (string stat in totalStats.Keys.ToList())
             {
-                totalStats[stat] += CurrentLevel - 1; 
+                totalStats[stat] += CurrentLevel - 1;
             }
             return totalStats;
         }
@@ -126,7 +121,7 @@ namespace AlJourney.Scripts.Data
         /// <summary>
         /// Возвращает строковое представление предмета, включающее его название, редкость и текущий уровень относительно максимального.
         /// </summary>
-        /// <returns>Строка в формате "Название (Редкость) - Level Текущий/Максимальный".</returns>
+        /// <returns>Строка в формате "Название - Level Текущий/Максимальный".</returns>
         public override string ToString()
         {
             return $"{Name} ({Rarity}) - Level {CurrentLevel}/{MaxLevel}";

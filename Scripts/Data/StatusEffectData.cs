@@ -1,14 +1,14 @@
-using AlJourney.Scripts.Core;
+﻿using AlJourney.Scripts.Core;
 
 namespace AlJourney.Scripts.Data
 {
     /// <summary>
-    /// Структура, описывающая статусный эффект, наложенный на персонажа или врага (например, горение или оглушение).
+    /// Структура, описывающая статусный эффект, наложенный на персонажа или врага.
     /// </summary>
     public record StatusEffectData(StatusEffect Type, int Duration, int Power, float ExtraData = 0f)
     {
         /// <summary>
-        /// Возвращает копию текущего статусного эффекта с уменьшенной на 1 длительностью (применяется каждый ход).
+        /// Возвращает копию текущего статусного эффекта с уменьшенной на 1 длительностью.
         /// </summary>
         /// <returns>Новый экземпляр StatusEffectData с обновленной длительностью.</returns>
         public StatusEffectData TickDuration()
@@ -17,7 +17,7 @@ namespace AlJourney.Scripts.Data
         }
 
         /// <summary>
-        /// Указывает, должен ли данный статусный эффект быть удален (если его длительность истекла).
+        /// Указывает, должен ли данный статусный эффект быть удален.
         /// </summary>
         public bool ShouldRemove => Duration <= 0;
     }

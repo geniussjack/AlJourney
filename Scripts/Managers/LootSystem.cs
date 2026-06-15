@@ -1,7 +1,7 @@
-using AlJourney.Scripts.Core;
+﻿using AlJourney.Scripts.Core;
 using AlJourney.Scripts.Data;
-using Godot;
 using AlJourney.Scripts.Interfaces;
+using Godot;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,7 +9,7 @@ namespace AlJourney.Scripts.Managers
 {
     /// <summary>
     /// Глобальный менеджер системы лута. Отвечает за генерацию экипировки 
-    /// (оружия, брони, бижутерии) после победы над врагами.
+    /// после победы над врагами.
     /// Определяет редкость предметов и их характеристики на основе текущей волны.
     /// </summary>
     public partial class LootSystem : Node, ILootSystem
@@ -54,14 +54,14 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Генерирует расширенный список предметов (лут) после победы над боссом.
+        /// Генерирует расширенный список предметов после победы над боссом.
         /// </summary>
         /// <param name="waveNumber">Номер текущей волны для скалирования редкости.</param>
         /// <returns>Список сгенерированных предметов экипировки.</returns>
         public List<EquipmentData> GenerateBossLoot(int waveNumber)
         {
             int dropCount = GD.RandRange(3, 11);
-            List<EquipmentData> loot = new List<EquipmentData>();
+            List<EquipmentData> loot = [];
 
             GD.Print($"[LootSystem] Generating {dropCount} items for boss at wave {waveNumber}");
 
@@ -82,21 +82,28 @@ namespace AlJourney.Scripts.Managers
 
         /// <summary>
         /// Генерирует один предмет после победы над обычным врагом.
-        /// Вероятность высокой редкости (Legendary/Epic) искусственно занижается для баланса.
+        /// Вероятность высокой редкости искусственно занижается для баланса.
         /// </summary>
         /// <param name="waveNumber">Номер текущей волны.</param>
         /// <returns>Сгенерированный предмет экипировки или null в случае ошибки.</returns>
         public EquipmentData GenerateNormalLoot(int waveNumber)
         {
             EquipmentRarity rarity = DetermineRarity();
-            
+
             // Снижение редкости для обычных врагов
-            if (rarity == EquipmentRarity.Legendary) rarity = EquipmentRarity.Epic;
-            if (rarity == EquipmentRarity.Epic && GD.Randf() > 0.1f) rarity = EquipmentRarity.Rare;
+            if (rarity == EquipmentRarity.Legendary)
+            {
+                rarity = EquipmentRarity.Epic;
+            }
+
+            if (rarity == EquipmentRarity.Epic && GD.Randf() > 0.1f)
+            {
+                rarity = EquipmentRarity.Rare;
+            }
 
             EquipmentSlot slot = DetermineSlot();
             EquipmentData item = GenerateEquipment(rarity, slot);
-            
+
             GD.Print($"[LootSystem] Generated normal loot: {item.Name} at wave {waveNumber}");
             return item;
         }
@@ -106,10 +113,13 @@ namespace AlJourney.Scripts.Managers
             float roll = GD.Randf() * 100f;
             float cumulative = 0f;
 
-            foreach (var (rarity, chance) in RarityWeights)
+            foreach ((EquipmentRarity rarity, float chance) in RarityWeights)
             {
                 cumulative += chance;
-                if (roll <= cumulative) return rarity;
+                if (roll <= cumulative)
+                {
+                    return rarity;
+                }
             }
 
             return EquipmentRarity.Common;
@@ -120,10 +130,13 @@ namespace AlJourney.Scripts.Managers
             float roll = GD.Randf() * 100f;
             float cumulative = 0f;
 
-            foreach (var (slot, chance) in SlotWeights)
+            foreach ((EquipmentSlot slot, float chance) in SlotWeights)
             {
                 cumulative += chance;
-                if (roll <= cumulative) return slot;
+                if (roll <= cumulative)
+                {
+                    return slot;
+                }
             }
 
             return EquipmentSlot.Earring;
@@ -135,8 +148,8 @@ namespace AlJourney.Scripts.Managers
                 .Where(item => item.Slot == slot && item.Rarity == rarity)
                 .ToList();
 
-            return templates.Count > 0 
-                ? templates[GD.RandRange(0, templates.Count - 1)] 
+            return templates.Count > 0
+                ? templates[GD.RandRange(0, templates.Count - 1)]
                 : GenerateBasicEquipment(rarity, slot);
         }
 
@@ -151,7 +164,7 @@ namespace AlJourney.Scripts.Managers
                 EquipmentSlot.Necklace => new Dictionary<string, int> { ["hp_percent"] = 5 },
                 EquipmentSlot.Ring => new Dictionary<string, int> { ["damage"] = 2 },
                 EquipmentSlot.Earring => new Dictionary<string, int> { ["defense"] = 1 },
-                _ => new Dictionary<string, int>()
+                _ => []
             };
         }
 
@@ -178,7 +191,7 @@ namespace AlJourney.Scripts.Managers
                 1,
                 maxLevel,
                 stats,
-                new Dictionary<string, string>());
+                []);
         }
     }
 }

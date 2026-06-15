@@ -1,7 +1,7 @@
-using AlJourney.Scripts.Core;
+﻿using AlJourney.Scripts.Core;
 using AlJourney.Scripts.Data;
-using Godot;
 using AlJourney.Scripts.Interfaces;
+using Godot;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -13,7 +13,7 @@ namespace AlJourney.Scripts.Managers
     public partial class AbilitySystem : Node, IAbilitySystem
     {
         /// <summary>
-        /// Глобальный экземпляр менеджера системы способностей (паттерн Singleton).
+        /// Глобальный экземпляр менеджера системы способностей.
         /// </summary>
         public static AbilitySystem Instance { get; private set; } = null!;
 
@@ -56,7 +56,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Разблокирует указанную способность для заданного персонажа за игровую валюту (монеты).
+        /// Разблокирует указанную способность для заданного персонажа за игровую валюту.
         /// </summary>
         /// <param name="hero">Класс персонажа, для которого разблокируется способность.</param>
         /// <param name="ability">Данные способности, которую необходимо разблокировать.</param>

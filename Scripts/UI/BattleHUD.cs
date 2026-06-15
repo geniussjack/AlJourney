@@ -1,4 +1,4 @@
-using AlJourney.Scripts.Characters;
+﻿using AlJourney.Scripts.Characters;
 using AlJourney.Scripts.Core;
 using AlJourney.Scripts.Managers;
 using AlJourney.Scripts.Match3;
@@ -8,7 +8,7 @@ using System.Collections.Generic;
 namespace AlJourney.Scripts.UI
 {
     /// <summary>
-    /// Пользовательский интерфейс боевого экрана (HUD). Отвечает за отображение здоровья, щитов героев, информации о врагах, текущей волне и количестве доступных ходов.
+    /// Пользовательский интерфейс боевого экрана. Отвечает за отображение здоровья, щитов героев, информации о врагах, текущей волне и количестве доступных ходов.
     /// </summary>
     public partial class BattleHUD : Control
     {
@@ -28,7 +28,6 @@ namespace AlJourney.Scripts.UI
         private Label _coinsLabel;
         private Label _swapsLabel;
 
-        private TextureButton _pauseButton;
 
         private DualHeroSystem _heroSystem;
         private readonly List<EnemyHealthBar> _enemyHealthBars = [];
@@ -65,11 +64,10 @@ namespace AlJourney.Scripts.UI
             _coinsLabel = GetNode<Label>("MarginContainer/VBoxContainer/BottomBar/CoinsContainer/CoinsLabel");
             _swapsLabel = GetNode<Label>("MarginContainer/VBoxContainer/BottomBar/SwapsLabel");
 
-            _pauseButton = GetNode<TextureButton>("MarginContainer/VBoxContainer/TopBar/PauseButton");
 
             _comboSystem = GetNode<ComboSystem>("/root/ComboSystem");
 
-            _pauseButton.Pressed += OnPausePressed;
+
             GameStateManager.Instance.CoinsChanged += OnCoinsChanged;
             GameStateManager.Instance.WaveChanged += OnWaveChanged;
             _comboSystem.CombosProcessed += OnCombosProcessed;
@@ -81,7 +79,7 @@ namespace AlJourney.Scripts.UI
         }
 
         /// <summary>
-        /// Инициализирует HUD для работы с системой двух героев (магом и воином), настраивает начальные значения здоровья, щитов и эффекты получения урона.
+        /// Инициализирует HUD для работы с системой двух героев, настраивает начальные значения здоровья, щитов и эффекты получения урона.
         /// </summary>
         /// <param name="heroSystem">Система управления двумя героями.</param>
         public void Initialize(DualHeroSystem heroSystem)
@@ -185,7 +183,7 @@ namespace AlJourney.Scripts.UI
         }
 
         /// <summary>
-        /// Обновляет текстовое отображение количества оставшихся перемещений (свапов) элементов на поле.
+        /// Обновляет текстовое отображение количества оставшихся перемещений элементов на поле.
         /// </summary>
         /// <param name="remainingSwaps">Количество оставшихся перемещений.</param>
         public void UpdateSwaps(int remainingSwaps)
@@ -253,12 +251,12 @@ namespace AlJourney.Scripts.UI
 
             if (mageActive)
             {
-                HighlightHero(_mageInfoContainer, new Color(0.5f, 0.8f, 1.0f)); 
+                HighlightHero(_mageInfoContainer, new Color(0.5f, 0.8f, 1.0f));
             }
 
             if (warriorActive)
             {
-                HighlightHero(_warriorInfoContainer, new Color(1.0f, 0.7f, 0.3f)); 
+                HighlightHero(_warriorInfoContainer, new Color(1.0f, 0.7f, 0.3f));
             }
         }
 
@@ -293,10 +291,7 @@ namespace AlJourney.Scripts.UI
                 _heroSystem.HeroShieldChanged -= OnHeroShieldChanged;
             }
 
-            if (_comboSystem != null)
-            {
-                _comboSystem.CombosProcessed -= OnCombosProcessed;
-            }
+            _comboSystem?.CombosProcessed -= OnCombosProcessed;
 
             GameStateManager.Instance.CoinsChanged -= OnCoinsChanged;
             GameStateManager.Instance.WaveChanged -= OnWaveChanged;
@@ -370,6 +365,7 @@ namespace AlJourney.Scripts.UI
             _healthBar.MaxValue = maxHealth;
             _healthBar.Value = currentHealth;
             _healthLabel.Text = $"{currentHealth}/{maxHealth}";
+            _nameLabel.Text = _enemy.CharacterName;
         }
 
         private void OnEnemyDied()

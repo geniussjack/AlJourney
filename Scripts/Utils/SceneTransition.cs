@@ -1,11 +1,11 @@
-using Godot;
+﻿using Godot;
 
 namespace AlJourney.Scripts.Utils
 {
     /// <summary>
     /// Компонент для создания плавных переходов между сценами.
-    /// Использует полноэкранный прямоугольник (ColorRect) для создания эффектов затемнения (Fade Out),
-    /// осветления (Fade In) и вспышек. Помогает избежать резких смен кадров в игре.
+    /// Использует полноэкранный прямоугольник для создания эффектов затемнения,
+    /// осветления и вспышек. Помогает избежать резких смен кадров в игре.
     /// </summary>
     public partial class SceneTransition : CanvasLayer
     {
@@ -14,7 +14,7 @@ namespace AlJourney.Scripts.Utils
 
         /// <summary>
         /// Инициализирует компонент. Создает полноэкранный ColorRect, делает его полностью прозрачным 
-        /// и настраивает так, чтобы он не перехватывал события мыши (MouseFilter).
+        /// и настраивает так, чтобы он не перехватывал события мыши.
         /// </summary>
         public override void _Ready()
         {
@@ -36,7 +36,7 @@ namespace AlJourney.Scripts.Utils
         /// Сначала затемняет экран, затем загружает новую сцену и осветляет экран обратно.
         /// </summary>
         /// <param name="scenePath">Путь к файлу целевой сцены.</param>
-        /// <param name="duration">Общее время перехода в секундах (делится пополам на затемнение и осветление).</param>
+        /// <param name="duration">Общее время перехода в секундах.</param>
         public void TransitionToScene(string scenePath, float duration = 0.5f)
         {
             if (_isTransitioning)
@@ -61,7 +61,7 @@ namespace AlJourney.Scripts.Utils
         }
 
         /// <summary>
-        /// Выполняет плавное затемнение экрана (Fade Out) до полностью непрозрачного состояния.
+        /// Выполняет плавное затемнение экрана до полностью непрозрачного состояния.
         /// </summary>
         /// <param name="duration">Длительность затемнения в секундах.</param>
         public void FadeOut(float duration = 0.3f)
@@ -71,7 +71,7 @@ namespace AlJourney.Scripts.Utils
         }
 
         /// <summary>
-        /// Выполняет плавное осветление экрана (Fade In) до полностью прозрачного состояния.
+        /// Выполняет плавное осветление экрана до полностью прозрачного состояния.
         /// </summary>
         /// <param name="duration">Длительность осветления в секундах.</param>
         public void FadeIn(float duration = 0.3f)

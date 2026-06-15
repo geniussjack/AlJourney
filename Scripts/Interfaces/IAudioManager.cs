@@ -1,13 +1,13 @@
-namespace AlJourney.Scripts.Interfaces
+﻿namespace AlJourney.Scripts.Interfaces
 {
     /// <summary>
     /// Интерфейс для управления аудиосистемой игры.
-    /// Позволяет настраивать громкость, воспроизводить и останавливать музыку и звуковые эффекты (SFX), а также применять эффекты затухания.
+    /// Позволяет настраивать громкость, воспроизводить и останавливать музыку и звуковые эффекты, а также применять эффекты затухания.
     /// </summary>
     public interface IAudioManager
     {
         /// <summary>
-        /// Общая (мастер) громкость игры. Влияет на все звуки и музыку.
+        /// Общая громкость игры. Влияет на все звуки и музыку.
         /// </summary>
         float MasterVolume { get; set; }
 
@@ -17,7 +17,7 @@ namespace AlJourney.Scripts.Interfaces
         float MusicVolume { get; set; }
 
         /// <summary>
-        /// Уровень громкости звуковых эффектов (SFX).
+        /// Уровень громкости звуковых эффектов.
         /// </summary>
         float SfxVolume { get; set; }
 
@@ -37,7 +37,7 @@ namespace AlJourney.Scripts.Interfaces
         void StopMusic();
 
         /// <summary>
-        /// Воспроизводит звуковой эффект по указанному пути с возможностью случайного изменения высоты тона (pitch).
+        /// Воспроизводит звуковой эффект по указанному пути с возможностью случайного изменения высоты тона.
         /// </summary>
         void PlaySfx(string sfxPath, float pitchVariation = 0.0f);
 
@@ -57,7 +57,7 @@ namespace AlJourney.Scripts.Interfaces
         void FadeInMusic(float duration = 1.0f);
 
         /// <summary>
-        /// Плавно переключает (кроссфейд) текущую музыку на новую композицию за указанное время.
+        /// Плавно переключает текущую музыку на новую композицию за указанное время.
         /// </summary>
         void CrossfadeMusic(string newMusicPath, float duration = 1.0f, bool loop = true);
     }

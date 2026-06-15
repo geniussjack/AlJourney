@@ -1,5 +1,5 @@
+﻿using AlJourney.Scripts.Match3;
 using System.Collections.Generic;
-using AlJourney.Scripts.Match3;
 
 namespace AlJourney.Scripts.Interfaces
 {
@@ -10,12 +10,12 @@ namespace AlJourney.Scripts.Interfaces
     public interface IGridManager
     {
         /// <summary>
-        /// Размер игрового поля (одна сторона квадратной сетки).
+        /// Размер игрового поля.
         /// </summary>
         int GridSize { get; }
 
         /// <summary>
-        /// Количество оставшихся у игрока ходов (перестановок).
+        /// Количество оставшихся у игрока ходов.
         /// </summary>
         int RemainingSwaps { get; }
 
@@ -31,12 +31,12 @@ namespace AlJourney.Scripts.Interfaces
 
         /// <summary>
         /// Пытается поменять местами два элемента на поле.
-        /// Возвращает true, если перестановка возможна и привела к совпадению (или была разрешена правилами).
+        /// Возвращает true, если перестановка возможна и привела к совпадению.
         /// </summary>
         bool TrySwap(int x1, int y1, int x2, int y2);
 
         /// <summary>
-        /// Ищет все текущие совпадения элементов (линии из 3 и более) на поле.
+        /// Ищет все текущие совпадения элементов на поле.
         /// </summary>
         List<MatchResult> FindAllMatches();
 

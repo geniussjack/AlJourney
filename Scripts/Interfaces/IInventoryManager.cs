@@ -1,6 +1,6 @@
-using System.Collections.Generic;
 using AlJourney.Scripts.Core;
 using AlJourney.Scripts.Data;
+using System.Collections.Generic;
 
 namespace AlJourney.Scripts.Interfaces
 {

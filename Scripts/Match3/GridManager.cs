@@ -1,15 +1,16 @@
-using AlJourney.Scripts.Core;
-using Godot;
+﻿using AlJourney.Scripts.Core;
 using AlJourney.Scripts.Interfaces;
+using AlJourney.Scripts.Managers;
+using Godot;
 using System.Collections.Generic;
 
 namespace AlJourney.Scripts.Match3
 {
     /// <summary>
-    /// Глобальный синглтон-менеджер, управляющий логикой игрового поля (сетки Match-3).
-    /// Отвечает за генерацию элементов, проверку возможных ходов (свапов), поиск совпадений 
-    /// (каскадов) и применение гравитации при исчезновении камней.
-    /// Не содержит визуальной логики (отделено от UI).
+    /// Глобальный синглтон-менеджер, управляющий логикой игрового поля.
+    /// Отвечает за генерацию элементов, проверку возможных ходов, поиск совпадений 
+    /// и применение гравитации при исчезновении камней.
+    /// Не содержит визуальной логики.
     /// </summary>
     public partial class GridManager : Node, IGridManager
     {
@@ -27,7 +28,7 @@ namespace AlJourney.Scripts.Match3
         public delegate void SwapCompletedEventHandler(bool wasValid);
 
         /// <summary>
-        /// Вызывается, когда на поле найдены совпадения (линии из 3 и более).
+        /// Вызывается, когда на поле найдены совпадения.
         /// </summary>
         /// <param name="matchCount">Количество уникальных комбинаций, найденных за этот проход.</param>
         [Signal]
@@ -35,7 +36,7 @@ namespace AlJourney.Scripts.Match3
 
         /// <summary>
         /// Вызывается после того, как пустые места заполнены новыми элементами,
-        /// что может запустить новую цепную реакцию (каскад).
+        /// что может запустить новую цепную реакцию.
         /// </summary>
         [Signal]
         public delegate void GridRefillCompletedEventHandler();
@@ -43,12 +44,12 @@ namespace AlJourney.Scripts.Match3
         private ElementData[,] _grid;
 
         /// <summary>
-        /// Размер игрового поля по ширине и высоте (стандартно 5x5).
+        /// Размер игрового поля по ширине и высоте.
         /// </summary>
         public int GridSize { get; private set; }
 
         /// <summary>
-        /// Количество доступных обменов (свапов) в текущий ход игрока.
+        /// Количество доступных обменов в текущий ход игрока.
         /// Если опускается до 0, ход считается завершенным.
         /// </summary>
         public int RemainingSwaps { get; private set; }
@@ -90,14 +91,18 @@ namespace AlJourney.Scripts.Match3
         {
             ElementType exclude1 = GetHorizontalExclude(x, y);
             ElementType exclude2 = GetVerticalExclude(x, y);
-            
+
             ElementType selectedType = GetRandomValidType(exclude1, exclude2);
             return new ElementData(selectedType, x, y);
         }
 
         private ElementType GetHorizontalExclude(int x, int y)
         {
-            if (x < 2) return ElementType.None;
+            if (x < 2)
+            {
+                return ElementType.None;
+            }
+
             ElementType? type1 = _grid[x - 1, y]?.Type;
             ElementType? type2 = _grid[x - 2, y]?.Type;
             return (type1 != null && type1 == type2) ? type1.Value : ElementType.None;
@@ -105,7 +110,11 @@ namespace AlJourney.Scripts.Match3
 
         private ElementType GetVerticalExclude(int x, int y)
         {
-            if (y < 2) return ElementType.None;
+            if (y < 2)
+            {
+                return ElementType.None;
+            }
+
             ElementType? type1 = _grid[x, y - 1]?.Type;
             ElementType? type2 = _grid[x, y - 2]?.Type;
             return (type1 != null && type1 == type2) ? type1.Value : ElementType.None;
@@ -114,8 +123,8 @@ namespace AlJourney.Scripts.Match3
         private ElementType GetRandomValidType(ElementType exclude1, ElementType exclude2)
         {
             ElementType[] allTypes = { ElementType.Fire, ElementType.Heal, ElementType.Sword, ElementType.Shield };
-            List<ElementType> validTypes = new List<ElementType>();
-            
+            List<ElementType> validTypes = [];
+
             foreach (ElementType t in allTypes)
             {
                 if (t != exclude1 && t != exclude2 && t != ElementType.None)
@@ -123,20 +132,15 @@ namespace AlJourney.Scripts.Match3
                     validTypes.Add(t);
                 }
             }
-            
-            if (validTypes.Count == 0)
-            {
-                return (ElementType)GD.RandRange(1, 4);
-            }
-            
-            return validTypes[GD.RandRange(0, validTypes.Count - 1)];
+
+            return validTypes.Count == 0 ? (ElementType)GD.RandRange(1, 4) : validTypes[GD.RandRange(0, validTypes.Count - 1)];
         }
 
         /// <summary>
         /// Возвращает логический объект элемента по заданным координатам.
         /// </summary>
-        /// <param name="x">Координата X (от 0 до GridSize - 1).</param>
-        /// <param name="y">Координата Y (от 0 до GridSize - 1).</param>
+        /// <param name="x">Координата X.</param>
+        /// <param name="y">Координата Y.</param>
         /// <returns>Объект ElementData, либо null, если координаты выходят за пределы поля.</returns>
         public ElementData GetElement(int x, int y)
         {
@@ -145,7 +149,7 @@ namespace AlJourney.Scripts.Match3
 
         /// <summary>
         /// Выполняет попытку поменять два соседних элемента местами.
-        /// Если обмен не приводит ни к одному совпадению (3-в-ряд), 
+        /// Если обмен не приводит ни к одному совпадению, 
         /// элементы возвращаются на свои исходные позиции.
         /// </summary>
         /// <param name="x1">X первой ячейки.</param>
@@ -166,6 +170,7 @@ namespace AlJourney.Scripts.Match3
             }
 
             SwapElements(x1, y1, x2, y2);
+            AudioManager.Instance?.PlaySwapSound();
 
             if (FindAllMatches().Count > 0)
             {
@@ -173,9 +178,10 @@ namespace AlJourney.Scripts.Match3
                 _ = EmitSignal(SignalName.SwapCompleted, true);
                 return true;
             }
-            
+
             // Откат свапа, если нет совпадений
             SwapElements(x1, y1, x2, y2);
+            AudioManager.Instance?.PlaySwapSound();
             _ = EmitSignal(SignalName.SwapCompleted, false);
             return false;
         }
@@ -204,13 +210,14 @@ namespace AlJourney.Scripts.Match3
         /// <returns>Список объектов MatchResult, каждый из которых содержит информацию о собранной линии.</returns>
         public List<MatchResult> FindAllMatches()
         {
-            List<MatchResult> allMatches = new List<MatchResult>();
-            
+            List<MatchResult> allMatches = [];
+
             ScanMatchesHorizontal(allMatches);
             ScanMatchesVertical(allMatches);
 
             if (allMatches.Count > 0)
             {
+                AudioManager.Instance?.PlayMatchSound();
                 _ = EmitSignal(SignalName.MatchesFound, allMatches.Count);
             }
 
@@ -223,11 +230,11 @@ namespace AlJourney.Scripts.Match3
             {
                 for (int x = 0; x < GridSize - 2; x++)
                 {
-                    MatchResult match = CheckLineMatch(x, y, 1, 0); 
+                    MatchResult match = CheckLineMatch(x, y, 1, 0);
                     if (match != null)
                     {
                         results.Add(match);
-                        x += match.MatchCount - 1; 
+                        x += match.MatchCount - 1;
                     }
                 }
             }
@@ -239,11 +246,11 @@ namespace AlJourney.Scripts.Match3
             {
                 for (int y = 0; y < GridSize - 2; y++)
                 {
-                    MatchResult match = CheckLineMatch(x, y, 0, 1); 
+                    MatchResult match = CheckLineMatch(x, y, 0, 1);
                     if (match != null)
                     {
                         results.Add(match);
-                        y += match.MatchCount - 1; 
+                        y += match.MatchCount - 1;
                     }
                 }
             }
@@ -258,31 +265,34 @@ namespace AlJourney.Scripts.Match3
             }
 
             int matchCount = 1;
-            List<(int, int)> matchedPositions = new List<(int, int)> { (startX, startY) };
+            List<(int, int)> matchedPositions = [(startX, startY)];
 
             for (int i = 1; i < GridSize; i++)
             {
                 int x = startX + (i * deltaX);
                 int y = startY + (i * deltaY);
 
-                if (!IsValidPosition(x, y)) break;
+                if (!IsValidPosition(x, y))
+                {
+                    break;
+                }
 
                 ElementData element = _grid[x, y];
-                if (element == null || !startElement.CanMatchWith(element)) break;
+                if (element == null || !startElement.CanMatchWith(element))
+                {
+                    break;
+                }
 
                 matchCount++;
                 matchedPositions.Add((x, y));
             }
 
-            if (matchCount >= GameConstants.MATCH_MIN_LENGTH)
-            {
-                return new MatchResult(startElement.Type, matchCount, deltaX == 1)
+            return matchCount >= GameConstants.MATCH_MIN_LENGTH
+                ? new MatchResult(startElement.Type, matchCount, deltaX == 1)
                 {
                     MatchedPositions = matchedPositions
-                };
-            }
-
-            return null;
+                }
+                : null;
         }
 
         /// <summary>
@@ -292,8 +302,11 @@ namespace AlJourney.Scripts.Match3
         /// <param name="matches">Список подтвержденных совпадений для удаления.</param>
         public void ProcessMatches(List<MatchResult> matches)
         {
-            if (matches == null || matches.Count == 0) return;
-            
+            if (matches == null || matches.Count == 0)
+            {
+                return;
+            }
+
             MarkMatchedElements(matches);
             ClearMatchedElements();
             ApplyGravity();
@@ -304,8 +317,11 @@ namespace AlJourney.Scripts.Match3
         {
             foreach (MatchResult match in matches)
             {
-                if (match?.MatchedPositions == null) continue;
-                
+                if (match?.MatchedPositions == null)
+                {
+                    continue;
+                }
+
                 foreach ((int x, int y) in match.MatchedPositions)
                 {
                     if (IsValidPosition(x, y) && _grid[x, y] != null)
@@ -370,7 +386,7 @@ namespace AlJourney.Scripts.Match3
         }
 
         /// <summary>
-        /// Восстанавливает лимит доступных обменов для игрока (например, в начале нового хода).
+        /// Восстанавливает лимит доступных обменов для игрока.
         /// </summary>
         public void ResetSwaps()
         {
@@ -384,7 +400,7 @@ namespace AlJourney.Scripts.Match3
 
         /// <summary>
         /// Симулирует все возможные ходы на доске, чтобы убедиться, 
-        /// что игрок не оказался в безвыходной ситуации (Deadlock).
+        /// что игрок не оказался в безвыходной ситуации.
         /// </summary>
         /// <returns>True, если на доске есть хотя бы один легальный ход, собирающий комбо.</returns>
         public bool HasValidMoves()
@@ -398,7 +414,10 @@ namespace AlJourney.Scripts.Match3
             {
                 for (int y = 0; y < GridSize; y++)
                 {
-                    if (WouldCreateMatch(x, y, x + 1, y)) return true;
+                    if (WouldCreateMatch(x, y, x + 1, y))
+                    {
+                        return true;
+                    }
                 }
             }
             return false;
@@ -410,7 +429,10 @@ namespace AlJourney.Scripts.Match3
             {
                 for (int y = 0; y < GridSize - 1; y++)
                 {
-                    if (WouldCreateMatch(x, y, x, y + 1)) return true;
+                    if (WouldCreateMatch(x, y, x, y + 1))
+                    {
+                        return true;
+                    }
                 }
             }
             return false;
@@ -418,12 +440,18 @@ namespace AlJourney.Scripts.Match3
 
         private bool WouldCreateMatch(int x1, int y1, int x2, int y2)
         {
-            if (!IsValidPosition(x1, y1) || !IsValidPosition(x2, y2)) return false;
+            if (!IsValidPosition(x1, y1) || !IsValidPosition(x2, y2))
+            {
+                return false;
+            }
 
             ElementData elem1 = _grid[x1, y1];
             ElementData elem2 = _grid[x2, y2];
 
-            if (elem1 == null || elem2 == null) return false;
+            if (elem1 == null || elem2 == null)
+            {
+                return false;
+            }
 
             // Временный свап
             _grid[x1, y1] = elem2;
@@ -440,34 +468,51 @@ namespace AlJourney.Scripts.Match3
 
         private bool CheckMatchAtPosition(int x, int y)
         {
-            if (!IsValidPosition(x, y)) return false;
+            if (!IsValidPosition(x, y))
+            {
+                return false;
+            }
 
             ElementData element = _grid[x, y];
-            if (element == null || element.Type == ElementType.None) return false;
-
-            return CheckHorizontalLength(x, y, element) >= GameConstants.MATCH_MIN_LENGTH || 
-                   CheckVerticalLength(x, y, element) >= GameConstants.MATCH_MIN_LENGTH;
+            return element != null && element.Type != ElementType.None && (CheckHorizontalLength(x, y, element) >= GameConstants.MATCH_MIN_LENGTH ||
+                   CheckVerticalLength(x, y, element) >= GameConstants.MATCH_MIN_LENGTH);
         }
 
         private int CheckHorizontalLength(int startX, int y, ElementData element)
         {
             int count = 1;
-            for (int i = startX - 1; i >= 0 && _grid[i, y] != null && element.CanMatchWith(_grid[i, y]); i--) count++;
-            for (int i = startX + 1; i < GridSize && _grid[i, y] != null && element.CanMatchWith(_grid[i, y]); i++) count++;
+            for (int i = startX - 1; i >= 0 && _grid[i, y] != null && element.CanMatchWith(_grid[i, y]); i--)
+            {
+                count++;
+            }
+
+            for (int i = startX + 1; i < GridSize && _grid[i, y] != null && element.CanMatchWith(_grid[i, y]); i++)
+            {
+                count++;
+            }
+
             return count;
         }
 
         private int CheckVerticalLength(int x, int startY, ElementData element)
         {
             int count = 1;
-            for (int i = startY - 1; i >= 0 && _grid[x, i] != null && element.CanMatchWith(_grid[x, i]); i--) count++;
-            for (int i = startY + 1; i < GridSize && _grid[x, i] != null && element.CanMatchWith(_grid[x, i]); i++) count++;
+            for (int i = startY - 1; i >= 0 && _grid[x, i] != null && element.CanMatchWith(_grid[x, i]); i--)
+            {
+                count++;
+            }
+
+            for (int i = startY + 1; i < GridSize && _grid[x, i] != null && element.CanMatchWith(_grid[x, i]); i++)
+            {
+                count++;
+            }
+
             return count;
         }
 
         /// <summary>
         /// Автоматически перемешивает все камни на доске, если метод <see cref="HasValidMoves"/> 
-        /// возвращает false (нет доступных ходов).
+        /// возвращает false.
         /// </summary>
         public void CheckAndReshuffleIfNeeded()
         {
@@ -480,10 +525,9 @@ namespace AlJourney.Scripts.Match3
 
         private void ReshuffleBoard()
         {
-            int attempts = 0;
-            const int maxAttempts = 3;
-            
-            while (attempts < maxAttempts)
+            const int maxAttempts = 10;
+
+            for (int attempts = 0; attempts < maxAttempts; attempts++)
             {
                 for (int x = 0; x < GridSize; x++)
                 {
@@ -492,14 +536,25 @@ namespace AlJourney.Scripts.Match3
                         _grid[x, y] = GenerateSafeElement(x, y);
                     }
                 }
-                
+
                 if (HasValidMoves())
                 {
-                    EmitSignal(SignalName.GridRefillCompleted);
+                    GD.Print($"[GridManager] Reshuffle succeeded on attempt {attempts + 1}");
+                    _ = EmitSignal(SignalName.GridRefillCompleted);
                     return;
                 }
-                attempts++;
             }
+
+            // Крайний случай: заполняем поле гарантированно имеющим ходы набором
+            GD.PrintErr("[GridManager] Could not find valid moves after max reshuffles, forcing generation");
+            for (int x = 0; x < GridSize; x++)
+            {
+                for (int y = 0; y < GridSize; y++)
+                {
+                    _grid[x, y] = new ElementData((ElementType)(1 + ((x + y) % 4)), x, y);
+                }
+            }
+            _ = EmitSignal(SignalName.GridRefillCompleted);
         }
 
         /// <summary>

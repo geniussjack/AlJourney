@@ -1,12 +1,10 @@
-using AlJourney.Scripts.Managers;
 using AlJourney.Scripts.Data;
-using AlJourney.Scripts.Core;
+using AlJourney.Scripts.Managers;
 using Chickensoft.GoDotTest;
 using Godot;
 using Shouldly;
-using System.IO;
 
-namespace AlJourney.Tests
+namespace AlJourney.Scripts.Tests
 {
     public class SaveSystemTest : TestClass
     {
@@ -36,7 +34,7 @@ namespace AlJourney.Tests
         public void InitialSaveFileDoesNotExist()
         {
             // Убедимся, что файл старого сохранения удален
-            _saveSystem.DeleteSave();
+            _ = _saveSystem.DeleteSave();
             _saveSystem.SaveFileExists().ShouldBeFalse();
         }
 
@@ -45,10 +43,10 @@ namespace AlJourney.Tests
         {
             // Очищаем CurrentSave
             _gameStateManager.StartNewGame();
-            var prevSave = GameStateManager.Instance.CurrentSave;
+            SaveData prevSave = GameStateManager.Instance.CurrentSave;
             // Устанавливаем в null
             typeof(GameStateManager).GetProperty("CurrentSave").SetValue(_gameStateManager, null);
-            
+
             bool result = _saveSystem.SaveGame();
             result.ShouldBeFalse();
 
@@ -60,16 +58,16 @@ namespace AlJourney.Tests
         public void SaveAndLoadGameWorksCorrectly()
         {
             _gameStateManager.StartNewGame();
-            var currentSave = GameStateManager.Instance.CurrentSave;
+            SaveData currentSave = GameStateManager.Instance.CurrentSave;
             currentSave.Coins = 100;
             currentSave.CurrentWave = 5;
-            
+
             bool saveResult = _saveSystem.SaveGame();
             saveResult.ShouldBeTrue();
             _saveSystem.SaveFileExists().ShouldBeTrue();
 
             SaveData loadedData = _saveSystem.LoadGame();
-            loadedData.ShouldNotBeNull();
+            _ = loadedData.ShouldNotBeNull();
             loadedData.Coins.ShouldBe(100);
             loadedData.CurrentWave.ShouldBe(5);
             loadedData.MageMaxHealth.ShouldBeGreaterThan(0);
@@ -79,10 +77,10 @@ namespace AlJourney.Tests
         public void DeleteSaveWorksCorrectly()
         {
             _gameStateManager.StartNewGame();
-            _saveSystem.SaveGame();
+            _ = _saveSystem.SaveGame();
             _saveSystem.SaveFileExists().ShouldBeTrue();
 
-            _saveSystem.DeleteSave();
+            _ = _saveSystem.DeleteSave();
             _saveSystem.SaveFileExists().ShouldBeFalse();
             _saveSystem.LoadGame().ShouldBeNull();
         }
@@ -91,10 +89,10 @@ namespace AlJourney.Tests
         public void ValidateSaveDataRejectsInvalidWave()
         {
             _gameStateManager.StartNewGame();
-            var currentSave = GameStateManager.Instance.CurrentSave;
+            SaveData currentSave = GameStateManager.Instance.CurrentSave;
             currentSave.CurrentWave = -1; // Invalid
 
-            _saveSystem.SaveGame();
+            _ = _saveSystem.SaveGame();
 
             SaveData loadedData = _saveSystem.LoadGame();
             loadedData.ShouldBeNull("LoadGame should return null for invalid save data");

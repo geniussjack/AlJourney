@@ -1,12 +1,12 @@
-using AlJourney.Scripts.Managers;
-using AlJourney.Scripts.Data;
 using AlJourney.Scripts.Core;
+using AlJourney.Scripts.Data;
+using AlJourney.Scripts.Managers;
 using Chickensoft.GoDotTest;
 using Godot;
 using Shouldly;
 using System.Collections.Generic;
 
-namespace AlJourney.Tests
+namespace AlJourney.Scripts.Tests
 {
     public class LootSystemTest : TestClass
     {
@@ -31,8 +31,8 @@ namespace AlJourney.Tests
         public void GenerateBossLootReturnsMultipleItems()
         {
             List<EquipmentData> loot = _lootSystem.GenerateBossLoot(5);
-            
-            loot.ShouldNotBeNull();
+
+            _ = loot.ShouldNotBeNull();
             loot.Count.ShouldBeGreaterThanOrEqualTo(3);
             loot.Count.ShouldBeLessThanOrEqualTo(11);
         }
@@ -41,8 +41,8 @@ namespace AlJourney.Tests
         public void GenerateNormalLootReturnsOneItem()
         {
             EquipmentData item = _lootSystem.GenerateNormalLoot(2);
-            
-            item.ShouldNotBeNull();
+
+            _ = item.ShouldNotBeNull();
             item.Rarity.ShouldNotBe(EquipmentRarity.Legendary, "Normal enemies should very rarely or never drop legendary directly like this without scaling down");
         }
     }

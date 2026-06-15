@@ -1,4 +1,4 @@
-using AlJourney.Scripts.Match3;
+﻿using AlJourney.Scripts.Match3;
 using Godot;
 
 namespace AlJourney.Scripts.UI
@@ -34,7 +34,7 @@ namespace AlJourney.Scripts.UI
         public bool IsAnimating { get; private set; }
 
         /// <summary>
-        /// Вызывается при готовности узла. Создает и настраивает визуальные компоненты (текстуру и панель выделения), а также подписывается на события ввода.
+        /// Вызывается при готовности узла. Создает и настраивает визуальные компоненты, а также подписывается на события ввода.
         /// </summary>
         public override void _Ready()
         {
@@ -42,8 +42,8 @@ namespace AlJourney.Scripts.UI
             {
                 ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
                 StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered,
-                CustomMinimumSize = new Vector2(128, 128)
             };
+            _sprite.SetAnchorsPreset(LayoutPreset.FullRect);
             AddChild(_sprite);
 
             _highlightPanel = new Panel
@@ -60,20 +60,22 @@ namespace AlJourney.Scripts.UI
         /// <summary>
         /// Инициализирует спрайт элемента заданными данными и текстурой, устанавливая начальные размеры и позицию.
         /// </summary>
-        /// <param name="data">Данные элемента (тип, позиция в сетке).</param>
+        /// <param name="data">Данные элемента.</param>
         /// <param name="texture">Текстура для визуального отображения.</param>
-        public void Initialize(ElementData data, Texture2D texture)
+        /// <param name="cellSize">Размер ячейки в пикселях.</param>
+        public void Initialize(ElementData data, Texture2D texture, int cellSize = 80)
         {
             Data = data;
             _sprite.Texture = texture;
             _targetPosition = Position;
 
-            CustomMinimumSize = new Vector2(128, 128);
-            Size = new Vector2(128, 128);
+            CustomMinimumSize = new Vector2(cellSize, cellSize);
+            Size = new Vector2(cellSize, cellSize);
+            _sprite.CustomMinimumSize = new Vector2(cellSize, cellSize);
         }
 
         /// <summary>
-        /// Обновляет логические данные элемента (ElementData), связанные с этим визуальным компонентом.
+        /// Обновляет логические данные элемента, связанные с этим визуальным компонентом.
         /// </summary>
         /// <param name="newData">Новые данные элемента.</param>
         public void UpdateData(ElementData newData)
@@ -91,7 +93,7 @@ namespace AlJourney.Scripts.UI
         }
 
         /// <summary>
-        /// Включает или отключает визуальное выделение элемента (например, при выборе для обмена).
+        /// Включает или отключает визуальное выделение элемента.
         /// </summary>
         /// <param name="enabled">True, если элемент должен быть выделен, иначе False.</param>
         public void SetHighlight(bool enabled)
@@ -100,7 +102,7 @@ namespace AlJourney.Scripts.UI
 
             if (enabled)
             {
-                _highlightPanel.Modulate = new Color(1, 1, 0, 0.5f); 
+                _highlightPanel.Modulate = new Color(1, 1, 0, 0.5f);
             }
         }
 
@@ -126,7 +128,7 @@ namespace AlJourney.Scripts.UI
         }
 
         /// <summary>
-        /// Воспроизводит анимацию исчезновения элемента при успешном совпадении (матче) "три в ряд", после чего удаляет узел.
+        /// Воспроизводит анимацию исчезновения элемента при успешном совпадении "три в ряд", после чего удаляет узел.
         /// </summary>
         public void PlayMatchAnimation()
         {
@@ -141,7 +143,7 @@ namespace AlJourney.Scripts.UI
         /// Воспроизводит анимацию обмена местами с другим элементом, перемещая данный спрайт в указанную позицию за заданное время.
         /// </summary>
         /// <param name="targetPos">Позиция, в которую нужно переместиться.</param>
-        /// <param name="duration">Продолжительность анимации в секундах (по умолчанию 0.2f).</param>
+        /// <param name="duration">Продолжительность анимации в секундах.</param>
         public void PlaySwapAnimation(Vector2 targetPos, float duration = 0.2f)
         {
             Tween tween = CreateTween();

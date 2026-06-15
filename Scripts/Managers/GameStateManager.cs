@@ -1,7 +1,7 @@
-using AlJourney.Scripts.Core;
+﻿using AlJourney.Scripts.Core;
 using AlJourney.Scripts.Data;
-using Godot;
 using AlJourney.Scripts.Interfaces;
+using Godot;
 
 namespace AlJourney.Scripts.Managers
 {
@@ -11,7 +11,7 @@ namespace AlJourney.Scripts.Managers
     public partial class GameStateManager : Node, IGameStateManager
     {
         /// <summary>
-        /// Глобальный экземпляр менеджера состояния игры (паттерн Singleton).
+        /// Глобальный экземпляр менеджера состояния игры.
         /// </summary>
         public static GameStateManager Instance { get; private set; } = null!;
 
@@ -76,7 +76,7 @@ namespace AlJourney.Scripts.Managers
         public int Coins => CurrentSave?.Coins ?? 0;
 
         /// <summary>
-        /// Указывает, активна ли игра в данный момент (идет ли битва/прохождение).
+        /// Указывает, активна ли игра в данный момент.
         /// </summary>
         public bool IsGameActive { get; private set; }
 

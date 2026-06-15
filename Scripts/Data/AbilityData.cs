@@ -1,4 +1,4 @@
-using AlJourney.Scripts.Core;
+﻿using AlJourney.Scripts.Core;
 using Godot;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,10 +21,10 @@ namespace AlJourney.Scripts.Data
     )
     {
         /// <summary>
-        /// Возвращает цвет, соответствующий элементу данной способности (Огонь, Лечение, Меч, Щит).
+        /// Возвращает цвет, соответствующий элементу данной способности.
         /// Используется для цветового кодирования в пользовательском интерфейсе.
         /// </summary>
-        /// <returns>Цвет элемента (Color) для отображения.</returns>
+        /// <returns>Цвет элемента для отображения.</returns>
         public Color GetElementColor()
         {
             return Element switch
@@ -38,18 +38,18 @@ namespace AlJourney.Scripts.Data
         }
 
         /// <summary>
-        /// Указывает, является ли данная способность атакующей (наносящей урон).
+        /// Указывает, является ли данная способность атакующей.
         /// </summary>
         public bool IsAttackAbility => Type == AbilityType.Attack;
 
         /// <summary>
-        /// Указывает, является ли данная способность поддерживающей (например, лечением или защитой).
+        /// Указывает, является ли данная способность поддерживающей.
         /// </summary>
         public bool IsSupportAbility => Type == AbilityType.Support;
 
         /// <summary>
         /// Возвращает значение первого эффекта из словаря эффектов способности.
-        /// Удобно использовать для способностей, имеющих только один числовой показатель (например, базовый урон или лечение).
+        /// Удобно использовать для способностей, имеющих только один числовой показатель.
         /// </summary>
         /// <returns>Значение основного эффекта или 0, если эффектов нет.</returns>
         public int GetPrimaryEffect()
@@ -60,7 +60,7 @@ namespace AlJourney.Scripts.Data
         /// <summary>
         /// Возвращает значение конкретного эффекта по его названию.
         /// </summary>
-        /// <param name="effectName">Название эффекта (например, "damage", "healing").</param>
+        /// <param name="effectName">Название эффекта.</param>
         /// <returns>Числовое значение эффекта, если он найден, иначе 0.</returns>
         public int GetEffect(string effectName)
         {
@@ -70,7 +70,7 @@ namespace AlJourney.Scripts.Data
         /// <summary>
         /// Возвращает строковое представление способности, включающее её название, тип и элемент.
         /// </summary>
-        /// <returns>Строка в формате "Название (Тип - Элемент)".</returns>
+        /// <returns>Строка в формате "Название".</returns>
         public override string ToString()
         {
             return $"{Name} ({Type} - {Element})";

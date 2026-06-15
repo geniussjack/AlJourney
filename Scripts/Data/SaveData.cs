@@ -1,4 +1,4 @@
-using AlJourney.Scripts.Core;
+﻿using AlJourney.Scripts.Core;
 using System;
 using System.Collections.Generic;
 
@@ -96,7 +96,7 @@ namespace AlJourney.Scripts.Data
         }
 
         /// <summary>
-        /// Метод для адаптации (миграции) данных из старых версий игры в новую структуру сохранения.
+        /// Метод для адаптации данных из старых версий игры в новую структуру сохранения.
         /// Если версия схемы устарела, данные преобразуются для обеспечения совместимости.
         /// </summary>
         /// <param name="oldData">Данные старого сохранения.</param>

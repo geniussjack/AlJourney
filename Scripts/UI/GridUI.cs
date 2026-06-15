@@ -7,58 +7,41 @@ using System.Collections.Generic;
 namespace AlJourney.Scripts.UI
 {
     /// <summary>
-    /// Главный компонент пользовательского интерфейса для игрового поля (Match-3).
-    /// Отвечает за визуализацию сетки, обработку кликов игрока, анимацию перемещения
-    /// (свапа) и эффекты уничтожения камней. Связывает логику GridManager с визуальными узлами.
+    /// Visual layer for the Match-3 board.
     /// </summary>
     public partial class GridUI : Control
     {
-        /// <summary>
-        /// Вызывается при попытке игрока перетащить (поменять местами) два элемента.
-        /// Используется для передачи координат в логический менеджер.
-        /// </summary>
-        /// <param name="x1">Координата X первого элемента.</param>
-        /// <param name="y1">Координата Y первого элемента.</param>
-        /// <param name="x2">Координата X второго элемента.</param>
-        /// <param name="y2">Координата Y второго элемента.</param>
         [Signal]
         public delegate void SwapAttemptedEventHandler(int x1, int y1, int x2, int y2);
 
-        private const int CELL_SIZE = 128;
-        private const int CELL_SPACING = 0;
+        private const int CELL_SIZE = 80;
+        private const int CELL_SPACING = 4;
         private const int GRID_TOP_OFFSET = 40;
 
-        private GridContainer _gridContainer;
+        private Control _gridContainer;
         private ElementSprite[,] _visualGrid;
         private ElementSprite _selectedElement;
 
         private Dictionary<ElementType, Texture2D> _elementTextures;
-        private Dictionary<ElementData, ElementSprite> _spriteMap = new Dictionary<ElementData, ElementSprite>();
+        private readonly Dictionary<ElementData, ElementSprite> _spriteMap = [];
 
         private GridManager _gridManager;
         private ComboSystem _comboSystem;
         private int _gridSize;
 
-        /// <summary>
-        /// Вызывается при готовности узла. Инициализирует сетку, загружает текстуры визуальных элементов, устанавливает отступы и подписывается на события логики игрового поля.
-        /// </summary>
         public override void _Ready()
         {
             _gridManager = GetNode<GridManager>("/root/GridManager");
             _comboSystem = GetNode<ComboSystem>("/root/ComboSystem");
             _gridSize = GameConstants.GRID_SIZE;
 
-            _gridContainer = new GridContainer
+            _gridContainer = new Control
             {
-                Columns = _gridSize
+                Position = new Vector2(0, GRID_TOP_OFFSET)
             };
-            _gridContainer.AddThemeConstantOverride("h_separation", CELL_SPACING);
-            _gridContainer.AddThemeConstantOverride("v_separation", CELL_SPACING);
-            _gridContainer.Position = new Vector2(0, GRID_TOP_OFFSET);
             AddChild(_gridContainer);
 
             _visualGrid = new ElementSprite[_gridSize, _gridSize];
-
             LoadElementTextures();
 
             _gridManager.GridInitialized += OnGridInitialized;
@@ -66,8 +49,8 @@ namespace AlJourney.Scripts.UI
             _gridManager.GridRefillCompleted += OnGridRefilled;
 
             CustomMinimumSize = new Vector2(
-                (_gridSize * CELL_SIZE) + ((_gridSize - 1) * CELL_SPACING),
-                GRID_TOP_OFFSET + (_gridSize * CELL_SIZE) + ((_gridSize - 1) * CELL_SPACING)
+                (_gridSize * (CELL_SIZE + CELL_SPACING)) - CELL_SPACING,
+                GRID_TOP_OFFSET + (_gridSize * (CELL_SIZE + CELL_SPACING)) - CELL_SPACING
             );
 
             GD.Print("[GridUI] Initialized");
@@ -82,8 +65,6 @@ namespace AlJourney.Scripts.UI
                 [ElementType.Sword] = LoadOrCreateTexture("res://Resources/Sprites/Elements/sword_icon.png", Colors.Orange),
                 [ElementType.Shield] = LoadOrCreateTexture("res://Resources/Sprites/Elements/shield_icon.png", Colors.Blue)
             };
-
-            GD.Print("[GridUI] Element textures loaded");
         }
 
         private static Texture2D LoadOrCreateTexture(string path, Color fallbackColor)
@@ -101,7 +82,6 @@ namespace AlJourney.Scripts.UI
         private void OnGridInitialized()
         {
             CreateVisualGrid();
-            GD.Print("[GridUI] Visual grid created");
         }
 
         private void CreateVisualGrid()
@@ -114,22 +94,22 @@ namespace AlJourney.Scripts.UI
             if (_selectedElement == null)
             {
                 SelectElement(clickedElement);
+                return;
             }
-            else if (clickedElement == _selectedElement)
+
+            if (clickedElement == _selectedElement)
             {
                 DeselectCurrentElement();
+                return;
             }
-            else
-            {
-                HandleElementSwap(clickedElement);
-            }
+
+            HandleElementSwap(clickedElement);
         }
 
         private void SelectElement(ElementSprite element)
         {
             _selectedElement = element;
             _selectedElement.SetHighlight(true);
-            GD.Print($"[GridUI] Selected element at ({element.GridX}, {element.GridY})");
         }
 
         private void DeselectCurrentElement()
@@ -146,25 +126,21 @@ namespace AlJourney.Scripts.UI
             if ((deltaX == 1 && deltaY == 0) || (deltaX == 0 && deltaY == 1))
             {
                 ProcessSwapAction(clickedElement);
+                return;
             }
-            else
-            {
-                DeselectCurrentElement();
-                SelectElement(clickedElement);
-            }
+
+            DeselectCurrentElement();
+            SelectElement(clickedElement);
         }
 
         private void ProcessSwapAction(ElementSprite clickedElement)
         {
-            GD.Print($"[GridUI] Attempting swap: ({_selectedElement.GridX},{_selectedElement.GridY}) <-> ({clickedElement.GridX},{clickedElement.GridY})");
-
             int fromX = _selectedElement.GridX;
             int fromY = _selectedElement.GridY;
             int toX = clickedElement.GridX;
             int toY = clickedElement.GridY;
 
             bool swapSuccessful = _gridManager.TrySwap(fromX, fromY, toX, toY);
-
             if (swapSuccessful)
             {
                 AnimateSwap(_selectedElement, clickedElement, fromX, fromY, toX, toY);
@@ -174,7 +150,7 @@ namespace AlJourney.Scripts.UI
                 PlayInvalidSwapAnimation(_selectedElement);
                 PlayInvalidSwapAnimation(clickedElement);
             }
-            
+
             DeselectCurrentElement();
         }
 
@@ -201,18 +177,20 @@ namespace AlJourney.Scripts.UI
 
         private void OnSwapCompleted(bool wasValid)
         {
-            if (!wasValid) return;
+            if (!wasValid)
+            {
+                return;
+            }
+
             GD.Print("[GridUI] Swap completed, waiting for BattleManager match processing");
         }
 
-        /// <summary>
-        /// Визуализирует процесс исчезновения совпавших элементов (линий) и отображает всплывающие эффекты комбо (например, лечение или урон).
-        /// </summary>
-        /// <param name="matches">Список совпадений, которые необходимо анимировать и удалить с поля.</param>
-        /// <param name="effects">Список визуальных эффектов (урон/лечение), привязанных к совпадениям.</param>
         public void VisualizeMatchesAndEffects(List<MatchResult> matches, List<ComboEffect> effects)
         {
-            if (matches == null || effects == null || matches.Count == 0) return;
+            if (matches == null || effects == null || matches.Count == 0)
+            {
+                return;
+            }
 
             VisualizeComboEffects(effects, matches);
 
@@ -227,7 +205,10 @@ namespace AlJourney.Scripts.UI
                 foreach ((int x, int y) in match.MatchedPositions)
                 {
                     _visualGrid[x, y]?.PlayMatchAnimation();
-                    _spriteMap.Remove(_visualGrid[x, y].Data);
+                    if (_visualGrid[x, y] != null)
+                    {
+                        _ = _spriteMap.Remove(_visualGrid[x, y].Data);
+                    }
                     _visualGrid[x, y] = null;
                 }
             }
@@ -239,7 +220,6 @@ namespace AlJourney.Scripts.UI
             {
                 ComboEffect effect = effects[i];
                 MatchResult match = matches[i];
-
                 Vector2 centerPos = CalculateMatchCenter(match);
 
                 ComboParticles.SpawnComboEffect(this, centerPos, effect.ElementType, effect.ComboLevel);
@@ -253,7 +233,10 @@ namespace AlJourney.Scripts.UI
 
         private static Vector2 CalculateMatchCenter(MatchResult match)
         {
-            if (match.MatchedPositions.Count == 0) return Vector2.Zero;
+            if (match.MatchedPositions.Count == 0)
+            {
+                return Vector2.Zero;
+            }
 
             float sumX = 0;
             float sumY = 0;
@@ -278,12 +261,14 @@ namespace AlJourney.Scripts.UI
             foreach ((int x, int y) in match.MatchedPositions)
             {
                 ElementSprite sprite = _visualGrid[x, y];
-                if (sprite != null)
+                if (sprite == null)
                 {
-                    Tween tween = CreateTween();
-                    _ = tween.TweenProperty(sprite, "modulate", flashColor * 1.5f, 0.1f);
-                    _ = tween.TweenProperty(sprite, "modulate", Colors.White, 0.1f);
+                    continue;
                 }
+
+                Tween tween = CreateTween();
+                _ = tween.TweenProperty(sprite, "modulate", flashColor * 1.5f, 0.1f);
+                _ = tween.TweenProperty(sprite, "modulate", Colors.White, 0.1f);
             }
         }
 
@@ -314,25 +299,27 @@ namespace AlJourney.Scripts.UI
         private void OnGridRefilled()
         {
             SyncVisualGridFromLogicalGrid(animateElements: true);
-            GD.Print("[GridUI] Grid refilled and visualized");
         }
 
         private void SyncVisualGridFromLogicalGrid(bool animateElements)
         {
             ElementData[,] logicalGrid = _gridManager.GetGrid();
             ElementSprite[,] syncedGrid = new ElementSprite[_gridSize, _gridSize];
-            HashSet<ElementSprite> activeSprites = new HashSet<ElementSprite>();
+            HashSet<ElementSprite> activeSprites = [];
 
             for (int y = 0; y < _gridSize; y++)
             {
                 for (int x = 0; x < _gridSize; x++)
                 {
                     ElementData data = logicalGrid[x, y];
-                    if (data == null) continue;
+                    if (data == null)
+                    {
+                        continue;
+                    }
 
                     ElementSprite sprite = ProcessGridElement(data, x, y, animateElements);
                     syncedGrid[x, y] = sprite;
-                    activeSprites.Add(sprite);
+                    _ = activeSprites.Add(sprite);
                 }
             }
 
@@ -343,12 +330,12 @@ namespace AlJourney.Scripts.UI
         private ElementSprite ProcessGridElement(ElementData data, int x, int y, bool animateElements)
         {
             Vector2 targetPos = GetElementPosition(x, y);
-            
+
             if (!_spriteMap.TryGetValue(data, out ElementSprite sprite))
             {
                 sprite = CreateElementSprite(data);
                 _spriteMap[data] = sprite;
-                
+
                 if (animateElements)
                 {
                     sprite.SetGridPosition(targetPos - new Vector2(0, 400));
@@ -379,9 +366,9 @@ namespace AlJourney.Scripts.UI
 
         private void CleanupOldSprites(HashSet<ElementSprite> activeSprites)
         {
-            List<ElementData> keysToRemove = new List<ElementData>();
+            List<ElementData> keysToRemove = [];
 
-            foreach (var kvp in _spriteMap)
+            foreach (KeyValuePair<ElementData, ElementSprite> kvp in _spriteMap)
             {
                 if (!activeSprites.Contains(kvp.Value))
                 {
@@ -390,9 +377,9 @@ namespace AlJourney.Scripts.UI
                 }
             }
 
-            foreach (var key in keysToRemove)
+            foreach (ElementData key in keysToRemove)
             {
-                _spriteMap.Remove(key);
+                _ = _spriteMap.Remove(key);
             }
 
             if (_selectedElement != null && !activeSprites.Contains(_selectedElement))
@@ -407,7 +394,7 @@ namespace AlJourney.Scripts.UI
             _gridContainer.AddChild(elementSprite);
 
             Texture2D texture = _elementTextures[data.Type];
-            elementSprite.Initialize(data, texture);
+            elementSprite.Initialize(data, texture, CELL_SIZE);
             elementSprite.ElementClicked += OnElementClicked;
             return elementSprite;
         }
@@ -420,10 +407,8 @@ namespace AlJourney.Scripts.UI
             );
 
             string cascadeText = $"⚡ CASCADE x{cascadeLevel}! ⚡";
-            Color cascadeColor = new(1.0f, 0.8f, 0.0f); 
-
+            Color cascadeColor = new(1.0f, 0.8f, 0.0f);
             ComboParticles.SpawnFloatingText(this, centerPos, cascadeText, cascadeColor);
-            GD.Print($"[GridUI] Cascade x{cascadeLevel} displayed!");
         }
 
         private static Vector2 GetElementPosition(int gridX, int gridY)
@@ -434,9 +419,6 @@ namespace AlJourney.Scripts.UI
             );
         }
 
-        /// <summary>
-        /// Вызывается при удалении узла из дерева сцены. Очищает все подписки на события логики для предотвращения утечек памяти.
-        /// </summary>
         public override void _ExitTree()
         {
             if (_gridManager != null)

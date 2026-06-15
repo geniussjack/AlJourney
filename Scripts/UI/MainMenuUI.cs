@@ -1,4 +1,4 @@
-using AlJourney.Scripts.Core;
+﻿using AlJourney.Scripts.Core;
 using AlJourney.Scripts.Managers;
 using Godot;
 
@@ -9,10 +9,11 @@ namespace AlJourney.Scripts.UI
     /// </summary>
     public partial class MainMenuUI : Control
     {
-        private TextureButton _continueButton;
-        private TextureButton _settingsButton;
-        private TextureButton _creditsButton;
-        private TextureButton _quitButton;
+        private Button _newGameButton;
+        private Button _continueButton;
+        private Button _settingsButton;
+        private Button _creditsButton;
+        private Button _quitButton;
 
         private Control _mainMenuPanel;
         private Control _settingsPanel;
@@ -25,18 +26,20 @@ namespace AlJourney.Scripts.UI
         {
             _mainMenuPanel = GetNode<Control>("MainMenuPanel");
 
-            _continueButton = GetNode<TextureButton>("MainMenuPanel/VBoxContainer/ContinueButton");
-            _settingsButton = GetNode<TextureButton>("MainMenuPanel/VBoxContainer/SettingsButton");
-            _creditsButton  = GetNode<TextureButton>("MainMenuPanel/VBoxContainer/CreditsButton");
-            _quitButton     = GetNode<TextureButton>("MainMenuPanel/VBoxContainer/QuitButton");
+            _newGameButton = GetNode<Button>("MainMenuPanel/VBoxContainer/NewGameButton");
+            _continueButton = GetNode<Button>("MainMenuPanel/VBoxContainer/ContinueButton");
+            _settingsButton = GetNode<Button>("MainMenuPanel/VBoxContainer/SettingsButton");
+            _creditsButton = GetNode<Button>("MainMenuPanel/VBoxContainer/CreditsButton");
+            _quitButton = GetNode<Button>("MainMenuPanel/VBoxContainer/QuitButton");
 
             _settingsPanel = GetNode<Control>("SettingsPanel");
-            _creditsPanel  = GetNode<Control>("CreditsPanel");
+            _creditsPanel = GetNode<Control>("CreditsPanel");
 
-            _continueButton.Pressed += OnPlayPressed;
+            _newGameButton.Pressed += OnNewGamePressed;
+            _continueButton.Pressed += OnContinuePressed;
             _settingsButton.Pressed += OnSettingsPressed;
-            _creditsButton.Pressed  += OnCreditsPressed;
-            _quitButton.Pressed     += OnQuitPressed;
+            _creditsButton.Pressed += OnCreditsPressed;
+            _quitButton.Pressed += OnQuitPressed;
 
             ShowMainMenu();
 
@@ -48,12 +51,27 @@ namespace AlJourney.Scripts.UI
             _mainMenuPanel.Show();
             _settingsPanel.Hide();
             _creditsPanel.Hide();
+            UpdateContinueButtonState();
         }
 
-        private void OnPlayPressed()
+        private void UpdateContinueButtonState()
         {
-            AudioManager.Instance?.TryPlaySfx("res://Resources/Audio/SFX/button_click.wav");
+            bool hasSave = SaveSystem.Instance != null && SaveSystem.Instance.SaveFileExists();
+            _continueButton.Disabled = !hasSave;
+            _continueButton.Modulate = hasSave ? Colors.White : new Color(1, 1, 1, 0.45f);
+        }
 
+        private void OnNewGamePressed()
+        {
+            AudioManager.Instance?.PlayNewGameSound();
+            GD.Print("[MainMenuUI] New game pressed");
+            _ = SaveSystem.Instance.DeleteSave();
+            GameStateManager.Instance.StartNewGame();
+            SceneManager.Instance.LoadScene(GameState.Battle);
+        }
+
+        private void OnContinuePressed()
+        {
             if (SaveSystem.Instance.SaveFileExists())
             {
                 GD.Print("[MainMenuUI] Save found - continuing game");
@@ -61,16 +79,13 @@ namespace AlJourney.Scripts.UI
             }
             else
             {
-                GD.Print("[MainMenuUI] No save - starting new game");
-                GameStateManager.Instance.StartNewGame();
-                SceneManager.Instance.LoadScene(GameState.Battle);
+                GD.PrintErr("[MainMenuUI] Continue button pressed but no save found!");
             }
         }
 
         private void OnSettingsPressed()
         {
             GD.Print("[MainMenuUI] Settings pressed");
-            AudioManager.Instance?.TryPlaySfx("res://Resources/Audio/SFX/button_click.wav");
             _mainMenuPanel.Hide();
             _settingsPanel.Show();
         }
@@ -78,7 +93,6 @@ namespace AlJourney.Scripts.UI
         private void OnCreditsPressed()
         {
             GD.Print("[MainMenuUI] Credits pressed");
-            AudioManager.Instance?.TryPlaySfx("res://Resources/Audio/SFX/button_click.wav");
             _mainMenuPanel.Hide();
             _creditsPanel.Show();
         }
@@ -86,17 +100,15 @@ namespace AlJourney.Scripts.UI
         private void OnQuitPressed()
         {
             GD.Print("[MainMenuUI] Quit pressed");
-            AudioManager.Instance?.TryPlaySfx("res://Resources/Audio/SFX/button_click.wav");
             GetTree().Quit();
         }
 
         /// <summary>
-        /// Скрывает все дополнительные панели (настройки, титры) и возвращает пользователя на основной экран главного меню.
+        /// Скрывает все дополнительные панели и возвращает пользователя на основной экран главного меню.
         /// </summary>
         public void OnBackToMainMenu()
         {
             GD.Print("[MainMenuUI] Back to main menu");
-            AudioManager.Instance?.TryPlaySfx("res://Resources/Audio/SFX/button_click.wav");
             ShowMainMenu();
         }
     }

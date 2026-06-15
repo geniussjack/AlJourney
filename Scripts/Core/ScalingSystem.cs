@@ -1,4 +1,4 @@
-using Godot;
+﻿using Godot;
 
 namespace AlJourney.Scripts.Core
 {
@@ -13,25 +13,25 @@ namespace AlJourney.Scripts.Core
         private const float COST_COEFFICIENT = 0.05f;
 
         /// <summary>
-        /// Вычисляет масштабированное значение характеристики врага (здоровья, урона и т.д.) для указанной волны.
+        /// Вычисляет масштабированное значение характеристики врага для указанной волны.
         /// </summary>
         /// <param name="baseStat">Базовое значение характеристики на первой волне.</param>
         /// <param name="waveNumber">Номер текущей волны.</param>
         /// <returns>Рассчитанное значение характеристики с учетом множителя волны.</returns>
         public static int ScaleEnemyStat(int baseStat, int waveNumber)
         {
-            return Mathf.CeilToInt(baseStat * (1 + waveNumber * ENEMY_STAT_COEFFICIENT));
+            return Mathf.CeilToInt(baseStat * (1 + (waveNumber * ENEMY_STAT_COEFFICIENT)));
         }
 
         /// <summary>
-        /// Вычисляет увеличенный размер награды (например, золота), получаемой игроком на указанной волне.
+        /// Вычисляет увеличенный размер награды, получаемой игроком на указанной волне.
         /// </summary>
         /// <param name="baseReward">Базовый размер награды.</param>
         /// <param name="waveNumber">Номер текущей волны.</param>
         /// <returns>Рассчитанное значение награды с учетом множителя.</returns>
         public static int ScaleReward(int baseReward, int waveNumber)
         {
-            return Mathf.CeilToInt(baseReward * (1 + waveNumber * REWARD_COEFFICIENT));
+            return Mathf.CeilToInt(baseReward * (1 + (waveNumber * REWARD_COEFFICIENT)));
         }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace AlJourney.Scripts.Core
         /// <returns>Рассчитанная стоимость с учетом множителя цены.</returns>
         public static int ScaleCost(int baseCost, int waveNumber)
         {
-            return Mathf.CeilToInt(baseCost * (1 + waveNumber * COST_COEFFICIENT));
+            return Mathf.CeilToInt(baseCost * (1 + (waveNumber * COST_COEFFICIENT)));
         }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace AlJourney.Scripts.Core
         public static int GetEnemyCount(int waveNumber)
         {
             int count = GameConstants.ENEMY_COUNT_BASE
-                + (waveNumber - 1) / GameConstants.ENEMY_COUNT_INCREASE_EVERY;
+                + ((waveNumber - 1) / GameConstants.ENEMY_COUNT_INCREASE_EVERY);
             return Mathf.Min(count, GameConstants.MAX_ENEMIES_PER_WAVE);
         }
 

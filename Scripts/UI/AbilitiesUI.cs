@@ -7,8 +7,7 @@ using System.Collections.Generic;
 namespace AlJourney.Scripts.UI
 {
     /// <summary>
-    /// Пользовательский интерфейс способностей. Управляет отображением и взаимодействием со списком способностей мага и воина.
-    /// Работает в связке с AbilitiesUI.tscn.
+    /// Ability browser UI for the mage and warrior.
     /// </summary>
     public partial class AbilitiesUI : Control
     {
@@ -16,9 +15,6 @@ namespace AlJourney.Scripts.UI
         private VBoxContainer _mageAbilitiesContainer;
         private VBoxContainer _warriorAbilitiesContainer;
 
-        /// <summary>
-        /// Вызывается при готовности узла. Инициализирует ссылки на элементы интерфейса, подписывается на события и обновляет данные.
-        /// </summary>
         public override void _Ready()
         {
             _closeButton = GetNode<Button>("MarginContainer/VBoxContainer/Header/CloseButton");
@@ -28,13 +24,16 @@ namespace AlJourney.Scripts.UI
             _closeButton.Pressed += OnClosePressed;
 
             RefreshUI();
-            
+
             GD.Print("[AbilitiesUI] Initialized");
         }
 
         private void RefreshUI()
         {
-            if (AbilitySystem.Instance == null) return;
+            if (AbilitySystem.Instance == null)
+            {
+                return;
+            }
 
             PopulateAbilitiesContainer(_mageAbilitiesContainer, CharacterClass.Mage);
             PopulateAbilitiesContainer(_warriorAbilitiesContainer, CharacterClass.Warrior);
@@ -50,12 +49,12 @@ namespace AlJourney.Scripts.UI
             List<AbilityData> abilities = AbilitySystem.Instance.GetAvailableAbilities(heroClass);
             foreach (AbilityData ability in abilities)
             {
-                Button btn = new Button
+                Button btn = new()
                 {
-                    Text = $"{ability.Name} (Цена: {ability.UnlockCost})",
+                    Text = $"{ability.Name} (Cost: {ability.UnlockCost})",
                     CustomMinimumSize = new Vector2(0, 50)
                 };
-                
+
                 AbilityData currentAbility = ability;
                 btn.Pressed += () => OnAbilityPressed(currentAbility, heroClass);
                 container.AddChild(btn);
@@ -65,13 +64,13 @@ namespace AlJourney.Scripts.UI
         private void OnAbilityPressed(AbilityData ability, CharacterClass heroClass)
         {
             GD.Print($"[AbilitiesUI] Ability pressed: {ability.Name}");
-            // Здесь может быть логика экипировки или покупки способности.
+            // Placeholder for unlock/equip logic.
         }
 
         private void OnClosePressed()
         {
             GD.Print("[AbilitiesUI] Closing abilities menu");
-            AudioManager.Instance?.TryPlaySfx("res://Resources/Audio/SFX/button_click.wav");
+            _ = (AudioManager.Instance?.TryPlaySfx("res://Resources/Audio/SFX/button_click.wav"));
             QueueFree();
         }
     }

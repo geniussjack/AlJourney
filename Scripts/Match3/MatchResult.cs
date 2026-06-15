@@ -1,11 +1,11 @@
-using AlJourney.Scripts.Core;
+﻿using AlJourney.Scripts.Core;
 using System.Collections.Generic;
 
 namespace AlJourney.Scripts.Match3
 {
     /// <summary>
-    /// Представляет результат успешно собранной комбинации элементов (Match-3).
-    /// Хранит данные о типе собранных элементов, их количестве, направлении комбинации (горизонталь/вертикаль) 
+    /// Представляет результат успешно собранной комбинации элементов.
+    /// Хранит данные о типе собранных элементов, их количестве, направлении комбинации 
     /// и точных позициях на игровом поле.
     /// </summary>
     public class MatchResult(ElementType elementType, int matchCount, bool isHorizontal)
@@ -16,13 +16,13 @@ namespace AlJourney.Scripts.Match3
         public ElementType ElementType { get; set; } = elementType;
 
         /// <summary>
-        /// Общее количество элементов в данной комбинации (обычно 3, 4 или 5).
+        /// Общее количество элементов в данной комбинации.
         /// Влияет на итоговый уровень комбо.
         /// </summary>
         public int MatchCount { get; set; } = matchCount;
 
         /// <summary>
-        /// Список координат (X и Y) всех элементов на поле, которые участвуют в этой комбинации.
+        /// Список координат всех элементов на поле, которые участвуют в этой комбинации.
         /// Используется для их удаления и создания визуальных эффектов.
         /// </summary>
         public List<(int x, int y)> MatchedPositions { get; set; } = [];
@@ -37,7 +37,7 @@ namespace AlJourney.Scripts.Match3
         /// Вычисляет и возвращает уровень комбо на основе количества собранных элементов в линии.
         /// 3 элемента = 1 уровень; 4 элемента = 2 уровень; 5 и более = 3 уровень.
         /// </summary>
-        /// <returns>Целое число, представляющее уровень комбо (от 0 до 3).</returns>
+        /// <returns>Целое число, представляющее уровень комбо.</returns>
         public int GetComboLevel()
         {
             return MatchCount switch

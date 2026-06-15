@@ -1,10 +1,10 @@
-using Godot;
+﻿using Godot;
 
 namespace AlJourney.Scripts.Utils
 {
     /// <summary>
     /// Утилитарный статический класс для программной генерации текстур.
-    /// Используется для создания простых графических примитивов (квадратов, рамок), 
+    /// Используется для создания простых графических примитивов, 
     /// что позволяет избежать необходимости импортировать внешние изображения для прототипирования.
     /// </summary>
     public static class TextureGenerator
@@ -12,9 +12,9 @@ namespace AlJourney.Scripts.Utils
         /// <summary>
         /// Создает сплошную квадратную текстуру заданного цвета и размера.
         /// </summary>
-        /// <param name="color">Цвет текстуры (например, красный для обозначения урона).</param>
+        /// <param name="color">Цвет текстуры.</param>
         /// <param name="size">Ширина и высота квадрата в пикселях.</param>
-        /// <returns>Сгенерированная текстура (Texture2D), готовая к использованию в UI или спрайтах.</returns>
+        /// <returns>Сгенерированная текстура, готовая к использованию в UI или спрайтах.</returns>
         public static Texture2D CreateColorSquare(Color color, int size = 64)
         {
             Image image = Image.CreateEmpty(size, size, false, Image.Format.Rgba8);
@@ -23,13 +23,13 @@ namespace AlJourney.Scripts.Utils
         }
 
         /// <summary>
-        /// Создает квадратную текстуру с заливкой и рамкой (обводкой) по краям.
+        /// Создает квадратную текстуру с заливкой и рамкой по краям.
         /// </summary>
         /// <param name="fillColor">Основной цвет заливки.</param>
         /// <param name="borderColor">Цвет рамки.</param>
         /// <param name="size">Ширина и высота квадрата в пикселях.</param>
         /// <param name="borderWidth">Толщина рамки в пикселях.</param>
-        /// <returns>Сгенерированная текстура (Texture2D) с рамкой.</returns>
+        /// <returns>Сгенерированная текстура с рамкой.</returns>
         public static Texture2D CreateColorSquareWithBorder(Color fillColor, Color borderColor, int size = 64, int borderWidth = 4)
         {
             Image image = Image.CreateEmpty(size, size, false, Image.Format.Rgba8);

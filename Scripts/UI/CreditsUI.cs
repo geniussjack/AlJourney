@@ -8,7 +8,7 @@ namespace AlJourney.Scripts.UI
     /// </summary>
     public partial class CreditsUI : Control
     {
-        private TextureButton _backButton;
+        private Button _backButton;
         private RichTextLabel _creditsText;
 
         /// <summary>
@@ -16,7 +16,7 @@ namespace AlJourney.Scripts.UI
         /// </summary>
         public override void _Ready()
         {
-            _backButton  = GetNode<TextureButton>("CreditsMenu/Panel/VBoxContainer/BackButton");
+            _backButton = GetNode<Button>("CreditsMenu/Panel/VBoxContainer/BackButton");
             _creditsText = GetNode<RichTextLabel>("CreditsMenu/Panel/VBoxContainer/ScrollContainer/CreditsText");
 
             _backButton.Pressed += OnBackPressed;
@@ -65,10 +65,15 @@ C# / .NET 10.0
         {
             GD.Print("[CreditsUI] Back pressed");
 
-            AudioManager.Instance?.TryPlaySfx("res://Resources/Audio/SFX/button_click.wav");
+            _ = (AudioManager.Instance?.TryPlaySfx("res://Resources/Audio/SFX/button_click.wav"));
 
-            MainMenuUI mainMenu = GetParent() as MainMenuUI;
-            mainMenu?.OnBackToMainMenu();
+            if (GetParent() is MainMenuUI mainMenu)
+            {
+                mainMenu.OnBackToMainMenu();
+                return;
+            }
+
+            SceneManager.GoToMainMenu();
         }
     }
 }

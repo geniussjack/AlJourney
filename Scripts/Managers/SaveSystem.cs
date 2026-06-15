@@ -1,7 +1,7 @@
-using AlJourney.Scripts.Core;
+﻿using AlJourney.Scripts.Core;
 using AlJourney.Scripts.Data;
-using Godot;
 using AlJourney.Scripts.Interfaces;
+using Godot;
 using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -10,7 +10,7 @@ namespace AlJourney.Scripts.Managers
 {
     /// <summary>
     /// Глобальный менеджер сохранения и загрузки прогресса.
-    /// Отвечает за сериализацию игровых данных (статистика, инвентарь) 
+    /// Отвечает за сериализацию игровых данных 
     /// в JSON формат и чтение из локального хранилища.
     /// </summary>
     public partial class SaveSystem : Node, ISaveSystem
@@ -36,7 +36,7 @@ namespace AlJourney.Scripts.Managers
 
         private string _savePath;
 
-        private static readonly JsonSerializerOptions JsonOptions = new JsonSerializerOptions
+        private static readonly JsonSerializerOptions JsonOptions = new()
         {
             WriteIndented = true,
             IncludeFields = false,
@@ -69,7 +69,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Сохраняет текущее состояние игры в файл (JSON).
+        /// Сохраняет текущее состояние игры в файл.
         /// Включает прогресс волн, характеристики героев и состояние инвентаря.
         /// </summary>
         /// <returns>True, если сохранение завершилось успешно.</returns>
@@ -173,7 +173,7 @@ namespace AlJourney.Scripts.Managers
 
         private SaveData DeserializeAndMigrate(string jsonData)
         {
-            SaveData saveData = null;
+            SaveData saveData;
             try
             {
                 saveData = JsonSerializer.Deserialize<SaveData>(jsonData, JsonOptions);
@@ -274,10 +274,7 @@ namespace AlJourney.Scripts.Managers
 
         private static bool ValidateHeroStats(SaveData data)
         {
-            if (!ValidateHero(data.MageHealth, data.MageMaxHealth, data.MageDamage, data.MageDefense, "Mage")) return false;
-            if (!ValidateHero(data.WarriorHealth, data.WarriorMaxHealth, data.WarriorDamage, data.WarriorDefense, "Warrior")) return false;
-            
-            return true;
+            return ValidateHero(data.MageHealth, data.MageMaxHealth, data.MageDamage, data.MageDefense, "Mage") && ValidateHero(data.WarriorHealth, data.WarriorMaxHealth, data.WarriorDamage, data.WarriorDefense, "Warrior");
         }
 
         private static bool ValidateHero(int health, int maxHealth, int damage, int defense, string heroName)

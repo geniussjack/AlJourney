@@ -1,7 +1,7 @@
-using AlJourney.Scripts.Core;
+﻿using AlJourney.Scripts.Core;
 using AlJourney.Scripts.Data;
-using Godot;
 using AlJourney.Scripts.Interfaces;
+using Godot;
 using System.Collections.Generic;
 
 namespace AlJourney.Scripts.Managers
@@ -12,7 +12,7 @@ namespace AlJourney.Scripts.Managers
     public partial class SceneManager : Node, ISceneManager
     {
         /// <summary>
-        /// Глобальный экземпляр менеджера сцен (паттерн Singleton).
+        /// Глобальный экземпляр менеджера сцен.
         /// </summary>
         public static SceneManager Instance { get; private set; }
 
@@ -77,9 +77,9 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Начинает процесс загрузки сцены по указанному пути. Переключение происходит отложенно (deferred).
+        /// Начинает процесс загрузки сцены по указанному пути. Переключение происходит отложенно.
         /// </summary>
-        /// <param name="scenePath">Путь к файлу сцены (формат res://).</param>
+        /// <param name="scenePath">Путь к файлу сцены.</param>
         public void LoadSceneByPath(string scenePath)
         {
             if (_isTransitioning)
@@ -173,17 +173,41 @@ namespace AlJourney.Scripts.Managers
             }
         }
 
+        public void ShowOverlay(string scenePath)
+        {
+            PackedScene newSceneResource = GD.Load<PackedScene>(scenePath);
+            if (newSceneResource != null)
+            {
+                Control overlay = newSceneResource.Instantiate<Control>();
+                // Убедимся, что оверлей рендерится поверх всего
+                overlay.ZIndex = 100;
+
+                // Добавляем в текущую сцену (BattleScene)
+                if (_currentScene != null && IsInstanceValid(_currentScene))
+                {
+                    CanvasLayer canvas = _currentScene.GetNodeOrNull<CanvasLayer>("CanvasLayer");
+                    if (canvas != null)
+                    {
+                        canvas.AddChild(overlay);
+                        return;
+                    }
+                }
+
+                GetTree().Root.AddChild(overlay);
+            }
+        }
+
         /// <summary>
         /// Статический вспомогательный метод: переходит на сцену магазина.
         /// </summary>
         public static void GoToShop()
         {
             GameStateManager.Instance.ChangeState(GameState.Shop);
-            Instance.LoadScene(GameState.Shop);
+            Instance.ShowOverlay("res://Scenes/UI/ShopScene.tscn");
         }
 
         /// <summary>
-        /// Статический вспомогательный метод: возвращается из других экранов (например, магазина) на сцену битвы.
+        /// Статический вспомогательный метод: возвращается из других экранов на сцену битвы.
         /// </summary>
         public static void ReturnToBattle()
         {
@@ -197,7 +221,7 @@ namespace AlJourney.Scripts.Managers
         public static void GameOver()
         {
             GameStateManager.Instance.EndGame(false);
-            Instance.LoadScene(GameState.GameOver);
+            Instance.ShowOverlay("res://Scenes/UI/GameOverScreen.tscn");
         }
     }
 }

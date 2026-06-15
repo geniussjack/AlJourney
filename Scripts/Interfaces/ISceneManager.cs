@@ -1,4 +1,4 @@
-using AlJourney.Scripts.Core;
+﻿using AlJourney.Scripts.Core;
 
 namespace AlJourney.Scripts.Interfaces
 {
@@ -14,7 +14,7 @@ namespace AlJourney.Scripts.Interfaces
         void LoadScene(GameState state);
 
         /// <summary>
-        /// Загружает конкретную сцену по её пути в проекте (например, "res://Scenes/Level.tscn").
+        /// Загружает конкретную сцену по её пути в проекте.
         /// </summary>
         void LoadSceneByPath(string scenePath);
 
@@ -25,7 +25,7 @@ namespace AlJourney.Scripts.Interfaces
         void DeferredSceneChange(string scenePath);
 
         /// <summary>
-        /// Перезагружает текущую активную сцену (полезно при рестарте уровня).
+        /// Перезагружает текущую активную сцену.
         /// </summary>
         void ReloadCurrentScene();
     }

@@ -1,4 +1,4 @@
-using Godot;
+﻿using Godot;
 
 namespace AlJourney.Scripts.Interfaces
 {
@@ -19,12 +19,12 @@ namespace AlJourney.Scripts.Interfaces
         bool Fullscreen { get; }
 
         /// <summary>
-        /// Флаг вертикальной синхронизации (VSync).
+        /// Флаг вертикальной синхронизации.
         /// </summary>
         bool VSync { get; }
 
         /// <summary>
-        /// Максимальное ограничение кадров в секунду (FPS).
+        /// Максимальное ограничение кадров в секунду.
         /// </summary>
         int MaxFps { get; }
 
@@ -39,7 +39,7 @@ namespace AlJourney.Scripts.Interfaces
         float MusicVolume { get; }
 
         /// <summary>
-        /// Уровень громкости звуковых эффектов (SFX).
+        /// Уровень громкости звуковых эффектов.
         /// </summary>
         float SfxVolume { get; }
 
@@ -58,7 +58,7 @@ namespace AlJourney.Scripts.Interfaces
         void SetFullscreen(bool enabled, bool applyImmediately = true);
 
         /// <summary>
-        /// Включает или отключает вертикальную синхронизацию (VSync).
+        /// Включает или отключает вертикальную синхронизацию.
         /// </summary>
         /// <param name="enabled">True - включить VSync, False - отключить.</param>
         /// <param name="applyImmediately">Применить настройки немедленно.</param>
@@ -72,7 +72,7 @@ namespace AlJourney.Scripts.Interfaces
         void SetMaxFps(int fps, bool applyImmediately = true);
 
         /// <summary>
-        /// Устанавливает уровень общей громкости (мастер-громкость).
+        /// Устанавливает уровень общей громкости.
         /// </summary>
         void SetMasterVolume(float volume);
 
@@ -82,7 +82,7 @@ namespace AlJourney.Scripts.Interfaces
         void SetMusicVolume(float volume);
 
         /// <summary>
-        /// Устанавливает уровень громкости звуковых эффектов (SFX).
+        /// Устанавливает уровень громкости звуковых эффектов.
         /// </summary>
         void SetSfxVolume(float volume);
 

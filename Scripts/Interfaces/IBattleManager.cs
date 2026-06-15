@@ -1,4 +1,4 @@
-using AlJourney.Scripts.Characters;
+﻿using AlJourney.Scripts.Characters;
 using AlJourney.Scripts.Core;
 using AlJourney.Scripts.UI;
 using AlJourney.Scripts.Utils;
@@ -12,7 +12,7 @@ namespace AlJourney.Scripts.Interfaces
     public interface IBattleManager
     {
         /// <summary>
-        /// Текущая фаза боя (например, ход игрока, ход врага, анимация).
+        /// Текущая фаза боя.
         /// </summary>
         BattlePhase CurrentPhase { get; }
 
@@ -27,7 +27,7 @@ namespace AlJourney.Scripts.Interfaces
         DualHeroSystem HeroSystem { get; }
 
         /// <summary>
-        /// Инициализирует менеджер боя, связывая его с интерфейсом игрового поля (GridUI).
+        /// Инициализирует менеджер боя, связывая его с интерфейсом игрового поля.
         /// </summary>
         void Initialize(GridUI gridUI);
 

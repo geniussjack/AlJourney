@@ -1,5 +1,6 @@
-using AlJourney.Scripts.Battle;
+﻿using AlJourney.Scripts.Battle;
 using AlJourney.Scripts.Characters;
+using AlJourney.Scripts.Core;
 using AlJourney.Scripts.Data;
 using AlJourney.Scripts.Managers;
 using AlJourney.Scripts.Match3;
@@ -11,8 +12,8 @@ namespace AlJourney.Scripts.Scenes
 {
     /// <summary>
     /// Главный контроллер сцены боя. 
-    /// Объединяет и координирует все системы, связанные с битвой: игровое поле (GridManager),
-    /// пользовательский интерфейс (BattleHUD), систему героев (DualHeroSystem) и менеджер боя (BattleManager).
+    /// Объединяет и координирует все системы, связанные с битвой: игровое поле,
+    /// пользовательский интерфейс, систему героев и менеджер боя.
     /// </summary>
     public partial class BattleScene : Node
     {
@@ -29,7 +30,7 @@ namespace AlJourney.Scripts.Scenes
 
         /// <summary>
         /// Инициализирует сцену боя. Настраивает камеру, загружает данные героев из сохранения, 
-        /// инициализирует интерфейс и подписывается на события (завершение волны, победа/поражение, обмен элементов).
+        /// инициализирует интерфейс и подписывается на события.
         /// Запускает начало битвы для текущей волны.
         /// </summary>
         public override void _Ready()
@@ -45,7 +46,7 @@ namespace AlJourney.Scripts.Scenes
             _camera = new Camera2D
             {
                 Enabled = true,
-                Position = new Vector2(960, 540) 
+                Position = new Vector2(960, 540)
             };
             AddChild(_camera);
 
@@ -64,6 +65,7 @@ namespace AlJourney.Scripts.Scenes
             _battleManager.WaveCompleted += OnWaveCompleted;
             _battleManager.BattleEnded += OnBattleEnded;
             _battleManager.EnemyDefeated += OnEnemyDefeated;
+            _battleManager.PhaseChanged += OnPhaseChanged;
 
             _gridManager.SwapCompleted += OnSwapCompleted;
 
@@ -72,7 +74,45 @@ namespace AlJourney.Scripts.Scenes
 
             _battleHUD.SetupEnemies(_battleManager.Enemies);
 
+            StartPortraitAnimations();
+
             GD.Print($"[BattleScene] Battle started - Wave {currentWave}");
+        }
+
+        private void StartPortraitAnimations()
+        {
+            TextureRect mage = GetNodeOrNull<TextureRect>("CanvasLayer/DecorativeLayer/LeftPanel/MarginContainer/VBoxContainer/MageRow/MagePortraitContainer/MagePortrait");
+            TextureRect warrior = GetNodeOrNull<TextureRect>("CanvasLayer/DecorativeLayer/LeftPanel/MarginContainer/VBoxContainer/WarriorRow/WarriorPortraitContainer/WarriorPortrait");
+            TextureRect slime = GetNodeOrNull<TextureRect>("CanvasLayer/DecorativeLayer/RightPanel/MarginContainer/VBoxContainer/SlimeRow/SlimePortraitContainer/SlimePortrait");
+            TextureRect skeleton = GetNodeOrNull<TextureRect>("CanvasLayer/DecorativeLayer/RightPanel/MarginContainer/VBoxContainer/SkeletonRow/SkeletonPortraitContainer/SkeletonPortrait");
+
+            AnimatePortrait(mage);
+            AnimatePortrait(warrior);
+            AnimatePortrait(slime);
+            AnimatePortrait(skeleton);
+        }
+
+        private void AnimatePortrait(TextureRect portrait)
+        {
+            if (portrait == null)
+            {
+                return;
+            }
+
+            portrait.PivotOffset = portrait.Size / 2;
+            if (portrait.PivotOffset == Vector2.Zero)
+            {
+                portrait.PivotOffset = new Vector2(48, 48); // Fallback
+            }
+            Tween tween = CreateTween();
+            _ = tween.SetLoops();
+            _ = tween.SetTrans(Tween.TransitionType.Sine);
+            _ = tween.SetEase(Tween.EaseType.InOut);
+
+            // Randomize starting delay a bit so they don't breathe perfectly in sync
+            _ = tween.TweenInterval(GD.Randf() * 0.5f);
+            _ = tween.TweenProperty(portrait, "scale", new Vector2(1.05f, 1.05f), 1.0f + (GD.Randf() * 0.2f));
+            _ = tween.TweenProperty(portrait, "scale", new Vector2(1.0f, 1.0f), 1.0f + (GD.Randf() * 0.2f));
         }
 
         private void InitializeHeroes()
@@ -97,6 +137,14 @@ namespace AlJourney.Scripts.Scenes
         private void OnSwapCompleted(bool wasValid)
         {
             if (wasValid)
+            {
+                _battleHUD.UpdateSwaps(_gridManager.RemainingSwaps);
+            }
+        }
+
+        private void OnPhaseChanged(BattlePhase newPhase)
+        {
+            if (newPhase == BattlePhase.PlayerSwap)
             {
                 _battleHUD.UpdateSwaps(_gridManager.RemainingSwaps);
             }
@@ -150,7 +198,7 @@ namespace AlJourney.Scripts.Scenes
         }
 
         /// <summary>
-        /// Выполняется при удалении сцены боя из дерева узлов (например, при переходе в магазин или главное меню).
+        /// Выполняется при удалении сцены боя из дерева узлов.
         /// Отписывается от всех событий менеджеров, чтобы избежать утечек памяти и вызовов методов уничтоженных объектов,
         /// а также корректно завершает бой.
         /// </summary>
@@ -163,10 +211,7 @@ namespace AlJourney.Scripts.Scenes
                 _battleManager.EnemyDefeated -= OnEnemyDefeated;
             }
 
-            if (_gridManager != null)
-            {
-                _gridManager.SwapCompleted -= OnSwapCompleted;
-            }
+            _gridManager?.SwapCompleted -= OnSwapCompleted;
 
             _battleManager?.EndBattle();
         }

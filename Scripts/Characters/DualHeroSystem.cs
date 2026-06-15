@@ -1,10 +1,10 @@
-using AlJourney.Scripts.Core;
+﻿using AlJourney.Scripts.Core;
 using Godot;
 
 namespace AlJourney.Scripts.Characters
 {
     /// <summary>
-    /// Система управления двумя героями (Маг и Воин). Отвечает за их инициализацию, отслеживание их состояний (здоровье, щит, смерть) и маршрутизацию сигналов.
+    /// Система управления двумя героями. Отвечает за их инициализацию, отслеживание их состояний и маршрутизацию сигналов.
     /// </summary>
     public partial class DualHeroSystem : Node
     {
@@ -27,7 +27,7 @@ namespace AlJourney.Scripts.Characters
         public delegate void HeroDiedEventHandler(CharacterClass heroClass);
 
         /// <summary>
-        /// Сигнал, вызываемый, когда оба героя (Маг и Воин) погибают. Это событие обычно приводит к окончанию игры.
+        /// Сигнал, вызываемый, когда оба героя погибают. Это событие обычно приводит к окончанию игры.
         /// </summary>
         [Signal]
         public delegate void BothHeroesDiedEventHandler();
@@ -43,12 +43,12 @@ namespace AlJourney.Scripts.Characters
         public PlayerCharacter Warrior { get; private set; }
 
         /// <summary>
-        /// Возвращает истину, если оба героя (Маг и Воин) в данный момент живы.
+        /// Возвращает истину, если оба героя в данный момент живы.
         /// </summary>
         public bool AreBothAlive => Mage.IsAlive && Warrior.IsAlive;
 
         /// <summary>
-        /// Возвращает истину, если хотя бы один из героев (Маг или Воин) в данный момент жив.
+        /// Возвращает истину, если хотя бы один из героев в данный момент жив.
         /// </summary>
         public bool IsAnyAlive => Mage.IsAlive || Warrior.IsAlive;
 
@@ -98,9 +98,9 @@ namespace AlJourney.Scripts.Characters
         }
 
         /// <summary>
-        /// Возвращает соответствующего героя в зависимости от типа элемента (магические элементы для Мага, физические — для Воина).
+        /// Возвращает соответствующего героя в зависимости от типа элемента.
         /// </summary>
-        /// <param name="elementType">Тип элемента (огонь, лечение, меч, щит).</param>
+        /// <param name="elementType">Тип элемента.</param>
         /// <returns>Персонаж-игрок, соответствующий данному элементу, или null при неизвестном элементе.</returns>
         public PlayerCharacter GetHeroForElement(ElementType elementType)
         {
@@ -115,7 +115,7 @@ namespace AlJourney.Scripts.Characters
         }
 
         /// <summary>
-        /// Загружает состояние обоих героев (здоровье, урон и защиту) из данных сохранения.
+        /// Загружает состояние обоих героев из данных сохранения.
         /// </summary>
         public void LoadFromSave(int mageHealth, int mageMaxHealth, int mageDamage, int mageDefense,
                                  int warriorHealth, int warriorMaxHealth, int warriorDamage, int warriorDefense)
@@ -127,14 +127,14 @@ namespace AlJourney.Scripts.Characters
         }
 
         /// <summary>
-        /// Возвращает объединенные характеристики обоих героев (Мага и Воина) в виде единого кортежа.
+        /// Возвращает объединенные характеристики обоих героев в виде единого кортежа.
         /// </summary>
         /// <returns>Кортеж, содержащий текущее здоровье, максимальное здоровье, урон и защиту для обоих героев.</returns>
         public (int mageHealth, int mageMaxHealth, int mageDamage, int mageDefense,
                 int warriorHealth, int warriorMaxHealth, int warriorDamage, int warriorDefense) GetCombinedStats()
         {
             (int maxHealth, int currentHealth, int damage, int defense) = Mage.GetStats();
-            
+
             (int maxHealth, int currentHealth, int damage, int defense) warriorStats = Warrior.GetStats();
 
             return (
@@ -144,7 +144,7 @@ namespace AlJourney.Scripts.Characters
         }
 
         /// <summary>
-        /// Обрабатывает все активные статусные эффекты (например, горение или регенерацию) для обоих героев.
+        /// Обрабатывает все активные статусные эффекты для обоих героев.
         /// </summary>
         public void ProcessStatusEffects()
         {

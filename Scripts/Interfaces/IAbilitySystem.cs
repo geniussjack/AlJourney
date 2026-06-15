@@ -1,6 +1,6 @@
-using System.Collections.Generic;
-using AlJourney.Scripts.Core;
+﻿using AlJourney.Scripts.Core;
 using AlJourney.Scripts.Data;
+using System.Collections.Generic;
 
 namespace AlJourney.Scripts.Interfaces
 {
@@ -16,7 +16,7 @@ namespace AlJourney.Scripts.Interfaces
         List<AbilityData> GetAvailableAbilities(CharacterClass heroClass);
 
         /// <summary>
-        /// Возвращает список способностей, которые в данный момент экипированы (активны) у указанного героя.
+        /// Возвращает список способностей, которые в данный момент экипированы у указанного героя.
         /// </summary>
         List<AbilityData> GetEquippedAbilities(CharacterClass heroClass);
 
@@ -31,7 +31,7 @@ namespace AlJourney.Scripts.Interfaces
         bool EquipAbility(CharacterClass hero, AbilityData ability);
 
         /// <summary>
-        /// Получает суммарное числовое значение конкретного эффекта (по его имени), исходя из экипированных способностей героя.
+        /// Получает суммарное числовое значение конкретного эффекта, исходя из экипированных способностей героя.
         /// </summary>
         int GetAbilityEffect(CharacterClass hero, string effectName);
 

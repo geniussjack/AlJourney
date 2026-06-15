@@ -1,16 +1,16 @@
+﻿using AlJourney.Scripts.Interfaces;
 using Godot;
-using AlJourney.Scripts.Interfaces;
 using System.Collections.Generic;
 
 namespace AlJourney.Scripts.Managers
 {
     /// <summary>
-    /// Менеджер пользовательского интерфейса (UI). Отвечает за открытие, закрытие и управление стеком экранов меню.
+    /// Менеджер пользовательского интерфейса. Отвечает за открытие, закрытие и управление стеком экранов меню.
     /// </summary>
     public partial class UIManager : Node, IUIManager
     {
         /// <summary>
-        /// Глобальный экземпляр менеджера интерфейса (паттерн Singleton).
+        /// Глобальный экземпляр менеджера интерфейса.
         /// </summary>
         public static UIManager Instance { get; private set; }
 
@@ -47,7 +47,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Открывает указанное меню, скрывая текущее (если оно есть) и добавляя его в стек возврата.
+        /// Открывает указанное меню, скрывая текущее и добавляя его в стек возврата.
         /// </summary>
         /// <param name="menu">Контрол меню, которое нужно открыть.</param>
         public void OpenMenu(Control menu)
@@ -72,7 +72,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Закрывает текущее активное меню и возвращает на экран предыдущее меню из стека (если оно существует).
+        /// Закрывает текущее активное меню и возвращает на экран предыдущее меню из стека.
         /// </summary>
         public void CloseCurrentMenu()
         {

@@ -1,33 +1,33 @@
-using AlJourney.Scripts.Data;
+﻿using AlJourney.Scripts.Data;
 using AlJourney.Scripts.Managers;
 using Godot;
 
 namespace AlJourney.Scripts.UI
 {
     /// <summary>
-    /// Пользовательский интерфейс экрана завершения игры (Game Over). Отображает финальную статистику (достигнутая волна, собранные монеты, побежденные враги) и предоставляет кнопки для начала новой игры или выхода в главное меню.
+    /// Пользовательский интерфейс экрана завершения игры. Отображает финальную статистику и предоставляет кнопки для начала новой игры или выхода в главное меню.
     /// </summary>
     public partial class GameOverUI : Control
     {
         private Label _waveReachedLabel;
         private Label _coinsCollectedLabel;
         private Label _enemiesDefeatedLabel;
-        private TextureButton _mainMenuButton;
-        private TextureButton _newGameButton;
+        private Button _mainMenuButton;
+        private Button _newGameButton;
 
         /// <summary>
         /// Вызывается при инициализации узла. Настраивает ссылки на текстовые метки и кнопки, подписывается на события нажатия и запускает отображение статистики.
         /// </summary>
         public override void _Ready()
         {
-            _waveReachedLabel     = GetNode<Label>("CenterContainer/VBoxContainer/StatsContainer/WaveLabel");
-            _coinsCollectedLabel  = GetNode<Label>("CenterContainer/VBoxContainer/StatsContainer/CoinsLabel");
+            _waveReachedLabel = GetNode<Label>("CenterContainer/VBoxContainer/StatsContainer/WaveLabel");
+            _coinsCollectedLabel = GetNode<Label>("CenterContainer/VBoxContainer/StatsContainer/CoinsLabel");
             _enemiesDefeatedLabel = GetNode<Label>("CenterContainer/VBoxContainer/StatsContainer/EnemiesLabel");
-            _mainMenuButton = GetNode<TextureButton>("CenterContainer/VBoxContainer/ButtonsContainer/MainMenuButton");
-            _newGameButton  = GetNode<TextureButton>("CenterContainer/VBoxContainer/ButtonsContainer/NewGameButton");
+            _mainMenuButton = GetNode<Button>("CenterContainer/VBoxContainer/ButtonsContainer/MainMenuButton");
+            _newGameButton = GetNode<Button>("CenterContainer/VBoxContainer/ButtonsContainer/NewGameButton");
 
             _mainMenuButton.Pressed += OnMainMenuPressed;
-            _newGameButton.Pressed  += OnNewGamePressed;
+            _newGameButton.Pressed += OnNewGamePressed;
 
             DisplayStats();
 
@@ -40,11 +40,11 @@ namespace AlJourney.Scripts.UI
 
             if (saveData != null)
             {
-                int waveReached      = saveData.CurrentWave;
-                int coinsCollected   = saveData.Coins;
-                int enemiesDefeated  = CalculateEnemiesDefeated(waveReached);
+                int waveReached = saveData.CurrentWave;
+                int coinsCollected = saveData.Coins;
+                int enemiesDefeated = CalculateEnemiesDefeated(waveReached);
 
-                _waveReachedLabel.Text    = $"Wave Reached: {waveReached}";
+                _waveReachedLabel.Text = $"Wave Reached: {waveReached}";
                 _coinsCollectedLabel.Text = $"Coins: {coinsCollected}";
                 _enemiesDefeatedLabel.Text = $"Enemies Defeated: {enemiesDefeated}";
 
@@ -52,7 +52,7 @@ namespace AlJourney.Scripts.UI
             }
             else
             {
-                _waveReachedLabel.Text    = "Wave Reached: 1";
+                _waveReachedLabel.Text = "Wave Reached: 1";
                 _coinsCollectedLabel.Text = "Coins: 0";
                 _enemiesDefeatedLabel.Text = "Enemies Defeated: 0";
             }
@@ -66,7 +66,7 @@ namespace AlJourney.Scripts.UI
         private void OnMainMenuPressed()
         {
             GD.Print("[GameOverUI] Returning to main menu");
-            AudioManager.Instance?.TryPlaySfx("res://Resources/Audio/SFX/button_click.wav");
+            _ = (AudioManager.Instance?.TryPlaySfx("res://Resources/Audio/SFX/button_click.wav"));
             _ = SaveSystem.Instance.DeleteSave();
             SceneManager.GoToMainMenu();
         }
@@ -74,7 +74,7 @@ namespace AlJourney.Scripts.UI
         private void OnNewGamePressed()
         {
             GD.Print("[GameOverUI] Starting new game");
-            AudioManager.Instance?.TryPlaySfx("res://Resources/Audio/SFX/button_click.wav");
+            _ = (AudioManager.Instance?.TryPlaySfx("res://Resources/Audio/SFX/button_click.wav"));
             _ = SaveSystem.Instance.DeleteSave();
             GameStateManager.Instance.StartNewGame();
             SceneManager.Instance.LoadScene(Core.GameState.Battle);

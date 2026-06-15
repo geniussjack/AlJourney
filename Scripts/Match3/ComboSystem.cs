@@ -1,4 +1,4 @@
-using AlJourney.Scripts.Core;
+﻿using AlJourney.Scripts.Core;
 using AlJourney.Scripts.Data;
 using Godot;
 using System.Collections.Generic;
@@ -6,9 +6,9 @@ using System.Collections.Generic;
 namespace AlJourney.Scripts.Match3
 {
     /// <summary>
-    /// Представляет эффект, возникающий при сборе комбинации элементов (комбо).
+    /// Представляет эффект, возникающий при сборе комбинации элементов.
     /// Хранит информацию о типе элемента, уровне комбо и результирующих значениях урона, лечения, защиты,
-    /// а также о накладываемых статусных эффектах и области действия (AoE).
+    /// а также о накладываемых статусных эффектах и области действия.
     /// </summary>
     public class ComboEffect(ElementType elementType, int comboLevel)
     {
@@ -18,7 +18,7 @@ namespace AlJourney.Scripts.Match3
         public ElementType ElementType { get; set; } = elementType;
 
         /// <summary>
-        /// Уровень комбо, который зависит от количества собранных элементов (например, 3 элемента = 1 уровень, 4 = 2 уровень и т.д.).
+        /// Уровень комбо, который зависит от количества собранных элементов.
         /// </summary>
         public int ComboLevel { get; set; } = comboLevel;
 
@@ -33,26 +33,26 @@ namespace AlJourney.Scripts.Match3
         public int Healing { get; set; }
 
         /// <summary>
-        /// Количество очков щита (брони), которое данное комбо наложит на союзников.
+        /// Количество очков щита, которое данное комбо наложит на союзников.
         /// </summary>
         public int Shield { get; set; }
 
         /// <summary>
-        /// Указывает, применяется ли эффект данного комбо по площади (сразу ко всем противникам).
+        /// Указывает, применяется ли эффект данного комбо по площади.
         /// </summary>
         public bool IsAoE { get; set; }
 
         /// <summary>
-        /// Данные о дополнительном статусном эффекте (например, горение, кровотечение, оглушение),
+        /// Данные о дополнительном статусном эффекте,
         /// который накладывается в результате этого комбо.
         /// </summary>
         public StatusEffectData StatusEffect { get; set; }
     }
 
     /// <summary>
-    /// Система управления комбинациями элементов (Match-3).
-    /// Отвечает за преобразование собранных на игровом поле линий в игровые эффекты (урон, лечение, щиты),
-    /// а также за отслеживание и начисление бонусов за каскадные совпадения (цепные реакции).
+    /// Система управления комбинациями элементов.
+    /// Отвечает за преобразование собранных на игровом поле линий в игровые эффекты,
+    /// а также за отслеживание и начисление бонусов за каскадные совпадения.
     /// </summary>
     public partial class ComboSystem : Node
     {
@@ -66,7 +66,7 @@ namespace AlJourney.Scripts.Match3
         [Signal]
         /// <summary>
         /// Событие, которое вызывается при обнаружении каскадного совпадения.
-        /// Передает текущий уровень каскада (множитель цепной реакции).
+        /// Передает текущий уровень каскада.
         /// </summary>
         public delegate void CascadeDetectedEventHandler(int cascadeLevel);
 
@@ -83,11 +83,11 @@ namespace AlJourney.Scripts.Match3
         }
 
         /// <summary>
-        /// Обрабатывает список собранных комбинаций (MatchResult) и превращает их в список боевых эффектов (ComboEffect).
-        /// При наличии каскада (цепной реакции) увеличивает текущий уровень каскада и применяет бонусы к эффектам.
+        /// Обрабатывает список собранных комбинаций и превращает их в список боевых эффектов.
+        /// При наличии каскада увеличивает текущий уровень каскада и применяет бонусы к эффектам.
         /// </summary>
         /// <param name="matches">Список результатов совпадений, собранных на поле.</param>
-        /// <param name="isCascade">Указывает, является ли текущая обработка частью цепной реакции (каскада).</param>
+        /// <param name="isCascade">Указывает, является ли текущая обработка частью цепной реакции.</param>
         /// <returns>Список сгенерированных комбо-эффектов со всеми примененными бонусами.</returns>
         public List<ComboEffect> ProcessMatches(List<MatchResult> matches, bool isCascade = false)
         {
@@ -111,7 +111,7 @@ namespace AlJourney.Scripts.Match3
                 {
                     if (_currentCascadeLevel > 0)
                     {
-                        float cascadeBonus = 1.0f + (_currentCascadeLevel * 0.2f); 
+                        float cascadeBonus = 1.0f + (_currentCascadeLevel * 0.2f);
                         effect.Damage = Mathf.CeilToInt(effect.Damage * cascadeBonus);
                         effect.Healing = Mathf.CeilToInt(effect.Healing * cascadeBonus);
                         effect.Shield = Mathf.CeilToInt(effect.Shield * cascadeBonus);
@@ -135,7 +135,7 @@ namespace AlJourney.Scripts.Match3
 
         /// <summary>
         /// Возвращает текущий уровень каскадных совпадений.
-        /// Чем выше уровень, тем больше бонусный множитель применяется к эффектам (урон, лечение, щиты).
+        /// Чем выше уровень, тем больше бонусный множитель применяется к эффектам.
         /// </summary>
         public int GetCascadeLevel()
         {
@@ -187,12 +187,12 @@ namespace AlJourney.Scripts.Match3
         {
             switch (level)
             {
-                case 1: 
+                case 1:
                     effect.Damage = GameConstants.FIRE_3_DAMAGE;
                     effect.IsAoE = false;
                     break;
 
-                case 2: 
+                case 2:
                     effect.Damage = GameConstants.FIRE_4_DAMAGE;
                     effect.IsAoE = false;
                     effect.StatusEffect = new StatusEffectData(
@@ -202,9 +202,9 @@ namespace AlJourney.Scripts.Match3
                     );
                     break;
 
-                case 3: 
+                case 3:
                     effect.Damage = GameConstants.FIRE_5_DAMAGE;
-                    effect.IsAoE = true; 
+                    effect.IsAoE = true;
                     effect.StatusEffect = new StatusEffectData(
                         StatusEffect.Burning,
                         GameConstants.FIRE_5_BURN_DURATION,
@@ -222,12 +222,12 @@ namespace AlJourney.Scripts.Match3
         {
             switch (level)
             {
-                case 1: 
+                case 1:
                     effect.Damage = GameConstants.SWORD_3_DAMAGE;
                     effect.IsAoE = false;
                     break;
 
-                case 2: 
+                case 2:
                     effect.Damage = GameConstants.SWORD_4_DAMAGE;
                     effect.IsAoE = false;
                     effect.StatusEffect = new StatusEffectData(
@@ -237,12 +237,12 @@ namespace AlJourney.Scripts.Match3
                     );
                     break;
 
-                case 3: 
+                case 3:
                     effect.Damage = GameConstants.SWORD_5_DAMAGE;
                     effect.IsAoE = false;
                     effect.StatusEffect = new StatusEffectData(
                         StatusEffect.Stunned,
-                        1, 
+                        1,
                         0
                     );
                     break;
@@ -257,15 +257,15 @@ namespace AlJourney.Scripts.Match3
         {
             switch (level)
             {
-                case 1: 
+                case 1:
                     effect.Healing = GameConstants.HEAL_3_AMOUNT;
                     break;
 
-                case 2: 
+                case 2:
                     effect.Healing = GameConstants.HEAL_4_AMOUNT;
                     break;
 
-                case 3: 
+                case 3:
                     effect.Healing = GameConstants.HEAL_5_AMOUNT;
                     effect.StatusEffect = new StatusEffectData(
                         StatusEffect.Regeneration,
@@ -284,25 +284,25 @@ namespace AlJourney.Scripts.Match3
         {
             switch (level)
             {
-                case 1: 
+                case 1:
                     effect.Shield = GameConstants.SHIELD_3_AMOUNT;
                     break;
 
-                case 2: 
+                case 2:
                     effect.Shield = GameConstants.SHIELD_4_AMOUNT;
                     effect.StatusEffect = new StatusEffectData(
                         StatusEffect.ShieldReflect,
-                        1, 
+                        1,
                         0,
                         GameConstants.SHIELD_4_REFLECT_PERCENT
                     );
                     break;
 
-                case 3: 
+                case 3:
                     effect.Shield = GameConstants.SHIELD_5_AMOUNT;
                     effect.StatusEffect = new StatusEffectData(
                         StatusEffect.Immunity,
-                        1, 
+                        1,
                         0
                     );
                     break;

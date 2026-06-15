@@ -1,4 +1,4 @@
-namespace AlJourney.Scripts.Core
+﻿namespace AlJourney.Scripts.Core
 {
     /// <summary>
     /// Возможные состояния игры, определяющие текущий экран и логику поведения.
@@ -13,15 +13,15 @@ namespace AlJourney.Scripts.Core
     }
 
     /// <summary>
-    /// Типы элементов на игровом поле. Каждый элемент соответствует определенной механике (урон огнем, лечение, физическая атака или защита щитом).
+    /// Типы элементов на игровом поле. Каждый элемент соответствует определенной механике.
     /// </summary>
     public enum ElementType
     {
         None,
-        Fire,      
-        Heal,      
-        Sword,     
-        Shield     
+        Fire,
+        Heal,
+        Sword,
+        Shield
     }
 
     /// <summary>
@@ -29,8 +29,8 @@ namespace AlJourney.Scripts.Core
     /// </summary>
     public enum CharacterClass
     {
-        Mage,      
-        Warrior    
+        Mage,
+        Warrior
     }
 
     /// <summary>
@@ -41,7 +41,7 @@ namespace AlJourney.Scripts.Core
         SkeletonWarrior,
         SkeletonArcher,
         Zombie,
-        Slime,             
+        Slime,
         DraugrWarrior,
         DraugrDefender,
         DraugrCaster,
@@ -62,18 +62,18 @@ namespace AlJourney.Scripts.Core
     }
 
     /// <summary>
-    /// Статусные эффекты (баффы и дебаффы), которые могут быть наложены на персонажей или врагов во время боя.
+    /// Статусные эффекты, которые могут быть наложены на персонажей или врагов во время боя.
     /// </summary>
     public enum StatusEffect
     {
         None,
-        Burning,           
-        Bleeding,          
-        Regeneration,      
-        ShieldReflect,     
-        Immunity,          
-        Stunned,           
-        Weakened           
+        Burning,
+        Bleeding,
+        Regeneration,
+        ShieldReflect,
+        Immunity,
+        Stunned,
+        Weakened
     }
 
     /// <summary>
@@ -81,10 +81,10 @@ namespace AlJourney.Scripts.Core
     /// </summary>
     public enum BattlePhase
     {
-        PlayerSwap,        
-        PlayerCombo,       
-        EnemyTurn,         
-        WaveTransition     
+        PlayerSwap,
+        PlayerCombo,
+        EnemyTurn,
+        WaveTransition
     }
 
     /// <summary>
@@ -92,13 +92,13 @@ namespace AlJourney.Scripts.Core
     /// </summary>
     public enum EquipmentSlot
     {
-        Weapon,            
-        Head,              
-        Body,              
-        Legs,              
-        Necklace,          
-        Ring,              
-        Earring            
+        Weapon,
+        Head,
+        Body,
+        Legs,
+        Necklace,
+        Ring,
+        Earring
     }
 
     /// <summary>
@@ -106,20 +106,20 @@ namespace AlJourney.Scripts.Core
     /// </summary>
     public enum EquipmentRarity
     {
-        Common,            
-        Uncommon,          
-        Rare,              
-        Epic,              
-        Legendary           
+        Common,
+        Uncommon,
+        Rare,
+        Epic,
+        Legendary
     }
 
     /// <summary>
-    /// Типы способностей, доступных персонажам (нанесение урона или поддержка).
+    /// Типы способностей, доступных персонажам.
     /// </summary>
     public enum AbilityType
     {
-        Attack,            
-        Support            
+        Attack,
+        Support
     }
 
     /// <summary>
@@ -127,9 +127,9 @@ namespace AlJourney.Scripts.Core
     /// </summary>
     public enum AbilityElement
     {
-        Fire,              
-        Heal,              
-        Sword,             
-        Shield             
+        Fire,
+        Heal,
+        Sword,
+        Shield
     }
 }

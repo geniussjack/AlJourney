@@ -7,8 +7,7 @@ using System.Collections.Generic;
 namespace AlJourney.Scripts.UI
 {
     /// <summary>
-    /// Упрощенный пользовательский интерфейс инвентаря. Отображает список доступных предметов, текущую экипировку героев, а также предоставляет функционал для просмотра характеристик и улучшения предметов.
-    /// Работает в связке с InventoryUI.tscn.
+    /// Simplified inventory UI. Shows the item list, current equipment, and details for the selected item.
     /// </summary>
     public partial class SimpleInventoryUI : Control
     {
@@ -22,17 +21,14 @@ namespace AlJourney.Scripts.UI
         private EquipmentData _selectedItem;
         private CharacterClass _selectedHero = CharacterClass.Mage;
 
-        /// <summary>
-        /// Вызывается при инициализации узла. Настраивает элементы интерфейса (контейнеры инвентаря и экипировки, метки), подписывается на нажатия кнопок и обновляет отображение данных.
-        /// </summary>
         public override void _Ready()
         {
             _coinsLabel = GetNode<Label>("MarginContainer/VBoxContainer/Header/CoinsLabel");
             _closeButton = GetNode<Button>("MarginContainer/VBoxContainer/Header/CloseButton");
-            
+
             _inventoryContainer = GetNode<VBoxContainer>("MarginContainer/VBoxContainer/ContentHBox/InventorySection/ScrollContainer/InventoryContainer");
             _equipmentContainer = GetNode<VBoxContainer>("MarginContainer/VBoxContainer/ContentHBox/EquipmentSection/ScrollContainer/EquipmentContainer");
-            
+
             _itemDetailsLabel = GetNode<Label>("MarginContainer/VBoxContainer/ContentHBox/DetailsSection/ItemDetailsLabel");
             _upgradeButton = GetNode<Button>("MarginContainer/VBoxContainer/ContentHBox/DetailsSection/UpgradeButton");
 
@@ -44,7 +40,7 @@ namespace AlJourney.Scripts.UI
 
         private void RefreshUI()
         {
-            _coinsLabel.Text = $"Монеты: {GameStateManager.Instance.Coins}";
+            _coinsLabel.Text = $"Coins: {GameStateManager.Instance.Coins}";
 
             foreach (Node child in _inventoryContainer.GetChildren())
             {
@@ -54,13 +50,13 @@ namespace AlJourney.Scripts.UI
             IReadOnlyList<EquipmentData> inventory = InventoryManager.Instance.GetInventory();
             foreach (EquipmentData item in inventory)
             {
-                Button itemButton = new Button
+                Button itemButton = new()
                 {
-                    Text = $"{item.Name} (Ур. {item.CurrentLevel})",
+                    Text = $"{item.Name} (Lv. {item.CurrentLevel})",
                     Modulate = item.GetRarityColor()
                 };
                 _inventoryContainer.AddChild(itemButton);
-                
+
                 EquipmentData currentItem = item;
                 itemButton.Pressed += () => OnItemSelected(currentItem);
             }
@@ -73,14 +69,14 @@ namespace AlJourney.Scripts.UI
             Dictionary<EquipmentSlot, EquipmentData> equipment = InventoryManager.Instance.GetHeroEquipment(_selectedHero);
             foreach (KeyValuePair<EquipmentSlot, EquipmentData> kvp in equipment)
             {
-                Label slotLabel = new Label
+                Label slotLabel = new()
                 {
                     Text = $"{kvp.Key}: {kvp.Value.Name}",
                     Modulate = kvp.Value.GetRarityColor()
                 };
                 _equipmentContainer.AddChild(slotLabel);
             }
-            
+
             UpdateDetailsPanel();
         }
 
@@ -88,12 +84,12 @@ namespace AlJourney.Scripts.UI
         {
             if (_selectedItem == null)
             {
-                _itemDetailsLabel.Text = "Выберите предмет для просмотра деталей.";
+                _itemDetailsLabel.Text = "Select an item to view details.";
                 _upgradeButton.Disabled = true;
                 return;
             }
 
-            _itemDetailsLabel.Text = $"{_selectedItem.Name}\nРедкость: {_selectedItem.Rarity}\nУровень: {_selectedItem.CurrentLevel}";
+            _itemDetailsLabel.Text = $"{_selectedItem.Name}\nRarity: {_selectedItem.Rarity}\nLevel: {_selectedItem.CurrentLevel}";
             _upgradeButton.Disabled = false;
         }
 
@@ -126,13 +122,9 @@ namespace AlJourney.Scripts.UI
             QueueFree();
         }
 
-        /// <summary>
-        /// Вызывается каждый кадр. Выполняет периодическое обновление интерфейса инвентаря (раз в 60 физических кадров).
-        /// </summary>
-        /// <param name="delta">Время, прошедшее с предыдущего кадра.</param>
         public override void _Process(double delta)
         {
-            if (Engine.GetPhysicsFrames() % 60 == 0) 
+            if (Engine.GetPhysicsFrames() % 60 == 0)
             {
                 RefreshUI();
             }

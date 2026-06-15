@@ -1,4 +1,4 @@
-using Godot;
+﻿using Godot;
 
 namespace AlJourney.Scripts.Utils
 {
@@ -17,8 +17,8 @@ namespace AlJourney.Scripts.Utils
         private bool _isShaking;
 
         /// <summary>
-        /// Метод инициализации. Проверяет наличие родительской камеры (Camera2D) 
-        /// и сохраняет ее изначальное смещение (Offset) для последующего возврата в исходное состояние.
+        /// Метод инициализации. Проверяет наличие родительской камеры 
+        /// и сохраняет ее изначальное смещение для последующего возврата в исходное состояние.
         /// </summary>
         public override void _Ready()
         {
@@ -69,7 +69,7 @@ namespace AlJourney.Scripts.Utils
         /// <summary>
         /// Запускает эффект тряски камеры с заданными параметрами.
         /// </summary>
-        /// <param name="intensity">Интенсивность (амплитуда) тряски в пикселях.</param>
+        /// <param name="intensity">Интенсивность тряски в пикселях.</param>
         /// <param name="duration">Продолжительность эффекта в секундах.</param>
         public void Shake(float intensity = 10.0f, float duration = 0.3f)
         {

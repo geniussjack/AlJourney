@@ -1,23 +1,25 @@
-using AlJourney.Scripts.Core;
+﻿using AlJourney.Scripts.Core;
+using AlJourney.Scripts.Data;
 using Godot;
+using System.Collections.Generic;
 
 namespace AlJourney.Scripts.Characters
 {
     /// <summary>
-    /// Основной класс игрового персонажа (героя), наследующийся от Character. 
+    /// Основной класс игрового персонажа, наследующийся от Character. 
     /// Управляет базовыми характеристиками, применением экипировки, способностями и расчетом наносимого урона.
     /// </summary>
     public partial class PlayerCharacter : Character
     {
         /// <summary>
-        /// Класс данного персонажа (например, Маг или Воин). Доступен только для чтения.
+        /// Класс данного персонажа. Доступен только для чтения.
         /// </summary>
         public CharacterClass CharacterClass { get; private set; }
 
         /// <summary>
         /// Фабричный метод для создания и инициализации нового персонажа определенного класса.
         /// </summary>
-        /// <param name="characterClass">Тип создаваемого класса (Маг или Воин).</param>
+        /// <param name="characterClass">Тип создаваемого класса.</param>
         /// <returns>Новый настроенный экземпляр персонажа.</returns>
         public static PlayerCharacter Create(CharacterClass characterClass)
         {
@@ -73,20 +75,28 @@ namespace AlJourney.Scripts.Characters
 
         private int GetEquipmentStat(string statName)
         {
-            if (AlJourney.Scripts.Managers.InventoryManager.Instance == null) return 0;
-            var equipment = AlJourney.Scripts.Managers.InventoryManager.Instance.GetHeroEquipment(CharacterClass);
-            int total = 0;
-            foreach (var item in equipment.Values)
+            if (AlJourney.Scripts.Managers.InventoryManager.Instance == null)
             {
-                if (item.GetTotalStats().TryGetValue(statName, out int value)) total += value;
+                return 0;
+            }
+
+            Dictionary<EquipmentSlot, EquipmentData> equipment = AlJourney.Scripts.Managers.InventoryManager.Instance.GetHeroEquipment(CharacterClass);
+            int total = 0;
+            foreach (EquipmentData item in equipment.Values)
+            {
+                if (item.GetTotalStats().TryGetValue(statName, out int value))
+                {
+                    total += value;
+                }
             }
             return total;
         }
 
         private int GetAbilityStat(string statName)
         {
-            if (AlJourney.Scripts.Managers.AbilitySystem.Instance == null) return 0;
-            return AlJourney.Scripts.Managers.AbilitySystem.Instance.GetAbilityEffect(CharacterClass, statName);
+            return AlJourney.Scripts.Managers.AbilitySystem.Instance == null
+                ? 0
+                : AlJourney.Scripts.Managers.AbilitySystem.Instance.GetAbilityEffect(CharacterClass, statName);
         }
 
         /// <summary>
@@ -109,14 +119,14 @@ namespace AlJourney.Scripts.Characters
         }
 
         /// <summary>
-        /// Рассчитывает итоговый урон атаки, учитывая базовый урон, бонусы от экипировки, способностей и статусные эффекты (например, Ослабление).
+        /// Рассчитывает итоговый урон атаки, учитывая базовый урон, бонусы от экипировки, способностей и статусные эффекты.
         /// </summary>
-        /// <param name="baseDamage">Базовый урон, наносимый атакой (зависящий от комбо).</param>
+        /// <param name="baseDamage">Базовый урон, наносимый атакой.</param>
         /// <param name="elementType">Тип элемента атаки, определяющий, будет ли урон магическим или физическим.</param>
         /// <returns>Конечное количество урона после всех расчетов.</returns>
         public int CalculateDamage(int baseDamage, ElementType elementType)
         {
-            string statName = elementType == ElementType.Fire || elementType == ElementType.Heal ? "magic_damage" : "damage";
+            string statName = elementType is ElementType.Fire or ElementType.Heal ? "magic_damage" : "damage";
             int equipBonus = GetEquipmentStat(statName) + GetEquipmentStat("damage");
             int abilityBonus = GetAbilityStat(statName) + GetAbilityStat("damage");
             int totalBaseDamage = _baseDamage + equipBonus + abilityBonus;
@@ -124,7 +134,7 @@ namespace AlJourney.Scripts.Characters
 
             if (HasStatusEffect(StatusEffect.Weakened))
             {
-                finalDamage = Mathf.CeilToInt(finalDamage * 0.7f); 
+                finalDamage = Mathf.CeilToInt(finalDamage * 0.7f);
                 GD.Print($"[{_name}] Damage reduced by Weakened status: {finalDamage}");
             }
 

@@ -1,9 +1,9 @@
-using Godot;
+﻿using Godot;
 
 namespace AlJourney.Scripts.Utils
 {
     /// <summary>
-    /// Компонент для кратковременного изменения цвета (модуляции) родительского CanvasItem.
+    /// Компонент для кратковременного изменения цвета родительского CanvasItem.
     /// Используется для создания эффекта "вспышки" при получении урона, лечении или других событиях.
     /// </summary>
     public partial class DamageFlash : Node
@@ -12,8 +12,8 @@ namespace AlJourney.Scripts.Utils
         private Color _originalModulate;
 
         /// <summary>
-        /// Инициализирует компонент. Ищет родительский узел типа CanvasItem (например, Sprite2D или Control)
-        /// и сохраняет его исходный цвет (Modulate) для корректного возврата после завершения анимации вспышки.
+        /// Инициализирует компонент. Ищет родительский узел типа CanvasItem
+        /// и сохраняет его исходный цвет для корректного возврата после завершения анимации вспышки.
         /// </summary>
         public override void _Ready()
         {
@@ -31,11 +31,11 @@ namespace AlJourney.Scripts.Utils
         }
 
         /// <summary>
-        /// Запускает анимацию (Tween) изменения цвета родительского узла на указанный, 
+        /// Запускает анимацию изменения цвета родительского узла на указанный, 
         /// а затем плавно возвращает его к исходному состоянию.
         /// </summary>
         /// <param name="flashColor">Цвет, в который окрасится объект во время вспышки.</param>
-        /// <param name="duration">Общая продолжительность эффекта (туда и обратно) в секундах.</param>
+        /// <param name="duration">Общая продолжительность эффекта в секундах.</param>
         public void Flash(Color flashColor, float duration = 0.15f)
         {
             if (_target == null)

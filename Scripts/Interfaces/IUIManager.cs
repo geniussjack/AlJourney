@@ -1,9 +1,9 @@
-using Godot;
+﻿using Godot;
 
 namespace AlJourney.Scripts.Interfaces
 {
     /// <summary>
-    /// Интерфейс для управления глобальным пользовательским интерфейсом (UI).
+    /// Интерфейс для управления глобальным пользовательским интерфейсом.
     /// Отвечает за открытие, закрытие и управление активными меню на экране.
     /// </summary>
     public interface IUIManager
@@ -15,7 +15,7 @@ namespace AlJourney.Scripts.Interfaces
         void OpenMenu(Control menu);
 
         /// <summary>
-        /// Закрывает самое верхнее (текущее активное) меню.
+        /// Закрывает самое верхнее меню.
         /// </summary>
         void CloseCurrentMenu();
 

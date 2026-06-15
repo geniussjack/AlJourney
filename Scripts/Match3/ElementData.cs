@@ -1,27 +1,27 @@
-using AlJourney.Scripts.Core;
+﻿using AlJourney.Scripts.Core;
 
 namespace AlJourney.Scripts.Match3
 {
     /// <summary>
     /// Представляет данные отдельного игрового элемента на поле Match-3.
-    /// Хранит тип элемента, его текущие координаты, состояние (участвует ли в совпадении или падает),
+    /// Хранит тип элемента, его текущие координаты, состояние,
     /// а также героя, которому принадлежит данный элемент.
     /// </summary>
     public class ElementData(ElementType type, int x, int y)
     {
         /// <summary>
-        /// Тип элемента (например, Огонь, Меч, Лечение, Щит).
+        /// Тип элемента.
         /// Определяет, какой эффект сработает при сборе комбинации.
         /// </summary>
         public ElementType Type { get; set; } = type;
 
         /// <summary>
-        /// Текущая позиция элемента на игровом поле по оси X (столбец).
+        /// Текущая позиция элемента на игровом поле по оси X.
         /// </summary>
         public int X { get; set; } = x;
 
         /// <summary>
-        /// Текущая позиция элемента на игровом поле по оси Y (строка).
+        /// Текущая позиция элемента на игровом поле по оси Y.
         /// </summary>
         public int Y { get; set; } = y;
 
@@ -32,13 +32,13 @@ namespace AlJourney.Scripts.Match3
         public bool IsMatched { get; set; } = false;
 
         /// <summary>
-        /// Указывает, находится ли элемент в состоянии падения (смещения вниз) после удаления элементов под ним.
+        /// Указывает, находится ли элемент в состоянии падения после удаления элементов под ним.
         /// </summary>
         public bool IsFalling { get; set; } = false;
 
         /// <summary>
-        /// Класс персонажа (героя), который привязан к данному типу элемента.
-        /// Определяется автоматически в зависимости от типа элемента (например, мечи принадлежат Воину).
+        /// Класс персонажа, который привязан к данному типу элемента.
+        /// Определяется автоматически в зависимости от типа элемента.
         /// </summary>
         public CharacterClass OwningHero { get; set; } = GetOwnerForElementType(type);
 
@@ -50,7 +50,7 @@ namespace AlJourney.Scripts.Match3
                 ElementType.Heal => CharacterClass.Mage,
                 ElementType.Sword => CharacterClass.Warrior,
                 ElementType.Shield => CharacterClass.Warrior,
-                _ => CharacterClass.Mage 
+                _ => CharacterClass.Mage
             };
         }
 
@@ -60,7 +60,7 @@ namespace AlJourney.Scripts.Match3
         /// </summary>
         /// <param name="x">Позиция по оси X для нового элемента.</param>
         /// <param name="y">Позиция по оси Y для нового элемента.</param>
-        /// <returns>Новый экземпляр данных элемента (ElementData).</returns>
+        /// <returns>Новый экземпляр данных элемента.</returns>
         public static ElementData CreateRandom(int x, int y)
         {
             ElementType randomType = (ElementType)Godot.GD.RandRange(1, 4);
@@ -69,7 +69,7 @@ namespace AlJourney.Scripts.Match3
 
         /// <summary>
         /// Проверяет, может ли данный элемент образовать совпадение с другим переданным элементом.
-        /// Совпадение возможно только если оба элемента имеют одинаковый тип, и этот тип не является пустóтой (None).
+        /// Совпадение возможно только если оба элемента имеют одинаковый тип, и этот тип не является пустóтой.
         /// </summary>
         /// <param name="other">Другой элемент для проверки совпадения.</param>
         /// <returns>True, если элементы могут образовать комбинацию; иначе False.</returns>

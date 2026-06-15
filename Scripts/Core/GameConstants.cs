@@ -1,4 +1,4 @@
-namespace AlJourney.Scripts.Core
+﻿namespace AlJourney.Scripts.Core
 {
     /// <summary>
     /// Хранилище всех игровых констант, включая настройки сетки, базовые характеристики, формулы урона и параметры врагов.
@@ -6,15 +6,15 @@ namespace AlJourney.Scripts.Core
     public static class GameConstants
     {
         /// <summary>
-        /// Размер игрового поля (сетки) в клетках (например, 5x5).
+        /// Размер игрового поля в клетках.
         /// </summary>
         public const int GRID_SIZE = 5;
         /// <summary>
         /// Количество перемещений фишек, доступных игроку за один ход.
         /// </summary>
-        public const int PLAYER_SWAPS_PER_TURN = 5;             
+        public const int PLAYER_SWAPS_PER_TURN = 3;
         /// <summary>
-        /// Минимальное количество одинаковых фишек в ряд для успешного совпадения (комбо).
+        /// Минимальное количество одинаковых фишек в ряд для успешного совпадения.
         /// </summary>
         public const int MATCH_MIN_LENGTH = 3;
 
@@ -36,7 +36,7 @@ namespace AlJourney.Scripts.Core
         /// </summary>
         public const int FIRE_4_BURN_DAMAGE = 3;
         /// <summary>
-        /// Длительность статуса горения (в ходах) при совпадении 4 огненных элементов.
+        /// Длительность статуса горения при совпадении 4 огненных элементов.
         /// </summary>
         public const int FIRE_4_BURN_DURATION = 2;
         /// <summary>
@@ -44,7 +44,7 @@ namespace AlJourney.Scripts.Core
         /// </summary>
         public const int FIRE_5_BURN_DAMAGE = 5;
         /// <summary>
-        /// Длительность статуса горения (в ходах) при совпадении 5 огненных элементов.
+        /// Длительность статуса горения при совпадении 5 огненных элементов.
         /// </summary>
         public const int FIRE_5_BURN_DURATION = 3;
 
@@ -65,7 +65,7 @@ namespace AlJourney.Scripts.Core
         /// </summary>
         public const int SWORD_4_BLEED_DAMAGE = 4;
         /// <summary>
-        /// Длительность кровотечения (в ходах) при совпадении 4 элементов меча.
+        /// Длительность кровотечения при совпадении 4 элементов меча.
         /// </summary>
         public const int SWORD_4_BLEED_DURATION = 2;
 
@@ -86,7 +86,7 @@ namespace AlJourney.Scripts.Core
         /// </summary>
         public const int HEAL_5_REGEN_AMOUNT = 5;
         /// <summary>
-        /// Длительность эффекта регенерации (в ходах) при совпадении 5 элементов лечения.
+        /// Длительность эффекта регенерации при совпадении 5 элементов лечения.
         /// </summary>
         public const int HEAL_5_REGEN_DURATION = 3;
 
@@ -110,11 +110,11 @@ namespace AlJourney.Scripts.Core
         /// <summary>
         /// Коэффициент увеличения здоровья врагов с каждой новой волной.
         /// </summary>
-        public const float ENEMY_HP_SCALE_PER_WAVE = 0.10f;     
+        public const float ENEMY_HP_SCALE_PER_WAVE = 0.10f;
         /// <summary>
         /// Коэффициент увеличения урона врагов с каждой новой волной.
         /// </summary>
-        public const float ENEMY_DAMAGE_SCALE_PER_WAVE = 0.06f; 
+        public const float ENEMY_DAMAGE_SCALE_PER_WAVE = 0.06f;
         /// <summary>
         /// Максимально допустимое количество врагов в одной волне.
         /// </summary>
@@ -125,9 +125,9 @@ namespace AlJourney.Scripts.Core
         /// </summary>
         public const int ENEMY_COUNT_BASE = 1;
         /// <summary>
-        /// Интервал (в волнах), через который количество врагов увеличивается на 1.
+        /// Интервал, через который количество врагов увеличивается на 1.
         /// </summary>
-        public const int ENEMY_COUNT_INCREASE_EVERY = 2; 
+        public const int ENEMY_COUNT_INCREASE_EVERY = 2;
 
         /// <summary>
         /// Номер волны, начиная с которой могут появляться враги-скелеты.
@@ -135,11 +135,11 @@ namespace AlJourney.Scripts.Core
         public const int SKELETON_UNLOCK_WAVE = 21;
 
         /// <summary>
-        /// Интервал (в волнах) между появлениями мини-боссов.
+        /// Интервал между появлениями мини-боссов.
         /// </summary>
         public const int MINIBOSS_WAVE_INTERVAL = 999;
         /// <summary>
-        /// Интервал (в волнах) между появлениями главных боссов.
+        /// Интервал между появлениями главных боссов.
         /// </summary>
         public const int BOSS_WAVE_INTERVAL = 999;
 
@@ -155,7 +155,7 @@ namespace AlJourney.Scripts.Core
         /// <summary>
         /// Базовая защита Мага без учета экипировки.
         /// </summary>
-        public const int MAGE_BASE_DEFENSE = 5;
+        public const int MAGE_BASE_DEFENSE = 2;
 
         /// <summary>
         /// Базовое максимальное здоровье Воина.
@@ -168,7 +168,7 @@ namespace AlJourney.Scripts.Core
         /// <summary>
         /// Базовая защита Воина без учета экипировки.
         /// </summary>
-        public const int WARRIOR_BASE_DEFENSE = 8;
+        public const int WARRIOR_BASE_DEFENSE = 4;
 
 
         /// <summary>
@@ -178,7 +178,7 @@ namespace AlJourney.Scripts.Core
         /// <summary>
         /// Урон Скелета-воина.
         /// </summary>
-        public const int SKELETON_WARRIOR_DAMAGE = 12;
+        public const int SKELETON_WARRIOR_DAMAGE = 25;
         /// <summary>
         /// Защита Скелета-воина.
         /// </summary>
@@ -191,7 +191,7 @@ namespace AlJourney.Scripts.Core
         /// <summary>
         /// Урон Скелета-лучника.
         /// </summary>
-        public const int SKELETON_ARCHER_DAMAGE = 8;
+        public const int SKELETON_ARCHER_DAMAGE = 18;
         /// <summary>
         /// Защита Скелета-лучника.
         /// </summary>
@@ -204,7 +204,7 @@ namespace AlJourney.Scripts.Core
         /// <summary>
         /// Урон Зомби.
         /// </summary>
-        public const int ZOMBIE_DAMAGE = 6;
+        public const int ZOMBIE_DAMAGE = 20;
         /// <summary>
         /// Защита Зомби.
         /// </summary>
@@ -217,7 +217,7 @@ namespace AlJourney.Scripts.Core
         /// <summary>
         /// Урон Слайма.
         /// </summary>
-        public const int SLIME_DAMAGE = 4;
+        public const int SLIME_DAMAGE = 12;
         /// <summary>
         /// Защита Слайма.
         /// </summary>
@@ -230,7 +230,7 @@ namespace AlJourney.Scripts.Core
         /// <summary>
         /// Урон Драугра-воина.
         /// </summary>
-        public const int DRAUGR_WARRIOR_DAMAGE = 10;
+        public const int DRAUGR_WARRIOR_DAMAGE = 22;
         /// <summary>
         /// Защита Драугра-воина.
         /// </summary>
@@ -243,7 +243,7 @@ namespace AlJourney.Scripts.Core
         /// <summary>
         /// Урон Драугра-защитника.
         /// </summary>
-        public const int DRAUGR_DEFENDER_DAMAGE = 7;
+        public const int DRAUGR_DEFENDER_DAMAGE = 15;
         /// <summary>
         /// Защита Драугра-защитника.
         /// </summary>
@@ -256,7 +256,7 @@ namespace AlJourney.Scripts.Core
         /// <summary>
         /// Урон Драугра-кастера.
         /// </summary>
-        public const int DRAUGR_CASTER_DAMAGE = 11;
+        public const int DRAUGR_CASTER_DAMAGE = 25;
         /// <summary>
         /// Защита Драугра-кастера.
         /// </summary>
@@ -269,7 +269,7 @@ namespace AlJourney.Scripts.Core
         /// <summary>
         /// Урон Генерала Драугров.
         /// </summary>
-        public const int GENERAL_DRAUGR_DAMAGE = 18;
+        public const int GENERAL_DRAUGR_DAMAGE = 35;
         /// <summary>
         /// Защита Генерала Драугров.
         /// </summary>
@@ -282,7 +282,7 @@ namespace AlJourney.Scripts.Core
         /// <summary>
         /// Урон Архискелета.
         /// </summary>
-        public const int ARHISKELETON_DAMAGE = 15;
+        public const int ARHISKELETON_DAMAGE = 25;
         /// <summary>
         /// Защита Архискелета.
         /// </summary>
@@ -299,7 +299,7 @@ namespace AlJourney.Scripts.Core
         /// <summary>
         /// Урон Некроманта.
         /// </summary>
-        public const int NECROMANCER_DAMAGE = 20;
+        public const int NECROMANCER_DAMAGE = 45;
         /// <summary>
         /// Защита Некроманта.
         /// </summary>
@@ -332,27 +332,27 @@ namespace AlJourney.Scripts.Core
         /// <summary>
         /// Коэффициент масштабирования цен в магазине с увеличением номера волны.
         /// </summary>
-        public const float SHOP_WAVE_SCALE_FACTOR = 1.8f;       
+        public const float SHOP_WAVE_SCALE_FACTOR = 1.8f;
 
         /// <summary>
         /// Количество монет, выпадающих за победу над обычным врагом.
         /// </summary>
-        public const int COINS_PER_BASIC_ENEMY = 8;             
+        public const int COINS_PER_BASIC_ENEMY = 8;
         /// <summary>
         /// Количество монет, выпадающих за победу над мини-боссом.
         /// </summary>
-        public const int COINS_PER_MINIBOSS = 40;               
+        public const int COINS_PER_MINIBOSS = 40;
         /// <summary>
         /// Количество монет, выпадающих за победу над главным боссом.
         /// </summary>
-        public const int COINS_PER_BOSS = 150;                  
+        public const int COINS_PER_BOSS = 150;
 
         /// <summary>
         /// Имя файла, используемое для сохранения прогресса игрока.
         /// </summary>
         public const string SAVE_FILE_NAME = "save_data.json";
         /// <summary>
-        /// Директория, в которой сохраняется файл прогресса (с префиксом user:// для Godot).
+        /// Директория, в которой сохраняется файл прогресса.
         /// </summary>
         public const string SAVE_DIRECTORY = "user://SaveData/";
     }

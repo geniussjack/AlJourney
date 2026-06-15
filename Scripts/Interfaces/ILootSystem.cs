@@ -1,11 +1,10 @@
+﻿using AlJourney.Scripts.Data;
 using System.Collections.Generic;
-using AlJourney.Scripts.Core;
-using AlJourney.Scripts.Data;
 
 namespace AlJourney.Scripts.Interfaces
 {
     /// <summary>
-    /// Интерфейс для генерации лута (наград).
+    /// Интерфейс для генерации лута.
     /// Отвечает за создание случайных предметов снаряжения по итогам прохождения обычных волн или боссов.
     /// </summary>
     public interface ILootSystem

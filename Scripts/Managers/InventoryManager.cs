@@ -1,7 +1,7 @@
-using AlJourney.Scripts.Core;
+﻿using AlJourney.Scripts.Core;
 using AlJourney.Scripts.Data;
-using Godot;
 using AlJourney.Scripts.Interfaces;
+using Godot;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -13,7 +13,7 @@ namespace AlJourney.Scripts.Managers
     public partial class InventoryManager : Node, IInventoryManager
     {
         /// <summary>
-        /// Глобальный экземпляр менеджера инвентаря (паттерн Singleton).
+        /// Глобальный экземпляр менеджера инвентаря.
         /// </summary>
         public static InventoryManager Instance { get; private set; } = null!;
 
@@ -100,12 +100,12 @@ namespace AlJourney.Scripts.Managers
         /// Улучшает предмет экипировки за монеты, если хватает средств.
         /// </summary>
         /// <param name="item">Предмет экипировки для улучшения.</param>
-        /// <returns><c>true</c>, если предмет успешно улучшен; иначе <c>false</c> (недостаточно средств или максимальный уровень).</returns>
+        /// <returns><c>true</c>, если предмет успешно улучшен; иначе <c>false</c>.</returns>
         public bool UpgradeEquipment(EquipmentData item)
         {
             int waveNumber = GameStateManager.Instance.CurrentWave;
             int cost = item.GetUpgradeCost(waveNumber);
-            
+
             if (cost == 0 || GameStateManager.Instance.Coins < cost)
             {
                 GD.Print($"[InventoryManager] Not enough coins to upgrade {item.Name}. Need: {cost}, Have: {GameStateManager.Instance.Coins}");
@@ -138,7 +138,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Возвращает список всех предметов, находящихся в инвентаре игрока (не экипированных).
+        /// Возвращает список всех предметов, находящихся в инвентаре игрока.
         /// </summary>
         /// <returns>Список предметов инвентаря только для чтения.</returns>
         public IReadOnlyList<EquipmentData> GetInventory()
@@ -153,7 +153,7 @@ namespace AlJourney.Scripts.Managers
         public void SaveToData(SaveData data)
         {
             data.Inventory = [.. _inventory];
-            data.HeroEquipment = new Dictionary<CharacterClass, Dictionary<EquipmentSlot, EquipmentData>>();
+            data.HeroEquipment = [];
             foreach (KeyValuePair<CharacterClass, Dictionary<EquipmentSlot, EquipmentData>> kvp in _heroEquipment)
             {
                 data.HeroEquipment[kvp.Key] = new Dictionary<EquipmentSlot, EquipmentData>(kvp.Value);

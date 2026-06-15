@@ -1,16 +1,16 @@
-using AlJourney.Scripts.Core;
+﻿using AlJourney.Scripts.Core;
 using AlJourney.Scripts.Data;
 
 namespace AlJourney.Scripts.Interfaces
 {
     /// <summary>
     /// Интерфейс для глобального состояния игры.
-    /// Отвечает за высокоуровневое управление игрой: сохранение/загрузку, переход между волнами, управление экономикой (монетами) и характеристиками героев.
+    /// Отвечает за высокоуровневое управление игрой: сохранение/загрузку, переход между волнами, управление экономикой и характеристиками героев.
     /// </summary>
     public interface IGameStateManager
     {
         /// <summary>
-        /// Текущее глобальное состояние игры (например, в главном меню, в бою, пауза).
+        /// Текущее глобальное состояние игры.
         /// </summary>
         GameState CurrentState { get; }
 
@@ -61,7 +61,7 @@ namespace AlJourney.Scripts.Interfaces
         bool SpendCoins(int amount);
 
         /// <summary>
-        /// Обновляет базовые и текущие характеристики обоих героев (мага и воина).
+        /// Обновляет базовые и текущие характеристики обоих героев.
         /// </summary>
         void UpdateHeroStats(int mageHealth, int mageMaxHealth, int mageDamage, int mageDefense, int warriorHealth, int warriorMaxHealth, int warriorDamage, int warriorDefense);
 
@@ -71,7 +71,7 @@ namespace AlJourney.Scripts.Interfaces
         void ChangeState(GameState newState);
 
         /// <summary>
-        /// Завершает игру с указанием результата (победа или поражение).
+        /// Завершает игру с указанием результата.
         /// </summary>
         void EndGame(bool isVictory);
 
