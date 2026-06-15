@@ -14,9 +14,9 @@ namespace AlJourney.Scripts.Interfaces
         Vector2I Resolution { get; }
 
         /// <summary>
-        /// Флаг полноэкранного режима. Значение true означает, что игра работает на весь экран.
+        /// Режим окна (0 = Fullscreen, 1 = Borderless, 2 = Windowed).
         /// </summary>
-        bool Fullscreen { get; }
+        int WindowMode { get; }
 
         /// <summary>
         /// Текущий язык игры (en или ru).
@@ -51,11 +51,11 @@ namespace AlJourney.Scripts.Interfaces
         void SetResolution(Vector2I resolution, bool applyImmediately = true);
 
         /// <summary>
-        /// Включает или отключает полноэкранный режим.
+        /// Устанавливает режим окна.
         /// </summary>
-        /// <param name="enabled">True - включить полный экран, False - оконный режим.</param>
+        /// <param name="mode">0 - Fullscreen, 1 - Borderless, 2 - Windowed.</param>
         /// <param name="applyImmediately">Применить настройки немедленно.</param>
-        void SetFullscreen(bool enabled, bool applyImmediately = true);
+        void SetWindowMode(int mode, bool applyImmediately = true);
 
         /// <summary>
         /// Изменяет язык игры.

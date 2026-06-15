@@ -9,7 +9,7 @@ namespace AlJourney.Scripts.UI
     public partial class SettingsMenuUI : Control
     {
         private OptionButton _resolutionDropdown;
-        private CheckButton _fullscreenToggle;
+        private OptionButton _windowModeDropdown;
         private OptionButton _languageDropdown;
         private OptionButton _fpsLimitDropdown;
 
@@ -40,7 +40,7 @@ namespace AlJourney.Scripts.UI
         public override void _Ready()
         {
             _resolutionDropdown = GetNode<OptionButton>("SettingsMenu/Panel/VBoxContainer/VideoSettings/ResolutionDropdown");
-            _fullscreenToggle = GetNode<CheckButton>("SettingsMenu/Panel/VBoxContainer/VideoSettings/FullscreenToggle");
+            _windowModeDropdown = GetNode<OptionButton>("SettingsMenu/Panel/VBoxContainer/VideoSettings/WindowModeDropdown");
             _languageDropdown = GetNode<OptionButton>("SettingsMenu/Panel/VBoxContainer/VideoSettings/LanguageDropdown");
             _fpsLimitDropdown = GetNode<OptionButton>("SettingsMenu/Panel/VBoxContainer/VideoSettings/FpsLimitDropdown");
 
@@ -58,8 +58,9 @@ namespace AlJourney.Scripts.UI
             SetupResolutionDropdown();
             SetupFpsDropdown();
             SetupLanguageDropdown();
+            SetupWindowModeDropdown();
 
-            _fullscreenToggle.Toggled += OnFullscreenToggled;
+            _windowModeDropdown.ItemSelected += OnWindowModeSelected;
             _languageDropdown.ItemSelected += OnLanguageSelected;
             _resolutionDropdown.ItemSelected += OnResolutionSelected;
             _fpsLimitDropdown.ItemSelected += OnFpsLimitSelected;
@@ -82,6 +83,14 @@ namespace AlJourney.Scripts.UI
             _languageDropdown.Clear();
             _languageDropdown.AddItem("English", 0);
             _languageDropdown.AddItem("Русский", 1);
+        }
+
+        private void SetupWindowModeDropdown()
+        {
+            _windowModeDropdown.Clear();
+            _windowModeDropdown.AddItem("Fullscreen", 0);
+            _windowModeDropdown.AddItem("Borderless", 1);
+            _windowModeDropdown.AddItem("Windowed", 2);
         }
 
         private void SetupResolutionDropdown()
@@ -109,7 +118,7 @@ namespace AlJourney.Scripts.UI
         {
             SettingsManager settings = SettingsManager.Instance;
 
-            _fullscreenToggle.ButtonPressed = settings.Fullscreen;
+            _windowModeDropdown.Selected = settings.WindowMode;
             _languageDropdown.Selected = settings.Language == "ru" ? 1 : 0;
 
             Vector2I currentRes = settings.Resolution;
@@ -141,14 +150,14 @@ namespace AlJourney.Scripts.UI
 
         private void UpdateVolumeLabels()
         {
-            _masterVolumeLabel.Text = $"Master: {_masterVolumeSlider.Value * 100:F0}%";
-            _musicVolumeLabel.Text = $"Music: {_musicVolumeSlider.Value * 100:F0}%";
-            _sfxVolumeLabel.Text = $"SFX: {_sfxVolumeSlider.Value * 100:F0}%";
+            _masterVolumeLabel.Text = $"{Tr("Master:")} {_masterVolumeSlider.Value * 100:F0}%";
+            _musicVolumeLabel.Text = $"{Tr("Music:")} {_musicVolumeSlider.Value * 100:F0}%";
+            _sfxVolumeLabel.Text = $"{Tr("SFX:")} {_sfxVolumeSlider.Value * 100:F0}%";
         }
 
-        private void OnFullscreenToggled(bool toggled)
+        private void OnWindowModeSelected(long index)
         {
-            SettingsManager.Instance.SetFullscreen(toggled, false);
+            SettingsManager.Instance.SetWindowMode((int)index, false);
         }
 
         private void OnLanguageSelected(long index)

@@ -77,9 +77,9 @@ layout_mode = 2
 custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
-text = "Fullscreen:"
+text = "Window Mode:"
 
-[node name="FullscreenToggle" type="CheckButton" parent="SettingsMenu/Panel/VBoxContainer/VideoSettings"]
+[node name="WindowModeDropdown" type="OptionButton" parent="SettingsMenu/Panel/VBoxContainer/VideoSettings"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
 

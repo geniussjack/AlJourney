@@ -1,4 +1,4 @@
-﻿using AlJourney.Scripts.Interfaces;
+using AlJourney.Scripts.Interfaces;
 using Godot;
 
 namespace AlJourney.Scripts.Managers
@@ -30,9 +30,9 @@ namespace AlJourney.Scripts.Managers
         public Vector2I Resolution => _resolution;
 
         /// <summary>
-        /// Указывает, включен ли полноэкранный режим.
+        /// Режим окна (0 = Fullscreen, 1 = Borderless, 2 = Windowed).
         /// </summary>
-        public bool Fullscreen { get; private set; } = true;
+        public int WindowMode { get; private set; } = 0;
 
         /// <summary>
         /// Текущий язык игры.
@@ -96,20 +96,20 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Включает или выключает полноэкранный режим.
+        /// Устанавливает режим окна.
         /// </summary>
-        /// <param name="enabled">Состояние полноэкранного режима.</param>
+        /// <param name="mode">0 - Fullscreen, 1 - Borderless, 2 - Windowed.</param>
         /// <param name="applyImmediately">Если <c>true</c>, видео-настройки применяются немедленно.</param>
-        public void SetFullscreen(bool enabled, bool applyImmediately = true)
+        public void SetWindowMode(int mode, bool applyImmediately = true)
         {
-            Fullscreen = enabled;
+            WindowMode = mode;
 
             if (applyImmediately)
             {
                 ApplyVideoSettings();
             }
 
-            GD.Print($"[SettingsManager] Fullscreen: {enabled}");
+            GD.Print($"[SettingsManager] WindowMode: {mode}");
         }
 
         /// <summary>
@@ -183,13 +183,22 @@ namespace AlJourney.Scripts.Managers
         {
             Window window = GetWindow();
 
-            if (Fullscreen)
+            if (WindowMode == 0) // Fullscreen
             {
                 window.Mode = Window.ModeEnum.Fullscreen;
+                window.Borderless = false;
             }
-            else
+            else if (WindowMode == 1) // Borderless
             {
                 window.Mode = Window.ModeEnum.Windowed;
+                window.Borderless = true;
+                window.Size = _resolution;
+                window.Position = (DisplayServer.ScreenGetSize() - _resolution) / 2;
+            }
+            else // Windowed
+            {
+                window.Mode = Window.ModeEnum.Windowed;
+                window.Borderless = false;
                 window.Size = _resolution;
                 window.Position = (DisplayServer.ScreenGetSize() - _resolution) / 2;
             }
@@ -217,7 +226,7 @@ namespace AlJourney.Scripts.Managers
 
             config.SetValue("video", "resolution_x", _resolution.X);
             config.SetValue("video", "resolution_y", _resolution.Y);
-            config.SetValue("video", "fullscreen", Fullscreen);
+            config.SetValue("video", "window_mode", WindowMode);
             config.SetValue("video", "language", Language);
             config.SetValue("video", "max_fps", MaxFps);
 
@@ -251,7 +260,7 @@ namespace AlJourney.Scripts.Managers
                 (int)config.GetValue("video", "resolution_x", 1920),
                 (int)config.GetValue("video", "resolution_y", 1080)
             );
-            Fullscreen = (bool)config.GetValue("video", "fullscreen", true);
+            WindowMode = (int)config.GetValue("video", "window_mode", 0);
             Language = (string)config.GetValue("video", "language", "en");
             MaxFps = (int)config.GetValue("video", "max_fps", 60);
 
@@ -268,7 +277,7 @@ namespace AlJourney.Scripts.Managers
         public void ResetToDefaults()
         {
             _resolution = new Vector2I(1920, 1080);
-            Fullscreen = true;
+            WindowMode = 0;
             Language = "en";
             MaxFps = 60;
             MasterVolume = 1.0f;
