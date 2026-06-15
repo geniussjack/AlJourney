@@ -1,4 +1,4 @@
-﻿using AlJourney.Scripts.Managers;
+using AlJourney.Scripts.Managers;
 using Godot;
 
 namespace AlJourney.Scripts.UI
@@ -20,19 +20,19 @@ namespace AlJourney.Scripts.UI
         private HSlider _sfxVolumeSlider;
         private Label _sfxVolumeLabel;
 
-        private TextureButton _applyButton;
-        private TextureButton _resetButton;
-        private TextureButton _backButton;
+        private Button _applyButton;
+        private Button _resetButton;
+        private Button _backButton;
 
         private readonly Vector2I[] _resolutions =
         [
-            new(1280, 720),   
-            new(1920, 1080),  
-            new(2560, 1440),  
-            new(3840, 2160)   
+            new(1280, 720),
+            new(1920, 1080),
+            new(2560, 1440),
+            new(3840, 2160)
         ];
 
-        private readonly int[] _fpsLimits = [30, 60, 120, 144, 240, 0]; 
+        private readonly int[] _fpsLimits = [30, 60, 120, 144, 240, 0];
 
         /// <summary>
         /// Вызывается при инициализации узла. Настраивает ссылки на элементы управления, подписывается на их события и загружает текущие настройки.
@@ -51,9 +51,9 @@ namespace AlJourney.Scripts.UI
             _sfxVolumeSlider = GetNode<HSlider>("SettingsMenu/Panel/VBoxContainer/AudioSettings/SfxVolumeSlider");
             _sfxVolumeLabel = GetNode<Label>("SettingsMenu/Panel/VBoxContainer/AudioSettings/SfxVolumeContainer/SfxVolumeLabel");
 
-            _applyButton = GetNode<TextureButton>("SettingsMenu/Panel/VBoxContainer/ButtonsContainer/ApplyButton");
-            _resetButton = GetNode<TextureButton>("SettingsMenu/Panel/VBoxContainer/ButtonsContainer/ResetButton");
-            _backButton  = GetNode<TextureButton>("SettingsMenu/Panel/VBoxContainer/ButtonsContainer/BackButton");
+            _applyButton = GetNode<Button>("SettingsMenu/Panel/VBoxContainer/ButtonsContainer/ApplyButton");
+            _resetButton = GetNode<Button>("SettingsMenu/Panel/VBoxContainer/ButtonsContainer/ResetButton");
+            _backButton = GetNode<Button>("SettingsMenu/Panel/VBoxContainer/ButtonsContainer/BackButton");
 
             SetupResolutionDropdown();
             SetupFpsDropdown();
@@ -186,7 +186,7 @@ namespace AlJourney.Scripts.UI
             SettingsManager.Instance.SetSfxVolume((float)value);
             UpdateVolumeLabels();
 
-            AudioManager.Instance?.TryPlaySfx("res://Resources/Audio/SFX/button_click.wav");
+            _ = (AudioManager.Instance?.TryPlaySfx("res://Resources/Audio/SFX/button_click.wav"));
         }
 
         private void OnApplyPressed()
@@ -197,7 +197,7 @@ namespace AlJourney.Scripts.UI
 
             SettingsManager.Instance.SaveSettings();
 
-            AudioManager.Instance?.TryPlaySfx("res://Resources/Audio/SFX/button_click.wav");
+            _ = (AudioManager.Instance?.TryPlaySfx("res://Resources/Audio/SFX/button_click.wav"));
         }
 
         private void OnResetPressed()
@@ -208,7 +208,7 @@ namespace AlJourney.Scripts.UI
 
             LoadCurrentSettings();
 
-            AudioManager.Instance?.TryPlaySfx("res://Resources/Audio/SFX/button_click.wav");
+            _ = (AudioManager.Instance?.TryPlaySfx("res://Resources/Audio/SFX/button_click.wav"));
         }
 
         private void OnBackPressed()

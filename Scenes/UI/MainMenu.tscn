@@ -166,16 +166,16 @@ text = "Fullscreen:"
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
 
-[node name="VsyncContainer" type="HBoxContainer" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/VideoSettings"]
+[node name="LanguageContainer" type="HBoxContainer" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/VideoSettings"]
 layout_mode = 2
 
-[node name="Label3" type="Label" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/VideoSettings/VsyncContainer"]
+[node name="LanguageLabel" type="Label" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/VideoSettings/LanguageContainer"]
 custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
-text = "VSync:"
+text = "Language:"
 
-[node name="VsyncToggle" type="CheckButton" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/VideoSettings"]
+[node name="LanguageDropdown" type="OptionButton" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/VideoSettings"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
 

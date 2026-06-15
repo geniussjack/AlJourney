@@ -1,4 +1,4 @@
-﻿using AlJourney.Scripts.Battle;
+using AlJourney.Scripts.Battle;
 using AlJourney.Scripts.Characters;
 using AlJourney.Scripts.Core;
 using AlJourney.Scripts.Data;
@@ -86,6 +86,8 @@ namespace AlJourney.Scripts.Scenes
             TextureRect slime = GetNodeOrNull<TextureRect>("CanvasLayer/DecorativeLayer/RightPanel/MarginContainer/VBoxContainer/SlimeRow/SlimePortraitContainer/SlimePortrait");
             TextureRect skeleton = GetNodeOrNull<TextureRect>("CanvasLayer/DecorativeLayer/RightPanel/MarginContainer/VBoxContainer/SkeletonRow/SkeletonPortraitContainer/SkeletonPortrait");
 
+            GD.Print($"[BattleScene] Portraits loaded: Mage={(mage != null)}, Warrior={(warrior != null)}, Slime={(slime != null)}, Skeleton={(skeleton != null)}");
+
             AnimatePortrait(mage);
             AnimatePortrait(warrior);
             AnimatePortrait(slime);
@@ -104,15 +106,23 @@ namespace AlJourney.Scripts.Scenes
             {
                 portrait.PivotOffset = new Vector2(48, 48); // Fallback
             }
+            
+            GD.Print($"[BattleScene] Animating portrait: {portrait.Name} with PivotOffset={portrait.PivotOffset}");
+
             Tween tween = CreateTween();
             _ = tween.SetLoops();
             _ = tween.SetTrans(Tween.TransitionType.Sine);
             _ = tween.SetEase(Tween.EaseType.InOut);
 
-            // Randomize starting delay a bit so they don't breathe perfectly in sync
-            _ = tween.TweenInterval(GD.Randf() * 0.5f);
-            _ = tween.TweenProperty(portrait, "scale", new Vector2(1.05f, 1.05f), 1.0f + (GD.Randf() * 0.2f));
-            _ = tween.TweenProperty(portrait, "scale", new Vector2(1.0f, 1.0f), 1.0f + (GD.Randf() * 0.2f));
+            float delay = GD.Randf() * 0.5f;
+            float dur1 = 1.0f + (GD.Randf() * 0.2f);
+            float dur2 = 1.0f + (GD.Randf() * 0.2f);
+
+            _ = tween.TweenInterval(delay);
+            _ = tween.TweenProperty(portrait, "scale", new Vector2(1.1f, 1.1f), dur1);
+            _ = tween.Parallel().TweenProperty(portrait, "position", portrait.Position - new Vector2(0, 4), dur1);
+            _ = tween.TweenProperty(portrait, "scale", new Vector2(1.0f, 1.0f), dur2);
+            _ = tween.Parallel().TweenProperty(portrait, "position", portrait.Position, dur2);
         }
 
         private void InitializeHeroes()
