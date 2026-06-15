@@ -28,13 +28,14 @@ ComboSystem="*res://Scripts/Match3/ComboSystem.cs"
 InventoryManager="*res://Scripts/Managers/InventoryManager.cs"
 LootSystem="*res://Scripts/Managers/LootSystem.cs"
 AbilitySystem="*res://Scripts/Managers/AbilitySystem.cs"
+LocalizationManager="*res://Scripts/Managers/LocalizationManager.cs"
 
 [display]
 
 window/size/viewport_width=1920
 window/size/viewport_height=1080
-window/stretch/mode="canvas_items"
-window/stretch/aspect="expand"
+window/stretch/mode="viewport"
+window/stretch/aspect="keep"
 
 [dotnet]
 
@@ -46,7 +47,3 @@ renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
 2d/snap/snap_2d_transforms_to_pixel=true
 2d/snap/snap_2d_vertices_to_pixel=true
-
-[internationalization]
-
-locale/translations=PackedStringArray("res://Data/translations.en.translation", "res://Data/translations.ru.translation")

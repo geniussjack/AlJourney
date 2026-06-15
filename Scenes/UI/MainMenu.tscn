@@ -63,35 +63,35 @@ custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 24
-text = "New Game"
+text = "UI_MAIN_MENU_NEW_GAME"
 
 [node name="ContinueButton" type="Button" parent="MainMenuPanel/VBoxContainer"]
 custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 24
-text = "Continue"
+text = "UI_MAIN_MENU_CONTINUE"
 
 [node name="SettingsButton" type="Button" parent="MainMenuPanel/VBoxContainer"]
 custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 24
-text = "Settings"
+text = "UI_MAIN_MENU_SETTINGS"
 
 [node name="CreditsButton" type="Button" parent="MainMenuPanel/VBoxContainer"]
 custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 24
-text = "Credits"
+text = "UI_MAIN_MENU_CREDITS"
 
 [node name="QuitButton" type="Button" parent="MainMenuPanel/VBoxContainer"]
 custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 24
-text = "Quit"
+text = "UI_MAIN_MENU_QUIT"
 
 [node name="SettingsPanel" type="Control" parent="."]
 visible = false
@@ -125,7 +125,7 @@ theme_override_constants/separation = 20
 [node name="Title" type="Label" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 56
-text = "Settings"
+text = "UI_SETTINGS_TITLE"
 horizontal_alignment = 1
 
 [node name="HSeparator1" type="HSeparator" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer"]
@@ -138,7 +138,7 @@ theme_override_constants/separation = 15
 [node name="VideoLabel" type="Label" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/VideoSettings"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 40
-text = "Video"
+text = "UI_SETTINGS_VIDEO"
 
 [node name="ResolutionContainer" type="HBoxContainer" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/VideoSettings"]
 layout_mode = 2
@@ -147,7 +147,7 @@ layout_mode = 2
 custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
-text = "Resolution:"
+text = "UI_SETTINGS_RESOLUTION"
 
 [node name="ResolutionDropdown" type="OptionButton" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/VideoSettings"]
 layout_mode = 2
@@ -160,7 +160,7 @@ layout_mode = 2
 custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
-text = "Window Mode:"
+text = "UI_SETTINGS_WINDOW_MODE"
 
 [node name="WindowModeDropdown" type="OptionButton" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/VideoSettings"]
 layout_mode = 2
@@ -173,7 +173,7 @@ layout_mode = 2
 custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
-text = "Language:"
+text = "UI_SETTINGS_LANGUAGE"
 
 [node name="LanguageDropdown" type="OptionButton" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/VideoSettings"]
 layout_mode = 2
@@ -186,7 +186,7 @@ layout_mode = 2
 custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
-text = "FPS Limit:"
+text = "UI_SETTINGS_FPS_LIMIT"
 
 [node name="FpsLimitDropdown" type="OptionButton" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/VideoSettings"]
 layout_mode = 2
@@ -202,7 +202,7 @@ theme_override_constants/separation = 15
 [node name="AudioLabel" type="Label" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/AudioSettings"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 40
-text = "Audio"
+text = "UI_SETTINGS_AUDIO"
 
 [node name="MasterVolumeContainer" type="VBoxContainer" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/AudioSettings"]
 layout_mode = 2
@@ -210,7 +210,7 @@ layout_mode = 2
 [node name="MasterVolumeLabel" type="Label" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/AudioSettings/MasterVolumeContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
-text = "Master: 100%"
+text = "UI_SETTINGS_MASTER"
 
 [node name="MasterVolumeSlider" type="HSlider" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/AudioSettings"]
 layout_mode = 2
@@ -224,7 +224,7 @@ layout_mode = 2
 [node name="MusicVolumeLabel" type="Label" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/AudioSettings/MusicVolumeContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
-text = "Music: 70%"
+text = "UI_SETTINGS_MUSIC"
 
 [node name="MusicVolumeSlider" type="HSlider" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/AudioSettings"]
 layout_mode = 2
@@ -238,7 +238,7 @@ layout_mode = 2
 [node name="SfxVolumeLabel" type="Label" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/AudioSettings/SfxVolumeContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
-text = "SFX: 80%"
+text = "UI_SETTINGS_SFX"
 
 [node name="SfxVolumeSlider" type="HSlider" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/AudioSettings"]
 layout_mode = 2
@@ -258,19 +258,19 @@ alignment = 1
 custom_minimum_size = Vector2(120, 48)
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
-text = "Apply"
+text = "UI_SETTINGS_APPLY"
 
 [node name="ResetButton" type="Button" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/ButtonsContainer"]
 custom_minimum_size = Vector2(120, 48)
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
-text = "Reset"
+text = "UI_SETTINGS_RESET"
 
 [node name="BackButton" type="Button" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/ButtonsContainer"]
 custom_minimum_size = Vector2(120, 48)
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
-text = "Back"
+text = "UI_SETTINGS_BACK"
 
 [node name="CreditsPanel" type="Control" parent="."]
 visible = false
@@ -304,7 +304,7 @@ theme_override_constants/separation = 20
 [node name="Title" type="Label" parent="CreditsPanel/CreditsMenu/Panel/VBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 56
-text = "Credits"
+text = "UI_CREDITS_TITLE"
 horizontal_alignment = 1
 
 [node name="ScrollContainer" type="ScrollContainer" parent="CreditsPanel/CreditsMenu/Panel/VBoxContainer"]
@@ -323,4 +323,4 @@ custom_minimum_size = Vector2(120, 48)
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 22
-text = "Back"
+text = "UI_SETTINGS_BACK"

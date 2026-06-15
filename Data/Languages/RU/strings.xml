@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Main Menu -->
+    <string id="UI_MAIN_MENU_NEW_GAME" text="Новая игра" />
+    <string id="UI_MAIN_MENU_CONTINUE" text="Продолжить" />
+    <string id="UI_MAIN_MENU_PLAY" text="Играть" />
+    <string id="UI_MAIN_MENU_SETTINGS" text="Настройки" />
+    <string id="UI_MAIN_MENU_CREDITS" text="Титры" />
+    <string id="UI_MAIN_MENU_QUIT" text="Выход" />
+
+    <!-- Settings Menu -->
+    <string id="UI_SETTINGS_TITLE" text="Настройки" />
+    <string id="UI_SETTINGS_VIDEO" text="Видео" />
+    <string id="UI_SETTINGS_RESOLUTION" text="Разрешение:" />
+    <string id="UI_SETTINGS_WINDOW_MODE" text="Режим окна:" />
+    <string id="UI_SETTINGS_LANGUAGE" text="Язык:" />
+    <string id="UI_SETTINGS_FPS_LIMIT" text="Лимит FPS:" />
+    
+    <string id="UI_SETTINGS_AUDIO" text="Аудио" />
+    <string id="UI_SETTINGS_MASTER" text="Общая:" />
+    <string id="UI_SETTINGS_MUSIC" text="Музыка:" />
+    <string id="UI_SETTINGS_SFX" text="Эффекты:" />
+
+    <string id="UI_SETTINGS_APPLY" text="Применить" />
+    <string id="UI_SETTINGS_RESET" text="Сброс" />
+    <string id="UI_SETTINGS_BACK" text="Назад" />
+
+    <!-- Pause Menu -->
+    <string id="UI_PAUSE_TITLE" text="Пауза" />
+    <string id="UI_PAUSE_RESUME" text="Продолжить" />
+    <string id="UI_PAUSE_MAIN_MENU" text="В главное меню" />
+
+    <!-- Credits -->
+    <string id="UI_CREDITS_TITLE" text="Титры" />
+
+    <!-- Battle HUD -->
+    <string id="UI_BATTLE_WAVE" text="Волна:" />
+    <string id="UI_BATTLE_SCORE" text="Очки:" />
+
+    <!-- Labels -->
+    <string id="UI_ENGLISH" text="English" />
+    <string id="UI_RUSSIAN" text="Русский" />
+    <string id="UI_FULLSCREEN" text="Полный экран" />
+    <string id="UI_BORDERLESS" text="Без рамок" />
+    <string id="UI_WINDOWED" text="В окне" />
+</resources>

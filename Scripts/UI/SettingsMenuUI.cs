@@ -78,19 +78,29 @@ namespace AlJourney.Scripts.UI
             GD.Print("[SettingsMenuUI] Initialized");
         }
 
+        public override void _Notification(int what)
+        {
+            if (what == NotificationTranslationChanged)
+            {
+                SetupLanguageDropdown();
+                SetupWindowModeDropdown();
+                LoadCurrentSettings();
+            }
+        }
+
         private void SetupLanguageDropdown()
         {
             _languageDropdown.Clear();
-            _languageDropdown.AddItem("English", 0);
-            _languageDropdown.AddItem("Русский", 1);
+            _languageDropdown.AddItem(Tr("UI_ENGLISH"), 0);
+            _languageDropdown.AddItem(Tr("UI_RUSSIAN"), 1);
         }
 
         private void SetupWindowModeDropdown()
         {
             _windowModeDropdown.Clear();
-            _windowModeDropdown.AddItem("Fullscreen", 0);
-            _windowModeDropdown.AddItem("Borderless", 1);
-            _windowModeDropdown.AddItem("Windowed", 2);
+            _windowModeDropdown.AddItem(Tr("UI_FULLSCREEN"), 0);
+            _windowModeDropdown.AddItem(Tr("UI_BORDERLESS"), 1);
+            _windowModeDropdown.AddItem(Tr("UI_WINDOWED"), 2);
         }
 
         private void SetupResolutionDropdown()
@@ -150,9 +160,9 @@ namespace AlJourney.Scripts.UI
 
         private void UpdateVolumeLabels()
         {
-            _masterVolumeLabel.Text = $"{Tr("Master:")} {_masterVolumeSlider.Value * 100:F0}%";
-            _musicVolumeLabel.Text = $"{Tr("Music:")} {_musicVolumeSlider.Value * 100:F0}%";
-            _sfxVolumeLabel.Text = $"{Tr("SFX:")} {_sfxVolumeSlider.Value * 100:F0}%";
+            _masterVolumeLabel.Text = $"{Tr("UI_SETTINGS_MASTER")} {_masterVolumeSlider.Value * 100:F0}%";
+            _musicVolumeLabel.Text = $"{Tr("UI_SETTINGS_MUSIC")} {_musicVolumeSlider.Value * 100:F0}%";
+            _sfxVolumeLabel.Text = $"{Tr("UI_SETTINGS_SFX")} {_sfxVolumeSlider.Value * 100:F0}%";
         }
 
         private void OnWindowModeSelected(long index)
