@@ -1,10 +1,8 @@
-[gd_scene load_steps=6 format=3 uid="uid://cdmiad6sigfpe"]
+[gd_scene load_steps=3 format=3 uid="uid://cdmiad6sigfpe"]
 
-[ext_resource type="Script" uid="uid://bdltufdw3l4ui" path="res://Scripts/UI/ShopUI.cs" id="1_shop"]
+[ext_resource type="Script" path="res://Scripts/UI/ShopUI.cs" id="1_shop"]
 [ext_resource type="Theme" path="res://Resources/Themes/game_theme.tres" id="2_theme"]
 [ext_resource type="Texture2D" path="res://Resources/Sprites/Backgrounds/menu_background.png" id="3_bg"]
-[ext_resource type="AtlasTexture" path="res://Resources/Sprites/UI/atlas_btn_resume.tres" id="4_resume"]
-[ext_resource type="AtlasTexture" path="res://Resources/Sprites/UI/atlas_btn_home.tres" id="5_home"]
 
 [node name="ShopScene" type="Control"]
 layout_mode = 3
@@ -16,17 +14,6 @@ grow_vertical = 2
 theme = ExtResource("2_theme")
 script = ExtResource("1_shop")
 
-[node name="Background" type="TextureRect" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-texture = ExtResource("3_bg")
-expand_mode = 1
-stretch_mode = 6
-
 [node name="DimOverlay" type="ColorRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
@@ -34,8 +21,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0, 0, 0, 0.45)
-mouse_filter = 2
+color = Color(0, 0, 0, 0.75)
+mouse_filter = 0
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 1
@@ -98,12 +85,10 @@ horizontal_alignment = 1
 [node name="HealthUpgrade" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ShopContainer/MageUpgrades"]
 layout_mode = 2
 
-[node name="BuyButton" type="TextureButton" parent="MarginContainer/VBoxContainer/ShopContainer/MageUpgrades/HealthUpgrade"]
-texture_normal = ExtResource("4_resume")
-ignore_texture_size = true
-stretch_mode = 2
-custom_minimum_size = Vector2(369, 80)
+[node name="BuyButton" type="Button" parent="MarginContainer/VBoxContainer/ShopContainer/MageUpgrades/HealthUpgrade"]
 layout_mode = 2
+custom_minimum_size = Vector2(220, 52)
+text = "Buy"
 
 [node name="PriceLabel" type="Label" parent="MarginContainer/VBoxContainer/ShopContainer/MageUpgrades/HealthUpgrade"]
 layout_mode = 2
@@ -114,12 +99,10 @@ horizontal_alignment = 1
 [node name="DamageUpgrade" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ShopContainer/MageUpgrades"]
 layout_mode = 2
 
-[node name="BuyButton" type="TextureButton" parent="MarginContainer/VBoxContainer/ShopContainer/MageUpgrades/DamageUpgrade"]
-texture_normal = ExtResource("4_resume")
-ignore_texture_size = true
-stretch_mode = 2
-custom_minimum_size = Vector2(369, 80)
+[node name="BuyButton" type="Button" parent="MarginContainer/VBoxContainer/ShopContainer/MageUpgrades/DamageUpgrade"]
 layout_mode = 2
+custom_minimum_size = Vector2(220, 52)
+text = "Buy"
 
 [node name="PriceLabel" type="Label" parent="MarginContainer/VBoxContainer/ShopContainer/MageUpgrades/DamageUpgrade"]
 layout_mode = 2
@@ -130,12 +113,10 @@ horizontal_alignment = 1
 [node name="DefenseUpgrade" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ShopContainer/MageUpgrades"]
 layout_mode = 2
 
-[node name="BuyButton" type="TextureButton" parent="MarginContainer/VBoxContainer/ShopContainer/MageUpgrades/DefenseUpgrade"]
-texture_normal = ExtResource("4_resume")
-ignore_texture_size = true
-stretch_mode = 2
-custom_minimum_size = Vector2(369, 80)
+[node name="BuyButton" type="Button" parent="MarginContainer/VBoxContainer/ShopContainer/MageUpgrades/DefenseUpgrade"]
 layout_mode = 2
+custom_minimum_size = Vector2(220, 52)
+text = "Buy"
 
 [node name="PriceLabel" type="Label" parent="MarginContainer/VBoxContainer/ShopContainer/MageUpgrades/DefenseUpgrade"]
 layout_mode = 2
@@ -157,12 +138,10 @@ horizontal_alignment = 1
 [node name="HealthUpgrade" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ShopContainer/WarriorUpgrades"]
 layout_mode = 2
 
-[node name="BuyButton" type="TextureButton" parent="MarginContainer/VBoxContainer/ShopContainer/WarriorUpgrades/HealthUpgrade"]
-texture_normal = ExtResource("4_resume")
-ignore_texture_size = true
-stretch_mode = 2
-custom_minimum_size = Vector2(369, 80)
+[node name="BuyButton" type="Button" parent="MarginContainer/VBoxContainer/ShopContainer/WarriorUpgrades/HealthUpgrade"]
 layout_mode = 2
+custom_minimum_size = Vector2(220, 52)
+text = "Buy"
 
 [node name="PriceLabel" type="Label" parent="MarginContainer/VBoxContainer/ShopContainer/WarriorUpgrades/HealthUpgrade"]
 layout_mode = 2
@@ -173,12 +152,10 @@ horizontal_alignment = 1
 [node name="DamageUpgrade" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ShopContainer/WarriorUpgrades"]
 layout_mode = 2
 
-[node name="BuyButton" type="TextureButton" parent="MarginContainer/VBoxContainer/ShopContainer/WarriorUpgrades/DamageUpgrade"]
-texture_normal = ExtResource("4_resume")
-ignore_texture_size = true
-stretch_mode = 2
-custom_minimum_size = Vector2(369, 80)
+[node name="BuyButton" type="Button" parent="MarginContainer/VBoxContainer/ShopContainer/WarriorUpgrades/DamageUpgrade"]
 layout_mode = 2
+custom_minimum_size = Vector2(220, 52)
+text = "Buy"
 
 [node name="PriceLabel" type="Label" parent="MarginContainer/VBoxContainer/ShopContainer/WarriorUpgrades/DamageUpgrade"]
 layout_mode = 2
@@ -189,12 +166,10 @@ horizontal_alignment = 1
 [node name="DefenseUpgrade" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ShopContainer/WarriorUpgrades"]
 layout_mode = 2
 
-[node name="BuyButton" type="TextureButton" parent="MarginContainer/VBoxContainer/ShopContainer/WarriorUpgrades/DefenseUpgrade"]
-texture_normal = ExtResource("4_resume")
-ignore_texture_size = true
-stretch_mode = 2
-custom_minimum_size = Vector2(369, 80)
+[node name="BuyButton" type="Button" parent="MarginContainer/VBoxContainer/ShopContainer/WarriorUpgrades/DefenseUpgrade"]
 layout_mode = 2
+custom_minimum_size = Vector2(220, 52)
+text = "Buy"
 
 [node name="PriceLabel" type="Label" parent="MarginContainer/VBoxContainer/ShopContainer/WarriorUpgrades/DefenseUpgrade"]
 layout_mode = 2
@@ -210,16 +185,12 @@ layout_mode = 2
 alignment = 1
 theme_override_constants/separation = 40
 
-[node name="ContinueButton" type="TextureButton" parent="MarginContainer/VBoxContainer/BottomRow"]
-texture_normal = ExtResource("4_resume")
-ignore_texture_size = true
-stretch_mode = 2
-custom_minimum_size = Vector2(369, 93)
+[node name="ContinueButton" type="Button" parent="MarginContainer/VBoxContainer/BottomRow"]
 layout_mode = 2
+custom_minimum_size = Vector2(160, 48)
+text = "Continue"
 
-[node name="HomeButton" type="TextureButton" parent="MarginContainer/VBoxContainer/BottomRow"]
-texture_normal = ExtResource("5_home")
-ignore_texture_size = true
-stretch_mode = 2
-custom_minimum_size = Vector2(273, 93)
+[node name="HomeButton" type="Button" parent="MarginContainer/VBoxContainer/BottomRow"]
 layout_mode = 2
+custom_minimum_size = Vector2(160, 48)
+text = "Main Menu"

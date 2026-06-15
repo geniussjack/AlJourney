@@ -2,17 +2,17 @@ using System;
 using System.IO;
 using System.Text.RegularExpressions;
 
-class Program
+internal static class Program
 {
-    static void Main()
+    private static void Main()
     {
         string[] files = Directory.GetFiles(@"c:\Users\DNS\OneDrive\Рабочий стол\Godot\aljourney\Scripts\Managers", "*.cs");
-        
-        foreach (var file in files)
+
+        foreach (string file in files)
         {
             string content = File.ReadAllText(file);
             string name = Path.GetFileNameWithoutExtension(file);
-            
+
             if (!content.Contains("using AlJourney.Scripts.Interfaces;"))
             {
                 content = content.Replace("using Godot;", "using Godot;\nusing AlJourney.Scripts.Interfaces;");
@@ -26,9 +26,9 @@ class Program
                 Console.WriteLine($"Updated {name}");
             }
         }
-        
+
         string[] match3Files = Directory.GetFiles(@"c:\Users\DNS\OneDrive\Рабочий стол\Godot\aljourney\Scripts\Match3", "GridManager.cs");
-        foreach(var file in match3Files)
+        foreach (string file in match3Files)
         {
             string content = File.ReadAllText(file);
             if (!content.Contains("using AlJourney.Scripts.Interfaces;"))
@@ -38,9 +38,9 @@ class Program
             content = Regex.Replace(content, @"public partial class GridManager : Node(?!\s*,)", "public partial class GridManager : Node, IGridManager");
             File.WriteAllText(file, content);
         }
-        
+
         string[] battleFiles = Directory.GetFiles(@"c:\Users\DNS\OneDrive\Рабочий стол\Godot\aljourney\Scripts\Battle", "BattleManager.cs");
-        foreach(var file in battleFiles)
+        foreach (string file in battleFiles)
         {
             string content = File.ReadAllText(file);
             if (!content.Contains("using AlJourney.Scripts.Interfaces;"))

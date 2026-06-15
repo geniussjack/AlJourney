@@ -1,7 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://credits_uid"]
+[gd_scene load_steps=2 format=3 uid="uid://credits_uid"]
 
 [ext_resource type="Script" path="res://Scripts/UI/CreditsUI.cs" id="1_credits"]
-[ext_resource type="Texture2D" path="res://Resources/Sprites/UI/atlas_btn_home.tres" id="2_home"]
 
 [node name="CreditsPanel" type="Control"]
 layout_mode = 3
@@ -43,7 +42,7 @@ theme_override_constants/separation = 20
 [node name="Title" type="Label" parent="CreditsMenu/Panel/VBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 56
-text = "Титра"
+text = "Credits"
 horizontal_alignment = 1
 
 [node name="ScrollContainer" type="ScrollContainer" parent="CreditsMenu/Panel/VBoxContainer"]
@@ -57,9 +56,8 @@ size_flags_vertical = 3
 bbcode_enabled = true
 fit_content = true
 
-[node name="BackButton" type="TextureButton" parent="CreditsMenu/Panel/VBoxContainer"]
-custom_minimum_size = Vector2(182, 62)
+[node name="BackButton" type="Button" parent="CreditsMenu/Panel/VBoxContainer"]
+custom_minimum_size = Vector2(140, 48)
 layout_mode = 2
 size_flags_horizontal = 4
-texture_normal = ExtResource("2_home")
-ignore_texture_size = true
+text = "Back"

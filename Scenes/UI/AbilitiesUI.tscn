@@ -44,12 +44,12 @@ layout_mode = 2
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 40
-text = "СПОСОБНОСТИ"
+text = "Abilities"
 
 [node name="CloseButton" type="Button" parent="MarginContainer/VBoxContainer/Header"]
 custom_minimum_size = Vector2(200, 60)
 layout_mode = 2
-text = "Закрыть"
+text = "Close"
 
 [node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
@@ -66,7 +66,7 @@ size_flags_horizontal = 3
 [node name="Label" type="Label" parent="MarginContainer/VBoxContainer/ContentHBox/MageSection"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
-text = "МАГ"
+text = "MAGE"
 horizontal_alignment = 1
 
 [node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer/ContentHBox/MageSection"]
@@ -85,7 +85,7 @@ size_flags_horizontal = 3
 [node name="Label" type="Label" parent="MarginContainer/VBoxContainer/ContentHBox/WarriorSection"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
-text = "ВОИН"
+text = "WARRIOR"
 horizontal_alignment = 1
 
 [node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer/ContentHBox/WarriorSection"]

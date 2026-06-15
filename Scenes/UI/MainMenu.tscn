@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://cmutdu1urtub0"]
+[gd_scene load_steps=7 format=3 uid="uid://cmutdu1urtub0"]
 
 [ext_resource type="Script" uid="uid://c7wem1c34vp64" path="res://Scripts/UI/MainMenuUI.cs" id="1_main"]
 [ext_resource type="Script" uid="uid://denji2vl47j8k" path="res://Scripts/UI/SettingsMenuUI.cs" id="2_settings"]
@@ -6,12 +6,6 @@
 [ext_resource type="Theme" uid="uid://d0twkb22dvira" path="res://Resources/Themes/game_theme.tres" id="4_theme"]
 [ext_resource type="Texture2D" uid="uid://cq4jbitxuh616" path="res://Resources/Sprites/Backgrounds/menu_background.png" id="5_bg"]
 [ext_resource type="Texture2D" uid="uid://gr30g6rbcfoe" path="res://Resources/Sprites/UI/logo.png" id="6_logo"]
-[ext_resource type="Texture2D" path="res://Resources/Sprites/UI/atlas_btn_settings.tres" id="7_settings"]
-[ext_resource type="Texture2D" path="res://Resources/Sprites/UI/atlas_btn_quit.tres" id="9_quit"]
-[ext_resource type="Texture2D" path="res://Resources/Sprites/UI/atlas_btn_reset.tres" id="10_reset"]
-[ext_resource type="Texture2D" path="res://Resources/Sprites/UI/atlas_btn_audio.tres" id="11_audio"]
-[ext_resource type="Texture2D" path="res://Resources/Sprites/UI/atlas_btn_home.tres" id="12_home"]
-[ext_resource type="Texture2D" path="res://Resources/Sprites/UI/atlas_btn_resume.tres" id="13_resume"]
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3
@@ -49,12 +43,11 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -125.0
-offset_bottom = -8.0
 grow_horizontal = 2
 grow_vertical = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MainMenuPanel"]
+custom_minimum_size = Vector2(360, 0)
 layout_mode = 2
 theme_override_constants/separation = 12
 
@@ -65,33 +58,40 @@ texture = ExtResource("6_logo")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="ContinueButton" type="TextureButton" parent="MainMenuPanel/VBoxContainer"]
-custom_minimum_size = Vector2(500, 125)
+[node name="NewGameButton" type="Button" parent="MainMenuPanel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
-texture_normal = ExtResource("13_resume")
-ignore_texture_size = true
-stretch_mode = 5
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 24
+text = "New Game"
 
-[node name="SettingsButton" type="TextureButton" parent="MainMenuPanel/VBoxContainer"]
-custom_minimum_size = Vector2(500, 125)
+[node name="ContinueButton" type="Button" parent="MainMenuPanel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
-texture_normal = ExtResource("7_settings")
-ignore_texture_size = true
-stretch_mode = 5
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 24
+text = "Continue"
 
-[node name="CreditsButton" type="TextureButton" parent="MainMenuPanel/VBoxContainer"]
-custom_minimum_size = Vector2(500, 125)
+[node name="SettingsButton" type="Button" parent="MainMenuPanel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
-texture_normal = ExtResource("11_audio")
-ignore_texture_size = true
-stretch_mode = 5
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 24
+text = "Settings"
 
-[node name="QuitButton" type="TextureButton" parent="MainMenuPanel/VBoxContainer"]
-custom_minimum_size = Vector2(370, 125)
+[node name="CreditsButton" type="Button" parent="MainMenuPanel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
-texture_normal = ExtResource("9_quit")
-ignore_texture_size = true
-stretch_mode = 5
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 24
+text = "Credits"
+
+[node name="QuitButton" type="Button" parent="MainMenuPanel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 24
+text = "Quit"
 
 [node name="SettingsPanel" type="Control" parent="."]
 visible = false
@@ -156,7 +156,7 @@ theme_override_font_sizes/font_size = 28
 [node name="FullscreenContainer" type="HBoxContainer" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/VideoSettings"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/VideoSettings/FullscreenContainer"]
+[node name="Label2" type="Label" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/VideoSettings/FullscreenContainer"]
 custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
@@ -169,7 +169,7 @@ theme_override_font_sizes/font_size = 28
 [node name="VsyncContainer" type="HBoxContainer" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/VideoSettings"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/VideoSettings/VsyncContainer"]
+[node name="Label3" type="Label" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/VideoSettings/VsyncContainer"]
 custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
@@ -182,7 +182,7 @@ theme_override_font_sizes/font_size = 28
 [node name="FpsContainer" type="HBoxContainer" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/VideoSettings"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/VideoSettings/FpsContainer"]
+[node name="Label4" type="Label" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/VideoSettings/FpsContainer"]
 custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
@@ -254,23 +254,23 @@ layout_mode = 2
 theme_override_constants/separation = 20
 alignment = 1
 
-[node name="ApplyButton" type="TextureButton" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/ButtonsContainer"]
-custom_minimum_size = Vector2(246, 62)
+[node name="ApplyButton" type="Button" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/ButtonsContainer"]
+custom_minimum_size = Vector2(120, 48)
 layout_mode = 2
-texture_normal = ExtResource("13_resume")
-ignore_texture_size = true
+theme_override_font_sizes/font_size = 22
+text = "Apply"
 
-[node name="ResetButton" type="TextureButton" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/ButtonsContainer"]
-custom_minimum_size = Vector2(182, 62)
+[node name="ResetButton" type="Button" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/ButtonsContainer"]
+custom_minimum_size = Vector2(120, 48)
 layout_mode = 2
-texture_normal = ExtResource("10_reset")
-ignore_texture_size = true
+theme_override_font_sizes/font_size = 22
+text = "Reset"
 
-[node name="BackButton" type="TextureButton" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/ButtonsContainer"]
-custom_minimum_size = Vector2(182, 62)
+[node name="BackButton" type="Button" parent="SettingsPanel/SettingsMenu/Panel/VBoxContainer/ButtonsContainer"]
+custom_minimum_size = Vector2(120, 48)
 layout_mode = 2
-texture_normal = ExtResource("12_home")
-ignore_texture_size = true
+theme_override_font_sizes/font_size = 22
+text = "Back"
 
 [node name="CreditsPanel" type="Control" parent="."]
 visible = false
@@ -318,9 +318,9 @@ size_flags_vertical = 3
 bbcode_enabled = true
 fit_content = true
 
-[node name="BackButton" type="TextureButton" parent="CreditsPanel/CreditsMenu/Panel/VBoxContainer"]
-custom_minimum_size = Vector2(182, 62)
+[node name="BackButton" type="Button" parent="CreditsPanel/CreditsMenu/Panel/VBoxContainer"]
+custom_minimum_size = Vector2(120, 48)
 layout_mode = 2
 size_flags_horizontal = 4
-texture_normal = ExtResource("12_home")
-ignore_texture_size = true
+theme_override_font_sizes/font_size = 22
+text = "Back"

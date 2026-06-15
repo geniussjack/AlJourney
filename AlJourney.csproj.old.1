@@ -1,0 +1,87 @@
+<Project Sdk="Godot.NET.Sdk/4.6.3">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <DebugType>portable</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <NoWarn>$(NoWarn);NU1605</NoWarn>
+    <RootNamespace>AlJourney</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="Resources\Sprites\Backgrounds\battle_background.png" />
+    <Content Include="Resources\Sprites\Backgrounds\menu_background.png" />
+    <Content Include="Resources\Sprites\Characters\arhiskeleton.png" />
+    <Content Include="Resources\Sprites\Characters\draugr_caster.png" />
+    <Content Include="Resources\Sprites\Characters\draugr_defender.png" />
+    <Content Include="Resources\Sprites\Characters\draugr_warrior.png" />
+    <Content Include="Resources\Sprites\Characters\general_draugr.png" />
+    <Content Include="Resources\Sprites\Characters\mage_attack_sheet.png" />
+    <Content Include="Resources\Sprites\Characters\mage_idle_sheet.png" />
+    <Content Include="Resources\Sprites\Characters\mage_portrait.png" />
+    <Content Include="Resources\Sprites\Characters\mage_sprite.png" />
+    <Content Include="Resources\Sprites\Characters\necromancer.png" />
+    <Content Include="Resources\Sprites\Characters\skeleton_archer.png" />
+    <Content Include="Resources\Sprites\Characters\skeleton_attack_sheet.png" />
+    <Content Include="Resources\Sprites\Characters\skeleton_idle_sheet.png" />
+    <Content Include="Resources\Sprites\Characters\skeleton_warrior.png" />
+    <Content Include="Resources\Sprites\Characters\warrior_attack_sheet.png" />
+    <Content Include="Resources\Sprites\Characters\warrior_idle_sheet.png" />
+    <Content Include="Resources\Sprites\Characters\warrior_portrait.png" />
+    <Content Include="Resources\Sprites\Characters\warrior_sprite.png" />
+    <Content Include="Resources\Sprites\Characters\zombie.png" />
+    <Content Include="Resources\Sprites\Characters\zombie_attack_sheet.png" />
+    <Content Include="Resources\Sprites\Characters\zombie_idle_sheet.png" />
+    <Content Include="Resources\Sprites\Effects\particle_explosion.png" />
+    <Content Include="Resources\Sprites\Effects\particle_fire.png" />
+    <Content Include="Resources\Sprites\Effects\particle_heal.png" />
+    <Content Include="Resources\Sprites\Elements\fire_icon.png" />
+    <Content Include="Resources\Sprites\Elements\heal_icon.png" />
+    <Content Include="Resources\Sprites\Elements\shield_icon.png" />
+    <Content Include="Resources\Sprites\Elements\sword_icon.png" />
+    <Content Include="Resources\Sprites\Icons\equipment_icons_sheet.png" />
+    <Content Include="Resources\Sprites\UI\button_hover.png" />
+    <Content Include="Resources\Sprites\UI\button_normal.png" />
+    <Content Include="Resources\Sprites\UI\button_pressed.png" />
+    <Content Include="Resources\Sprites\UI\coin_icon.png" />
+    <Content Include="Resources\Sprites\UI\health_bar_background.png" />
+    <Content Include="Resources\Sprites\UI\health_bar_fill.png" />
+    <Content Include="Resources\Sprites\UI\panel_background.png" />
+    <Content Include="Resources\Sprites\UI\status_icons_sheet.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Docs\Architecture\" />
+    <Folder Include="Docs\GameDesign\" />
+    <Folder Include="Docs\API\" />
+    <Folder Include="Resources\Audio\Music\" />
+    <Folder Include="Resources\Audio\SFX\" />
+    <Folder Include="Resources\Data\" />
+    <Folder Include="Resources\Fonts\" />
+    <Folder Include="Resources\Themes\" />
+    <Folder Include="Scenes\UI\" />
+    <Folder Include="Scenes\Battle\" />
+    <Folder Include="Scenes\Match3\" />
+    <Folder Include="Scenes\Characters\" />
+    <Folder Include="Scenes\Prefabs\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="scenes\battle\BattleScene.tscn" />
+    <None Include="scenes\characters\Enemy.tscn" />
+    <None Include="scenes\characters\Player.tscn" />
+    <None Include="scenes\match3\ElementSprite.tscn" />
+    <None Include="scenes\match3\GridCell.tscn" />
+    <None Include="scenes\ui\BattleHUD.tscn" />
+    <None Include="scenes\ui\GameOverScreen.tscn" />
+    <None Include="scenes\ui\MainMenu.tscn" />
+    <None Include="scenes\ui\ShopScene.tscn" />
+    <None Include="scenes\ui\VictoryScreen.tscn" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Chickensoft.GoDotTest" Version="2.0.35" />
+    <PackageReference Include="coverlet.collector" Version="10.0.1">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Moq" Version="4.20.72" />
+    <PackageReference Include="Shouldly" Version="4.3.0" />
+  </ItemGroup>
+</Project>
