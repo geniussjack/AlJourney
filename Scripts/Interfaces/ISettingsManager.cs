@@ -1,4 +1,4 @@
-﻿using Godot;
+using Godot;
 
 namespace AlJourney.Scripts.Interfaces
 {
@@ -19,9 +19,9 @@ namespace AlJourney.Scripts.Interfaces
         bool Fullscreen { get; }
 
         /// <summary>
-        /// Флаг вертикальной синхронизации.
+        /// Текущий язык игры (en или ru).
         /// </summary>
-        bool VSync { get; }
+        string Language { get; }
 
         /// <summary>
         /// Максимальное ограничение кадров в секунду.
@@ -58,11 +58,11 @@ namespace AlJourney.Scripts.Interfaces
         void SetFullscreen(bool enabled, bool applyImmediately = true);
 
         /// <summary>
-        /// Включает или отключает вертикальную синхронизацию.
+        /// Изменяет язык игры.
         /// </summary>
-        /// <param name="enabled">True - включить VSync, False - отключить.</param>
+        /// <param name="lang">Код языка (например, "en" или "ru").</param>
         /// <param name="applyImmediately">Применить настройки немедленно.</param>
-        void SetVSync(bool enabled, bool applyImmediately = true);
+        void SetLanguage(string lang, bool applyImmediately = true);
 
         /// <summary>
         /// Устанавливает лимит максимального количества кадров в секунду.
