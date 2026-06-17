@@ -185,7 +185,7 @@ namespace AlJourney.Scripts.Managers
 
             if (WindowMode == 0) // Fullscreen
             {
-                DisplayServer.WindowSetMode(DisplayServer.WindowMode.Fullscreen);
+                DisplayServer.WindowSetMode(DisplayServer.WindowMode.ExclusiveFullscreen);
                 window.Borderless = false;
             }
             else if (WindowMode == 1) // Borderless

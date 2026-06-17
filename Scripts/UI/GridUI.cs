@@ -39,10 +39,7 @@ namespace AlJourney.Scripts.UI
         {
             _gridManager = GetNode<GridManager>("/root/GridManager");
             _comboSystem = GetNode<ComboSystem>("/root/ComboSystem");
-            _heroSystem = GetNode<AlJourney.Scripts.Characters.DualHeroSystem>("/root/HeroSystem");
             _gridSize = GameConstants.GRID_SIZE;
-
-            _heroSystem.HeroDied += OnHeroDied;
 
             _gridContainer = new Control
             {
@@ -63,6 +60,12 @@ namespace AlJourney.Scripts.UI
             );
 
             GD.Print("[GridUI] Initialized");
+        }
+
+        public void Initialize(AlJourney.Scripts.Characters.DualHeroSystem heroSystem)
+        {
+            _heroSystem = heroSystem;
+            _heroSystem.HeroDied += OnHeroDied;
         }
 
         private void LoadElementTextures()

@@ -59,6 +59,7 @@ namespace AlJourney.Scripts.Scenes
             InitializeHeroes();
 
             _battleHUD.Initialize(_heroSystem);
+            _gridUI.Initialize(_heroSystem);
 
             _battleManager.Initialize(_gridUI);
 
