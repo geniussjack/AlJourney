@@ -92,6 +92,7 @@ namespace AlJourney.Scripts.UI
 
         private void SetupLanguageDropdown()
         {
+            if (_languageDropdown == null) return;
             _languageDropdown.Clear();
             _languageDropdown.AddItem(Tr("UI_ENGLISH"), 0);
             _languageDropdown.AddItem(Tr("UI_RUSSIAN"), 1);
@@ -99,6 +100,7 @@ namespace AlJourney.Scripts.UI
 
         private void SetupWindowModeDropdown()
         {
+            if (_windowModeDropdown == null) return;
             _windowModeDropdown.Clear();
             _windowModeDropdown.AddItem(Tr("UI_FULLSCREEN"), 0);
             _windowModeDropdown.AddItem(Tr("UI_BORDERLESS"), 1);

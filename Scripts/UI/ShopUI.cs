@@ -30,6 +30,13 @@ namespace AlJourney.Scripts.UI
         private Label _warriorDamageLabel;
         private Label _warriorDefenseLabel;
 
+        private Label _mageHealthCostLabel;
+        private Label _mageDamageCostLabel;
+        private Label _mageDefenseCostLabel;
+        private Label _warriorHealthCostLabel;
+        private Label _warriorDamageCostLabel;
+        private Label _warriorDefenseCostLabel;
+
         private int _mageHealthPrice;
         private int _mageDamagePrice;
         private int _mageDefensePrice;
@@ -69,6 +76,13 @@ namespace AlJourney.Scripts.UI
             _warriorDamageLabel = GetNode<Label>("MarginContainer/VBoxContainer/ShopContainer/WarriorUpgrades/DamageUpgrade/PriceLabel");
             _warriorDefenseLabel = GetNode<Label>("MarginContainer/VBoxContainer/ShopContainer/WarriorUpgrades/DefenseUpgrade/PriceLabel");
 
+            _mageHealthCostLabel = AddCostUI(_mageHealthButton.GetParent());
+            _mageDamageCostLabel = AddCostUI(_mageDamageButton.GetParent());
+            _mageDefenseCostLabel = AddCostUI(_mageDefenseButton.GetParent());
+            _warriorHealthCostLabel = AddCostUI(_warriorHealthButton.GetParent());
+            _warriorDamageCostLabel = AddCostUI(_warriorDamageButton.GetParent());
+            _warriorDefenseCostLabel = AddCostUI(_warriorDefenseButton.GetParent());
+
             _mageHealthButton.Pressed += () => OnUpgradePurchased(UpgradeType.MageHealth);
             _mageDamageButton.Pressed += () => OnUpgradePurchased(UpgradeType.MageDamage);
             _mageDefenseButton.Pressed += () => OnUpgradePurchased(UpgradeType.MageDefense);
@@ -96,6 +110,26 @@ namespace AlJourney.Scripts.UI
             InitializeShop();
 
             GD.Print("[ShopUI] Initialized");
+        }
+
+        private Label AddCostUI(Node parent)
+        {
+            HBoxContainer hbox = new HBoxContainer();
+            hbox.Alignment = BoxContainer.AlignmentMode.Center;
+            
+            Label costLabel = new Label();
+            costLabel.AddThemeFontSizeOverride("font_size", 22);
+            hbox.AddChild(costLabel);
+
+            TextureRect coinIcon = new TextureRect();
+            coinIcon.Texture = GD.Load<Texture2D>("res://Resources/Sprites/UI/coin_icon.png");
+            coinIcon.CustomMinimumSize = new Vector2(24, 24);
+            coinIcon.ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize;
+            coinIcon.StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered;
+            hbox.AddChild(coinIcon);
+
+            parent.AddChild(hbox);
+            return costLabel;
         }
 
         private void InitializeShop()
@@ -143,15 +177,15 @@ namespace AlJourney.Scripts.UI
                 return;
             }
 
-            UpdateUpgradeButton(_mageHealthButton, _mageHealthLabel, _mageHealthPrice, coins, saveData.MageMaxHealth, _mageHealthUpgrade, Tr("UI_SHOP_HP"));
-            UpdateUpgradeButton(_mageDamageButton, _mageDamageLabel, _mageDamagePrice, coins, saveData.MageDamage, _mageDamageUpgrade, Tr("UI_SHOP_DMG"));
-            UpdateUpgradeButton(_mageDefenseButton, _mageDefenseLabel, _mageDefensePrice, coins, saveData.MageDefense, _mageDefenseUpgrade, Tr("UI_SHOP_DEF"));
-            UpdateUpgradeButton(_warriorHealthButton, _warriorHealthLabel, _warriorHealthPrice, coins, saveData.WarriorMaxHealth, _warriorHealthUpgrade, Tr("UI_SHOP_HP"));
-            UpdateUpgradeButton(_warriorDamageButton, _warriorDamageLabel, _warriorDamagePrice, coins, saveData.WarriorDamage, _warriorDamageUpgrade, Tr("UI_SHOP_DMG"));
-            UpdateUpgradeButton(_warriorDefenseButton, _warriorDefenseLabel, _warriorDefensePrice, coins, saveData.WarriorDefense, _warriorDefenseUpgrade, Tr("UI_SHOP_DEF"));
+            UpdateUpgradeButton(_mageHealthButton, _mageHealthLabel, _mageHealthCostLabel, _mageHealthPrice, coins, saveData.MageMaxHealth, _mageHealthUpgrade, Tr("UI_SHOP_HP"));
+            UpdateUpgradeButton(_mageDamageButton, _mageDamageLabel, _mageDamageCostLabel, _mageDamagePrice, coins, saveData.MageDamage, _mageDamageUpgrade, Tr("UI_SHOP_DMG"));
+            UpdateUpgradeButton(_mageDefenseButton, _mageDefenseLabel, _mageDefenseCostLabel, _mageDefensePrice, coins, saveData.MageDefense, _mageDefenseUpgrade, Tr("UI_SHOP_DEF"));
+            UpdateUpgradeButton(_warriorHealthButton, _warriorHealthLabel, _warriorHealthCostLabel, _warriorHealthPrice, coins, saveData.WarriorMaxHealth, _warriorHealthUpgrade, Tr("UI_SHOP_HP"));
+            UpdateUpgradeButton(_warriorDamageButton, _warriorDamageLabel, _warriorDamageCostLabel, _warriorDamagePrice, coins, saveData.WarriorDamage, _warriorDamageUpgrade, Tr("UI_SHOP_DMG"));
+            UpdateUpgradeButton(_warriorDefenseButton, _warriorDefenseLabel, _warriorDefenseCostLabel, _warriorDefensePrice, coins, saveData.WarriorDefense, _warriorDefenseUpgrade, Tr("UI_SHOP_DEF"));
         }
 
-        private static void UpdateUpgradeButton(Button button, Label priceLabel, int price,
+        private static void UpdateUpgradeButton(Button button, Label priceLabel, Label costLabel, int price,
             int currentCoins, int currentStat, int upgradeAmount, string statName)
         {
             bool canAfford = currentCoins >= price;
@@ -159,8 +193,11 @@ namespace AlJourney.Scripts.UI
             button.Modulate = canAfford ? Colors.White : new Color(1, 1, 1, 0.4f);
 
             int newStat = currentStat + upgradeAmount;
-            priceLabel.Text = $"{currentStat} -> {newStat} {statName}\n{button.GetNode<Control>("/root").Tr("UI_SHOP_COST")}: {price}";
+            priceLabel.Text = $"{currentStat} -> {newStat} {statName}";
             priceLabel.Modulate = canAfford ? Colors.White : Colors.Gray;
+
+            costLabel.Text = $"{button.GetNode<Control>("/root").Tr("UI_SHOP_COST")}: {price}";
+            costLabel.Modulate = canAfford ? Colors.White : Colors.Gray;
         }
 
         private void OnUpgradePurchased(UpgradeType upgradeType)

@@ -1,0 +1,67 @@
+keys,en,ru
+UI_MAIN_MENU_NEW_GAME,New Game,Новая игра
+UI_MAIN_MENU_CONTINUE,Continue,Продолжить
+UI_MAIN_MENU_PLAY,Play,Играть
+UI_MAIN_MENU_SETTINGS,Settings,Настройки
+UI_MAIN_MENU_CREDITS,Credits,Титры
+UI_MAIN_MENU_QUIT,Quit,Выход
+UI_SETTINGS_TITLE,Settings,Настройки
+UI_SETTINGS_VIDEO,Video,Видео
+UI_SETTINGS_RESOLUTION,Resolution:,Разрешение:
+UI_SETTINGS_WINDOW_MODE,Window Mode:,Режим окна:
+UI_SETTINGS_LANGUAGE,Language:,Язык:
+UI_SETTINGS_FPS_LIMIT,FPS Limit:,Лимит FPS:
+UI_SETTINGS_AUDIO,Audio,Аудио
+UI_SETTINGS_MASTER,Master:,Общая:
+UI_SETTINGS_MUSIC,Music:,Музыка:
+UI_SETTINGS_SFX,SFX:,Эффекты:
+UI_SETTINGS_APPLY,Apply,Применить
+UI_SETTINGS_RESET,Reset,Сброс
+UI_SETTINGS_BACK,Back,Назад
+UI_SETTINGS_CANCEL_TITLE,Cancel Changes,Отмена изменений
+UI_SETTINGS_CANCEL_PROMPT,Are you sure you want to cancel the changes?,"Вы уверены, что хотите отменить внесённые изменения?"
+UI_PAUSE_TITLE,PAUSED,ПАУЗА
+UI_PAUSE_RESUME,Resume,Продолжить
+UI_PAUSE_MAIN_MENU,Main Menu,В главное меню
+UI_CREDITS_TITLE,Credits,Титры
+UI_BATTLE_WAVE,Wave:,Волна:
+UI_BATTLE_SCORE,Score:,Очки:
+UI_BATTLE_SHIELD,Shield:,Щит:
+UI_BATTLE_SWAPS,Swaps:,Ходы:
+UI_BATTLE_ALTARION,Altarion,Эльтарион
+UI_BATTLE_ALDRIC,Aldric,Элдрик
+UI_PAUSE_SAVE,Save Game,Сохранить
+CHARACTER_MAGE,Mage,Маг
+CHARACTER_WARRIOR,Warrior,Воин
+ENEMY_SKELETON_WARRIOR,Skeleton Warrior,Скелет-воин
+ENEMY_SKELETON_ARCHER,Skeleton Archer,Скелет-лучник
+ENEMY_ZOMBIE,Zombie,Зомби
+ENEMY_SLIME,Slime,Слайм
+ENEMY_DRAUGR_WARRIOR,Draugr Warrior,Драугр-воин
+ENEMY_DRAUGR_DEFENDER,Draugr Defender,Драугр-защитник
+ENEMY_DRAUGR_CASTER,Draugr Caster,Драугр-маг
+ENEMY_GENERAL_OF_DRAUGR,General of Draugr,Генерал Драугров
+ENEMY_ARHISKELETON,Arhiskeleton,Архискелет
+ENEMY_NECROMANCER,Necromancer,Некромант
+UI_ENGLISH,English,English
+UI_RUSSIAN,Русский,Русский
+UI_FULLSCREEN,Fullscreen,Полный экран
+UI_BORDERLESS,Borderless,Без рамок
+UI_WINDOWED,Windowed,Оконный
+UI_GAMEOVER_TITLE,Game Over,Игра Окончена
+UI_GAMEOVER_RETRY,Try Again,Попробовать снова
+UI_GAMEOVER_MAIN_MENU,Main Menu,В главное меню
+UI_GAMEOVER_WAVE_REACHED,Wave Reached:,Достигнута волна:
+UI_GAMEOVER_COINS,Coins Collected:,Собрано монет:
+UI_GAMEOVER_ENEMIES_DEFEATED,Enemies Defeated:,Врагов побеждено:
+UI_VICTORY_TITLE,Victory!,Победа!
+UI_VICTORY_NEXT_WAVE,Next Wave,Следующая волна
+UI_VICTORY_MAIN_MENU,Main Menu,В главное меню
+UI_SHOP_NEXT_WAVE,Next Wave,Следующая волна
+UI_INVENTORY,Inventory,Инвентарь
+UI_SHOP_TITLE,Shop,Магазин
+UI_SHOP_HP,HP,Здоровье
+UI_SHOP_DMG,DMG,Урон
+UI_SHOP_DEF,DEF,Защита
+UI_SHOP_COST,Cost,Цена
+UI_SHOP_BUY,Buy,Купить
