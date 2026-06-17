@@ -334,7 +334,7 @@ namespace AlJourney.Scripts.Battle
             }
         }
 
-        private void ApplyHealEffect(ComboEffect effect, PlayerCharacter activeHero)
+        private void ApplyHealEffect(ComboEffect effect, PlayerCharacter _)
         {
             int healing = PlayerCharacter.CalculateHealing(effect.Healing);
             _cameraShake?.ShakeLight();
@@ -359,7 +359,7 @@ namespace AlJourney.Scripts.Battle
             }
         }
 
-        private void ApplyShieldEffect(ComboEffect effect, PlayerCharacter activeHero)
+        private void ApplyShieldEffect(ComboEffect effect, PlayerCharacter _)
         {
             int shield = PlayerCharacter.CalculateShield(effect.Shield);
             _cameraShake?.ShakeLight();
@@ -514,7 +514,7 @@ namespace AlJourney.Scripts.Battle
             }
         }
 
-        private void ExecuteNecromancerDarkBolt(Enemy necromancer, PlayerCharacter target)
+        private static void ExecuteNecromancerDarkBolt(Enemy necromancer, PlayerCharacter target)
         {
             int damage = necromancer.PerformAttack();
             int reflected = target.TakeDamage(damage, AttackType.Magical, canReflect: true);

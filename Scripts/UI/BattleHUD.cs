@@ -393,8 +393,8 @@ namespace AlJourney.Scripts.UI
 
             _damageFlash = new AlJourney.Scripts.Utils.DamageFlash();
             AddChild(_damageFlash);
-            _enemy.DamageTaken += (amount) => _damageFlash.FlashDamage();
-            _enemy.Healed += (amount) => _damageFlash.FlashHeal();
+            _enemy.DamageTaken += (_) => _damageFlash.FlashDamage();
+            _enemy.Healed += (_) => _damageFlash.FlashHeal();
         }
 
         private void AnimatePortrait()

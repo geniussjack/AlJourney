@@ -120,7 +120,7 @@ namespace AlJourney.Scripts.Match3
             return (type1 != null && type1 == type2) ? type1.Value : ElementType.None;
         }
 
-        private ElementType GetRandomValidType(ElementType exclude1, ElementType exclude2)
+        private static ElementType GetRandomValidType(ElementType exclude1, ElementType exclude2)
         {
             ElementType[] allTypes = [ElementType.Fire, ElementType.Heal, ElementType.Sword, ElementType.Shield];
             List<ElementType> validTypes = [];
@@ -186,7 +186,7 @@ namespace AlJourney.Scripts.Match3
             return false;
         }
 
-        private bool ArePositionsAdjacent(int x1, int y1, int x2, int y2)
+        private static bool ArePositionsAdjacent(int x1, int y1, int x2, int y2)
         {
             int deltaX = Mathf.Abs(x2 - x1);
             int deltaY = Mathf.Abs(y2 - y1);

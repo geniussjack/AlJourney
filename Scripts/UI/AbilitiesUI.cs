@@ -61,7 +61,7 @@ namespace AlJourney.Scripts.UI
             }
         }
 
-        private void OnAbilityPressed(AbilityData ability, CharacterClass heroClass)
+        private static void OnAbilityPressed(AbilityData ability, CharacterClass _)
         {
             GD.Print($"[AbilitiesUI] Ability pressed: {ability.Name}");
             // Placeholder for unlock/equip logic.
