@@ -54,6 +54,8 @@ namespace AlJourney.Scripts.Battle
         public delegate void EnemyDefeatedEventHandler(Enemy enemy);
 
         private int _necromancerTurnCount;
+        public int NecromancerTurnCount => _necromancerTurnCount;
+        public void IncrementNecromancerTurnCount() => _necromancerTurnCount++;
         private GridManager _gridManager;
         private ComboSystem _comboSystem;
         private CameraShake _cameraShake;
@@ -152,43 +154,12 @@ namespace AlJourney.Scripts.Battle
         {
             Enemies.Clear();
 
-            int totalEnemies = ScalingSystem.GetEnemyCount(CurrentWave);
-
-            if (CurrentWave <= 5)
+            List<Enemy> newEnemies = EnemySpawner.GenerateWaveEnemies(CurrentWave);
+            foreach (Enemy enemy in newEnemies)
             {
-                int count = Mathf.Min(totalEnemies, 5);
-                AddEnemyToWave(EnemyType.Slime, count);
+                enemy.CharacterDied += () => OnEnemyDied(enemy);
+                Enemies.Add(enemy);
             }
-            else if (CurrentWave <= 10)
-            {
-                int count = Mathf.Min(totalEnemies, 5);
-                AddEnemyToWave(EnemyType.SkeletonWarrior, count);
-            }
-            else
-            {
-                // Mix
-                int slimes = Mathf.Min(totalEnemies / 2, 5);
-                int skeletons = Mathf.Min(totalEnemies - slimes, 5);
-
-                if (slimes > 0)
-                {
-                    AddEnemyToWave(EnemyType.Slime, slimes);
-                }
-
-                if (skeletons > 0)
-                {
-                    AddEnemyToWave(EnemyType.SkeletonWarrior, skeletons);
-                }
-            }
-
-            GD.Print($"[BattleManager] Wave {CurrentWave}: {totalEnemies} enemies total, generated {Enemies.Count} stacks");
-        }
-
-        private void AddEnemyToWave(EnemyType type, int count)
-        {
-            Enemy enemy = Enemy.Create(type, CurrentWave, count);
-            enemy.CharacterDied += () => OnEnemyDied(enemy);
-            Enemies.Add(enemy);
         }
 
         private async void OnSwapCompleted(bool wasValid)
@@ -268,116 +239,21 @@ namespace AlJourney.Scripts.Battle
         private void ApplyComboEffect(ComboEffect effect)
         {
             PlayerCharacter activeHero = HeroSystem.GetHeroForElement(effect.ElementType);
-            if (activeHero?.IsAlive != true)
-            {
-                return;
-            }
+            if (activeHero?.IsAlive != true) return;
 
             if (effect.ElementType is ElementType.Fire or ElementType.Sword)
             {
-                ApplyDamageEffect(effect, activeHero);
+                CombatEffectProcessor.ApplyDamageEffect(effect, activeHero, this, _cameraShake);
             }
             else if (effect.ElementType == ElementType.Heal)
             {
-                ApplyHealEffect(effect, activeHero);
+                CombatEffectProcessor.ApplyHealEffect(effect, HeroSystem, this, _cameraShake);
             }
             else if (effect.ElementType == ElementType.Shield)
             {
-                ApplyShieldEffect(effect, activeHero);
+                CombatEffectProcessor.ApplyShieldEffect(effect, HeroSystem, this, _cameraShake);
             }
         }
-
-        private void ApplyDamageEffect(ComboEffect effect, PlayerCharacter activeHero)
-        {
-            int damage = activeHero.CalculateDamage(effect.Damage, effect.ElementType);
-
-            AudioManager.Instance?.PlayAttackSound();
-
-            if (effect.IsAoE)
-            {
-                _cameraShake?.ShakeStrong();
-                ComboParticles.SpawnComboEffect(this, new Vector2(640, 360), effect.ElementType, effect.ComboLevel);
-
-                foreach (Enemy enemy in Enemies.Where(e => e.IsAlive))
-                {
-                    DealDamageToEnemy(enemy, damage, effect, activeHero, isAoE: true);
-                }
-            }
-            else
-            {
-                Enemy target = Enemies.FirstOrDefault(e => e.IsAlive);
-                if (target != null)
-                {
-                    _cameraShake?.ShakeMedium();
-                    ComboParticles.SpawnComboEffect(this, new Vector2(640, 300), effect.ElementType, effect.ComboLevel);
-                    DealDamageToEnemy(target, damage, effect, activeHero, isAoE: false);
-                }
-            }
-        }
-
-        private void DealDamageToEnemy(Enemy target, int damage, ComboEffect effect, PlayerCharacter activeHero, bool isAoE)
-        {
-            int reflected = target.TakeDamage(damage, activeHero.AttackType, canReflect: true);
-            Vector2 particlePos = isAoE ? new Vector2(400, 200) : new Vector2(640, 250);
-
-            AudioManager.Instance?.PlayHitSound();
-            ComboParticles.SpawnDamageNumber(this, particlePos, damage);
-
-            if (effect.StatusEffect != null)
-            {
-                target.ApplyStatusEffect(effect.StatusEffect);
-            }
-
-            if (reflected > 0)
-            {
-                _ = activeHero.TakeDamage(reflected, target.AttackType, canReflect: false);
-            }
-        }
-
-        private void ApplyHealEffect(ComboEffect effect, PlayerCharacter _)
-        {
-            int healing = PlayerCharacter.CalculateHealing(effect.Healing);
-            _cameraShake?.ShakeLight();
-            ComboParticles.SpawnComboEffect(this, new Vector2(640, 360), ElementType.Heal, effect.ComboLevel);
-
-            HeroSystem.Mage.Heal(healing);
-            HeroSystem.Warrior.Heal(healing);
-
-            ComboParticles.SpawnHealNumber(this, new Vector2(200, 100), healing);
-            ComboParticles.SpawnHealNumber(this, new Vector2(1000, 100), healing);
-
-            if (effect.ComboLevel == 2)
-            {
-                HeroSystem.Mage.ClearNegativeEffects();
-                HeroSystem.Warrior.ClearNegativeEffects();
-            }
-
-            if (effect.StatusEffect != null)
-            {
-                HeroSystem.Mage.ApplyStatusEffect(effect.StatusEffect);
-                HeroSystem.Warrior.ApplyStatusEffect(effect.StatusEffect);
-            }
-        }
-
-        private void ApplyShieldEffect(ComboEffect effect, PlayerCharacter _)
-        {
-            int shield = PlayerCharacter.CalculateShield(effect.Shield);
-            _cameraShake?.ShakeLight();
-            ComboParticles.SpawnComboEffect(this, new Vector2(640, 360), ElementType.Shield, effect.ComboLevel);
-
-            HeroSystem.Mage.AddShield(shield);
-            HeroSystem.Warrior.AddShield(shield);
-
-            ComboParticles.SpawnShieldNumber(this, new Vector2(200, 100), shield);
-            ComboParticles.SpawnShieldNumber(this, new Vector2(1000, 100), shield);
-
-            if (effect.StatusEffect != null)
-            {
-                HeroSystem.Mage.ApplyStatusEffect(effect.StatusEffect);
-                HeroSystem.Warrior.ApplyStatusEffect(effect.StatusEffect);
-            }
-        }
-
         private async Task StartEnemyTurn()
         {
             ChangePhase(BattlePhase.EnemyTurn);
@@ -395,7 +271,7 @@ namespace AlJourney.Scripts.Battle
                     continue;
                 }
 
-                PerformEnemyAction(enemy);
+                EnemyAIController.PerformEnemyAction(enemy, this, _cameraShake);
                 _ = await ToSignal(GetTree().CreateTimer(0.5f), SceneTreeTimer.SignalName.Timeout);
             }
 
@@ -413,131 +289,13 @@ namespace AlJourney.Scripts.Battle
             StartNextTurn();
         }
 
-        private void PerformEnemyAction(Enemy enemy)
-        {
-            if (enemy.IsStunned)
-            {
-                return;
-            }
-
-            List<PlayerCharacter> aliveHeroes = [];
-            if (HeroSystem.Mage.IsAlive)
-            {
-                aliveHeroes.Add(HeroSystem.Mage);
-            }
-
-            if (HeroSystem.Warrior.IsAlive)
-            {
-                aliveHeroes.Add(HeroSystem.Warrior);
-            }
-
-            if (aliveHeroes.Count == 0)
-            {
-                return;
-            }
-
-            PlayerCharacter target = SelectTarget(aliveHeroes, enemy);
-
-            if (enemy.IsBoss)
-            {
-                PerformNecromancerAction(enemy, target);
-            }
-            else
-            {
-                ExecuteStandardEnemyAttack(enemy, target);
-            }
-        }
-
-        private void ExecuteStandardEnemyAttack(Enemy enemy, PlayerCharacter target)
-        {
-            int damage = enemy.PerformAttack();
-            if (damage > 0)
-            {
-                AudioManager.Instance?.PlayAttackSound();
-                _cameraShake?.ShakeLight();
-                int reflected = target.TakeDamage(damage, enemy.AttackType, canReflect: true);
-
-                AudioManager.Instance?.PlayHitSound();
-                Vector2 targetPos = target == HeroSystem.Mage ? new Vector2(200, 100) : new Vector2(1000, 100);
-                ComboParticles.SpawnDamageNumber(this, targetPos, damage);
-
-                if (reflected > 0)
-                {
-                    _ = enemy.TakeDamage(reflected, target.AttackType, canReflect: false);
-                }
-            }
-        }
-
-        private static PlayerCharacter SelectTarget(List<PlayerCharacter> aliveHeroes, Enemy enemy)
-        {
-            PlayerCharacter wounded = aliveHeroes
-                .Where(h => h.CurrentHealth < h.MaxHealth * 0.3f)
-                .OrderBy(h => h.CurrentHealth)
-                .FirstOrDefault();
-
-            return wounded ?? (enemy.IsMiniboss || enemy.IsBoss
-                ? aliveHeroes.OrderBy(h => h.BaseDefense).First()
-                : aliveHeroes[GD.RandRange(0, aliveHeroes.Count - 1)]);
-        }
-
-        private void PerformNecromancerAction(Enemy necromancer, PlayerCharacter target)
-        {
-            if (necromancer.IsStunned)
-            {
-                return;
-            }
-
-            _necromancerTurnCount++;
-            Enemy.NecromancerAbility ability = necromancer.GetNecromancerAbility(_necromancerTurnCount);
-
-            if (ability == Enemy.NecromancerAbility.SummonSkeleton)
-            {
-                ExecuteNecromancerSummon();
-            }
-            else if (ability == Enemy.NecromancerAbility.DarkBolt)
-            {
-                ExecuteNecromancerDarkBolt(necromancer, target);
-            }
-            else if (ability == Enemy.NecromancerAbility.WeakeningDarkness)
-            {
-                ExecuteNecromancerWeaken();
-            }
-        }
-
-        private void ExecuteNecromancerSummon()
-        {
-            if (Enemies.Count < GameConstants.MAX_ENEMIES_PER_WAVE)
-            {
-                Enemy skeleton = Enemy.Create(EnemyType.SkeletonWarrior, CurrentWave);
-                skeleton.CharacterDied += () => OnEnemyDied(skeleton);
-                Enemies.Add(skeleton);
-            }
-        }
-
-        private static void ExecuteNecromancerDarkBolt(Enemy necromancer, PlayerCharacter target)
-        {
-            int damage = necromancer.PerformAttack();
-            int reflected = target.TakeDamage(damage, AttackType.Magical, canReflect: true);
-            if (reflected > 0)
-            {
-                _ = necromancer.TakeDamage(reflected, target.AttackType, canReflect: false);
-            }
-        }
-
-        private void ExecuteNecromancerWeaken()
-        {
-            StatusEffectData weakenEffect = new(StatusEffect.Weakened, 1, 0);
-            HeroSystem.Mage.ApplyStatusEffect(weakenEffect);
-            HeroSystem.Warrior.ApplyStatusEffect(weakenEffect);
-        }
-
         private void StartNextTurn()
         {
             _gridManager.ResetSwaps();
             ChangePhase(BattlePhase.PlayerSwap);
         }
 
-        private void OnEnemyDied(Enemy enemy)
+        internal void OnEnemyDied(Enemy enemy)
         {
             _ = EmitSignal(SignalName.EnemyDefeated, enemy);
 
