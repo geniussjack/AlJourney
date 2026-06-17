@@ -39,7 +39,9 @@
     <string id="UI_BATTLE_WAVE" text="Волна:" />
     <string id="UI_BATTLE_SCORE" text="Очки:" />
     <string id="UI_BATTLE_SHIELD" text="Щит:" />
-    <string id="UI_BATTLE_SWAPS" text="Ходов:" />
+    <string id="UI_BATTLE_SWAPS" text="Ходы:" />
+    <string id="UI_BATTLE_ALTARION" text="Эльтарион" />
+    <string id="UI_BATTLE_ALDRIC" text="Элдрик" />
     <string id="CHARACTER_MAGE" text="Маг" />
     <string id="CHARACTER_WARRIOR" text="Воин" />
     <string id="ENEMY_SKELETON_WARRIOR" text="Скелет-воин" />

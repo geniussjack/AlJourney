@@ -157,12 +157,6 @@ theme_override_constants/margin_bottom = 12
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="SectionTitle" type="Label" parent="CanvasLayer/DecorativeLayer/LeftPanel/MarginContainer/VBoxContainer"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 24
-text = "Heroes"
-horizontal_alignment = 1
-
 [node name="MageRow" type="HBoxContainer" parent="CanvasLayer/DecorativeLayer/LeftPanel/MarginContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_constants/separation = 10
@@ -195,7 +189,26 @@ theme_override_constants/separation = 2
 [node name="MageName" type="Label" parent="CanvasLayer/DecorativeLayer/LeftPanel/MarginContainer/VBoxContainer/MageRow/MageText"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
-text = "Mage"
+text = "Altarion"
+
+[node name="MageHealthBar" type="ProgressBar" parent="CanvasLayer/DecorativeLayer/LeftPanel/MarginContainer/VBoxContainer/MageRow/MageText"]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+value = 80.0
+show_percentage = false
+
+[node name="MageHealthLabel" type="Label" parent="CanvasLayer/DecorativeLayer/LeftPanel/MarginContainer/VBoxContainer/MageRow/MageText"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "80/100"
+horizontal_alignment = 1
+
+[node name="MageShieldLabel" type="Label" parent="CanvasLayer/DecorativeLayer/LeftPanel/MarginContainer/VBoxContainer/MageRow/MageText"]
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Shield: 0"
+horizontal_alignment = 1
 
 
 [node name="WarriorRow" type="HBoxContainer" parent="CanvasLayer/DecorativeLayer/LeftPanel/MarginContainer/VBoxContainer"]
@@ -230,7 +243,26 @@ theme_override_constants/separation = 2
 [node name="WarriorName" type="Label" parent="CanvasLayer/DecorativeLayer/LeftPanel/MarginContainer/VBoxContainer/WarriorRow/WarriorText"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
-text = "Warrior"
+text = "Aldric"
+
+[node name="WarriorHealthBar" type="ProgressBar" parent="CanvasLayer/DecorativeLayer/LeftPanel/MarginContainer/VBoxContainer/WarriorRow/WarriorText"]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+value = 120.0
+show_percentage = false
+
+[node name="WarriorHealthLabel" type="Label" parent="CanvasLayer/DecorativeLayer/LeftPanel/MarginContainer/VBoxContainer/WarriorRow/WarriorText"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "120/120"
+horizontal_alignment = 1
+
+[node name="WarriorShieldLabel" type="Label" parent="CanvasLayer/DecorativeLayer/LeftPanel/MarginContainer/VBoxContainer/WarriorRow/WarriorText"]
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Shield: 0"
+horizontal_alignment = 1
 
 
 [node name="RightPanel" type="PanelContainer" parent="CanvasLayer/DecorativeLayer"]
@@ -260,12 +292,6 @@ theme_override_constants/margin_bottom = 12
 [node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/DecorativeLayer/RightPanel/MarginContainer"]
 layout_mode = 2
 theme_override_constants/separation = 10
-
-[node name="SectionTitle" type="Label" parent="CanvasLayer/DecorativeLayer/RightPanel/MarginContainer/VBoxContainer"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 24
-text = "Enemies"
-horizontal_alignment = 1
 
 
 [node name="CenterContainer" type="CenterContainer" parent="CanvasLayer"]

@@ -45,23 +45,20 @@ namespace AlJourney.Scripts.UI
         /// </summary>
         public override void _Ready()
         {
-            _mageNameLabel = GetNode<Label>("MarginContainer/VBoxContainer/TopBar/HeroesContainer/MageInfo/MageName");
-            _mageHealthBar = GetNode<ProgressBar>("MarginContainer/VBoxContainer/TopBar/HeroesContainer/MageInfo/HealthBar");
-            _mageHealthLabel = GetNode<Label>("MarginContainer/VBoxContainer/TopBar/HeroesContainer/MageInfo/HealthLabel");
-            _mageShieldLabel = GetNode<Label>("MarginContainer/VBoxContainer/TopBar/HeroesContainer/MageInfo/ShieldLabel");
+            _mageNameLabel = GetNode<Label>("../DecorativeLayer/LeftPanel/MarginContainer/VBoxContainer/MageRow/MageText/MageName");
+            _mageHealthBar = GetNode<ProgressBar>("../DecorativeLayer/LeftPanel/MarginContainer/VBoxContainer/MageRow/MageText/MageHealthBar");
+            _mageHealthLabel = GetNode<Label>("../DecorativeLayer/LeftPanel/MarginContainer/VBoxContainer/MageRow/MageText/MageHealthLabel");
+            _mageShieldLabel = GetNode<Label>("../DecorativeLayer/LeftPanel/MarginContainer/VBoxContainer/MageRow/MageText/MageShieldLabel");
 
-            _warriorNameLabel = GetNode<Label>("MarginContainer/VBoxContainer/TopBar/HeroesContainer/WarriorInfo/WarriorName");
-            _warriorHealthBar = GetNode<ProgressBar>("MarginContainer/VBoxContainer/TopBar/HeroesContainer/WarriorInfo/HealthBar");
-            _warriorHealthLabel = GetNode<Label>("MarginContainer/VBoxContainer/TopBar/HeroesContainer/WarriorInfo/HealthLabel");
-            _warriorShieldLabel = GetNode<Label>("MarginContainer/VBoxContainer/TopBar/HeroesContainer/WarriorInfo/ShieldLabel");
+            _warriorNameLabel = GetNode<Label>("../DecorativeLayer/LeftPanel/MarginContainer/VBoxContainer/WarriorRow/WarriorText/WarriorName");
+            _warriorHealthBar = GetNode<ProgressBar>("../DecorativeLayer/LeftPanel/MarginContainer/VBoxContainer/WarriorRow/WarriorText/WarriorHealthBar");
+            _warriorHealthLabel = GetNode<Label>("../DecorativeLayer/LeftPanel/MarginContainer/VBoxContainer/WarriorRow/WarriorText/WarriorHealthLabel");
+            _warriorShieldLabel = GetNode<Label>("../DecorativeLayer/LeftPanel/MarginContainer/VBoxContainer/WarriorRow/WarriorText/WarriorShieldLabel");
 
-            _mageInfoContainer = GetNode<Control>("MarginContainer/VBoxContainer/TopBar/HeroesContainer/MageInfo");
-            _warriorInfoContainer = GetNode<Control>("MarginContainer/VBoxContainer/TopBar/HeroesContainer/WarriorInfo");
+            _mageInfoContainer = GetNode<Control>("../DecorativeLayer/LeftPanel/MarginContainer/VBoxContainer/MageRow/MagePortraitContainer");
+            _warriorInfoContainer = GetNode<Control>("../DecorativeLayer/LeftPanel/MarginContainer/VBoxContainer/WarriorRow/WarriorPortraitContainer");
 
             _enemiesContainer = GetNode<Container>("../DecorativeLayer/RightPanel/MarginContainer/VBoxContainer");
-            if (_enemiesContainer == null) {
-                _enemiesContainer = GetNode<HBoxContainer>("MarginContainer/VBoxContainer/TopBar/EnemiesInfo");
-            }
 
             _waveLabel = GetNode<Label>("MarginContainer/VBoxContainer/BottomBar/WaveLabel");
             _coinsLabel = GetNode<Label>("MarginContainer/VBoxContainer/BottomBar/CoinsContainer/CoinsLabel");
@@ -103,8 +100,8 @@ namespace AlJourney.Scripts.UI
             _heroSystem.Mage.ShieldChanged += (shield) => UpdateHeroShield(CharacterClass.Mage, shield);
             _heroSystem.Warrior.ShieldChanged += (shield) => UpdateHeroShield(CharacterClass.Warrior, shield);
 
-            _mageNameLabel.Text = Tr(_heroSystem.Mage.CharacterName);
-            _warriorNameLabel.Text = Tr(_heroSystem.Warrior.CharacterName);
+            _mageNameLabel.Text = Tr("UI_BATTLE_ALTARION");
+            _warriorNameLabel.Text = Tr("UI_BATTLE_ALDRIC");
 
             UpdateHeroHealth(CharacterClass.Mage, _heroSystem.Mage.CurrentHealth, _heroSystem.Mage.MaxHealth);
             UpdateHeroHealth(CharacterClass.Warrior, _heroSystem.Warrior.CurrentHealth, _heroSystem.Warrior.MaxHealth);
@@ -384,6 +381,7 @@ namespace AlJourney.Scripts.UI
                 _ => "res://Resources/Sprites/Characters/skeleton_sprite.png"
             };
             _portrait.Texture = GD.Load<Texture2D>(spritePath);
+            AnimatePortrait();
             UpdateHealth(_enemy.CurrentHealth, _enemy.MaxHealth);
 
             _healthBar.Modulate = _enemy.IsBoss ? Colors.Purple : _enemy.IsMiniboss ? Colors.Orange : Colors.Red;
@@ -392,6 +390,26 @@ namespace AlJourney.Scripts.UI
             AddChild(_damageFlash);
             _enemy.DamageTaken += (amount) => _damageFlash.FlashDamage();
             _enemy.Healed += (amount) => _damageFlash.FlashHeal();
+        }
+
+        private void AnimatePortrait()
+        {
+            _portrait.PivotOffset = new Vector2(48, 48); // 96x96 default size
+
+            Tween tween = CreateTween();
+            _ = tween.SetLoops();
+            _ = tween.SetTrans(Tween.TransitionType.Sine);
+            _ = tween.SetEase(Tween.EaseType.InOut);
+
+            float delay = GD.Randf() * 0.5f;
+            float dur1 = 1.0f + (GD.Randf() * 0.2f);
+            float dur2 = 1.0f + (GD.Randf() * 0.2f);
+
+            _ = tween.TweenInterval(delay);
+            _ = tween.TweenProperty(_portrait, "scale", new Vector2(1.1f, 1.1f), dur1);
+            _ = tween.Parallel().TweenProperty(_portrait, "position", _portrait.Position - new Vector2(0, 4), dur1);
+            _ = tween.TweenProperty(_portrait, "scale", new Vector2(1.0f, 1.0f), dur2);
+            _ = tween.Parallel().TweenProperty(_portrait, "position", _portrait.Position, dur2);
         }
 
         private void OnHealthChanged(int currentHealth, int maxHealth)

@@ -40,6 +40,8 @@
     <string id="UI_BATTLE_SCORE" text="Score:" />
     <string id="UI_BATTLE_SHIELD" text="Shield:" />
     <string id="UI_BATTLE_SWAPS" text="Swaps:" />
+    <string id="UI_BATTLE_ALTARION" text="Altarion" />
+    <string id="UI_BATTLE_ALDRIC" text="Aldric" />
     <string id="CHARACTER_MAGE" text="Mage" />
     <string id="CHARACTER_WARRIOR" text="Warrior" />
     <string id="ENEMY_SKELETON_WARRIOR" text="Skeleton Warrior" />

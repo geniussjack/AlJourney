@@ -83,15 +83,11 @@ namespace AlJourney.Scripts.Scenes
         {
             TextureRect mage = GetNodeOrNull<TextureRect>("CanvasLayer/DecorativeLayer/LeftPanel/MarginContainer/VBoxContainer/MageRow/MagePortraitContainer/MagePortrait");
             TextureRect warrior = GetNodeOrNull<TextureRect>("CanvasLayer/DecorativeLayer/LeftPanel/MarginContainer/VBoxContainer/WarriorRow/WarriorPortraitContainer/WarriorPortrait");
-            TextureRect slime = GetNodeOrNull<TextureRect>("CanvasLayer/DecorativeLayer/RightPanel/MarginContainer/VBoxContainer/SlimeRow/SlimePortraitContainer/SlimePortrait");
-            TextureRect skeleton = GetNodeOrNull<TextureRect>("CanvasLayer/DecorativeLayer/RightPanel/MarginContainer/VBoxContainer/SkeletonRow/SkeletonPortraitContainer/SkeletonPortrait");
 
-            GD.Print($"[BattleScene] Portraits loaded: Mage={mage != null}, Warrior={warrior != null}, Slime={slime != null}, Skeleton={skeleton != null}");
+            GD.Print($"[BattleScene] Portraits loaded: Mage={mage != null}, Warrior={warrior != null}");
 
             AnimatePortrait(mage);
             AnimatePortrait(warrior);
-            AnimatePortrait(slime);
-            AnimatePortrait(skeleton);
         }
 
         private void AnimatePortrait(TextureRect portrait)
