@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://Scripts/UI/ShopUI.cs" id="1_shop"]
 [ext_resource type="Theme" path="res://Resources/Themes/game_theme.tres" id="2_theme"]
 [ext_resource type="Texture2D" path="res://Resources/Sprites/Backgrounds/menu_background.png" id="3_bg"]
+[ext_resource type="Texture2D" path="res://Resources/Sprites/UI/coin_icon.png" id="4_coin"]
 
 [node name="ShopScene" type="Control"]
 layout_mode = 3
@@ -50,7 +51,18 @@ theme_override_font_sizes/font_size = 52
 text = "Wave X Complete!"
 horizontal_alignment = 1
 
-[node name="CoinsLabel" type="Label" parent="MarginContainer/VBoxContainer/Header"]
+[node name="CoinsContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Header"]
+layout_mode = 2
+alignment = 1
+
+[node name="CoinIcon" type="TextureRect" parent="MarginContainer/VBoxContainer/Header/CoinsContainer"]
+layout_mode = 2
+texture = ExtResource("4_coin")
+custom_minimum_size = Vector2(36, 36)
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CoinsLabel" type="Label" parent="MarginContainer/VBoxContainer/Header/CoinsContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 36
 text = "0"

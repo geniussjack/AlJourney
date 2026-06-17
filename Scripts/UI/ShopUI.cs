@@ -57,7 +57,7 @@ namespace AlJourney.Scripts.UI
         public override void _Ready()
         {
             _waveLabel = GetNode<Label>("MarginContainer/VBoxContainer/Header/WaveLabel");
-            _coinsLabel = GetNode<Label>("MarginContainer/VBoxContainer/Header/CoinsLabel");
+            _coinsLabel = GetNode<Label>("MarginContainer/VBoxContainer/Header/CoinsContainer/CoinsLabel");
             _continueButton = GetNode<Button>("MarginContainer/VBoxContainer/BottomRow/ContinueButton");
             _homeButton = GetNode<Button>("MarginContainer/VBoxContainer/BottomRow/HomeButton");
 
@@ -98,7 +98,7 @@ namespace AlJourney.Scripts.UI
             GetNode<Label>("MarginContainer/VBoxContainer/ShopContainer/MageUpgrades/MageTitle").Text = Tr("UI_BATTLE_ALTARION") + " (" + Tr("CHARACTER_MAGE") + ")";
             GetNode<Label>("MarginContainer/VBoxContainer/ShopContainer/WarriorUpgrades/WarriorTitle").Text = Tr("UI_BATTLE_ALDRIC") + " (" + Tr("CHARACTER_WARRIOR") + ")";
 
-            GetNode<Label>("MarginContainer/VBoxContainer/Header/ShopTitleLabel").Text = "UI_SHOP_TITLE";
+            GetNode<Label>("MarginContainer/VBoxContainer/ShopTitle").Text = "UI_SHOP_TITLE";
 
             _mageHealthButton.Text = "UI_SHOP_BUY";
             _mageDamageButton.Text = "UI_SHOP_BUY";
