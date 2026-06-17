@@ -1,4 +1,4 @@
-﻿using AlJourney.Scripts.Managers;
+using AlJourney.Scripts.Managers;
 using Godot;
 
 namespace AlJourney.Scripts.UI
@@ -9,6 +9,7 @@ namespace AlJourney.Scripts.UI
     /// </summary>
     public partial class PauseMenu : Control
     {
+        private Label _titleLabel;
         private Button _resumeButton;
         private Button _saveButton;
         private Button _mainMenuButton;
@@ -19,9 +20,15 @@ namespace AlJourney.Scripts.UI
         /// </summary>
         public override void _Ready()
         {
+            _titleLabel = GetNode<Label>("CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TitleLabel");
             _resumeButton = GetNode<Button>("CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ResumeButton");
             _saveButton = GetNode<Button>("CenterContainer/PanelContainer/MarginContainer/VBoxContainer/SaveButton");
             _mainMenuButton = GetNode<Button>("CenterContainer/PanelContainer/MarginContainer/VBoxContainer/MainMenuButton");
+
+            _titleLabel.Text = Tr("UI_PAUSE_TITLE");
+            _resumeButton.Text = Tr("UI_PAUSE_RESUME");
+            _saveButton.Text = Tr("UI_PAUSE_SAVE");
+            _mainMenuButton.Text = Tr("UI_PAUSE_MAIN_MENU");
 
             _resumeButton.Pressed += OnResumePressed;
             _saveButton.Pressed += OnSavePressed;

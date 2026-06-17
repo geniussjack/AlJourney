@@ -42,6 +42,10 @@
     <string id="UI_BATTLE_SWAPS" text="Ходы:" />
     <string id="UI_BATTLE_ALTARION" text="Эльтарион" />
     <string id="UI_BATTLE_ALDRIC" text="Элдрик" />
+    <string id="UI_PAUSE_TITLE" text="ПАУЗА" />
+    <string id="UI_PAUSE_RESUME" text="Продолжить" />
+    <string id="UI_PAUSE_SAVE" text="Сохранить" />
+    <string id="UI_PAUSE_MAIN_MENU" text="В главное меню" />
     <string id="CHARACTER_MAGE" text="Маг" />
     <string id="CHARACTER_WARRIOR" text="Воин" />
     <string id="ENEMY_SKELETON_WARRIOR" text="Скелет-воин" />

@@ -143,7 +143,12 @@ namespace AlJourney.Scripts.Battle
         private void ChangePhase(BattlePhase newPhase)
         {
             CurrentPhase = newPhase;
+            if (_gridUI != null)
+            {
+                _gridUI.CanInteract = (CurrentPhase == BattlePhase.PlayerSwap);
+            }
             _ = EmitSignal(SignalName.PhaseChanged, (int)CurrentPhase);
+            GD.Print($"[BattleManager] Phase changed to {CurrentPhase}");
         }
 
         private void GenerateWaveEnemies()

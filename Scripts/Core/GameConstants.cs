@@ -1,4 +1,4 @@
-﻿namespace AlJourney.Scripts.Core
+namespace AlJourney.Scripts.Core
 {
     /// <summary>
     /// Хранилище всех игровых констант, включая настройки сетки, базовые характеристики, формулы урона и параметры врагов.
@@ -12,7 +12,7 @@
         /// <summary>
         /// Количество перемещений фишек, доступных игроку за один ход.
         /// </summary>
-        public const int PLAYER_SWAPS_PER_TURN = 3;
+        public const int PLAYER_SWAPS_PER_TURN = 1;
         /// <summary>
         /// Минимальное количество одинаковых фишек в ряд для успешного совпадения.
         /// </summary>

@@ -18,6 +18,11 @@ namespace AlJourney.Scripts.UI
         private const int CELL_SPACING = 4;
         private const int GRID_TOP_OFFSET = 40;
 
+        private Vector2 _elementSize = new(64, 64);
+        private Vector2 _gridOffset = new(0, 0);
+
+        public bool CanInteract { get; set; } = true;
+
         private Control _gridContainer;
         private ElementSprite[,] _visualGrid;
         private ElementSprite _selectedElement;
@@ -91,6 +96,8 @@ namespace AlJourney.Scripts.UI
 
         private void OnElementClicked(ElementSprite clickedElement)
         {
+            if (!CanInteract) return;
+
             if (_selectedElement == null)
             {
                 SelectElement(clickedElement);

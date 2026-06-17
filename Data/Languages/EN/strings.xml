@@ -42,6 +42,10 @@
     <string id="UI_BATTLE_SWAPS" text="Swaps:" />
     <string id="UI_BATTLE_ALTARION" text="Altarion" />
     <string id="UI_BATTLE_ALDRIC" text="Aldric" />
+    <string id="UI_PAUSE_TITLE" text="PAUSED" />
+    <string id="UI_PAUSE_RESUME" text="Resume" />
+    <string id="UI_PAUSE_SAVE" text="Save Game" />
+    <string id="UI_PAUSE_MAIN_MENU" text="Main Menu" />
     <string id="CHARACTER_MAGE" text="Mage" />
     <string id="CHARACTER_WARRIOR" text="Warrior" />
     <string id="ENEMY_SKELETON_WARRIOR" text="Skeleton Warrior" />
