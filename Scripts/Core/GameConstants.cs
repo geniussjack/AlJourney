@@ -332,7 +332,7 @@ namespace AlJourney.Scripts.Core
         /// <summary>
         /// Коэффициент масштабирования цен в магазине с увеличением номера волны.
         /// </summary>
-        public const float SHOP_WAVE_SCALE_FACTOR = 1.8f;
+        public const float SHOP_WAVE_SCALE_FACTOR = 0.7f;
 
         /// <summary>
         /// Количество монет, выпадающих за победу над обычным врагом.

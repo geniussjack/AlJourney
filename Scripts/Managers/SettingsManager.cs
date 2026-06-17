@@ -185,19 +185,19 @@ namespace AlJourney.Scripts.Managers
 
             if (WindowMode == 0) // Fullscreen
             {
-                window.Mode = Window.ModeEnum.Fullscreen;
+                DisplayServer.WindowSetMode(DisplayServer.WindowMode.Fullscreen);
                 window.Borderless = false;
             }
             else if (WindowMode == 1) // Borderless
             {
-                window.Mode = Window.ModeEnum.Windowed;
+                DisplayServer.WindowSetMode(DisplayServer.WindowMode.Windowed);
                 window.Borderless = true;
                 window.Size = _resolution;
                 window.Position = (DisplayServer.ScreenGetSize() - _resolution) / 2;
             }
             else // Windowed
             {
-                window.Mode = Window.ModeEnum.Windowed;
+                DisplayServer.WindowSetMode(DisplayServer.WindowMode.Windowed);
                 window.Borderless = false;
                 window.Size = _resolution;
                 window.Position = (DisplayServer.ScreenGetSize() - _resolution) / 2;

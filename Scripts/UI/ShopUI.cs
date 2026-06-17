@@ -1,4 +1,4 @@
-﻿using AlJourney.Scripts.Core;
+using AlJourney.Scripts.Core;
 using AlJourney.Scripts.Data;
 using AlJourney.Scripts.Managers;
 using Godot;
@@ -78,6 +78,14 @@ namespace AlJourney.Scripts.UI
             _continueButton.Pressed += OnContinuePressed;
             _homeButton.Pressed += OnHomePressed;
 
+            _continueButton.Text = Tr("UI_PAUSE_RESUME"); // Can just use continue/resume
+            _homeButton.Text = Tr("UI_PAUSE_MAIN_MENU");
+
+            GetNode<Label>("MarginContainer/VBoxContainer/ShopContainer/MageUpgrades/MageTitle").Text = Tr("UI_BATTLE_ALTARION") + " (" + Tr("CHARACTER_MAGE") + ")";
+            GetNode<Label>("MarginContainer/VBoxContainer/ShopContainer/WarriorUpgrades/WarriorTitle").Text = Tr("UI_BATTLE_ALDRIC") + " (" + Tr("CHARACTER_WARRIOR") + ")";
+
+            GetNode<Label>("MarginContainer/VBoxContainer/Header/ShopTitleLabel").Text = Tr("UI_SHOP_TITLE");
+
             InitializeShop();
 
             GD.Print("[ShopUI] Initialized");
@@ -89,7 +97,7 @@ namespace AlJourney.Scripts.UI
             int completedWave = Mathf.Max(1, currentWave - 1);
             int coins = GameStateManager.Instance.Coins;
 
-            _waveLabel.Text = $"Wave {completedWave} Complete! Next: Wave {currentWave}";
+            _waveLabel.Text = $"{Tr("UI_SHOP_NEXT_WAVE")}: {currentWave}";
             _coinsLabel.Text = $"{coins}";
 
             CalculatePrices(currentWave);
@@ -127,12 +135,12 @@ namespace AlJourney.Scripts.UI
                 return;
             }
 
-            UpdateUpgradeButton(_mageHealthButton, _mageHealthLabel, _mageHealthPrice, coins, saveData.MageMaxHealth, _mageHealthUpgrade, "Max HP");
-            UpdateUpgradeButton(_mageDamageButton, _mageDamageLabel, _mageDamagePrice, coins, saveData.MageDamage, _mageDamageUpgrade, "Damage");
-            UpdateUpgradeButton(_mageDefenseButton, _mageDefenseLabel, _mageDefensePrice, coins, saveData.MageDefense, _mageDefenseUpgrade, "Defense");
-            UpdateUpgradeButton(_warriorHealthButton, _warriorHealthLabel, _warriorHealthPrice, coins, saveData.WarriorMaxHealth, _warriorHealthUpgrade, "Max HP");
-            UpdateUpgradeButton(_warriorDamageButton, _warriorDamageLabel, _warriorDamagePrice, coins, saveData.WarriorDamage, _warriorDamageUpgrade, "Damage");
-            UpdateUpgradeButton(_warriorDefenseButton, _warriorDefenseLabel, _warriorDefensePrice, coins, saveData.WarriorDefense, _warriorDefenseUpgrade, "Defense");
+            UpdateUpgradeButton(_mageHealthButton, _mageHealthLabel, _mageHealthPrice, coins, saveData.MageMaxHealth, _mageHealthUpgrade, Tr("UI_SHOP_HP"));
+            UpdateUpgradeButton(_mageDamageButton, _mageDamageLabel, _mageDamagePrice, coins, saveData.MageDamage, _mageDamageUpgrade, Tr("UI_SHOP_DMG"));
+            UpdateUpgradeButton(_mageDefenseButton, _mageDefenseLabel, _mageDefensePrice, coins, saveData.MageDefense, _mageDefenseUpgrade, Tr("UI_SHOP_DEF"));
+            UpdateUpgradeButton(_warriorHealthButton, _warriorHealthLabel, _warriorHealthPrice, coins, saveData.WarriorMaxHealth, _warriorHealthUpgrade, Tr("UI_SHOP_HP"));
+            UpdateUpgradeButton(_warriorDamageButton, _warriorDamageLabel, _warriorDamagePrice, coins, saveData.WarriorDamage, _warriorDamageUpgrade, Tr("UI_SHOP_DMG"));
+            UpdateUpgradeButton(_warriorDefenseButton, _warriorDefenseLabel, _warriorDefensePrice, coins, saveData.WarriorDefense, _warriorDefenseUpgrade, Tr("UI_SHOP_DEF"));
         }
 
         private static void UpdateUpgradeButton(Button button, Label priceLabel, int price,
@@ -143,7 +151,7 @@ namespace AlJourney.Scripts.UI
             button.Modulate = canAfford ? Colors.White : new Color(1, 1, 1, 0.4f);
 
             int newStat = currentStat + upgradeAmount;
-            priceLabel.Text = $"{currentStat} -> {newStat} {statName}\nCost: {price}";
+            priceLabel.Text = $"{currentStat} -> {newStat} {statName}\n{button.GetNode<Control>("/root").Tr("UI_SHOP_COST")}: {price}";
             priceLabel.Modulate = canAfford ? Colors.White : Colors.Gray;
         }
 

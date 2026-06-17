@@ -24,9 +24,8 @@ namespace AlJourney.Scripts.UI
 
         private Container _enemiesContainer;
 
-        private Label _waveLabel;
         private Label _coinsLabel;
-        private Label _swapsLabel;
+        private Label _waveLabel;
 
 
         private DualHeroSystem _heroSystem;
@@ -62,7 +61,6 @@ namespace AlJourney.Scripts.UI
 
             _waveLabel = GetNode<Label>("MarginContainer/VBoxContainer/BottomBar/WaveLabel");
             _coinsLabel = GetNode<Label>("MarginContainer/VBoxContainer/BottomBar/CoinsContainer/CoinsLabel");
-            _swapsLabel = GetNode<Label>("MarginContainer/VBoxContainer/BottomBar/SwapsLabel");
 
 
             _comboSystem = GetNode<ComboSystem>("/root/ComboSystem");
@@ -196,7 +194,7 @@ namespace AlJourney.Scripts.UI
         /// <param name="remainingSwaps">Количество оставшихся перемещений.</param>
         public void UpdateSwaps(int remainingSwaps)
         {
-            _swapsLabel.Text = $"{Tr("UI_BATTLE_SWAPS")} {remainingSwaps}";
+            // Swaps text has been removed as per 1-swap-per-turn rule
         }
 
         private void OnWaveChanged(int waveNumber)
@@ -341,12 +339,15 @@ namespace AlJourney.Scripts.UI
             portraitContainer.AddChild(_portrait);
 
             VBoxContainer textContainer = new VBoxContainer();
+            textContainer.CustomMinimumSize = new Vector2(150, 0);
             textContainer.AddThemeConstantOverride("separation", 2);
             row.AddChild(textContainer);
 
             _nameLabel = new Label
             {
-                HorizontalAlignment = HorizontalAlignment.Left
+                HorizontalAlignment = HorizontalAlignment.Left,
+                ClipText = true,
+                TextOverrunBehavior = TextServer.OverrunBehavior.TrimEllipsis
             };
             textContainer.AddChild(_nameLabel);
 

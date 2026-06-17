@@ -33,7 +33,16 @@ theme_override_constants/margin_bottom = 20
 layout_mode = 2
 mouse_filter = 2
 
+[node name="TopBar" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+mouse_filter = 2
 
+[node name="InventoryButton" type="Button" parent="MarginContainer/VBoxContainer/TopBar"]
+custom_minimum_size = Vector2(150, 40)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+disabled = true
+text = "UI_INVENTORY"
 
 [node name="Spacer" type="Control" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
@@ -63,10 +72,3 @@ stretch_mode = 5
 layout_mode = 2
 theme_override_font_sizes/font_size = 30
 text = "0"
-
-[node name="SwapsLabel" type="Label" parent="MarginContainer/VBoxContainer/BottomBar"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 30
-text = "Swaps: 5"
-horizontal_alignment = 2

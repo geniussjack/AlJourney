@@ -28,6 +28,7 @@ namespace AlJourney.Scripts.UI
         private ElementSprite _selectedElement;
 
         private Dictionary<ElementType, Texture2D> _elementTextures;
+        private AlJourney.Scripts.Characters.DualHeroSystem _heroSystem;
         private readonly Dictionary<ElementData, ElementSprite> _spriteMap = [];
 
         private GridManager _gridManager;
@@ -38,7 +39,10 @@ namespace AlJourney.Scripts.UI
         {
             _gridManager = GetNode<GridManager>("/root/GridManager");
             _comboSystem = GetNode<ComboSystem>("/root/ComboSystem");
+            _heroSystem = GetNode<AlJourney.Scripts.Characters.DualHeroSystem>("/root/HeroSystem");
             _gridSize = GameConstants.GRID_SIZE;
+
+            _heroSystem.HeroDied += OnHeroDied;
 
             _gridContainer = new Control
             {
@@ -97,6 +101,9 @@ namespace AlJourney.Scripts.UI
         private void OnElementClicked(ElementSprite clickedElement)
         {
             if (!CanInteract) return;
+
+            var hero = _heroSystem.GetHeroForElement(clickedElement.Data.Type);
+            if (hero != null && !hero.IsAlive) return;
 
             if (_selectedElement == null)
             {
@@ -332,6 +339,7 @@ namespace AlJourney.Scripts.UI
 
             CleanupOldSprites(activeSprites);
             _visualGrid = syncedGrid;
+            UpdateElementVisuals();
         }
 
         private ElementSprite ProcessGridElement(ElementData data, int x, int y, bool animateElements)
@@ -433,6 +441,35 @@ namespace AlJourney.Scripts.UI
                 _gridManager.GridInitialized -= OnGridInitialized;
                 _gridManager.SwapCompleted -= OnSwapCompleted;
                 _gridManager.GridRefillCompleted -= OnGridRefilled;
+            }
+
+            if (_heroSystem != null)
+            {
+                _heroSystem.HeroDied -= OnHeroDied;
+            }
+        }
+
+        private void OnHeroDied(AlJourney.Scripts.Core.CharacterClass heroClass)
+        {
+            UpdateElementVisuals();
+        }
+
+        private void UpdateElementVisuals()
+        {
+            foreach (var sprite in _spriteMap.Values)
+            {
+                var data = sprite.Data;
+                if (data == null) continue;
+
+                var hero = _heroSystem.GetHeroForElement(data.Type);
+                if (hero != null && !hero.IsAlive)
+                {
+                    sprite.Modulate = Colors.Gray;
+                }
+                else
+                {
+                    sprite.Modulate = Colors.White;
+                }
             }
         }
     }

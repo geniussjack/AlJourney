@@ -24,6 +24,8 @@ namespace AlJourney.Scripts.UI
         private Button _resetButton;
         private Button _backButton;
 
+        private bool _hasUnsavedChanges = false;
+
         private readonly Vector2I[] _resolutions =
         [
             new(1280, 720),
@@ -156,6 +158,7 @@ namespace AlJourney.Scripts.UI
             _sfxVolumeSlider.Value = settings.SfxVolume;
 
             UpdateVolumeLabels();
+            _hasUnsavedChanges = false;
         }
 
         private void UpdateVolumeLabels()
@@ -168,42 +171,49 @@ namespace AlJourney.Scripts.UI
         private void OnWindowModeSelected(long index)
         {
             SettingsManager.Instance.SetWindowMode((int)index, false);
+            _hasUnsavedChanges = true;
         }
 
         private void OnLanguageSelected(long index)
         {
             string lang = index == 1 ? "ru" : "en";
             SettingsManager.Instance.SetLanguage(lang);
+            _hasUnsavedChanges = true;
         }
 
         private void OnResolutionSelected(long index)
         {
             Vector2I resolution = _resolutions[index];
             SettingsManager.Instance.SetResolution(resolution, false);
+            _hasUnsavedChanges = true;
         }
 
         private void OnFpsLimitSelected(long index)
         {
             int fpsLimit = _fpsLimits[index];
             SettingsManager.Instance.SetMaxFps(fpsLimit, false);
+            _hasUnsavedChanges = true;
         }
 
         private void OnMasterVolumeChanged(double value)
         {
             SettingsManager.Instance.SetMasterVolume((float)value);
             UpdateVolumeLabels();
+            _hasUnsavedChanges = true;
         }
 
         private void OnMusicVolumeChanged(double value)
         {
             SettingsManager.Instance.SetMusicVolume((float)value);
             UpdateVolumeLabels();
+            _hasUnsavedChanges = true;
         }
 
         private void OnSfxVolumeChanged(double value)
         {
             SettingsManager.Instance.SetSfxVolume((float)value);
             UpdateVolumeLabels();
+            _hasUnsavedChanges = true;
 
             _ = (AudioManager.Instance?.TryPlaySfx("res://Resources/Audio/SFX/button_click.wav"));
         }
@@ -214,6 +224,7 @@ namespace AlJourney.Scripts.UI
 
             SettingsManager.Instance.ApplyVideoSettings();
             SettingsManager.Instance.SaveSettings();
+            _hasUnsavedChanges = false;
 
             _ = (AudioManager.Instance?.TryPlaySfx("res://Resources/Audio/SFX/button_click.wav"));
 
@@ -236,6 +247,13 @@ namespace AlJourney.Scripts.UI
         {
             GD.Print("[SettingsMenuUI] Back pressed");
             _ = (AudioManager.Instance?.TryPlaySfx("res://Resources/Audio/SFX/button_click.wav"));
+
+            if (!_hasUnsavedChanges)
+            {
+                MainMenuUI mainMenu = GetParent() as MainMenuUI;
+                mainMenu?.OnBackToMainMenu();
+                return;
+            }
 
             ConfirmationDialog dialog = new()
             {

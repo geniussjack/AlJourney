@@ -65,4 +65,24 @@
     <string id="UI_FULLSCREEN" text="Fullscreen" />
     <string id="UI_BORDERLESS" text="Borderless" />
     <string id="UI_WINDOWED" text="Windowed" />
+
+    <!-- Game Over / Victory -->
+    <string id="UI_GAMEOVER_TITLE" text="Game Over" />
+    <string id="UI_GAMEOVER_RETRY" text="Try Again" />
+    <string id="UI_GAMEOVER_MAIN_MENU" text="Main Menu" />
+    <string id="UI_GAMEOVER_WAVE_REACHED" text="Wave Reached:" />
+    <string id="UI_GAMEOVER_COINS" text="Coins Collected:" />
+    <string id="UI_GAMEOVER_ENEMIES_DEFEATED" text="Enemies Defeated:" />
+    <string id="UI_VICTORY_TITLE" text="Victory!" />
+    <string id="UI_VICTORY_NEXT_WAVE" text="Next Wave" />
+    <string id="UI_VICTORY_MAIN_MENU" text="Main Menu" />
+    <string id="UI_SHOP_NEXT_WAVE" text="Next Wave" />
+
+    <!-- Shop / Inventory -->
+    <string id="UI_INVENTORY" text="Inventory" />
+    <string id="UI_SHOP_TITLE" text="Shop" />
+    <string id="UI_SHOP_HP" text="HP" />
+    <string id="UI_SHOP_DMG" text="DMG" />
+    <string id="UI_SHOP_DEF" text="DEF" />
+    <string id="UI_SHOP_COST" text="Cost" />
 </resources>

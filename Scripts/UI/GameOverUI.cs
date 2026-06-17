@@ -1,4 +1,4 @@
-﻿using AlJourney.Scripts.Data;
+using AlJourney.Scripts.Data;
 using AlJourney.Scripts.Managers;
 using Godot;
 
@@ -29,6 +29,10 @@ namespace AlJourney.Scripts.UI
             _mainMenuButton.Pressed += OnMainMenuPressed;
             _newGameButton.Pressed += OnNewGamePressed;
 
+            _mainMenuButton.Text = Tr("UI_GAMEOVER_MAIN_MENU");
+            _newGameButton.Text = Tr("UI_GAMEOVER_RETRY");
+            GetNode<Label>("CenterContainer/VBoxContainer/TitleLabel").Text = Tr("UI_GAMEOVER_TITLE");
+
             DisplayStats();
 
             GD.Print("[GameOverUI] Initialized");
@@ -44,17 +48,17 @@ namespace AlJourney.Scripts.UI
                 int coinsCollected = saveData.Coins;
                 int enemiesDefeated = CalculateEnemiesDefeated(waveReached);
 
-                _waveReachedLabel.Text = $"Wave Reached: {waveReached}";
-                _coinsCollectedLabel.Text = $"Coins: {coinsCollected}";
-                _enemiesDefeatedLabel.Text = $"Enemies Defeated: {enemiesDefeated}";
+                _waveReachedLabel.Text = $"{Tr("UI_GAMEOVER_WAVE_REACHED")} {waveReached}";
+                _coinsCollectedLabel.Text = $"{Tr("UI_GAMEOVER_COINS")} {coinsCollected}";
+                _enemiesDefeatedLabel.Text = $"{Tr("UI_GAMEOVER_ENEMIES_DEFEATED")} {enemiesDefeated}";
 
                 GD.Print($"[GameOverUI] Stats - Wave: {waveReached}, Coins: {coinsCollected}, Enemies: {enemiesDefeated}");
             }
             else
             {
-                _waveReachedLabel.Text = "Wave Reached: 1";
-                _coinsCollectedLabel.Text = "Coins: 0";
-                _enemiesDefeatedLabel.Text = "Enemies Defeated: 0";
+                _waveReachedLabel.Text = $"{Tr("UI_GAMEOVER_WAVE_REACHED")} 1";
+                _coinsCollectedLabel.Text = $"{Tr("UI_GAMEOVER_COINS")} 0";
+                _enemiesDefeatedLabel.Text = $"{Tr("UI_GAMEOVER_ENEMIES_DEFEATED")} 0";
             }
         }
 

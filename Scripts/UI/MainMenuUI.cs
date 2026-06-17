@@ -1,4 +1,4 @@
-﻿using AlJourney.Scripts.Core;
+using AlJourney.Scripts.Core;
 using AlJourney.Scripts.Managers;
 using Godot;
 
@@ -40,6 +40,12 @@ namespace AlJourney.Scripts.UI
             _settingsButton.Pressed += OnSettingsPressed;
             _creditsButton.Pressed += OnCreditsPressed;
             _quitButton.Pressed += OnQuitPressed;
+
+            _newGameButton.Text = Tr("UI_MAIN_MENU_NEW_GAME");
+            _continueButton.Text = Tr("UI_MAIN_MENU_CONTINUE");
+            _settingsButton.Text = Tr("UI_MAIN_MENU_SETTINGS");
+            _creditsButton.Text = Tr("UI_MAIN_MENU_CREDITS");
+            _quitButton.Text = Tr("UI_MAIN_MENU_QUIT");
 
             ShowMainMenu();
 
