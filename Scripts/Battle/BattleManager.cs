@@ -53,9 +53,12 @@ namespace AlJourney.Scripts.Battle
         [Signal]
         public delegate void EnemyDefeatedEventHandler(Enemy enemy);
 
-        private int _necromancerTurnCount;
-        public int NecromancerTurnCount => _necromancerTurnCount;
-        public void IncrementNecromancerTurnCount() => _necromancerTurnCount++;
+        public int NecromancerTurnCount { get; private set; }
+        public void IncrementNecromancerTurnCount()
+        {
+            NecromancerTurnCount++;
+        }
+
         private GridManager _gridManager;
         private ComboSystem _comboSystem;
         private CameraShake _cameraShake;
@@ -92,7 +95,7 @@ namespace AlJourney.Scripts.Battle
         {
             Enemies = [];
             CurrentPhase = BattlePhase.PlayerSwap;
-            _necromancerTurnCount = 0;
+            NecromancerTurnCount = 0;
             _battleEndedSignaled = false;
             _isWaveCompleted = false;
 
@@ -128,7 +131,7 @@ namespace AlJourney.Scripts.Battle
         {
             HeroSystem = heroSystem;
             CurrentWave = waveNumber;
-            _necromancerTurnCount = 0;
+            NecromancerTurnCount = 0;
             _cameraShake = cameraShake;
             _battleEndedSignaled = false;
             _isWaveCompleted = false;
@@ -239,7 +242,10 @@ namespace AlJourney.Scripts.Battle
         private void ApplyComboEffect(ComboEffect effect)
         {
             PlayerCharacter activeHero = HeroSystem.GetHeroForElement(effect.ElementType);
-            if (activeHero?.IsAlive != true) return;
+            if (activeHero?.IsAlive != true)
+            {
+                return;
+            }
 
             if (effect.ElementType is ElementType.Fire or ElementType.Sword)
             {

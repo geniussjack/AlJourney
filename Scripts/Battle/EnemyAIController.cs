@@ -1,10 +1,10 @@
 using AlJourney.Scripts.Characters;
+using AlJourney.Scripts.Core;
+using AlJourney.Scripts.Managers;
 using AlJourney.Scripts.Utils;
 using Godot;
 using System.Collections.Generic;
 using System.Linq;
-using AlJourney.Scripts.Managers;
-using AlJourney.Scripts.Core;
 
 namespace AlJourney.Scripts.Battle
 {
@@ -110,13 +110,13 @@ namespace AlJourney.Scripts.Battle
             {
                 Enemy skeleton = EnemySpawner.SpawnEnemy(EnemyType.SkeletonWarrior, battleManager.CurrentWave);
                 skeleton.CharacterDied += () => battleManager.OnEnemyDied(skeleton);
-                
+
                 // Рассчитываем позицию для нового скелета, чтобы он не накладывался на других.
                 int maxEnemies = battleManager.Enemies.Count + 1;
                 float totalWidth = (maxEnemies - 1) * 150f;
                 float startX = 640f - (totalWidth / 2f) + 150f;
                 float xOffset = startX + (battleManager.Enemies.Count * 150f);
-                
+
                 battleManager.Enemies.Add(skeleton);
                 battleManager.AddChild(skeleton);
             }

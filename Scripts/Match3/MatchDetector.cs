@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using AlJourney.Scripts.Core;
+using System.Collections.Generic;
 
 namespace AlJourney.Scripts.Match3
 {

@@ -39,7 +39,7 @@ namespace AlJourney.Scripts.UI
             PopulateAbilitiesContainer(_warriorAbilitiesContainer, CharacterClass.Warrior);
         }
 
-        private void PopulateAbilitiesContainer(VBoxContainer container, CharacterClass heroClass)
+        private static void PopulateAbilitiesContainer(VBoxContainer container, CharacterClass heroClass)
         {
             foreach (Node child in container.GetChildren())
             {

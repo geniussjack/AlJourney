@@ -1,7 +1,5 @@
-using Xunit;
-using AlJourney.Scripts.Match3;
 using AlJourney.Scripts.Core;
-using Moq;
+using AlJourney.Scripts.Match3;
 
 namespace AlJourneyTests.Scripts.Match3
 {
@@ -11,7 +9,7 @@ namespace AlJourneyTests.Scripts.Match3
         public void IsValidPosition_ReturnsTrue_ForValidCoordinates()
         {
             // Arrange
-            int gridSize = 8;
+            const int gridSize = 8;
 
             // Act & Assert
             Assert.True(GridValidator.IsValidPosition(0, 0, gridSize));
@@ -23,7 +21,7 @@ namespace AlJourneyTests.Scripts.Match3
         public void IsValidPosition_ReturnsFalse_ForInvalidCoordinates()
         {
             // Arrange
-            int gridSize = 8;
+            const int gridSize = 8;
 
             // Act & Assert
             Assert.False(GridValidator.IsValidPosition(-1, 0, gridSize));
@@ -36,7 +34,7 @@ namespace AlJourneyTests.Scripts.Match3
         public void HasValidMoves_ReturnsTrue_WhenHorizontalMoveExists()
         {
             // Arrange
-            int gridSize = 4;
+            const int gridSize = 4;
             ElementData[,] grid = new ElementData[gridSize, gridSize];
             // Создаем поле без совпадений
             for (int x = 0; x < gridSize; x++)
@@ -69,7 +67,7 @@ namespace AlJourneyTests.Scripts.Match3
         public void HasValidMoves_ReturnsTrue_WhenVerticalMoveExists()
         {
             // Arrange
-            int gridSize = 4;
+            const int gridSize = 4;
             ElementData[,] grid = new ElementData[gridSize, gridSize];
             for (int x = 0; x < gridSize; x++)
             {
@@ -96,7 +94,7 @@ namespace AlJourneyTests.Scripts.Match3
         public void HasValidMoves_ReturnsFalse_WhenNoMovesExist()
         {
             // Arrange
-            int gridSize = 4;
+            const int gridSize = 4;
             ElementData[,] grid = new ElementData[gridSize, gridSize];
             // Идеальное "безопасное" поле без возможных ходов (диагональное распределение)
             for (int x = 0; x < gridSize; x++)

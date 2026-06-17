@@ -1,7 +1,5 @@
-using Xunit;
-using AlJourney.Scripts.Match3;
 using AlJourney.Scripts.Core;
-using System.Collections.Generic;
+using AlJourney.Scripts.Match3;
 
 namespace AlJourneyTests.Scripts.Match3
 {
@@ -11,7 +9,7 @@ namespace AlJourneyTests.Scripts.Match3
         public void FindAllMatches_ReturnsMatches_WhenHorizontalMatchExists()
         {
             // Arrange
-            int gridSize = 4;
+            const int gridSize = 4;
             ElementData[,] grid = new ElementData[gridSize, gridSize];
             for (int x = 0; x < gridSize; x++)
             {
@@ -30,7 +28,7 @@ namespace AlJourneyTests.Scripts.Match3
             List<MatchResult> results = MatchDetector.FindAllMatches(grid, gridSize);
 
             // Assert
-            Assert.Single(results);
+            _ = Assert.Single(results);
             Assert.Equal(ElementType.Fire, results[0].ElementType);
             Assert.Equal(3, results[0].MatchCount);
             Assert.True(results[0].IsHorizontal);
@@ -44,7 +42,7 @@ namespace AlJourneyTests.Scripts.Match3
         public void FindAllMatches_ReturnsMatches_WhenVerticalMatchExists()
         {
             // Arrange
-            int gridSize = 5;
+            const int gridSize = 5;
             ElementData[,] grid = new ElementData[gridSize, gridSize];
             for (int x = 0; x < gridSize; x++)
             {
@@ -64,7 +62,7 @@ namespace AlJourneyTests.Scripts.Match3
             List<MatchResult> results = MatchDetector.FindAllMatches(grid, gridSize);
 
             // Assert
-            Assert.Single(results);
+            _ = Assert.Single(results);
             Assert.Equal(ElementType.Shield, results[0].ElementType);
             Assert.Equal(4, results[0].MatchCount);
             Assert.False(results[0].IsHorizontal);
@@ -74,7 +72,7 @@ namespace AlJourneyTests.Scripts.Match3
         public void FindAllMatches_ReturnsMultipleMatches_WhenCrossMatchExists()
         {
             // Arrange
-            int gridSize = 5;
+            const int gridSize = 5;
             ElementData[,] grid = new ElementData[gridSize, gridSize];
             for (int x = 0; x < gridSize; x++)
             {
@@ -104,7 +102,7 @@ namespace AlJourneyTests.Scripts.Match3
         public void FindAllMatches_ReturnsEmpty_WhenNoMatchesExist()
         {
             // Arrange
-            int gridSize = 4;
+            const int gridSize = 4;
             ElementData[,] grid = new ElementData[gridSize, gridSize];
             for (int x = 0; x < gridSize; x++)
             {

@@ -1,12 +1,10 @@
 using AlJourney.Scripts.Characters;
-using AlJourney.Scripts.Data;
+using AlJourney.Scripts.Core;
+using AlJourney.Scripts.Managers;
 using AlJourney.Scripts.Match3;
 using AlJourney.Scripts.Utils;
-using AlJourney.Scripts.Managers;
 using Godot;
-using System.Collections.Generic;
 using System.Linq;
-using AlJourney.Scripts.Core;
 
 namespace AlJourney.Scripts.Battle
 {
