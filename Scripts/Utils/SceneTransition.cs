@@ -1,4 +1,4 @@
-﻿using Godot;
+using Godot;
 
 namespace AlJourney.Scripts.Utils
 {
@@ -13,7 +13,7 @@ namespace AlJourney.Scripts.Utils
         private bool _isTransitioning;
 
         /// <summary>
-        /// Инициализирует компонент. Создает полноэкранный ColorRect, делает его полностью прозрачным 
+        /// Инициализирует компонент. Создает полноэкранный ColorRect, делает его полностью прозрачным
         /// и настраивает так, чтобы он не перехватывал события мыши.
         /// </summary>
         public override void _Ready()

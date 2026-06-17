@@ -1,4 +1,4 @@
-﻿namespace AlJourney.Scripts.Interfaces
+namespace AlJourney.Scripts.Interfaces
 {
     /// <summary>
     /// Интерфейс для управления аудиосистемой игры.

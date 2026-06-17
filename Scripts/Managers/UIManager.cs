@@ -1,4 +1,4 @@
-﻿using AlJourney.Scripts.Interfaces;
+using AlJourney.Scripts.Interfaces;
 using Godot;
 using System.Collections.Generic;
 

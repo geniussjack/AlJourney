@@ -11,7 +11,7 @@ using Godot;
 namespace AlJourney.Scripts.Scenes
 {
     /// <summary>
-    /// Главный контроллер сцены боя. 
+    /// Главный контроллер сцены боя.
     /// Объединяет и координирует все системы, связанные с битвой: игровое поле,
     /// пользовательский интерфейс, систему героев и менеджер боя.
     /// </summary>
@@ -29,7 +29,7 @@ namespace AlJourney.Scripts.Scenes
         private bool _isBattleTransitionQueued;
 
         /// <summary>
-        /// Инициализирует сцену боя. Настраивает камеру, загружает данные героев из сохранения, 
+        /// Инициализирует сцену боя. Настраивает камеру, загружает данные героев из сохранения,
         /// инициализирует интерфейс и подписывается на события.
         /// Запускает начало битвы для текущей волны.
         /// </summary>
@@ -145,7 +145,7 @@ namespace AlJourney.Scripts.Scenes
         {
             if (wasValid)
             {
-                _battleHUD.UpdateSwaps(_gridManager.RemainingSwaps);
+                BattleHUD.UpdateSwaps(_gridManager.RemainingSwaps);
             }
         }
 
@@ -153,7 +153,7 @@ namespace AlJourney.Scripts.Scenes
         {
             if (newPhase == BattlePhase.PlayerSwap)
             {
-                _battleHUD.UpdateSwaps(_gridManager.RemainingSwaps);
+                BattleHUD.UpdateSwaps(_gridManager.RemainingSwaps);
             }
         }
 

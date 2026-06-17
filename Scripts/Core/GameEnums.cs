@@ -1,4 +1,4 @@
-﻿namespace AlJourney.Scripts.Core
+namespace AlJourney.Scripts.Core
 {
     /// <summary>
     /// Возможные состояния игры, определяющие текущий экран и логику поведения.

@@ -1,4 +1,4 @@
-﻿using AlJourney.Scripts.Core;
+using AlJourney.Scripts.Core;
 using System;
 using System.Collections.Generic;
 

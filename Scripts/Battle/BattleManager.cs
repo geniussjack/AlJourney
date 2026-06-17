@@ -143,10 +143,7 @@ namespace AlJourney.Scripts.Battle
         private void ChangePhase(BattlePhase newPhase)
         {
             CurrentPhase = newPhase;
-            if (_gridUI != null)
-            {
-                _gridUI.CanInteract = (CurrentPhase == BattlePhase.PlayerSwap);
-            }
+            _ = _gridUI?.CanInteract = CurrentPhase == BattlePhase.PlayerSwap;
             _ = EmitSignal(SignalName.PhaseChanged, (int)CurrentPhase);
             GD.Print($"[BattleManager] Phase changed to {CurrentPhase}");
         }
@@ -271,7 +268,7 @@ namespace AlJourney.Scripts.Battle
         private void ApplyComboEffect(ComboEffect effect)
         {
             PlayerCharacter activeHero = HeroSystem.GetHeroForElement(effect.ElementType);
-            if (activeHero == null || !activeHero.IsAlive)
+            if (activeHero?.IsAlive != true)
             {
                 return;
             }
@@ -385,7 +382,7 @@ namespace AlJourney.Scripts.Battle
         {
             ChangePhase(BattlePhase.EnemyTurn);
 
-            List<Enemy> activeEnemies = Enemies.Where(e => e.IsAlive).ToList();
+            List<Enemy> activeEnemies = [.. Enemies.Where(e => e.IsAlive)];
             foreach (Enemy enemy in activeEnemies)
             {
                 enemy.ProcessStatusEffects();

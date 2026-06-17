@@ -1,4 +1,4 @@
-﻿using AlJourney.Scripts.Match3;
+using AlJourney.Scripts.Match3;
 using System.Collections.Generic;
 
 namespace AlJourney.Scripts.Interfaces

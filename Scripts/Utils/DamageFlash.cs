@@ -1,4 +1,4 @@
-﻿using Godot;
+using Godot;
 
 namespace AlJourney.Scripts.Utils
 {
@@ -31,7 +31,7 @@ namespace AlJourney.Scripts.Utils
         }
 
         /// <summary>
-        /// Запускает анимацию изменения цвета родительского узла на указанный, 
+        /// Запускает анимацию изменения цвета родительского узла на указанный,
         /// а затем плавно возвращает его к исходному состоянию.
         /// </summary>
         /// <param name="flashColor">Цвет, в который окрасится объект во время вспышки.</param>
@@ -49,7 +49,7 @@ namespace AlJourney.Scripts.Utils
         }
 
         /// <summary>
-        /// Запускает вспышку красного цвета. 
+        /// Запускает вспышку красного цвета.
         /// Предназначено для визуализации получения урона.
         /// </summary>
         public void FlashDamage()

@@ -62,7 +62,7 @@ namespace AlJourney.Scripts.UI
 
         private void UpdateContinueButtonState()
         {
-            bool hasSave = SaveSystem.Instance != null && SaveSystem.Instance.SaveFileExists();
+            bool hasSave = SaveSystem.Instance?.SaveFileExists() == true;
             _continueButton.Disabled = !hasSave;
             _continueButton.Modulate = hasSave ? Colors.White : new Color(1, 1, 1, 0.45f);
         }

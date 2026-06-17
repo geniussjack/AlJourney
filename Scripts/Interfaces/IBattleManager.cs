@@ -1,4 +1,4 @@
-﻿using AlJourney.Scripts.Characters;
+using AlJourney.Scripts.Characters;
 using AlJourney.Scripts.Core;
 using AlJourney.Scripts.UI;
 using AlJourney.Scripts.Utils;

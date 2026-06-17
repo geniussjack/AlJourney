@@ -111,13 +111,13 @@ namespace AlJourney.Scripts.UI
 
             _mageDamageFlash = new AlJourney.Scripts.Utils.DamageFlash();
             _mageInfoContainer.AddChild(_mageDamageFlash);
-            _heroSystem.Mage.DamageTaken += (amount) => _mageDamageFlash.FlashDamage();
-            _heroSystem.Mage.Healed += (amount) => _mageDamageFlash.FlashHeal();
+            _heroSystem.Mage.DamageTaken += (_) => _mageDamageFlash.FlashDamage();
+            _heroSystem.Mage.Healed += (_) => _mageDamageFlash.FlashHeal();
 
             _warriorDamageFlash = new AlJourney.Scripts.Utils.DamageFlash();
             _warriorInfoContainer.AddChild(_warriorDamageFlash);
-            _heroSystem.Warrior.DamageTaken += (amount) => _warriorDamageFlash.FlashDamage();
-            _heroSystem.Warrior.Healed += (amount) => _warriorDamageFlash.FlashHeal();
+            _heroSystem.Warrior.DamageTaken += (_) => _warriorDamageFlash.FlashDamage();
+            _heroSystem.Warrior.Healed += (_) => _warriorDamageFlash.FlashHeal();
 
             GD.Print($"[BattleHUD] Initialized for {_heroSystem.Mage.CharacterName} and {_heroSystem.Warrior.CharacterName}");
         }
@@ -191,8 +191,7 @@ namespace AlJourney.Scripts.UI
         /// <summary>
         /// Обновляет текстовое отображение количества оставшихся перемещений элементов на поле.
         /// </summary>
-        /// <param name="remainingSwaps">Количество оставшихся перемещений.</param>
-        public void UpdateSwaps(int remainingSwaps)
+        public static void UpdateSwaps(int _)
         {
             // Swaps text has been removed as per 1-swap-per-turn rule
         }
@@ -321,12 +320,14 @@ namespace AlJourney.Scripts.UI
         /// </summary>
         public EnemyHealthBar()
         {
-            HBoxContainer row = new HBoxContainer();
+            HBoxContainer row = new();
             row.AddThemeConstantOverride("separation", 10);
             AddChild(row);
 
-            Control portraitContainer = new Control();
-            portraitContainer.CustomMinimumSize = new Vector2(96, 96);
+            Control portraitContainer = new()
+            {
+                CustomMinimumSize = new Vector2(96, 96)
+            };
             row.AddChild(portraitContainer);
 
             _portrait = new TextureRect();
@@ -338,8 +339,10 @@ namespace AlJourney.Scripts.UI
             _portrait.CustomMinimumSize = new Vector2(96, 96);
             portraitContainer.AddChild(_portrait);
 
-            VBoxContainer textContainer = new VBoxContainer();
-            textContainer.CustomMinimumSize = new Vector2(150, 0);
+            VBoxContainer textContainer = new()
+            {
+                CustomMinimumSize = new Vector2(150, 0)
+            };
             textContainer.AddThemeConstantOverride("separation", 2);
             row.AddChild(textContainer);
 
@@ -376,8 +379,9 @@ namespace AlJourney.Scripts.UI
             _enemy.CharacterDied += OnEnemyDied;
 
             _nameLabel.Text = _enemy.CharacterName;
-            
-            string spritePath = _enemy.EnemyType switch {
+
+            string spritePath = _enemy.EnemyType switch
+            {
                 EnemyType.Slime => "res://Resources/Sprites/Characters/slime_sprite.png",
                 _ => "res://Resources/Sprites/Characters/skeleton_sprite.png"
             };

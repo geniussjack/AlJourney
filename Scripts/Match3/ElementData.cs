@@ -1,4 +1,4 @@
-﻿using AlJourney.Scripts.Core;
+using AlJourney.Scripts.Core;
 
 namespace AlJourney.Scripts.Match3
 {

@@ -1,4 +1,4 @@
-﻿using AlJourney.Scripts.Core;
+using AlJourney.Scripts.Core;
 using AlJourney.Scripts.Interfaces;
 using AlJourney.Scripts.Managers;
 using Godot;
@@ -8,7 +8,7 @@ namespace AlJourney.Scripts.Match3
 {
     /// <summary>
     /// Глобальный синглтон-менеджер, управляющий логикой игрового поля.
-    /// Отвечает за генерацию элементов, проверку возможных ходов, поиск совпадений 
+    /// Отвечает за генерацию элементов, проверку возможных ходов, поиск совпадений
     /// и применение гравитации при исчезновении камней.
     /// Не содержит визуальной логики.
     /// </summary>
@@ -68,7 +68,7 @@ namespace AlJourney.Scripts.Match3
 
         /// <summary>
         /// Полностью очищает и заново генерирует игровое поле.
-        /// Гарантирует, что на сгенерированном поле не будет изначальных 
+        /// Гарантирует, что на сгенерированном поле не будет изначальных
         /// совпадений 3-в-ряд и будут доступны возможные ходы.
         /// </summary>
         public void InitializeGrid()
@@ -122,7 +122,7 @@ namespace AlJourney.Scripts.Match3
 
         private ElementType GetRandomValidType(ElementType exclude1, ElementType exclude2)
         {
-            ElementType[] allTypes = { ElementType.Fire, ElementType.Heal, ElementType.Sword, ElementType.Shield };
+            ElementType[] allTypes = [ElementType.Fire, ElementType.Heal, ElementType.Sword, ElementType.Shield];
             List<ElementType> validTypes = [];
 
             foreach (ElementType t in allTypes)
@@ -149,7 +149,7 @@ namespace AlJourney.Scripts.Match3
 
         /// <summary>
         /// Выполняет попытку поменять два соседних элемента местами.
-        /// Если обмен не приводит ни к одному совпадению, 
+        /// Если обмен не приводит ни к одному совпадению,
         /// элементы возвращаются на свои исходные позиции.
         /// </summary>
         /// <param name="x1">X первой ячейки.</param>
@@ -204,7 +204,7 @@ namespace AlJourney.Scripts.Match3
         }
 
         /// <summary>
-        /// Сканирует всю сетку по горизонтали и вертикали в поисках линий 
+        /// Сканирует всю сетку по горизонтали и вертикали в поисках линий
         /// из 3 или более одинаковых камней.
         /// </summary>
         /// <returns>Список объектов MatchResult, каждый из которых содержит информацию о собранной линии.</returns>
@@ -338,7 +338,7 @@ namespace AlJourney.Scripts.Match3
             {
                 for (int y = 0; y < GridSize; y++)
                 {
-                    if (_grid[x, y] != null && _grid[x, y].IsMatched)
+                    if (_grid[x, y]?.IsMatched == true)
                     {
                         _grid[x, y] = null;
                     }
@@ -399,7 +399,7 @@ namespace AlJourney.Scripts.Match3
         }
 
         /// <summary>
-        /// Симулирует все возможные ходы на доске, чтобы убедиться, 
+        /// Симулирует все возможные ходы на доске, чтобы убедиться,
         /// что игрок не оказался в безвыходной ситуации.
         /// </summary>
         /// <returns>True, если на доске есть хотя бы один легальный ход, собирающий комбо.</returns>
@@ -511,7 +511,7 @@ namespace AlJourney.Scripts.Match3
         }
 
         /// <summary>
-        /// Автоматически перемешивает все камни на доске, если метод <see cref="HasValidMoves"/> 
+        /// Автоматически перемешивает все камни на доске, если метод <see cref="HasValidMoves"/>
         /// возвращает false.
         /// </summary>
         public void CheckAndReshuffleIfNeeded()

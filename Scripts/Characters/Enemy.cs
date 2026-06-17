@@ -6,7 +6,7 @@ namespace AlJourney.Scripts.Characters
 {
     /// <summary>
     /// Класс врага. Наследует базовый класс Character.
-    /// Обрабатывает типы врагов, их базовые характеристики, скалирование с волнами 
+    /// Обрабатывает типы врагов, их базовые характеристики, скалирование с волнами
     /// и специфические атаки.
     /// </summary>
     public partial class Enemy : Character
@@ -26,9 +26,9 @@ namespace AlJourney.Scripts.Characters
         private int _initialStackCount;
 
         /// <summary>
-        /// Текущее количество существ в отряде. 
+        /// Текущее количество существ в отряде.
         /// </summary>
-        public int StackCount { get => _initialStackCount > 0 ? Mathf.CeilToInt((float)CurrentHealth / ((float)TotalMaxHealth / _initialStackCount)) : 1; private set { } }
+        public int StackCount { get => _initialStackCount > 0 ? Mathf.CeilToInt(CurrentHealth / ((float)TotalMaxHealth / _initialStackCount)) : 1; private set { } }
 
         public new string CharacterName => StackCount > 1 ? $"{Tr(_name)} x{StackCount}" : Tr(_name);
 

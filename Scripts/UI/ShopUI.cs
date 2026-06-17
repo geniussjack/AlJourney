@@ -112,20 +112,24 @@ namespace AlJourney.Scripts.UI
             GD.Print("[ShopUI] Initialized");
         }
 
-        private Label AddCostUI(Node parent)
+        private static Label AddCostUI(Node parent)
         {
-            HBoxContainer hbox = new HBoxContainer();
-            hbox.Alignment = BoxContainer.AlignmentMode.Center;
-            
-            Label costLabel = new Label();
+            HBoxContainer hbox = new()
+            {
+                Alignment = BoxContainer.AlignmentMode.Center
+            };
+
+            Label costLabel = new();
             costLabel.AddThemeFontSizeOverride("font_size", 22);
             hbox.AddChild(costLabel);
 
-            TextureRect coinIcon = new TextureRect();
-            coinIcon.Texture = GD.Load<Texture2D>("res://Resources/Sprites/UI/coin_icon.png");
-            coinIcon.CustomMinimumSize = new Vector2(24, 24);
-            coinIcon.ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize;
-            coinIcon.StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered;
+            TextureRect coinIcon = new()
+            {
+                Texture = GD.Load<Texture2D>("res://Resources/Sprites/UI/coin_icon.png"),
+                CustomMinimumSize = new Vector2(24, 24),
+                ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
+                StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered
+            };
             hbox.AddChild(coinIcon);
 
             parent.AddChild(hbox);

@@ -1,3 +1,4 @@
+using AlJourney.Scripts.Characters;
 using AlJourney.Scripts.Core;
 using AlJourney.Scripts.Match3;
 using AlJourney.Scripts.Utils;
@@ -103,10 +104,16 @@ namespace AlJourney.Scripts.UI
 
         private void OnElementClicked(ElementSprite clickedElement)
         {
-            if (!CanInteract) return;
+            if (!CanInteract)
+            {
+                return;
+            }
 
-            var hero = _heroSystem.GetHeroForElement(clickedElement.Data.Type);
-            if (hero != null && !hero.IsAlive) return;
+            PlayerCharacter hero = _heroSystem.GetHeroForElement(clickedElement.Data.Type);
+            if (hero?.IsAlive == false)
+            {
+                return;
+            }
 
             if (_selectedElement == null)
             {
@@ -446,10 +453,7 @@ namespace AlJourney.Scripts.UI
                 _gridManager.GridRefillCompleted -= OnGridRefilled;
             }
 
-            if (_heroSystem != null)
-            {
-                _heroSystem.HeroDied -= OnHeroDied;
-            }
+            _heroSystem?.HeroDied -= OnHeroDied;
         }
 
         private void OnHeroDied(AlJourney.Scripts.Core.CharacterClass heroClass)
@@ -459,20 +463,16 @@ namespace AlJourney.Scripts.UI
 
         private void UpdateElementVisuals()
         {
-            foreach (var sprite in _spriteMap.Values)
+            foreach (ElementSprite sprite in _spriteMap.Values)
             {
-                var data = sprite.Data;
-                if (data == null) continue;
+                ElementData data = sprite.Data;
+                if (data == null)
+                {
+                    continue;
+                }
 
-                var hero = _heroSystem.GetHeroForElement(data.Type);
-                if (hero != null && !hero.IsAlive)
-                {
-                    sprite.Modulate = Colors.Gray;
-                }
-                else
-                {
-                    sprite.Modulate = Colors.White;
-                }
+                PlayerCharacter hero = _heroSystem.GetHeroForElement(data.Type);
+                sprite.Modulate = hero?.IsAlive == false ? Colors.Gray : Colors.White;
             }
         }
     }

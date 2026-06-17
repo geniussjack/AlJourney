@@ -1,4 +1,4 @@
-﻿using AlJourney.Scripts.Core;
+using AlJourney.Scripts.Core;
 using AlJourney.Scripts.Data;
 using Godot;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ namespace AlJourney.Scripts.Characters
 {
     /// <summary>
     /// Базовый класс для всех живых существ в игре.
-    /// Управляет здоровьем, броней, щитами, статусными эффектами и 
+    /// Управляет здоровьем, броней, щитами, статусными эффектами и
     /// базовыми характеристиками.
     /// </summary>
     public partial class Character : Node
@@ -310,8 +310,8 @@ namespace AlJourney.Scripts.Characters
         /// </summary>
         public virtual void ClearNegativeEffects()
         {
-            StatusEffect[] negativeEffects = { StatusEffect.Burning, StatusEffect.Bleeding, StatusEffect.Weakened, StatusEffect.Stunned };
-            List<StatusEffectData> toRemove = _activeEffects.Where(e => negativeEffects.Contains(e.Type)).ToList();
+            StatusEffect[] negativeEffects = [StatusEffect.Burning, StatusEffect.Bleeding, StatusEffect.Weakened, StatusEffect.Stunned];
+            List<StatusEffectData> toRemove = [.. _activeEffects.Where(e => negativeEffects.Contains(e.Type))];
 
             foreach (StatusEffectData effect in toRemove)
             {
@@ -398,7 +398,7 @@ namespace AlJourney.Scripts.Characters
         /// </summary>
         public List<StatusEffectData> GetActiveEffects()
         {
-            return _activeEffects.ToList();
+            return [.. _activeEffects];
         }
 
         /// <summary>

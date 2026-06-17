@@ -1,4 +1,4 @@
-﻿using AlJourney.Scripts.Data;
+using AlJourney.Scripts.Data;
 using System.Collections.Generic;
 
 namespace AlJourney.Scripts.Interfaces

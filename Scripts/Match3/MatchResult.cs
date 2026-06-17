@@ -1,11 +1,11 @@
-﻿using AlJourney.Scripts.Core;
+using AlJourney.Scripts.Core;
 using System.Collections.Generic;
 
 namespace AlJourney.Scripts.Match3
 {
     /// <summary>
     /// Представляет результат успешно собранной комбинации элементов.
-    /// Хранит данные о типе собранных элементов, их количестве, направлении комбинации 
+    /// Хранит данные о типе собранных элементов, их количестве, направлении комбинации
     /// и точных позициях на игровом поле.
     /// </summary>
     public class MatchResult(ElementType elementType, int matchCount, bool isHorizontal)

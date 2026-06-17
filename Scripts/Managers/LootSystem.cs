@@ -1,4 +1,4 @@
-﻿using AlJourney.Scripts.Core;
+using AlJourney.Scripts.Core;
 using AlJourney.Scripts.Data;
 using AlJourney.Scripts.Interfaces;
 using Godot;
@@ -8,7 +8,7 @@ using System.Linq;
 namespace AlJourney.Scripts.Managers
 {
     /// <summary>
-    /// Глобальный менеджер системы лута. Отвечает за генерацию экипировки 
+    /// Глобальный менеджер системы лута. Отвечает за генерацию экипировки
     /// после победы над врагами.
     /// Определяет редкость предметов и их характеристики на основе текущей волны.
     /// </summary>
@@ -21,15 +21,15 @@ namespace AlJourney.Scripts.Managers
 
         private readonly Dictionary<string, EquipmentData> _equipmentTemplates = EquipmentDatabase.Templates;
 
-        private static readonly (EquipmentRarity Rarity, float Chance)[] RarityWeights = {
+        private static readonly (EquipmentRarity Rarity, float Chance)[] RarityWeights = [
             (EquipmentRarity.Common, 40f),
             (EquipmentRarity.Uncommon, 30f),
             (EquipmentRarity.Rare, 15f),
             (EquipmentRarity.Epic, 10f),
             (EquipmentRarity.Legendary, 5f)
-        };
+        ];
 
-        private static readonly (EquipmentSlot Slot, float Chance)[] SlotWeights = {
+        private static readonly (EquipmentSlot Slot, float Chance)[] SlotWeights = [
             (EquipmentSlot.Weapon, 25f),
             (EquipmentSlot.Head, 15f),
             (EquipmentSlot.Body, 15f),
@@ -37,7 +37,7 @@ namespace AlJourney.Scripts.Managers
             (EquipmentSlot.Necklace, 15f),
             (EquipmentSlot.Ring, 7f),
             (EquipmentSlot.Earring, 8f)
-        };
+        ];
 
         /// <summary>
         /// Инициализация синглтона. Если объект уже существует, дубликат удаляется.
@@ -144,9 +144,7 @@ namespace AlJourney.Scripts.Managers
 
         private EquipmentData GenerateEquipment(EquipmentRarity rarity, EquipmentSlot slot)
         {
-            List<EquipmentData> templates = _equipmentTemplates.Values
-                .Where(item => item.Slot == slot && item.Rarity == rarity)
-                .ToList();
+            List<EquipmentData> templates = [.. _equipmentTemplates.Values.Where(item => item.Slot == slot && item.Rarity == rarity)];
 
             return templates.Count > 0
                 ? templates[GD.RandRange(0, templates.Count - 1)]

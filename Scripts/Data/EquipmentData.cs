@@ -1,4 +1,4 @@
-﻿using AlJourney.Scripts.Core;
+using AlJourney.Scripts.Core;
 using Godot;
 using System.Collections.Generic;
 using System.Linq;

@@ -196,7 +196,7 @@ namespace AlJourney.Scripts.Managers
                 window.Mode = Window.ModeEnum.Windowed;
                 window.Borderless = true;
                 window.Size = _resolution;
-                window.Position = screenPos + (screenSize - _resolution) / 2;
+                window.Position = screenPos + ((screenSize - _resolution) / 2);
             }
             else // Windowed
             {
@@ -205,7 +205,7 @@ namespace AlJourney.Scripts.Managers
                 Vector2I screenSize = DisplayServer.ScreenGetSize(screenId);
                 window.Mode = Window.ModeEnum.Windowed;
                 window.Borderless = false;
-                
+
                 Vector2I newSize = _resolution;
                 if (newSize == screenSize)
                 {
@@ -213,8 +213,12 @@ namespace AlJourney.Scripts.Managers
                 }
                 window.Size = newSize;
 
-                Vector2I centered = screenPos + (screenSize - newSize) / 2;
-                if (centered.Y <= screenPos.Y) centered.Y = screenPos.Y + 40;
+                Vector2I centered = screenPos + ((screenSize - newSize) / 2);
+                if (centered.Y <= screenPos.Y)
+                {
+                    centered.Y = screenPos.Y + 40;
+                }
+
                 window.Position = centered;
             }
 

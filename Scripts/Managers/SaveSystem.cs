@@ -1,16 +1,17 @@
-﻿using AlJourney.Scripts.Core;
+using AlJourney.Scripts.Core;
 using AlJourney.Scripts.Data;
 using AlJourney.Scripts.Interfaces;
 using Godot;
 using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using GodotFileAccess = Godot.FileAccess;
 
 namespace AlJourney.Scripts.Managers
 {
     /// <summary>
     /// Глобальный менеджер сохранения и загрузки прогресса.
-    /// Отвечает за сериализацию игровых данных 
+    /// Отвечает за сериализацию игровых данных
     /// в JSON формат и чтение из локального хранилища.
     /// </summary>
     public partial class SaveSystem : Node, ISaveSystem
@@ -90,10 +91,10 @@ namespace AlJourney.Scripts.Managers
 
                 string jsonData = JsonSerializer.Serialize(saveData, JsonOptions);
 
-                using FileAccess file = FileAccess.Open(_savePath, FileAccess.ModeFlags.Write);
+                using GodotFileAccess file = GodotFileAccess.Open(_savePath, GodotFileAccess.ModeFlags.Write);
                 if (file == null)
                 {
-                    GD.PrintErr($"[SaveSystem] Failed to open save file: {FileAccess.GetOpenError()}");
+                    GD.PrintErr($"[SaveSystem] Failed to open save file: {GodotFileAccess.GetOpenError()}");
                     _ = EmitSignal(SignalName.SaveCompleted, false);
                     return false;
                 }
@@ -114,8 +115,8 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Читает и десериализует файл сохранения. 
-        /// Если структура устарела, пытается произвести миграцию. 
+        /// Читает и десериализует файл сохранения.
+        /// Если структура устарела, пытается произвести миграцию.
         /// Проводит валидацию целостности данных.
         /// </summary>
         /// <returns>Загруженный объект SaveData, либо null в случае ошибки.</returns>
@@ -123,7 +124,7 @@ namespace AlJourney.Scripts.Managers
         {
             try
             {
-                if (!FileAccess.FileExists(_savePath))
+                if (!GodotFileAccess.FileExists(_savePath))
                 {
                     GD.Print("[SaveSystem] No save file found");
                     _ = EmitSignal(SignalName.LoadCompleted, false);
@@ -131,11 +132,11 @@ namespace AlJourney.Scripts.Managers
                 }
 
                 string jsonData;
-                using (FileAccess file = FileAccess.Open(_savePath, FileAccess.ModeFlags.Read))
+                using (GodotFileAccess file = GodotFileAccess.Open(_savePath, GodotFileAccess.ModeFlags.Read))
                 {
                     if (file == null)
                     {
-                        GD.PrintErr($"[SaveSystem] Failed to open save file: {FileAccess.GetOpenError()}");
+                        GD.PrintErr($"[SaveSystem] Failed to open save file: {GodotFileAccess.GetOpenError()}");
                         _ = EmitSignal(SignalName.LoadCompleted, false);
                         return null;
                     }
@@ -171,7 +172,7 @@ namespace AlJourney.Scripts.Managers
             }
         }
 
-        private SaveData DeserializeAndMigrate(string jsonData)
+        private static SaveData DeserializeAndMigrate(string jsonData)
         {
             SaveData saveData;
             try
@@ -211,7 +212,7 @@ namespace AlJourney.Scripts.Managers
         /// </summary>
         public bool SaveFileExists()
         {
-            return FileAccess.FileExists(_savePath);
+            return GodotFileAccess.FileExists(_savePath);
         }
 
         /// <summary>
@@ -221,7 +222,7 @@ namespace AlJourney.Scripts.Managers
         {
             try
             {
-                if (!FileAccess.FileExists(_savePath))
+                if (!GodotFileAccess.FileExists(_savePath))
                 {
                     GD.Print("[SaveSystem] No save file to delete");
                     return true;

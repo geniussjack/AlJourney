@@ -6,7 +6,7 @@ using System.Collections.Generic;
 namespace AlJourney.Scripts.Characters
 {
     /// <summary>
-    /// Основной класс игрового персонажа, наследующийся от Character. 
+    /// Основной класс игрового персонажа, наследующийся от Character.
     /// Управляет базовыми характеристиками, применением экипировки, способностями и расчетом наносимого урона.
     /// </summary>
     public partial class PlayerCharacter : Character
@@ -94,9 +94,7 @@ namespace AlJourney.Scripts.Characters
 
         private int GetAbilityStat(string statName)
         {
-            return AlJourney.Scripts.Managers.AbilitySystem.Instance == null
-                ? 0
-                : AlJourney.Scripts.Managers.AbilitySystem.Instance.GetAbilityEffect(CharacterClass, statName);
+            return (AlJourney.Scripts.Managers.AbilitySystem.Instance?.GetAbilityEffect(CharacterClass, statName)) ?? 0;
         }
 
         /// <summary>

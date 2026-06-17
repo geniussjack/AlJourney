@@ -8,6 +8,10 @@
     <RootNamespace>AlJourney</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="AlJourneyTests\**" />
+    <Content Remove="AlJourneyTests\**" />
+  </ItemGroup>
+  <ItemGroup>
     <Content Include="Resources\Sprites\Backgrounds\battle_background.png" />
     <Content Include="Resources\Sprites\Backgrounds\menu_background.png" />
     <Content Include="Resources\Sprites\Characters\arhiskeleton.png" />

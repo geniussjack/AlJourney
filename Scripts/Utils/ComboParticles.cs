@@ -1,10 +1,10 @@
-﻿using AlJourney.Scripts.Core;
+using AlJourney.Scripts.Core;
 using Godot;
 
 namespace AlJourney.Scripts.Utils
 {
     /// <summary>
-    /// Вспомогательный класс для создания визуальных эффектов и всплывающего текста 
+    /// Вспомогательный класс для создания визуальных эффектов и всплывающего текста
     /// при срабатывании комбо-эффектов, получении урона, лечении и наложении щитов.
     /// </summary>
     public partial class ComboParticles : Node2D
