@@ -196,7 +196,7 @@ namespace AlJourney.Scripts.UI
             priceLabel.Text = $"{currentStat} -> {newStat} {statName}";
             priceLabel.Modulate = canAfford ? Colors.White : Colors.Gray;
 
-            costLabel.Text = $"{button.GetNode<Control>("/root").Tr("UI_SHOP_COST")}: {price}";
+            costLabel.Text = $"{button.Tr("UI_SHOP_COST")}: {price}";
             costLabel.Modulate = canAfford ? Colors.White : Colors.Gray;
         }
 
