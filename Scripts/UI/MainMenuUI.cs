@@ -41,11 +41,11 @@ namespace AlJourney.Scripts.UI
             _creditsButton.Pressed += OnCreditsPressed;
             _quitButton.Pressed += OnQuitPressed;
 
-            _newGameButton.Text = Tr("UI_MAIN_MENU_NEW_GAME");
-            _continueButton.Text = Tr("UI_MAIN_MENU_CONTINUE");
-            _settingsButton.Text = Tr("UI_MAIN_MENU_SETTINGS");
-            _creditsButton.Text = Tr("UI_MAIN_MENU_CREDITS");
-            _quitButton.Text = Tr("UI_MAIN_MENU_QUIT");
+            _newGameButton.Text = "UI_MAIN_MENU_NEW_GAME";
+            _continueButton.Text = "UI_MAIN_MENU_CONTINUE";
+            _settingsButton.Text = "UI_MAIN_MENU_SETTINGS";
+            _creditsButton.Text = "UI_MAIN_MENU_CREDITS";
+            _quitButton.Text = "UI_MAIN_MENU_QUIT";
 
             ShowMainMenu();
 

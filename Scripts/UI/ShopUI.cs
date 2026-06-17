@@ -78,13 +78,20 @@ namespace AlJourney.Scripts.UI
             _continueButton.Pressed += OnContinuePressed;
             _homeButton.Pressed += OnHomePressed;
 
-            _continueButton.Text = Tr("UI_PAUSE_RESUME"); // Can just use continue/resume
-            _homeButton.Text = Tr("UI_PAUSE_MAIN_MENU");
+            _continueButton.Text = "UI_PAUSE_RESUME"; // Can just use continue/resume
+            _homeButton.Text = "UI_PAUSE_MAIN_MENU";
 
             GetNode<Label>("MarginContainer/VBoxContainer/ShopContainer/MageUpgrades/MageTitle").Text = Tr("UI_BATTLE_ALTARION") + " (" + Tr("CHARACTER_MAGE") + ")";
             GetNode<Label>("MarginContainer/VBoxContainer/ShopContainer/WarriorUpgrades/WarriorTitle").Text = Tr("UI_BATTLE_ALDRIC") + " (" + Tr("CHARACTER_WARRIOR") + ")";
 
-            GetNode<Label>("MarginContainer/VBoxContainer/Header/ShopTitleLabel").Text = Tr("UI_SHOP_TITLE");
+            GetNode<Label>("MarginContainer/VBoxContainer/Header/ShopTitleLabel").Text = "UI_SHOP_TITLE";
+
+            _mageHealthButton.Text = "UI_SHOP_BUY";
+            _mageDamageButton.Text = "UI_SHOP_BUY";
+            _mageDefenseButton.Text = "UI_SHOP_BUY";
+            _warriorHealthButton.Text = "UI_SHOP_BUY";
+            _warriorDamageButton.Text = "UI_SHOP_BUY";
+            _warriorDefenseButton.Text = "UI_SHOP_BUY";
 
             InitializeShop();
 
@@ -132,6 +139,7 @@ namespace AlJourney.Scripts.UI
             SaveData saveData = GameStateManager.Instance.CurrentSave;
             if (saveData == null)
             {
+                GD.PrintErr("[ShopUI] SaveData is null! Make sure the game is started via Main Menu to initialize GameStateManager.");
                 return;
             }
 

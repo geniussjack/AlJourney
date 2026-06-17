@@ -190,17 +190,24 @@ namespace AlJourney.Scripts.Managers
             }
             else if (WindowMode == 1) // Borderless
             {
+                int screenId = window.CurrentScreen;
+                Vector2I screenPos = DisplayServer.ScreenGetPosition(screenId);
+                Vector2I screenSize = DisplayServer.ScreenGetSize(screenId);
                 DisplayServer.WindowSetMode(DisplayServer.WindowMode.Windowed);
                 window.Borderless = true;
                 window.Size = _resolution;
-                window.Position = (DisplayServer.ScreenGetSize() - _resolution) / 2;
+                window.Position = screenPos + (screenSize - _resolution) / 2;
             }
             else // Windowed
             {
-                DisplayServer.WindowSetMode(DisplayServer.WindowMode.Windowed);
+                int screenId = window.CurrentScreen;
+                Vector2I screenPos = DisplayServer.ScreenGetPosition(screenId);
+                Vector2I screenSize = DisplayServer.ScreenGetSize(screenId);
                 window.Borderless = false;
                 window.Size = _resolution;
-                window.Position = (DisplayServer.ScreenGetSize() - _resolution) / 2;
+                Vector2I centered = screenPos + (screenSize - _resolution) / 2;
+                if (centered.Y <= screenPos.Y) centered.Y = screenPos.Y + 40;
+                window.Position = centered;
             }
 
             Engine.MaxFps = MaxFps;

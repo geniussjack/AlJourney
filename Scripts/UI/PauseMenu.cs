@@ -25,10 +25,10 @@ namespace AlJourney.Scripts.UI
             _saveButton = GetNode<Button>("CenterContainer/PanelContainer/MarginContainer/VBoxContainer/SaveButton");
             _mainMenuButton = GetNode<Button>("CenterContainer/PanelContainer/MarginContainer/VBoxContainer/MainMenuButton");
 
-            _titleLabel.Text = Tr("UI_PAUSE_TITLE");
-            _resumeButton.Text = Tr("UI_PAUSE_RESUME");
-            _saveButton.Text = Tr("UI_PAUSE_SAVE");
-            _mainMenuButton.Text = Tr("UI_PAUSE_MAIN_MENU");
+            _titleLabel.Text = "UI_PAUSE_TITLE";
+            _resumeButton.Text = "UI_PAUSE_RESUME";
+            _saveButton.Text = "UI_PAUSE_SAVE";
+            _mainMenuButton.Text = "UI_PAUSE_MAIN_MENU";
 
             _resumeButton.Pressed += OnResumePressed;
             _saveButton.Pressed += OnSavePressed;

@@ -85,4 +85,5 @@
     <string id="UI_SHOP_DMG" text="Урон" />
     <string id="UI_SHOP_DEF" text="Защита" />
     <string id="UI_SHOP_COST" text="Цена" />
+    <string id="UI_SHOP_BUY" text="Купить" />
 </resources>

@@ -31,9 +31,9 @@ namespace AlJourney.Scripts.UI
             _mainMenuButton.Pressed += OnMainMenuPressed;
             _newGameButton.Pressed += OnNewGamePressed;
 
-            _mainMenuButton.Text = Tr("UI_VICTORY_MAIN_MENU");
-            _newGameButton.Text = Tr("UI_MAIN_MENU_NEW_GAME"); // New Game
-            GetNode<Label>("CenterContainer/VBoxContainer/TitleLabel").Text = Tr("UI_VICTORY_TITLE");
+            _mainMenuButton.Text = "UI_VICTORY_MAIN_MENU";
+            _newGameButton.Text = "UI_MAIN_MENU_NEW_GAME"; // New Game
+            GetNode<Label>("CenterContainer/VBoxContainer/TitleLabel").Text = "UI_VICTORY_TITLE";
 
             DisplayStats();
 

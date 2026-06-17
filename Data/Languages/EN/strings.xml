@@ -85,4 +85,5 @@
     <string id="UI_SHOP_DMG" text="DMG" />
     <string id="UI_SHOP_DEF" text="DEF" />
     <string id="UI_SHOP_COST" text="Cost" />
+    <string id="UI_SHOP_BUY" text="Buy" />
 </resources>
