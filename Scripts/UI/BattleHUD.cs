@@ -322,9 +322,9 @@ namespace AlJourney.Scripts.UI
         private TextureRect _portrait;
 
         /// <summary>
-        /// Вызывается при готовности узла. Создает и настраивает визуальные элементы полоски здоровья: имя, саму полоску и текст здоровья.
+        /// Конструктор. Создает и настраивает визуальные элементы полоски здоровья: имя, саму полоску и текст здоровья.
         /// </summary>
-        public override void _Ready()
+        public EnemyHealthBar()
         {
             HBoxContainer row = new HBoxContainer();
             row.AddThemeConstantOverride("separation", 10);
