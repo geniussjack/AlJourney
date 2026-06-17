@@ -245,7 +245,7 @@ namespace AlJourney.Scripts.Managers
             }
         }
 
-        private void LoadSettings()
+        public void LoadSettings()
         {
             ConfigFile config = new();
             Error err = config.Load(SettingsPath);

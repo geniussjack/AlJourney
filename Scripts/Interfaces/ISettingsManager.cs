@@ -97,6 +97,11 @@ namespace AlJourney.Scripts.Interfaces
         void SaveSettings();
 
         /// <summary>
+        /// Загружает настройки из файла.
+        /// </summary>
+        void LoadSettings();
+
+        /// <summary>
         /// Сбрасывает все настройки игры до их значений по умолчанию.
         /// </summary>
         void ResetToDefaults();
