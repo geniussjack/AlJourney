@@ -24,6 +24,8 @@
     <string id="UI_SETTINGS_APPLY" text="Применить" />
     <string id="UI_SETTINGS_RESET" text="Сброс" />
     <string id="UI_SETTINGS_BACK" text="Назад" />
+    <string id="UI_SETTINGS_CANCEL_TITLE" text="Отмена изменений" />
+    <string id="UI_SETTINGS_CANCEL_PROMPT" text="Вы уверены, что хотите отменить внесённые изменения?" />
 
     <!-- Pause Menu -->
     <string id="UI_PAUSE_TITLE" text="Пауза" />
@@ -36,6 +38,20 @@
     <!-- Battle HUD -->
     <string id="UI_BATTLE_WAVE" text="Волна:" />
     <string id="UI_BATTLE_SCORE" text="Очки:" />
+    <string id="UI_BATTLE_SHIELD" text="Щит:" />
+    <string id="UI_BATTLE_SWAPS" text="Ходов:" />
+    <string id="CHARACTER_MAGE" text="Маг" />
+    <string id="CHARACTER_WARRIOR" text="Воин" />
+    <string id="ENEMY_SKELETON_WARRIOR" text="Скелет-воин" />
+    <string id="ENEMY_SKELETON_ARCHER" text="Скелет-лучник" />
+    <string id="ENEMY_ZOMBIE" text="Зомби" />
+    <string id="ENEMY_SLIME" text="Слайм" />
+    <string id="ENEMY_DRAUGR_WARRIOR" text="Драугр-воин" />
+    <string id="ENEMY_DRAUGR_DEFENDER" text="Драугр-защитник" />
+    <string id="ENEMY_DRAUGR_CASTER" text="Драугр-маг" />
+    <string id="ENEMY_GENERAL_OF_DRAUGR" text="Генерал Драугров" />
+    <string id="ENEMY_ARHISKELETON" text="Архискелет" />
+    <string id="ENEMY_NECROMANCER" text="Некромант" />
 
     <!-- Labels -->
     <string id="UI_ENGLISH" text="English" />

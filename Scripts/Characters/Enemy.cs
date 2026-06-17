@@ -1,4 +1,4 @@
-﻿using AlJourney.Scripts.Core;
+using AlJourney.Scripts.Core;
 using Godot;
 using System.Collections.Generic;
 
@@ -28,9 +28,9 @@ namespace AlJourney.Scripts.Characters
         /// <summary>
         /// Текущее количество существ в отряде. 
         /// </summary>
-        public int StackCount { get => Mathf.CeilToInt((float)CurrentHealth / field); private set; }
+        public int StackCount { get => _initialStackCount > 0 ? Mathf.CeilToInt((float)CurrentHealth / ((float)TotalMaxHealth / _initialStackCount)) : 1; private set { } }
 
-        public new string CharacterName => StackCount > 1 ? $"{_name} x{StackCount}" : _name;
+        public new string CharacterName => StackCount > 1 ? $"{Tr(_name)} x{StackCount}" : Tr(_name);
 
         /// <summary>
         /// Является ли данный враг мини-боссом.
@@ -42,19 +42,19 @@ namespace AlJourney.Scripts.Characters
         /// </summary>
         public bool IsBoss => EnemyType == EnemyType.Necromancer;
 
-        private static readonly Dictionary<EnemyType, (string name, int hp, int damage, int defense, AttackType attackType, int coinReward)> BaseStatsMap =
+        private static readonly Dictionary<EnemyType, (string nameKey, int hp, int damage, int defense, AttackType attackType, int coinReward)> BaseStatsMap =
             new()
             {
-                [EnemyType.SkeletonWarrior] = ("Skeleton Warrior", GameConstants.SKELETON_WARRIOR_HP, GameConstants.SKELETON_WARRIOR_DAMAGE, GameConstants.SKELETON_WARRIOR_DEFENSE, AttackType.Physical, GameConstants.COINS_PER_BASIC_ENEMY),
-                [EnemyType.SkeletonArcher] = ("Skeleton Archer", GameConstants.SKELETON_ARCHER_HP, GameConstants.SKELETON_ARCHER_DAMAGE, GameConstants.SKELETON_ARCHER_DEFENSE, AttackType.Physical, GameConstants.COINS_PER_BASIC_ENEMY),
-                [EnemyType.Zombie] = ("Zombie", GameConstants.ZOMBIE_HP, GameConstants.ZOMBIE_DAMAGE, GameConstants.ZOMBIE_DEFENSE, AttackType.Physical, GameConstants.COINS_PER_BASIC_ENEMY),
-                [EnemyType.Slime] = ("Slime", GameConstants.SLIME_HP, GameConstants.SLIME_DAMAGE, GameConstants.SLIME_DEFENSE, AttackType.Physical, GameConstants.COINS_PER_BASIC_ENEMY),
-                [EnemyType.DraugrWarrior] = ("Draugr Warrior", GameConstants.DRAUGR_WARRIOR_HP, GameConstants.DRAUGR_WARRIOR_DAMAGE, GameConstants.DRAUGR_WARRIOR_DEFENSE, AttackType.Physical, GameConstants.COINS_PER_BASIC_ENEMY),
-                [EnemyType.DraugrDefender] = ("Draugr Defender", GameConstants.DRAUGR_DEFENDER_HP, GameConstants.DRAUGR_DEFENDER_DAMAGE, GameConstants.DRAUGR_DEFENDER_DEFENSE, AttackType.Physical, GameConstants.COINS_PER_BASIC_ENEMY),
-                [EnemyType.DraugrCaster] = ("Draugr Caster", GameConstants.DRAUGR_CASTER_HP, GameConstants.DRAUGR_CASTER_DAMAGE, GameConstants.DRAUGR_CASTER_DEFENSE, AttackType.Magical, GameConstants.COINS_PER_BASIC_ENEMY),
-                [EnemyType.GeneralOfDraugr] = ("General of Draugr", GameConstants.GENERAL_DRAUGR_HP, GameConstants.GENERAL_DRAUGR_DAMAGE, GameConstants.GENERAL_DRAUGR_DEFENSE, AttackType.Physical, GameConstants.COINS_PER_MINIBOSS),
-                [EnemyType.Arhiskeleton] = ("Arhiskeleton", GameConstants.ARHISKELETON_HP, GameConstants.ARHISKELETON_DAMAGE, GameConstants.ARHISKELETON_DEFENSE, AttackType.Physical, GameConstants.COINS_PER_MINIBOSS),
-                [EnemyType.Necromancer] = ("Necromancer", GameConstants.NECROMANCER_HP, GameConstants.NECROMANCER_DAMAGE, GameConstants.NECROMANCER_DEFENSE, AttackType.Magical, GameConstants.COINS_PER_BOSS)
+                [EnemyType.SkeletonWarrior] = ("ENEMY_SKELETON_WARRIOR", GameConstants.SKELETON_WARRIOR_HP, GameConstants.SKELETON_WARRIOR_DAMAGE, GameConstants.SKELETON_WARRIOR_DEFENSE, AttackType.Physical, GameConstants.COINS_PER_BASIC_ENEMY),
+                [EnemyType.SkeletonArcher] = ("ENEMY_SKELETON_ARCHER", GameConstants.SKELETON_ARCHER_HP, GameConstants.SKELETON_ARCHER_DAMAGE, GameConstants.SKELETON_ARCHER_DEFENSE, AttackType.Physical, GameConstants.COINS_PER_BASIC_ENEMY),
+                [EnemyType.Zombie] = ("ENEMY_ZOMBIE", GameConstants.ZOMBIE_HP, GameConstants.ZOMBIE_DAMAGE, GameConstants.ZOMBIE_DEFENSE, AttackType.Physical, GameConstants.COINS_PER_BASIC_ENEMY),
+                [EnemyType.Slime] = ("ENEMY_SLIME", GameConstants.SLIME_HP, GameConstants.SLIME_DAMAGE, GameConstants.SLIME_DEFENSE, AttackType.Physical, GameConstants.COINS_PER_BASIC_ENEMY),
+                [EnemyType.DraugrWarrior] = ("ENEMY_DRAUGR_WARRIOR", GameConstants.DRAUGR_WARRIOR_HP, GameConstants.DRAUGR_WARRIOR_DAMAGE, GameConstants.DRAUGR_WARRIOR_DEFENSE, AttackType.Physical, GameConstants.COINS_PER_BASIC_ENEMY),
+                [EnemyType.DraugrDefender] = ("ENEMY_DRAUGR_DEFENDER", GameConstants.DRAUGR_DEFENDER_HP, GameConstants.DRAUGR_DEFENDER_DAMAGE, GameConstants.DRAUGR_DEFENDER_DEFENSE, AttackType.Physical, GameConstants.COINS_PER_BASIC_ENEMY),
+                [EnemyType.DraugrCaster] = ("ENEMY_DRAUGR_CASTER", GameConstants.DRAUGR_CASTER_HP, GameConstants.DRAUGR_CASTER_DAMAGE, GameConstants.DRAUGR_CASTER_DEFENSE, AttackType.Magical, GameConstants.COINS_PER_BASIC_ENEMY),
+                [EnemyType.GeneralOfDraugr] = ("ENEMY_GENERAL_OF_DRAUGR", GameConstants.GENERAL_DRAUGR_HP, GameConstants.GENERAL_DRAUGR_DAMAGE, GameConstants.GENERAL_DRAUGR_DEFENSE, AttackType.Physical, GameConstants.COINS_PER_MINIBOSS),
+                [EnemyType.Arhiskeleton] = ("ENEMY_ARHISKELETON", GameConstants.ARHISKELETON_HP, GameConstants.ARHISKELETON_DAMAGE, GameConstants.ARHISKELETON_DEFENSE, AttackType.Physical, GameConstants.COINS_PER_MINIBOSS),
+                [EnemyType.Necromancer] = ("ENEMY_NECROMANCER", GameConstants.NECROMANCER_HP, GameConstants.NECROMANCER_DAMAGE, GameConstants.NECROMANCER_DEFENSE, AttackType.Magical, GameConstants.COINS_PER_BOSS)
             };
 
         /// <summary>
@@ -92,9 +92,9 @@ namespace AlJourney.Scripts.Characters
             return enemy;
         }
 
-        private static (string name, int hp, int damage, int defense, AttackType attackType, int coinReward) GetEnemyBaseStats(EnemyType type)
+        private static (string nameKey, int hp, int damage, int defense, AttackType attackType, int coinReward) GetEnemyBaseStats(EnemyType type)
         {
-            return BaseStatsMap.TryGetValue(type, out (string name, int hp, int damage, int defense, AttackType attackType, int coinReward) stats) ? stats : ((string name, int hp, int damage, int defense, AttackType attackType, int coinReward))("Unknown Enemy", 10, 5, 0, AttackType.Physical, 1);
+            return BaseStatsMap.TryGetValue(type, out (string nameKey, int hp, int damage, int defense, AttackType attackType, int coinReward) stats) ? stats : ((string nameKey, int hp, int damage, int defense, AttackType attackType, int coinReward))("Unknown Enemy", 10, 5, 0, AttackType.Physical, 1);
         }
 
         /// <summary>

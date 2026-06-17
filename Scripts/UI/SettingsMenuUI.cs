@@ -213,10 +213,12 @@ namespace AlJourney.Scripts.UI
             GD.Print("[SettingsMenuUI] Apply pressed");
 
             SettingsManager.Instance.ApplyVideoSettings();
-
             SettingsManager.Instance.SaveSettings();
 
             _ = (AudioManager.Instance?.TryPlaySfx("res://Resources/Audio/SFX/button_click.wav"));
+
+            MainMenuUI mainMenu = GetParent() as MainMenuUI;
+            mainMenu?.OnBackToMainMenu();
         }
 
         private void OnResetPressed()
@@ -233,9 +235,30 @@ namespace AlJourney.Scripts.UI
         private void OnBackPressed()
         {
             GD.Print("[SettingsMenuUI] Back pressed");
+            _ = (AudioManager.Instance?.TryPlaySfx("res://Resources/Audio/SFX/button_click.wav"));
 
-            MainMenuUI mainMenu = GetParent() as MainMenuUI;
-            mainMenu?.OnBackToMainMenu();
+            ConfirmationDialog dialog = new()
+            {
+                Title = Tr("UI_SETTINGS_CANCEL_TITLE"),
+                DialogText = Tr("UI_SETTINGS_CANCEL_PROMPT"),
+                Theme = Theme
+            };
+
+            dialog.Confirmed += () =>
+            {
+                SettingsManager.Instance.LoadSettings();
+                SettingsManager.Instance.ApplyVideoSettings();
+                LoadCurrentSettings();
+
+                MainMenuUI mainMenu = GetParent() as MainMenuUI;
+                mainMenu?.OnBackToMainMenu();
+                dialog.QueueFree();
+            };
+
+            dialog.Canceled += () => dialog.QueueFree();
+
+            AddChild(dialog);
+            dialog.PopupCentered();
         }
     }
 }

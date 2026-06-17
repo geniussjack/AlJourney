@@ -24,6 +24,8 @@
     <string id="UI_SETTINGS_APPLY" text="Apply" />
     <string id="UI_SETTINGS_RESET" text="Reset" />
     <string id="UI_SETTINGS_BACK" text="Back" />
+    <string id="UI_SETTINGS_CANCEL_TITLE" text="Cancel Changes" />
+    <string id="UI_SETTINGS_CANCEL_PROMPT" text="Are you sure you want to cancel the changes?" />
 
     <!-- Pause Menu -->
     <string id="UI_PAUSE_TITLE" text="Game Paused" />
@@ -36,6 +38,20 @@
     <!-- Battle HUD -->
     <string id="UI_BATTLE_WAVE" text="Wave:" />
     <string id="UI_BATTLE_SCORE" text="Score:" />
+    <string id="UI_BATTLE_SHIELD" text="Shield:" />
+    <string id="UI_BATTLE_SWAPS" text="Swaps:" />
+    <string id="CHARACTER_MAGE" text="Mage" />
+    <string id="CHARACTER_WARRIOR" text="Warrior" />
+    <string id="ENEMY_SKELETON_WARRIOR" text="Skeleton Warrior" />
+    <string id="ENEMY_SKELETON_ARCHER" text="Skeleton Archer" />
+    <string id="ENEMY_ZOMBIE" text="Zombie" />
+    <string id="ENEMY_SLIME" text="Slime" />
+    <string id="ENEMY_DRAUGR_WARRIOR" text="Draugr Warrior" />
+    <string id="ENEMY_DRAUGR_DEFENDER" text="Draugr Defender" />
+    <string id="ENEMY_DRAUGR_CASTER" text="Draugr Caster" />
+    <string id="ENEMY_GENERAL_OF_DRAUGR" text="General of Draugr" />
+    <string id="ENEMY_ARHISKELETON" text="Arhiskeleton" />
+    <string id="ENEMY_NECROMANCER" text="Necromancer" />
 
     <!-- Labels -->
     <string id="UI_ENGLISH" text="English" />

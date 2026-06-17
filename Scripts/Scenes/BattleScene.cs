@@ -86,7 +86,7 @@ namespace AlJourney.Scripts.Scenes
             TextureRect slime = GetNodeOrNull<TextureRect>("CanvasLayer/DecorativeLayer/RightPanel/MarginContainer/VBoxContainer/SlimeRow/SlimePortraitContainer/SlimePortrait");
             TextureRect skeleton = GetNodeOrNull<TextureRect>("CanvasLayer/DecorativeLayer/RightPanel/MarginContainer/VBoxContainer/SkeletonRow/SkeletonPortraitContainer/SkeletonPortrait");
 
-            GD.Print($"[BattleScene] Portraits loaded: Mage={(mage != null)}, Warrior={(warrior != null)}, Slime={(slime != null)}, Skeleton={(skeleton != null)}");
+            GD.Print($"[BattleScene] Portraits loaded: Mage={mage != null}, Warrior={warrior != null}, Slime={slime != null}, Skeleton={skeleton != null}");
 
             AnimatePortrait(mage);
             AnimatePortrait(warrior);
@@ -106,7 +106,7 @@ namespace AlJourney.Scripts.Scenes
             {
                 portrait.PivotOffset = new Vector2(48, 48); // Fallback
             }
-            
+
             GD.Print($"[BattleScene] Animating portrait: {portrait.Name} with PivotOffset={portrait.PivotOffset}");
 
             Tween tween = CreateTween();

@@ -21,7 +21,7 @@ namespace AlJourney.Scripts.Managers
             Instance = this;
 
             LoadTranslations();
-            
+
             GD.Print("[LocalizationManager] Initialized");
         }
 
@@ -45,7 +45,7 @@ namespace AlJourney.Scripts.Managers
                 return;
             }
 
-            using var file = FileAccess.Open(resPath, FileAccess.ModeFlags.Read);
+            using FileAccess file = FileAccess.Open(resPath, FileAccess.ModeFlags.Read);
             string xmlContent = file.GetAsText();
 
             XmlDocument xmlDoc = new();

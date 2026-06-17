@@ -1,4 +1,4 @@
-﻿using AlJourney.Scripts.Core;
+using AlJourney.Scripts.Core;
 using AlJourney.Scripts.Data;
 using Godot;
 using System.Collections.Generic;
@@ -32,7 +32,7 @@ namespace AlJourney.Scripts.Characters
             {
                 case CharacterClass.Mage:
                     player.Initialize(
-                        "Altarion",
+                        "CHARACTER_MAGE",
                         GameConstants.MAGE_BASE_HP,
                         GameConstants.MAGE_BASE_DAMAGE,
                         GameConstants.MAGE_BASE_DEFENSE,
@@ -42,7 +42,7 @@ namespace AlJourney.Scripts.Characters
 
                 case CharacterClass.Warrior:
                     player.Initialize(
-                        "Aldric",
+                        "CHARACTER_WARRIOR",
                         GameConstants.WARRIOR_BASE_HP,
                         GameConstants.WARRIOR_BASE_DAMAGE,
                         GameConstants.WARRIOR_BASE_DEFENSE,

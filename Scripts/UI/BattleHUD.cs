@@ -1,4 +1,4 @@
-﻿using AlJourney.Scripts.Characters;
+using AlJourney.Scripts.Characters;
 using AlJourney.Scripts.Core;
 using AlJourney.Scripts.Managers;
 using AlJourney.Scripts.Match3;
@@ -22,7 +22,7 @@ namespace AlJourney.Scripts.UI
         private Label _warriorHealthLabel;
         private Label _warriorShieldLabel;
 
-        private HBoxContainer _enemiesContainer;
+        private Container _enemiesContainer;
 
         private Label _waveLabel;
         private Label _coinsLabel;
@@ -58,7 +58,10 @@ namespace AlJourney.Scripts.UI
             _mageInfoContainer = GetNode<Control>("MarginContainer/VBoxContainer/TopBar/HeroesContainer/MageInfo");
             _warriorInfoContainer = GetNode<Control>("MarginContainer/VBoxContainer/TopBar/HeroesContainer/WarriorInfo");
 
-            _enemiesContainer = GetNode<HBoxContainer>("MarginContainer/VBoxContainer/TopBar/EnemiesInfo");
+            _enemiesContainer = GetNode<Container>("../DecorativeLayer/RightPanel/MarginContainer/VBoxContainer");
+            if (_enemiesContainer == null) {
+                _enemiesContainer = GetNode<HBoxContainer>("MarginContainer/VBoxContainer/TopBar/EnemiesInfo");
+            }
 
             _waveLabel = GetNode<Label>("MarginContainer/VBoxContainer/BottomBar/WaveLabel");
             _coinsLabel = GetNode<Label>("MarginContainer/VBoxContainer/BottomBar/CoinsContainer/CoinsLabel");
@@ -72,8 +75,16 @@ namespace AlJourney.Scripts.UI
             GameStateManager.Instance.WaveChanged += OnWaveChanged;
             _comboSystem.CombosProcessed += OnCombosProcessed;
 
-            _pauseMenu = new PauseMenu();
-            AddChild(_pauseMenu);
+            PackedScene pauseScene = GD.Load<PackedScene>("res://Scenes/UI/PauseMenu.tscn");
+            if (pauseScene != null)
+            {
+                _pauseMenu = pauseScene.Instantiate<PauseMenu>();
+                AddChild(_pauseMenu);
+            }
+            else
+            {
+                GD.PrintErr("[BattleHUD] Failed to load PauseMenu.tscn");
+            }
 
             GD.Print("[BattleHUD] Initialized for dual hero system");
         }
@@ -92,8 +103,8 @@ namespace AlJourney.Scripts.UI
             _heroSystem.Mage.ShieldChanged += (shield) => UpdateHeroShield(CharacterClass.Mage, shield);
             _heroSystem.Warrior.ShieldChanged += (shield) => UpdateHeroShield(CharacterClass.Warrior, shield);
 
-            _mageNameLabel.Text = _heroSystem.Mage.CharacterName;
-            _warriorNameLabel.Text = _heroSystem.Warrior.CharacterName;
+            _mageNameLabel.Text = Tr(_heroSystem.Mage.CharacterName);
+            _warriorNameLabel.Text = Tr(_heroSystem.Warrior.CharacterName);
 
             UpdateHeroHealth(CharacterClass.Mage, _heroSystem.Mage.CurrentHealth, _heroSystem.Mage.MaxHealth);
             UpdateHeroHealth(CharacterClass.Warrior, _heroSystem.Warrior.CurrentHealth, _heroSystem.Warrior.MaxHealth);
@@ -146,7 +157,7 @@ namespace AlJourney.Scripts.UI
             if (shieldAmount > 0)
             {
                 shieldLabel.Show();
-                shieldLabel.Text = $"Shield: {shieldAmount}";
+                shieldLabel.Text = $"{Tr("UI_BATTLE_SHIELD")} {shieldAmount}";
             }
             else
             {
@@ -188,7 +199,7 @@ namespace AlJourney.Scripts.UI
         /// <param name="remainingSwaps">Количество оставшихся перемещений.</param>
         public void UpdateSwaps(int remainingSwaps)
         {
-            _swapsLabel.Text = $"Swaps: {remainingSwaps}";
+            _swapsLabel.Text = $"{Tr("UI_BATTLE_SWAPS")} {remainingSwaps}";
         }
 
         private void OnWaveChanged(int waveNumber)
@@ -198,7 +209,7 @@ namespace AlJourney.Scripts.UI
 
         private void UpdateWave(int waveNumber)
         {
-            _waveLabel.Text = $"Wave: {waveNumber}";
+            _waveLabel.Text = $"{Tr("UI_BATTLE_WAVE")} {waveNumber}";
         }
 
         private void OnCoinsChanged(int coins)
@@ -308,30 +319,52 @@ namespace AlJourney.Scripts.UI
         private Label _healthLabel;
         private Enemy _enemy;
         private AlJourney.Scripts.Utils.DamageFlash _damageFlash;
+        private TextureRect _portrait;
 
         /// <summary>
         /// Вызывается при готовности узла. Создает и настраивает визуальные элементы полоски здоровья: имя, саму полоску и текст здоровья.
         /// </summary>
         public override void _Ready()
         {
+            HBoxContainer row = new HBoxContainer();
+            row.AddThemeConstantOverride("separation", 10);
+            AddChild(row);
+
+            Control portraitContainer = new Control();
+            portraitContainer.CustomMinimumSize = new Vector2(96, 96);
+            row.AddChild(portraitContainer);
+
+            _portrait = new TextureRect();
+            _portrait.SetAnchorsPreset(LayoutPreset.Center);
+            _portrait.GrowHorizontal = GrowDirection.Both;
+            _portrait.GrowVertical = GrowDirection.Both;
+            _portrait.ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize;
+            _portrait.StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered;
+            _portrait.CustomMinimumSize = new Vector2(96, 96);
+            portraitContainer.AddChild(_portrait);
+
+            VBoxContainer textContainer = new VBoxContainer();
+            textContainer.AddThemeConstantOverride("separation", 2);
+            row.AddChild(textContainer);
+
             _nameLabel = new Label
             {
-                HorizontalAlignment = HorizontalAlignment.Center
+                HorizontalAlignment = HorizontalAlignment.Left
             };
-            AddChild(_nameLabel);
+            textContainer.AddChild(_nameLabel);
 
             _healthBar = new ProgressBar
             {
                 CustomMinimumSize = new Vector2(150, 20),
                 ShowPercentage = false
             };
-            AddChild(_healthBar);
+            textContainer.AddChild(_healthBar);
 
             _healthLabel = new Label
             {
                 HorizontalAlignment = HorizontalAlignment.Center
             };
-            AddChild(_healthLabel);
+            textContainer.AddChild(_healthLabel);
         }
 
         /// <summary>
@@ -345,6 +378,12 @@ namespace AlJourney.Scripts.UI
             _enemy.CharacterDied += OnEnemyDied;
 
             _nameLabel.Text = _enemy.CharacterName;
+            
+            string spritePath = _enemy.EnemyType switch {
+                EnemyType.Slime => "res://Resources/Sprites/Characters/slime_sprite.png",
+                _ => "res://Resources/Sprites/Characters/skeleton_sprite.png"
+            };
+            _portrait.Texture = GD.Load<Texture2D>(spritePath);
             UpdateHealth(_enemy.CurrentHealth, _enemy.MaxHealth);
 
             _healthBar.Modulate = _enemy.IsBoss ? Colors.Purple : _enemy.IsMiniboss ? Colors.Orange : Colors.Red;

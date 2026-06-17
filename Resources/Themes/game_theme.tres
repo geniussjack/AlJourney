@@ -1,6 +1,6 @@
 [gd_resource type="Theme" load_steps=4 format=3 uid="uid://d0twkb22dvira"]
 
-[ext_resource type="FontFile" uid="uid://bi5xgtq1w03qd" path="res://Resources/Fonts/m5x7.ttf" id="1_font"]
+[ext_resource type="FontFile" uid="uid://dl0mr2byrt8fm" path="res://Resources/Fonts/Comic Sans MS Pixel.ttf" id="1_font"]
 [ext_resource type="Texture2D" uid="uid://cacp5of8tpr6e" path="res://Resources/Sprites/UI/Wooden Pixel Art GUI 32x32.png" id="2_atlas"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_panel"]
