@@ -88,7 +88,7 @@ namespace AlJourney.Scripts.Managers
                 return;
             }
 
-            _ = CallDeferred(nameof(DeferredSceneChange), scenePath);
+            Callable.From<string>(DeferredSceneChange).CallDeferred(scenePath);
         }
 
         /// <summary>

@@ -335,7 +335,7 @@ namespace AlJourney.Scripts.Battle
 
             if (Enemies.All(e => !e.IsAlive))
             {
-                _ = CallDeferred(MethodName.OnWaveCompleted);
+                Callable.From(OnWaveCompleted).CallDeferred();
             }
         }
 

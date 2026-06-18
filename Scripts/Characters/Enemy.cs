@@ -163,5 +163,13 @@ namespace AlJourney.Scripts.Characters
             DarkBolt,
             WeakeningDarkness
         }
+
+        protected override void OnDeath()
+        {
+            base.OnDeath();
+            Tween tween = CreateTween();
+            _ = tween.TweenProperty(this, "modulate:a", 0.0f, 0.5f);
+            _ = tween.TweenCallback(Callable.From(QueueFree));
+        }
     }
 }
