@@ -345,6 +345,18 @@ namespace AlJourney.Scripts.Match3
                     _grid[x, y] = new ElementData((ElementType)(1 + ((x + y) % 4)), x, y);
                 }
             }
+
+            // Гарантируем наличие как минимум одного валидного хода без изначальных совпадений
+            // Свап (0,0) и (0,1) по вертикали или (0,0) и (1,0) по горизонтали создаст совпадение
+            if (GridSize >= 4)
+            {
+                _grid[0, 0] = new ElementData((ElementType)1, 0, 0);
+                _grid[1, 0] = new ElementData((ElementType)2, 1, 0);
+                _grid[1, 1] = new ElementData((ElementType)1, 1, 1);
+                _grid[2, 1] = new ElementData((ElementType)1, 2, 1);
+                _grid[3, 1] = new ElementData((ElementType)2, 3, 1);
+            }
+
             _ = EmitSignal(SignalName.GridRefillCompleted);
         }
 
