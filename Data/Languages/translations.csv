@@ -33,7 +33,7 @@ UI_BATTLE_ALDRIC,Aldric,Элдрик
 UI_PAUSE_SAVE,Save Game,Сохранить
 CHARACTER_MAGE,Mage,Маг
 CHARACTER_WARRIOR,Warrior,Воин
-ENEMY_SKELETON_WARRIOR,Skeleton Warrior,Скелет-воин
+ENEMY_SKELETON_WARRIOR,Skeleton,Скелет
 ENEMY_SKELETON_ARCHER,Skeleton Archer,Скелет-лучник
 ENEMY_ZOMBIE,Zombie,Зомби
 ENEMY_SLIME,Slime,Слайм
