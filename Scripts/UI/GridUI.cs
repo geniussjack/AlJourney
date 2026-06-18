@@ -110,10 +110,6 @@ namespace AlJourney.Scripts.UI
             }
 
             PlayerCharacter hero = _heroSystem.GetHeroForElement(clickedElement.Data.Type);
-            if (hero?.IsAlive == false)
-            {
-                return;
-            }
 
             if (_selectedElement == null)
             {
@@ -243,6 +239,11 @@ namespace AlJourney.Scripts.UI
             for (int i = 0; i < effects.Count && i < matches.Count; i++)
             {
                 ComboEffect effect = effects[i];
+                if (effect == null)
+                {
+                    continue;
+                }
+
                 MatchResult match = matches[i];
                 Vector2 centerPos = CalculateMatchCenter(match);
 

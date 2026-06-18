@@ -198,6 +198,14 @@ namespace AlJourney.Scripts.Battle
             }
 
             List<ComboEffect> comboEffects = _comboSystem.ProcessMatches(matches, isCascade);
+            for (int i = 0; i < comboEffects.Count; i++)
+            {
+                PlayerCharacter activeHero = HeroSystem.GetHeroForElement(comboEffects[i].ElementType);
+                if (activeHero?.IsAlive == false)
+                {
+                    comboEffects[i] = null;
+                }
+            }
             _accumulatedEffects.AddRange(comboEffects);
 
             _gridUI?.VisualizeMatchesAndEffects(matches, comboEffects);
@@ -217,6 +225,11 @@ namespace AlJourney.Scripts.Battle
 
             foreach (ComboEffect effect in _accumulatedEffects)
             {
+                if (effect == null)
+                {
+                    continue;
+                }
+                
                 ApplyComboEffect(effect);
                 _ = await ToSignal(GetTree().CreateTimer(0.3f), SceneTreeTimer.SignalName.Timeout);
             }

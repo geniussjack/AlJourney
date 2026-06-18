@@ -29,20 +29,19 @@ InventoryManager="*res://Scripts/Managers/InventoryManager.cs"
 LootSystem="*res://Scripts/Managers/LootSystem.cs"
 AbilitySystem="*res://Scripts/Managers/AbilitySystem.cs"
 
-[internationalization]
-
-locale/translations=PackedStringArray("res://Data/Languages/translations.en.translation", "res://Data/Languages/translations.ru.translation")
 [display]
 
 window/size/viewport_width=1920
 window/size/viewport_height=1080
 window/stretch/mode="canvas_items"
-window/stretch/aspect="keep"
-window/stretch/scale_mode="fractional"
 
 [dotnet]
 
 project/assembly_name="AlJourney"
+
+[internationalization]
+
+locale/translations=PackedStringArray("res://Data/Languages/translations.en.translation", "res://Data/Languages/translations.ru.translation")
 
 [rendering]
 
