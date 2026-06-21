@@ -41,7 +41,6 @@ mouse_filter = 2
 custom_minimum_size = Vector2(150, 40)
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
-disabled = true
 text = "UI_INVENTORY"
 
 [node name="Spacer" type="Control" parent="MarginContainer/VBoxContainer"]
