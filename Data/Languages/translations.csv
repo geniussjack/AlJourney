@@ -93,3 +93,13 @@ WPN_NAME_LEATHER_ARMOR,Leather Armor,Кожаная броня
 WPN_NAME_DRAGON_SCALES,Dragon Scales,Чешуя дракона
 WPN_NAME_POWER_RING,Ring of Power,Кольцо силы
 WPN_NAME_LIFE_AMULET,Amulet of Life,Амулет жизни
+UI_CREDITS_GAME_TITLE,Altarion's Journey,Altarion's Journey
+UI_CREDITS_SUBTITLE,A Match-3 RPG Roguelike,Match-3 RPG Рогалик
+UI_CREDITS_TEAM_TITLE,Development Team,Команда Разработчиков
+UI_CREDITS_PROGRAMMING,Game Design & Programming,Геймдизайн и Программирование
+UI_CREDITS_ART,Art & Graphics,Арт и Графика
+UI_CREDITS_AUDIO,Audio,Звук
+UI_CREDITS_THANKS,Special Thanks,Особая благодарность
+UI_CREDITS_BUILT_WITH,Built with,Создано с помощью
+UI_CREDITS_COPYRIGHT,(C) 2026 All Rights Reserved,(C) 2026 Все права защищены
+AUTHOR_NAME,Maksimov Daniil,Максимов Даниил

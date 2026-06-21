@@ -21,6 +21,7 @@ namespace AlJourney.Scripts.UI
 
             _backButton.Pressed += OnBackPressed;
 
+
             SetupCreditsContent();
 
             GD.Print("[CreditsUI] Initialized");
@@ -29,36 +30,36 @@ namespace AlJourney.Scripts.UI
         private void SetupCreditsContent()
         {
             _creditsText.BbcodeEnabled = true;
-            _creditsText.Text = @"[center][b][font_size=32]AlJourney[/font_size][/b]
+            _creditsText.Text = $@"[center][b][font_size=32]{Tr("UI_CREDITS_GAME_TITLE")}[/font_size][/b]
 
-[font_size=20]A Match-3 RPG Roguelike[/font_size]
-
-[font_size=16]-------------------------[/font_size]
-
-[b]Development Team[/b]
-
-[b]Game Design & Programming[/b]
-Your Name Here
-
-[b]Art & Graphics[/b]
-Placeholder Assets
-
-[b]Audio[/b]
-Placeholder Sounds
+[font_size=20]{Tr("UI_CREDITS_SUBTITLE")}[/font_size]
 
 [font_size=16]-------------------------[/font_size]
 
-[b]Special Thanks[/b]
+[b]{Tr("UI_CREDITS_TEAM_TITLE")}[/b]
+
+[b]{Tr("UI_CREDITS_PROGRAMMING")}[/b]
+{Tr("AUTHOR_NAME")}
+
+[b]{Tr("UI_CREDITS_ART")}[/b]
+{Tr("AUTHOR_NAME")}
+
+[b]{Tr("UI_CREDITS_AUDIO")}[/b]
+{Tr("AUTHOR_NAME")}
+
+[font_size=16]-------------------------[/font_size]
+
+[b]{Tr("UI_CREDITS_THANKS")}[/b]
 Godot Engine Team
 Community Contributors
 
 [font_size=16]-------------------------[/font_size]
 
-[b]Built with[/b]
+[b]{Tr("UI_CREDITS_BUILT_WITH")}[/b]
 Godot Engine 4.5.1
 C# / .NET 10.0
 
-[font_size=14](C) 2026 All Rights Reserved[/font_size][/center]";
+[font_size=14]{Tr("UI_CREDITS_COPYRIGHT")}[/font_size][/center]";
         }
 
         private void OnBackPressed()
