@@ -332,29 +332,22 @@ namespace AlJourney.Scripts.Characters
                 return;
             }
 
-            List<StatusEffectData> effectsToRemove = [];
-
-            foreach (StatusEffectData effect in _activeEffects)
+            for (int i = _activeEffects.Count - 1; i >= 0; i--)
             {
+                StatusEffectData effect = _activeEffects[i];
                 ApplyEffectTick(effect);
 
                 StatusEffectData updatedEffect = effect.TickDuration();
                 if (updatedEffect.ShouldRemove)
                 {
-                    effectsToRemove.Add(effect);
+                    _activeEffects.RemoveAt(i);
+                    _ = EmitSignal(SignalName.StatusEffectRemoved, (int)effect.Type);
+                    GD.Print($"[{_name}] Status effect expired: {effect.Type}");
                 }
                 else
                 {
-                    int index = _activeEffects.IndexOf(effect);
-                    _activeEffects[index] = updatedEffect;
+                    _activeEffects[i] = updatedEffect;
                 }
-            }
-
-            foreach (StatusEffectData effect in effectsToRemove)
-            {
-                _ = _activeEffects.Remove(effect);
-                _ = EmitSignal(SignalName.StatusEffectRemoved, (int)effect.Type);
-                GD.Print($"[{_name}] Status effect expired: {effect.Type}");
             }
 
             if (!IsAlive)

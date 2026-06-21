@@ -277,32 +277,39 @@ namespace AlJourney.Scripts.Battle
         {
             ChangePhase(BattlePhase.EnemyTurn);
 
-            List<Enemy> activeEnemies = [.. Enemies.Where(e => e.IsAlive)];
-            foreach (Enemy enemy in activeEnemies)
+            try
             {
-                enemy.ProcessStatusEffects();
-            }
-
-            foreach (Enemy enemy in activeEnemies)
-            {
-                if (!enemy.IsAlive)
+                List<Enemy> activeEnemies = [.. Enemies.Where(e => e.IsAlive)];
+                foreach (Enemy enemy in activeEnemies)
                 {
-                    continue;
+                    enemy.ProcessStatusEffects();
                 }
 
-                EnemyAIController.PerformEnemyAction(enemy, this, _cameraShake);
-                _ = await ToSignal(GetTree().CreateTimer(0.5f), SceneTreeTimer.SignalName.Timeout);
-            }
+                foreach (Enemy enemy in activeEnemies)
+                {
+                    if (!enemy.IsAlive)
+                    {
+                        continue;
+                    }
 
-            if (!HeroSystem.IsAnyAlive)
-            {
-                return;
-            }
+                    EnemyAIController.PerformEnemyAction(enemy, this, _cameraShake);
+                    _ = await ToSignal(GetTree().CreateTimer(0.5f), SceneTreeTimer.SignalName.Timeout);
+                }
 
-            if (Enemies.All(e => !e.IsAlive))
+                if (!HeroSystem.IsAnyAlive)
+                {
+                    return;
+                }
+
+                if (Enemies.All(e => !e.IsAlive))
+                {
+                    OnWaveCompleted();
+                    return;
+                }
+            }
+            catch (System.Exception ex)
             {
-                OnWaveCompleted();
-                return;
+                GD.PrintErr($"[BattleManager] Error during enemy turn: {ex}");
             }
 
             StartNextTurn();
