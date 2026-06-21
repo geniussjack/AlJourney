@@ -211,7 +211,25 @@ namespace AlJourney.Scripts.UI
 
         private void OnClosePressed()
         {
+            // Find the GridUI in the scene and refresh it
+            GridUI gridUi = GetTree().Root.GetNodeOrNull<GridUI>("BattleScene/Grid/GridUI"); // Or use an event/signal. The simplest is a tree lookup if the path is known, but better to use a signal or find the node.
+            
+            // Let's use a dynamic search to be safe
+            FindAndRefreshGrid(GetTree().Root);
+
             QueueFree();
+        }
+
+        private void FindAndRefreshGrid(Node node)
+        {
+            if (node is GridUI grid)
+            {
+                grid.RefreshTextures();
+            }
+            foreach (Node child in node.GetChildren())
+            {
+                FindAndRefreshGrid(child);
+            }
         }
 
         public override void _Process(double delta)

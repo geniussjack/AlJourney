@@ -1,6 +1,7 @@
 using AlJourney.Scripts.Characters;
 using AlJourney.Scripts.Core;
 using AlJourney.Scripts.Match3;
+using AlJourney.Scripts.Managers;
 using AlJourney.Scripts.Utils;
 using Godot;
 using System.Collections.Generic;
@@ -73,11 +74,32 @@ namespace AlJourney.Scripts.UI
         {
             _elementTextures = new Dictionary<ElementType, Texture2D>
             {
-                [ElementType.Fire] = LoadOrCreateTexture("res://Resources/Sprites/Elements/fire_icon.png", Colors.Red),
                 [ElementType.Heal] = LoadOrCreateTexture("res://Resources/Sprites/Elements/heal_icon.png", Colors.Green),
-                [ElementType.Sword] = LoadOrCreateTexture("res://Resources/Sprites/Elements/sword_icon.png", Colors.Orange),
                 [ElementType.Shield] = LoadOrCreateTexture("res://Resources/Sprites/Elements/shield_icon.png", Colors.Blue)
             };
+
+            // Load Mage weapon (Fire element)
+            AlJourney.Scripts.Data.EquipmentData mageWeapon = InventoryManager.Instance?.GetEquippedItem(CharacterClass.Mage, EquipmentSlot.Weapon);
+            string mageSprite = mageWeapon?.Id != null ? $"res://Resources/Sprites/Elements/{mageWeapon.Id}_sprite.png" : "res://Resources/Sprites/Elements/fireball_sprite.png";
+            if (mageWeapon?.Id == "fireball") mageSprite = "res://Resources/Sprites/Elements/fireball_sprite.png"; // Fallback to ensure
+            if (!ResourceLoader.Exists(mageSprite)) mageSprite = "res://Resources/Sprites/Elements/fire_icon.png";
+            _elementTextures[ElementType.Fire] = LoadOrCreateTexture(mageSprite, Colors.Red);
+
+            // Load Warrior weapon (Sword element)
+            AlJourney.Scripts.Data.EquipmentData warriorWeapon = InventoryManager.Instance?.GetEquippedItem(CharacterClass.Warrior, EquipmentSlot.Weapon);
+            string warriorSprite = warriorWeapon?.Id != null ? $"res://Resources/Sprites/Elements/{warriorWeapon.Id}_sprite.png" : "res://Resources/Sprites/Elements/sword_icon.png";
+            if (warriorWeapon?.Id == "sword") warriorSprite = "res://Resources/Sprites/Elements/sword_icon.png";
+            if (!ResourceLoader.Exists(warriorSprite)) warriorSprite = "res://Resources/Sprites/Elements/sword_icon.png";
+            _elementTextures[ElementType.Sword] = LoadOrCreateTexture(warriorSprite, Colors.Orange);
+        }
+
+        public void RefreshTextures()
+        {
+            LoadElementTextures();
+            foreach (var kvp in _spriteMap)
+            {
+                kvp.Value.SetTexture(_elementTextures[kvp.Key.Type]);
+            }
         }
 
         private static Texture2D LoadOrCreateTexture(string path, Color fallbackColor)

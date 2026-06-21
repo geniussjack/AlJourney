@@ -55,6 +55,9 @@ namespace AlJourney.Scripts.Characters
         [Signal]
         public delegate void CharacterDiedEventHandler();
 
+        [Signal]
+        public delegate void StatusEffectAddedEventHandler(int effectType, int duration, int power);
+
         protected string _name;
         protected int _maxHealth;
         protected int _currentHealth;
@@ -284,14 +287,8 @@ namespace AlJourney.Scripts.Characters
         /// <param name="effect">Объект с данными статусного эффекта.</param>
         public virtual void ApplyStatusEffect(StatusEffectData effect)
         {
-            if (!IsAlive || effect == null)
+            if (!IsAlive || HasStatusEffect(StatusEffect.Immunity))
             {
-                return;
-            }
-
-            if (HasStatusEffect(StatusEffect.Immunity))
-            {
-                GD.Print($"[{_name}] Immune to status effect: {effect.Type}");
                 return;
             }
 
@@ -307,9 +304,10 @@ namespace AlJourney.Scripts.Characters
             else
             {
                 _activeEffects.Add(effect);
-                _ = EmitSignal(SignalName.StatusEffectApplied, (int)effect.Type);
-                GD.Print($"[{_name}] Applied status effect: {effect.Type} for {effect.Duration} turns");
             }
+            
+            _ = EmitSignal(SignalName.StatusEffectAdded, (int)effect.Type, effect.Duration, effect.Power);
+            GD.Print($"[{_name}] Applied status effect: {effect.Type} for {effect.Duration} turns");
         }
 
         /// <summary>

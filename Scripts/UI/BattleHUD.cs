@@ -35,6 +35,8 @@ namespace AlJourney.Scripts.UI
 
         private Control _mageInfoContainer;
         private Control _warriorInfoContainer;
+        private HBoxContainer _mageStatusContainer;
+        private HBoxContainer _warriorStatusContainer;
 
         private AlJourney.Scripts.Utils.DamageFlash _mageDamageFlash;
         private AlJourney.Scripts.Utils.DamageFlash _warriorDamageFlash;
@@ -119,7 +121,54 @@ namespace AlJourney.Scripts.UI
             _heroSystem.Warrior.DamageTaken += (_) => _warriorDamageFlash.FlashDamage();
             _heroSystem.Warrior.Healed += (_) => _warriorDamageFlash.FlashHeal();
 
+            _mageStatusContainer = new HBoxContainer() { Alignment = BoxContainer.AlignmentMode.Center };
+            _mageInfoContainer.AddChild(_mageStatusContainer);
+            _warriorStatusContainer = new HBoxContainer() { Alignment = BoxContainer.AlignmentMode.Center };
+            _warriorInfoContainer.AddChild(_warriorStatusContainer);
+
+            _heroSystem.Mage.StatusEffectAdded += (effectType, duration, power) => UpdateHeroStatusEffects(CharacterClass.Mage);
+            _heroSystem.Mage.StatusEffectRemoved += (effectType) => UpdateHeroStatusEffects(CharacterClass.Mage);
+            _heroSystem.Warrior.StatusEffectAdded += (effectType, duration, power) => UpdateHeroStatusEffects(CharacterClass.Warrior);
+            _heroSystem.Warrior.StatusEffectRemoved += (effectType) => UpdateHeroStatusEffects(CharacterClass.Warrior);
+
             GD.Print($"[BattleHUD] Initialized for {_heroSystem.Mage.CharacterName} and {_heroSystem.Warrior.CharacterName}");
+        }
+
+        private void UpdateHeroStatusEffects(CharacterClass heroClass)
+        {
+            HBoxContainer container = heroClass == CharacterClass.Mage ? _mageStatusContainer : _warriorStatusContainer;
+            Character hero = heroClass == CharacterClass.Mage ? _heroSystem.Mage : _heroSystem.Warrior;
+
+            foreach (Node child in container.GetChildren())
+            {
+                child.QueueFree();
+            }
+
+            foreach (var effect in hero.GetActiveEffects())
+            {
+                Color rectColor = Colors.White;
+                switch (effect.Type)
+                {
+                    case StatusEffect.Burning: rectColor = Colors.Orange; break;
+                    case StatusEffect.Bleeding: rectColor = Colors.Red; break;
+                    case StatusEffect.Freeze: rectColor = Colors.Aqua; break;
+                    case StatusEffect.Shock: rectColor = Colors.Yellow; break;
+                    case StatusEffect.Vulnerable: rectColor = Colors.Purple; break;
+                    case StatusEffect.Stunned: rectColor = Colors.Gray; break;
+                    case StatusEffect.Weakened: rectColor = Colors.Brown; break;
+                    case StatusEffect.ShieldReflect: rectColor = Colors.LightBlue; break;
+                    case StatusEffect.Immunity: rectColor = Colors.Gold; break;
+                    case StatusEffect.Regeneration: rectColor = Colors.Green; break;
+                }
+
+                ColorRect icon = new ColorRect()
+                {
+                    CustomMinimumSize = new Vector2(16, 16),
+                    Color = rectColor,
+                    TooltipText = $"{effect.Type} (Осталось: {effect.Duration})"
+                };
+                container.AddChild(icon);
+            }
         }
 
         private void OnHeroHealthChanged(CharacterClass heroClass, int currentHealth, int maxHealth)
@@ -368,6 +417,8 @@ namespace AlJourney.Scripts.UI
             textContainer.AddChild(_healthLabel);
         }
 
+        private HBoxContainer _statusContainer;
+
         /// <summary>
         /// Инициализирует полоску здоровья данными конкретного врага, подписывается на его события изменения здоровья и смерти, а также настраивает цвет в зависимости от типа врага.
         /// </summary>
@@ -395,6 +446,49 @@ namespace AlJourney.Scripts.UI
             AddChild(_damageFlash);
             _enemy.DamageTaken += (_) => _damageFlash.FlashDamage();
             _enemy.Healed += (_) => _damageFlash.FlashHeal();
+
+            _statusContainer = new HBoxContainer() { Alignment = BoxContainer.AlignmentMode.Center };
+            // Add _statusContainer to the text container below the health label
+            var textContainer = _healthLabel.GetParent();
+            textContainer.AddChild(_statusContainer);
+
+            _enemy.StatusEffectAdded += (effectType, duration, power) => UpdateStatusEffects();
+            _enemy.StatusEffectRemoved += (effectType) => UpdateStatusEffects();
+            UpdateStatusEffects();
+        }
+
+        private void UpdateStatusEffects()
+        {
+            foreach (Node child in _statusContainer.GetChildren())
+            {
+                child.QueueFree();
+            }
+
+            foreach (var effect in _enemy.GetActiveEffects())
+            {
+                Color rectColor = Colors.White;
+                switch (effect.Type)
+                {
+                    case StatusEffect.Burning: rectColor = Colors.Orange; break;
+                    case StatusEffect.Bleeding: rectColor = Colors.Red; break;
+                    case StatusEffect.Freeze: rectColor = Colors.Aqua; break;
+                    case StatusEffect.Shock: rectColor = Colors.Yellow; break;
+                    case StatusEffect.Vulnerable: rectColor = Colors.Purple; break;
+                    case StatusEffect.Stunned: rectColor = Colors.Gray; break;
+                    case StatusEffect.Weakened: rectColor = Colors.Brown; break;
+                    case StatusEffect.ShieldReflect: rectColor = Colors.LightBlue; break;
+                    case StatusEffect.Immunity: rectColor = Colors.Gold; break;
+                    case StatusEffect.Regeneration: rectColor = Colors.Green; break;
+                }
+
+                ColorRect icon = new ColorRect()
+                {
+                    CustomMinimumSize = new Vector2(12, 12),
+                    Color = rectColor,
+                    TooltipText = $"{effect.Type} (Осталось: {effect.Duration})"
+                };
+                _statusContainer.AddChild(icon);
+            }
         }
 
         private void AnimatePortrait()
