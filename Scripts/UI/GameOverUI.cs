@@ -29,9 +29,9 @@ namespace AlJourney.Scripts.UI
             _mainMenuButton.Pressed += OnMainMenuPressed;
             _newGameButton.Pressed += OnNewGamePressed;
 
-            _mainMenuButton.Text = "UI_GAMEOVER_MAIN_MENU";
-            _newGameButton.Text = "UI_GAMEOVER_RETRY";
-            GetNode<Label>("CenterContainer/VBoxContainer/TitleLabel").Text = "UI_GAMEOVER_TITLE";
+            _mainMenuButton.Text = Tr("UI_GAMEOVER_MAIN_MENU");
+            _newGameButton.Text = Tr("UI_GAMEOVER_RETRY");
+            GetNode<Label>("CenterContainer/VBoxContainer/TitleLabel").Text = Tr("UI_GAMEOVER_TITLE");
 
             DisplayStats();
 

@@ -319,15 +319,15 @@ namespace AlJourney.Scripts.UI
             }
         }
 
-        private static string GetEffectText(ComboEffect effect)
+        private string GetEffectText(ComboEffect effect)
         {
             return effect.ElementType switch
             {
-                ElementType.Fire => $"🔥 {effect.Damage} DMG!",
-                ElementType.Heal => $"💚 +{effect.Healing} HP!",
-                ElementType.Sword => $"⚔️ {effect.Damage} DMG!",
-                ElementType.Shield => $"🛡️ +{effect.Shield} Shield!",
-                _ => "Combo!"
+                ElementType.Fire => $"🔥 {effect.Damage} {Tr("UI_DMG_SHORT")}!",
+                ElementType.Heal => $"💚 +{effect.Healing} {Tr("UI_HP_SHORT")}!",
+                ElementType.Sword => $"⚔️ {effect.Damage} {Tr("UI_DMG_SHORT")}!",
+                ElementType.Shield => $"🛡️ +{effect.Shield} {Tr("UI_SHIELD_SHORT")}!",
+                _ => Tr("UI_COMBO")
             };
         }
 
@@ -454,7 +454,7 @@ namespace AlJourney.Scripts.UI
                 _gridSize * (CELL_SIZE + CELL_SPACING) / 2
             );
 
-            string cascadeText = $"⚡ CASCADE x{cascadeLevel}! ⚡";
+            string cascadeText = $"⚡ {Tr("UI_CASCADE")} x{cascadeLevel}! ⚡";
             Color cascadeColor = new(1.0f, 0.8f, 0.0f);
             ComboParticles.SpawnFloatingText(this, centerPos, cascadeText, cascadeColor);
         }

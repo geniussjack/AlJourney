@@ -150,26 +150,30 @@ namespace AlJourney.Scripts.UI
             foreach (var effect in hero.GetActiveEffects())
             {
                 Color rectColor = Colors.White;
+                string iconEmoji = "❓";
                 switch (effect.Type)
                 {
-                    case StatusEffect.Burning: rectColor = Colors.Orange; break;
-                    case StatusEffect.Bleeding: rectColor = Colors.Red; break;
-                    case StatusEffect.Freeze: rectColor = Colors.Aqua; break;
-                    case StatusEffect.Shock: rectColor = Colors.Yellow; break;
-                    case StatusEffect.Vulnerable: rectColor = Colors.Purple; break;
-                    case StatusEffect.Stunned: rectColor = Colors.Gray; break;
-                    case StatusEffect.Weakened: rectColor = Colors.Brown; break;
-                    case StatusEffect.ShieldReflect: rectColor = Colors.LightBlue; break;
-                    case StatusEffect.Immunity: rectColor = Colors.Gold; break;
-                    case StatusEffect.Regeneration: rectColor = Colors.Green; break;
+                    case StatusEffect.Burning: iconEmoji = "🔥"; rectColor = Colors.Orange; break;
+                    case StatusEffect.Bleeding: iconEmoji = "🩸"; rectColor = Colors.Red; break;
+                    case StatusEffect.Freeze: iconEmoji = "❄️"; rectColor = Colors.Aqua; break;
+                    case StatusEffect.Shock: iconEmoji = "⚡"; rectColor = Colors.Yellow; break;
+                    case StatusEffect.Vulnerable: iconEmoji = "💔"; rectColor = Colors.Purple; break;
+                    case StatusEffect.Stunned: iconEmoji = "💫"; rectColor = Colors.Gray; break;
+                    case StatusEffect.Weakened: iconEmoji = "📉"; rectColor = Colors.Brown; break;
+                    case StatusEffect.ShieldReflect: iconEmoji = "🛡️"; rectColor = Colors.LightBlue; break;
+                    case StatusEffect.Immunity: iconEmoji = "✨"; rectColor = Colors.Gold; break;
+                    case StatusEffect.Regeneration: iconEmoji = "💚"; rectColor = Colors.Green; break;
                 }
 
-                ColorRect icon = new ColorRect()
+                Label icon = new Label()
                 {
-                    CustomMinimumSize = new Vector2(16, 16),
-                    Color = rectColor,
-                    TooltipText = $"{effect.Type} (Осталось: {effect.Duration})"
+                    Text = iconEmoji,
+                    Modulate = rectColor,
+                    TooltipText = $"{effect.Type} (Осталось: {effect.Duration})",
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center
                 };
+                icon.AddThemeFontSizeOverride("font_size", 24);
                 container.AddChild(icon);
             }
         }
@@ -484,26 +488,30 @@ namespace AlJourney.Scripts.UI
             foreach (var effect in _enemy.GetActiveEffects())
             {
                 Color rectColor = Colors.White;
+                string iconEmoji = "❓";
                 switch (effect.Type)
                 {
-                    case StatusEffect.Burning: rectColor = Colors.Orange; break;
-                    case StatusEffect.Bleeding: rectColor = Colors.Red; break;
-                    case StatusEffect.Freeze: rectColor = Colors.Aqua; break;
-                    case StatusEffect.Shock: rectColor = Colors.Yellow; break;
-                    case StatusEffect.Vulnerable: rectColor = Colors.Purple; break;
-                    case StatusEffect.Stunned: rectColor = Colors.Gray; break;
-                    case StatusEffect.Weakened: rectColor = Colors.Brown; break;
-                    case StatusEffect.ShieldReflect: rectColor = Colors.LightBlue; break;
-                    case StatusEffect.Immunity: rectColor = Colors.Gold; break;
-                    case StatusEffect.Regeneration: rectColor = Colors.Green; break;
+                    case StatusEffect.Burning: iconEmoji = "🔥"; rectColor = Colors.Orange; break;
+                    case StatusEffect.Bleeding: iconEmoji = "🩸"; rectColor = Colors.Red; break;
+                    case StatusEffect.Freeze: iconEmoji = "❄️"; rectColor = Colors.Aqua; break;
+                    case StatusEffect.Shock: iconEmoji = "⚡"; rectColor = Colors.Yellow; break;
+                    case StatusEffect.Vulnerable: iconEmoji = "💔"; rectColor = Colors.Purple; break;
+                    case StatusEffect.Stunned: iconEmoji = "💫"; rectColor = Colors.Gray; break;
+                    case StatusEffect.Weakened: iconEmoji = "📉"; rectColor = Colors.Brown; break;
+                    case StatusEffect.ShieldReflect: iconEmoji = "🛡️"; rectColor = Colors.LightBlue; break;
+                    case StatusEffect.Immunity: iconEmoji = "✨"; rectColor = Colors.Gold; break;
+                    case StatusEffect.Regeneration: iconEmoji = "💚"; rectColor = Colors.Green; break;
                 }
 
-                ColorRect icon = new ColorRect()
+                Label icon = new Label()
                 {
-                    CustomMinimumSize = new Vector2(12, 12),
-                    Color = rectColor,
-                    TooltipText = $"{effect.Type} (Осталось: {effect.Duration})"
+                    Text = iconEmoji,
+                    Modulate = rectColor,
+                    TooltipText = $"{effect.Type} (Осталось: {effect.Duration})",
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center
                 };
+                icon.AddThemeFontSizeOverride("font_size", 24);
                 _statusContainer.AddChild(icon);
             }
         }
