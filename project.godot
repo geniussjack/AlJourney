@@ -14,7 +14,6 @@ config/name="Altarion's Journey"
 run/main_scene="res://Scenes/UI/MainMenu.tscn"
 config/features=PackedStringArray("4.5", "C#", "Mobile")
 config/icon="res://Resources/Sprites/UI/logo.png"
-config/windows_native_icon="res://Resources/Sprites/UI/logo.ico"
 boot_splash/bg_color=Color(0, 0, 0, 1)
 boot_splash/image="res://Resources/Sprites/UI/logo.png"
 boot_splash/show_image=true
