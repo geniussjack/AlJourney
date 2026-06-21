@@ -24,10 +24,15 @@ namespace AlJourney.Scripts.Managers
         /// </summary>
         public float MasterVolume
         {
-            get; set
+            get => field;
+            set
             {
                 field = Mathf.Clamp(value, 0.0f, 1.0f);
-                UpdateVolumes();
+                int busIndex = AudioServer.GetBusIndex("Master");
+                if (busIndex >= 0)
+                {
+                    AudioServer.SetBusVolumeDb(busIndex, Mathf.LinearToDb(field));
+                }
             }
         } = 1.0f;
 
@@ -36,17 +41,34 @@ namespace AlJourney.Scripts.Managers
         /// </summary>
         public float MusicVolume
         {
-            get; set
+            get => field;
+            set
             {
                 field = Mathf.Clamp(value, 0.0f, 1.0f);
-                UpdateVolumes();
+                int busIndex = AudioServer.GetBusIndex("Music");
+                if (busIndex >= 0)
+                {
+                    AudioServer.SetBusVolumeDb(busIndex, Mathf.LinearToDb(field));
+                }
             }
         } = 0.7f;
 
         /// <summary>
         /// Громкость звуковых эффектов. Значение от 0.0 до 1.0.
         /// </summary>
-        public float SfxVolume { get; set => field = Mathf.Clamp(value, 0.0f, 1.0f); } = 0.8f;
+        public float SfxVolume
+        {
+            get => field;
+            set
+            {
+                field = Mathf.Clamp(value, 0.0f, 1.0f);
+                int busIndex = AudioServer.GetBusIndex("SFX");
+                if (busIndex >= 0)
+                {
+                    AudioServer.SetBusVolumeDb(busIndex, Mathf.LinearToDb(field));
+                }
+            }
+        } = 0.8f;
 
         /// <summary>
         /// Инициализирует аудиоплееры для музыки и эффектов при добавлении в дерево сцены.
@@ -81,7 +103,11 @@ namespace AlJourney.Scripts.Managers
                 _sfxPlayers.Add(sfxPlayer);
             }
 
-            UpdateVolumes();
+            // Инициализация громкости шин
+            MasterVolume = MasterVolume;
+            MusicVolume = MusicVolume;
+            SfxVolume = SfxVolume;
+
             GD.Print("[AudioManager] Initialized");
         }
 
@@ -177,7 +203,7 @@ namespace AlJourney.Scripts.Managers
             availablePlayer ??= _sfxPlayers[0];
 
             availablePlayer.Stream = stream;
-            availablePlayer.VolumeDb = Mathf.LinearToDb(SfxVolume * MasterVolume);
+            availablePlayer.VolumeDb = 0.0f; // Reset local volume, Bus handles the global volume
 
             availablePlayer.PitchScale = pitchVariation > 0.0f ? 1.0f + ((GD.Randf() * pitchVariation * 2.0f) - pitchVariation) : 1.0f;
 
@@ -226,7 +252,6 @@ namespace AlJourney.Scripts.Managers
             _ = tween.TweenCallback(Callable.From(() =>
             {
                 _musicPlayer.Stop();
-                UpdateVolumes();
             }));
 
             GD.Print($"[AudioManager] Fading out music over {duration}s");
@@ -245,9 +270,8 @@ namespace AlJourney.Scripts.Managers
 
             _musicPlayer.VolumeDb = -80.0f;
 
-            float targetVolume = Mathf.LinearToDb(MusicVolume * MasterVolume);
             Tween tween = CreateTween();
-            _ = tween.TweenProperty(_musicPlayer, "volume_db", targetVolume, duration);
+            _ = tween.TweenProperty(_musicPlayer, "volume_db", 0.0f, duration);
 
             GD.Print($"[AudioManager] Fading in music over {duration}s");
         }
@@ -274,10 +298,7 @@ namespace AlJourney.Scripts.Managers
             GD.Print($"[AudioManager] Crossfading to: {newMusicPath}");
         }
 
-        private void UpdateVolumes()
-        {
-            _ = _musicPlayer?.VolumeDb = Mathf.LinearToDb(MusicVolume * MasterVolume);
-        }
+
 
         private void WarnMissingResourceOnce(string resourceType, string resourcePath)
         {
