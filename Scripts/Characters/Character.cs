@@ -180,7 +180,15 @@ namespace AlJourney.Scripts.Characters
                 GD.Print($"[{_name}] Defense reduced by Weakened status: {effectiveDefense}");
             }
 
-            return Mathf.Max(1, rawDamage - effectiveDefense);
+            int finalDamage = Mathf.Max(1, rawDamage - effectiveDefense);
+
+            if (HasStatusEffect(StatusEffect.Shock) || HasStatusEffect(StatusEffect.Vulnerable))
+            {
+                finalDamage = Mathf.CeilToInt(finalDamage * 1.5f);
+                GD.Print($"[{_name}] Damage increased by Shock/Vulnerable status: {finalDamage}");
+            }
+
+            return finalDamage;
         }
 
         private int AbsorbWithShield(int damage)

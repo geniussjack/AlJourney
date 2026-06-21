@@ -73,7 +73,10 @@ namespace AlJourney.Scripts.Core
         ShieldReflect,
         Immunity,
         Stunned,
-        Weakened
+        Weakened,
+        Freeze,
+        Shock,
+        Vulnerable
     }
 
     /// <summary>

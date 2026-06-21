@@ -139,6 +139,12 @@ namespace AlJourney.Scripts.Characters
                     break;
             }
 
+            if (HasStatusEffect(StatusEffect.Freeze))
+            {
+                damage = Mathf.CeilToInt(damage * 0.7f);
+                GD.Print($"[{_name}] Damage reduced by Freeze status: {damage}");
+            }
+
             return damage;
         }
 

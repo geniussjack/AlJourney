@@ -193,6 +193,11 @@ namespace AlJourney.Scripts.Managers
             return _heroEquipment.TryGetValue(hero, out Dictionary<EquipmentSlot, EquipmentData> equipment) ? equipment : [];
         }
 
+        public EquipmentData GetEquippedItem(CharacterClass hero, EquipmentSlot slot)
+        {
+            return GetHeroEquipment(hero).TryGetValue(slot, out EquipmentData item) ? item : null;
+        }
+
         /// <summary>
         /// Получает список предметов из инвентаря, отфильтрованный по их редкости.
         /// </summary>

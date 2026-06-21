@@ -13,46 +13,33 @@ namespace AlJourney.Scripts.Data
         /// </summary>
         public static readonly Dictionary<string, EquipmentData> Templates = new()
         {
-            ["rusty_sword"] = new EquipmentData(
-                "rusty_sword", "Rusty Sword", EquipmentSlot.Weapon, EquipmentRarity.Common, 1, 5,
-                new Dictionary<string, int> { ["damage"] = 2 }, []),
+            // Mage Weapons
+            ["fireball"] = new EquipmentData(
+                "fireball", "Fireball", EquipmentSlot.Weapon, EquipmentRarity.Common, 1, 10,
+                new Dictionary<string, int> { ["magic_damage"] = 3 }, []),
 
-            ["old_staff"] = new EquipmentData(
-                "old_staff", "Old Staff", EquipmentSlot.Weapon, EquipmentRarity.Common, 1, 5,
+            ["iceball"] = new EquipmentData(
+                "iceball", "Iceball", EquipmentSlot.Weapon, EquipmentRarity.Uncommon, 1, 10,
                 new Dictionary<string, int> { ["magic_damage"] = 2 }, []),
 
-            ["steel_blade"] = new EquipmentData(
-                "steel_blade", "Steel Blade", EquipmentSlot.Weapon, EquipmentRarity.Uncommon, 1, 10,
-                new Dictionary<string, int> { ["damage"] = 5, ["crit_chance"] = 10 }, []),
+            ["electroball"] = new EquipmentData(
+                "electroball", "Electroball", EquipmentSlot.Weapon, EquipmentRarity.Rare, 1, 10,
+                new Dictionary<string, int> { ["magic_damage"] = 4 }, []),
 
-            ["apprentice_staff"] = new EquipmentData(
-                "apprentice_staff", "Apprentice Staff", EquipmentSlot.Weapon, EquipmentRarity.Uncommon, 1, 10,
-                new Dictionary<string, int> { ["magic_damage"] = 5, ["mana_regen"] = 1 }, []),
+            // Warrior Weapons
+            ["sword"] = new EquipmentData(
+                "sword", "Sword", EquipmentSlot.Weapon, EquipmentRarity.Common, 1, 10,
+                new Dictionary<string, int> { ["damage"] = 3 }, []),
 
-            ["ice_sword"] = new EquipmentData(
-                "ice_sword", "Ice Sword", EquipmentSlot.Weapon, EquipmentRarity.Rare, 1, 15,
-                new Dictionary<string, int> { ["damage"] = 8, ["slow"] = 20 }, []),
+            ["axe"] = new EquipmentData(
+                "axe", "Axe", EquipmentSlot.Weapon, EquipmentRarity.Uncommon, 1, 10,
+                new Dictionary<string, int> { ["damage"] = 4, ["defense"] = -1 }, []),
 
-            ["fire_staff"] = new EquipmentData(
-                "fire_staff", "Fire Staff", EquipmentSlot.Weapon, EquipmentRarity.Rare, 1, 15,
-                new Dictionary<string, int> { ["magic_damage"] = 8, ["burn"] = 25 }, []),
+            ["spear"] = new EquipmentData(
+                "spear", "Spear", EquipmentSlot.Weapon, EquipmentRarity.Rare, 1, 10,
+                new Dictionary<string, int> { ["damage"] = 2 }, []),
 
-            ["shadow_blade"] = new EquipmentData(
-                "shadow_blade", "Shadow Blade", EquipmentSlot.Weapon, EquipmentRarity.Epic, 1, 20,
-                new Dictionary<string, int> { ["damage"] = 12, ["invisibility"] = 30 }, []),
-
-            ["elemental_staff"] = new EquipmentData(
-                "elemental_staff", "Elemental Staff", EquipmentSlot.Weapon, EquipmentRarity.Epic, 1, 20,
-                new Dictionary<string, int> { ["magic_damage"] = 12, ["random_element"] = 50 }, []),
-
-            ["excalibur"] = new EquipmentData(
-                "excalibur", "Excalibur", EquipmentSlot.Weapon, EquipmentRarity.Legendary, 1, 25,
-                new Dictionary<string, int> { ["damage"] = 20, ["lifesteal"] = 15 }, []),
-
-            ["archmage_staff"] = new EquipmentData(
-                "archmage_staff", "Archmage Staff", EquipmentSlot.Weapon, EquipmentRarity.Legendary, 1, 25,
-                new Dictionary<string, int> { ["magic_damage"] = 20, ["double_spells"] = 100 }, []),
-
+            // Armor (keeping a couple for defaults if needed)
             ["leather_armor"] = new EquipmentData(
                 "leather_armor", "Leather Armor", EquipmentSlot.Body, EquipmentRarity.Common, 1, 5,
                 new Dictionary<string, int> { ["defense"] = 3 }, []),
