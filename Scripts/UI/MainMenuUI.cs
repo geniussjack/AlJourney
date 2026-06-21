@@ -19,6 +19,8 @@ namespace AlJourney.Scripts.UI
         private Control _settingsPanel;
         private Control _creditsPanel;
 
+        private static bool _hasPlayedGameStart = false;
+
         /// <summary>
         /// Вызывается при готовности узла. Инициализирует ссылки на кнопки и панели, подписывается на события нажатия и отображает основной экран меню.
         /// </summary>
@@ -49,6 +51,16 @@ namespace AlJourney.Scripts.UI
 
             ShowMainMenu();
 
+            if (!_hasPlayedGameStart)
+            {
+                AudioManager.Instance?.PlayMusic("res://Resources/Audio/Music/game_start.mp3", false);
+                _hasPlayedGameStart = true;
+            }
+            else
+            {
+                AudioManager.Instance?.StopMusic();
+            }
+
             GD.Print("[MainMenuUI] Initialized");
         }
 
@@ -70,6 +82,7 @@ namespace AlJourney.Scripts.UI
         private void OnNewGamePressed()
         {
             AudioManager.Instance?.PlayNewGameSound();
+            AudioManager.Instance?.PlayMusic("res://Resources/Audio/Music/main_theme.mp3", true);
             GD.Print("[MainMenuUI] New game pressed");
             _ = SaveSystem.Instance.DeleteSave();
             GameStateManager.Instance.StartNewGame();
@@ -80,6 +93,7 @@ namespace AlJourney.Scripts.UI
         {
             if (SaveSystem.Instance.SaveFileExists())
             {
+                AudioManager.Instance?.PlayMusic("res://Resources/Audio/Music/main_theme.mp3", true);
                 GD.Print("[MainMenuUI] Save found - continuing game");
                 SceneManager.ContinueGame();
             }

@@ -108,6 +108,9 @@ namespace AlJourney.Scripts.Managers
             MusicVolume = MusicVolume;
             SfxVolume = SfxVolume;
 
+            GetTree().NodeAdded += OnNodeAdded;
+            HookExistingNodes(GetTree().Root);
+
             GD.Print("[AudioManager] Initialized");
         }
 
@@ -145,6 +148,10 @@ namespace AlJourney.Scripts.Managers
             else if (stream is AudioStreamWav wavStream)
             {
                 wavStream.LoopMode = loop ? AudioStreamWav.LoopModeEnum.Forward : AudioStreamWav.LoopModeEnum.Disabled;
+            }
+            else if (stream is AudioStreamMP3 mp3Stream)
+            {
+                mp3Stream.Loop = loop;
             }
 
             _musicPlayer.Play();
@@ -209,6 +216,43 @@ namespace AlJourney.Scripts.Managers
 
             availablePlayer.Play();
             return true;
+        }
+
+        public void PlayChoiceRightSound()
+        {
+            PlaySfx("res://Resources/Audio/SFX/choice_right_sound.mp3", 0.05f);
+        }
+
+        public void PlayChoiceErrorSound()
+        {
+            PlaySfx("res://Resources/Audio/SFX/choice_error_sound.mp3", 0.05f);
+        }
+
+        private void HookExistingNodes(Node parent)
+        {
+            OnNodeAdded(parent);
+            foreach (Node child in parent.GetChildren())
+            {
+                HookExistingNodes(child);
+            }
+        }
+
+        private void OnNodeAdded(Node node)
+        {
+            if (node is BaseButton button)
+            {
+                // To avoid multiple connections if somehow called twice
+                if (!button.HasSignal("pressed") || button.IsConnected("pressed", Callable.From(PlayChoiceRightSound))) return;
+
+                button.Pressed += PlayChoiceRightSound;
+                button.GuiInput += (InputEvent @event) =>
+                {
+                    if (button.Disabled && @event is InputEventMouseButton mouseEvent && mouseEvent.Pressed && mouseEvent.ButtonIndex == MouseButton.Left)
+                    {
+                        PlayChoiceErrorSound();
+                    }
+                };
+            }
         }
 
         public void PlaySwapSound()
