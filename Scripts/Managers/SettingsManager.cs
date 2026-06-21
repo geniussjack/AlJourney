@@ -37,7 +37,7 @@ namespace AlJourney.Scripts.Managers
         /// <summary>
         /// Текущий язык игры.
         /// </summary>
-        public string Language { get; private set; } = "en";
+        public string Language { get; private set; } = OS.GetLocaleLanguage() == "ru" ? "ru" : "en";
 
         /// <summary>
         /// Максимальное количество кадров в секунду.
@@ -231,6 +231,7 @@ namespace AlJourney.Scripts.Managers
         private void ApplySettings()
         {
             ApplyVideoSettings();
+            TranslationServer.SetLocale(Language);
             AudioManager.Instance.MasterVolume = MasterVolume;
             AudioManager.Instance.MusicVolume = MusicVolume;
             AudioManager.Instance.SfxVolume = SfxVolume;
@@ -280,7 +281,7 @@ namespace AlJourney.Scripts.Managers
                 (int)config.GetValue("video", "resolution_y", 1080)
             );
             WindowMode = (int)config.GetValue("video", "window_mode", 0);
-            Language = (string)config.GetValue("video", "language", "en");
+            Language = (string)config.GetValue("video", "language", OS.GetLocaleLanguage() == "ru" ? "ru" : "en");
             MaxFps = (int)config.GetValue("video", "max_fps", 60);
 
             MasterVolume = (float)config.GetValue("audio", "master_volume", 1.0f);
@@ -297,7 +298,7 @@ namespace AlJourney.Scripts.Managers
         {
             _resolution = new Vector2I(1920, 1080);
             WindowMode = 0;
-            Language = "en";
+            Language = OS.GetLocaleLanguage() == "ru" ? "ru" : "en";
             MaxFps = 60;
             MasterVolume = 1.0f;
             MusicVolume = 0.7f;

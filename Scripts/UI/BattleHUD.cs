@@ -41,6 +41,8 @@ namespace AlJourney.Scripts.UI
         private AlJourney.Scripts.Utils.DamageFlash _mageDamageFlash;
         private AlJourney.Scripts.Utils.DamageFlash _warriorDamageFlash;
 
+        private Button _inventoryButton;
+
         /// <summary>
         /// Вызывается при инициализации узла. Настраивает ссылки на дочерние элементы интерфейса, подписывается на события изменения состояния игры и комбо.
         /// </summary>
@@ -64,9 +66,10 @@ namespace AlJourney.Scripts.UI
             _waveLabel = GetNode<Label>("MarginContainer/VBoxContainer/BottomBar/WaveLabel");
             _coinsLabel = GetNode<Label>("MarginContainer/VBoxContainer/BottomBar/CoinsContainer/CoinsLabel");
 
+            _inventoryButton = GetNode<Button>("MarginContainer/VBoxContainer/TopBar/InventoryButton");
+            _inventoryButton.Pressed += OnInventoryButtonPressed;
 
             _comboSystem = GetNode<ComboSystem>("/root/ComboSystem");
-
 
             GameStateManager.Instance.CoinsChanged += OnCoinsChanged;
             GameStateManager.Instance.WaveChanged += OnWaveChanged;
@@ -263,6 +266,20 @@ namespace AlJourney.Scripts.UI
         private void UpdateCoins(int coins)
         {
             _coinsLabel.Text = $"{coins}";
+        }
+
+        private void OnInventoryButtonPressed()
+        {
+            PackedScene inventoryScene = GD.Load<PackedScene>("res://Scenes/UI/InventoryUI.tscn");
+            if (inventoryScene != null)
+            {
+                var inventory = inventoryScene.Instantiate<Control>();
+                AddChild(inventory);
+            }
+            else
+            {
+                GD.PrintErr("[BattleHUD] Failed to load InventoryUI.tscn");
+            }
         }
 
         private void OnPausePressed()
