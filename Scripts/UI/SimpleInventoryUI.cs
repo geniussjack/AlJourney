@@ -114,7 +114,6 @@ namespace AlJourney.Scripts.UI
                 AutowrapMode = TextServer.AutowrapMode.Word,
                 CustomMinimumSize = new Vector2(250, 0)
             };
-            _weaponDescLabel.AddThemeFontSizeOverride("font_size", 14);
             mainVBox.AddChild(_weaponDescLabel);
 
             // Spacer
@@ -129,8 +128,8 @@ namespace AlJourney.Scripts.UI
         {
             _heroNameLabel.Text = _selectedHero == CharacterClass.Mage ? Tr("HERO_MAGE") : Tr("HERO_WARRIOR");
             string portraitPath = _selectedHero == CharacterClass.Mage
-                ? "res://Resources/Sprites/Characters/mage_portrait.png"
-                : "res://Resources/Sprites/Characters/warrior_portrait.png";
+                ? "res://Resources/Sprites/Characters/mage_sprite.png"
+                : "res://Resources/Sprites/Characters/warrior_sprite.png";
 
             _heroToggleBtn.TextureNormal = ResourceLoader.Exists(portraitPath) ? GD.Load<Texture2D>(portraitPath) : null;
 
