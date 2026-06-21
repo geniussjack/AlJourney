@@ -15,45 +15,45 @@ namespace AlJourney.Scripts.Data
         {
             // Mage Weapons
             ["fireball"] = new EquipmentData(
-                "fireball", "Fireball", EquipmentSlot.Weapon, EquipmentRarity.Common, 1, 10,
-                new Dictionary<string, int> { ["magic_damage"] = 3 }, []),
+                "fireball", "WPN_NAME_FIREBALL", "WPN_DESC_FIREBALL", EquipmentSlot.Weapon, EquipmentRarity.Common, 1, 10,
+                new Dictionary<string, int> { ["damage"] = 5, ["burn_damage"] = 2 }, []),
 
             ["iceball"] = new EquipmentData(
-                "iceball", "Iceball", EquipmentSlot.Weapon, EquipmentRarity.Uncommon, 1, 10,
-                new Dictionary<string, int> { ["magic_damage"] = 2 }, []),
+                "iceball", "WPN_NAME_ICEBALL", "WPN_DESC_ICEBALL", EquipmentSlot.Weapon, EquipmentRarity.Uncommon, 1, 10,
+                new Dictionary<string, int> { ["damage"] = 2, ["weaken_amount"] = 30 }, []),
 
             ["electroball"] = new EquipmentData(
-                "electroball", "Electroball", EquipmentSlot.Weapon, EquipmentRarity.Rare, 1, 10,
-                new Dictionary<string, int> { ["magic_damage"] = 4 }, []),
+                "electroball", "WPN_NAME_ELECTROBALL", "WPN_DESC_ELECTROBALL", EquipmentSlot.Weapon, EquipmentRarity.Rare, 1, 10,
+                new Dictionary<string, int> { ["damage"] = 3, ["shock_amount"] = 50 }, []),
 
             // Warrior Weapons
             ["sword"] = new EquipmentData(
-                "sword", "Sword", EquipmentSlot.Weapon, EquipmentRarity.Common, 1, 10,
-                new Dictionary<string, int> { ["damage"] = 3 }, []),
+                "sword", "WPN_NAME_SWORD", "WPN_DESC_SWORD", EquipmentSlot.Weapon, EquipmentRarity.Common, 1, 10,
+                new Dictionary<string, int> { ["damage"] = 5 }, []),
 
             ["axe"] = new EquipmentData(
-                "axe", "Axe", EquipmentSlot.Weapon, EquipmentRarity.Uncommon, 1, 10,
-                new Dictionary<string, int> { ["damage"] = 4, ["defense"] = -1 }, []),
+                "axe", "WPN_NAME_AXE", "WPN_DESC_AXE", EquipmentSlot.Weapon, EquipmentRarity.Uncommon, 1, 10,
+                new Dictionary<string, int> { ["damage"] = 3, ["bleed_damage"] = 2 }, []),
 
             ["spear"] = new EquipmentData(
-                "spear", "Spear", EquipmentSlot.Weapon, EquipmentRarity.Rare, 1, 10,
-                new Dictionary<string, int> { ["damage"] = 2 }, []),
+                "spear", "WPN_NAME_SPEAR", "WPN_DESC_SPEAR", EquipmentSlot.Weapon, EquipmentRarity.Rare, 1, 10,
+                new Dictionary<string, int> { ["damage"] = 2, ["vulnerable_amount"] = 50 }, []),
 
             // Armor (keeping a couple for defaults if needed)
             ["leather_armor"] = new EquipmentData(
-                "leather_armor", "Leather Armor", EquipmentSlot.Body, EquipmentRarity.Common, 1, 5,
+                "leather_armor", "WPN_NAME_LEATHER_ARMOR", "", EquipmentSlot.Body, EquipmentRarity.Common, 1, 5,
                 new Dictionary<string, int> { ["defense"] = 3 }, []),
 
             ["dragon_scales"] = new EquipmentData(
-                "dragon_scales", "Dragon Scales", EquipmentSlot.Body, EquipmentRarity.Legendary, 1, 25,
+                "dragon_scales", "WPN_NAME_DRAGON_SCALES", "", EquipmentSlot.Body, EquipmentRarity.Legendary, 1, 25,
                 new Dictionary<string, int> { ["defense"] = 15, ["immunity_burn"] = 100 }, []),
 
             ["power_ring"] = new EquipmentData(
-                "power_ring", "Ring of Power", EquipmentSlot.Ring, EquipmentRarity.Rare, 1, 15,
+                "power_ring", "WPN_NAME_POWER_RING", "", EquipmentSlot.Ring, EquipmentRarity.Rare, 1, 15,
                 new Dictionary<string, int> { ["damage"] = 10 }, []),
 
             ["life_amulet"] = new EquipmentData(
-                "life_amulet", "Amulet of Life", EquipmentSlot.Necklace, EquipmentRarity.Epic, 1, 20,
+                "life_amulet", "WPN_NAME_LIFE_AMULET", "", EquipmentSlot.Necklace, EquipmentRarity.Epic, 1, 20,
                 new Dictionary<string, int> { ["hp_percent"] = 20 }, [])
         };
     }

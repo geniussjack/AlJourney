@@ -124,9 +124,8 @@ namespace AlJourney.Scripts.Characters
         /// <returns>Конечное количество урона после всех расчетов.</returns>
         public int CalculateDamage(int baseDamage, ElementType elementType)
         {
-            string statName = elementType is ElementType.Fire or ElementType.Heal ? "magic_damage" : "damage";
-            int equipBonus = GetEquipmentStat(statName) + GetEquipmentStat("damage");
-            int abilityBonus = GetAbilityStat(statName) + GetAbilityStat("damage");
+            int equipBonus = GetEquipmentStat("damage");
+            int abilityBonus = GetAbilityStat("damage");
             int totalBaseDamage = _baseDamage + equipBonus + abilityBonus;
             int finalDamage = baseDamage + totalBaseDamage;
 

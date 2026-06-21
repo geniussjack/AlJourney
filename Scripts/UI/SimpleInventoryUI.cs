@@ -21,6 +21,7 @@ namespace AlJourney.Scripts.UI
         private TextureRect _weaponIcon;
         private Label _weaponNameLabel;
         private Label _weaponStatsLabel;
+        private Label _weaponDescLabel;
 
         private Button _prevWeaponBtn;
         private Button _nextWeaponBtn;
@@ -34,6 +35,7 @@ namespace AlJourney.Scripts.UI
         {
             _coinsLabel = GetNode<Label>("MarginContainer/VBoxContainer/Header/CoinsLabel");
             _closeButton = GetNode<Button>("MarginContainer/VBoxContainer/Header/CloseButton");
+            _closeButton.Text = Tr("UI_CLOSE");
             _contentHBox = GetNode<HBoxContainer>("MarginContainer/VBoxContainer/ContentHBox");
 
             _closeButton.Pressed += OnClosePressed;
@@ -48,6 +50,14 @@ namespace AlJourney.Scripts.UI
             LoadHeroData();
         }
 
+        public override void _Process(double delta)
+        {
+            if (Engine.GetPhysicsFrames() % 60 == 0)
+            {
+                _coinsLabel.Text = $"{Tr("UI_COINS")}: {GameStateManager.Instance.Coins}";
+            }
+        }
+
         private void BuildNewUI()
         {
             VBoxContainer mainVBox = new() { SizeFlagsHorizontal = SizeFlags.ExpandFill, Alignment = BoxContainer.AlignmentMode.Center };
@@ -60,7 +70,7 @@ namespace AlJourney.Scripts.UI
             _heroToggleBtn = new TextureButton()
             {
                 StretchMode = TextureButton.StretchModeEnum.KeepAspectCentered,
-                CustomMinimumSize = new Vector2(64, 64),
+                CustomMinimumSize = new Vector2(48, 48),
                 SizeFlagsHorizontal = SizeFlags.ShrinkCenter
             };
             _heroToggleBtn.Pressed += OnHeroToggled;
@@ -69,7 +79,7 @@ namespace AlJourney.Scripts.UI
             // Spacer
             mainVBox.AddChild(new Control() { CustomMinimumSize = new Vector2(0, 20) });
 
-            Label equipmentTitle = new Label() { Text = "Снаряжение", HorizontalAlignment = HorizontalAlignment.Center };
+            Label equipmentTitle = new Label() { Text = Tr("UI_EQUIPMENT"), HorizontalAlignment = HorizontalAlignment.Center };
             mainVBox.AddChild(equipmentTitle);
 
             // Weapon Selector
@@ -97,45 +107,54 @@ namespace AlJourney.Scripts.UI
 
             _weaponStatsLabel = new Label() { HorizontalAlignment = HorizontalAlignment.Center };
             mainVBox.AddChild(_weaponStatsLabel);
+            
+            _weaponDescLabel = new Label() 
+            { 
+                HorizontalAlignment = HorizontalAlignment.Center,
+                AutowrapMode = TextServer.AutowrapMode.Word,
+                CustomMinimumSize = new Vector2(250, 0)
+            };
+            _weaponDescLabel.AddThemeFontSizeOverride("font_size", 14);
+            mainVBox.AddChild(_weaponDescLabel);
 
             // Spacer
             mainVBox.AddChild(new Control() { CustomMinimumSize = new Vector2(0, 20) });
 
-            _upgradeBtn = new Button() { Text = "Улучшить" };
+            _upgradeBtn = new Button() { Text = Tr("UI_UPGRADE") };
             _upgradeBtn.Pressed += OnUpgradePressed;
             mainVBox.AddChild(_upgradeBtn);
         }
 
         private void LoadHeroData()
         {
-            _coinsLabel.Text = $"Coins: {GameStateManager.Instance.Coins}";
-            _heroNameLabel.Text = _selectedHero == CharacterClass.Mage ? "Маг" : "Воин";
-            
-            string heroSpritePath = _selectedHero == CharacterClass.Mage ? "res://Resources/Sprites/Characters/mage_sprite.png" : "res://Resources/Sprites/Characters/warrior_sprite.png";
-            _heroToggleBtn.TextureNormal = GD.Load<Texture2D>(heroSpritePath);
+            _heroNameLabel.Text = _selectedHero == CharacterClass.Mage ? Tr("HERO_MAGE") : Tr("HERO_WARRIOR");
+            string portraitPath = _selectedHero == CharacterClass.Mage
+                ? "res://Resources/Sprites/Characters/mage_portrait.png"
+                : "res://Resources/Sprites/Characters/warrior_portrait.png";
+
+            _heroToggleBtn.TextureNormal = ResourceLoader.Exists(portraitPath) ? GD.Load<Texture2D>(portraitPath) : null;
 
             _availableWeapons.Clear();
-            foreach (EquipmentData item in InventoryManager.Instance.GetInventory())
+            var allItems = InventoryManager.Instance.GetInventory();
+            foreach (var item in allItems)
             {
-                bool isMageWeapon = item.Id == "fireball" || item.Id == "iceball" || item.Id == "electroball";
-                bool isWarriorWeapon = item.Id == "sword" || item.Id == "axe" || item.Id == "spear";
-
-                if ((_selectedHero == CharacterClass.Mage && isMageWeapon) ||
-                    (_selectedHero == CharacterClass.Warrior && isWarriorWeapon))
+                if (item.Slot == EquipmentSlot.Weapon &&
+                    ((_selectedHero == CharacterClass.Mage && (item.Id.Contains("ball") || item.Id == "staff")) ||
+                     (_selectedHero == CharacterClass.Warrior && (item.Id == "sword" || item.Id == "axe" || item.Id == "spear"))))
                 {
                     _availableWeapons.Add(item);
                 }
             }
 
-            EquipmentData equippedWeapon = InventoryManager.Instance.GetEquippedItem(_selectedHero, EquipmentSlot.Weapon);
-            if (equippedWeapon != null)
+            EquipmentData currentWeapon = InventoryManager.Instance.GetEquippedItem(_selectedHero, EquipmentSlot.Weapon);
+            _selectedWeaponIndex = 0;
+            for (int i = 0; i < _availableWeapons.Count; i++)
             {
-                _selectedWeaponIndex = _availableWeapons.FindIndex(w => w.Id == equippedWeapon.Id);
-                if (_selectedWeaponIndex == -1) _selectedWeaponIndex = 0;
-            }
-            else
-            {
-                _selectedWeaponIndex = 0;
+                if (currentWeapon != null && _availableWeapons[i].Id == currentWeapon.Id)
+                {
+                    _selectedWeaponIndex = i;
+                    break;
+                }
             }
 
             UpdateWeaponDisplay();
@@ -160,21 +179,24 @@ namespace AlJourney.Scripts.UI
             {
                 _weaponNameLabel.Text = "Нет оружия";
                 _weaponStatsLabel.Text = "";
+                _weaponDescLabel.Text = "";
                 _weaponIcon.Texture = null;
                 _upgradeBtn.Disabled = true;
                 return;
             }
 
             EquipmentData weapon = _availableWeapons[_selectedWeaponIndex];
-            _weaponNameLabel.Text = $"{weapon.Name} (Ур. {weapon.CurrentLevel})";
+            _weaponNameLabel.Text = $"{Tr(weapon.Name)} (Ур. {weapon.CurrentLevel})";
             _weaponNameLabel.Modulate = weapon.GetRarityColor();
 
             string stats = "";
             foreach (var stat in weapon.BaseStats)
             {
-                stats += $"{stat.Key}: {stat.Value}\n";
+                string statName = Tr($"STAT_{stat.Key.ToUpper()}");
+                stats += $"{statName}: {stat.Value}\n";
             }
             _weaponStatsLabel.Text = stats;
+            _weaponDescLabel.Text = Tr(weapon.DescriptionKey);
 
             string iconPath = $"res://Resources/Sprites/Elements/{weapon.Id}_sprite.png";
             if (weapon.Id == "fireball") iconPath = "res://Resources/Sprites/Elements/fireball_sprite.png";
@@ -187,9 +209,9 @@ namespace AlJourney.Scripts.UI
             _weaponIcon.Texture = ResourceLoader.Exists(iconPath) ? GD.Load<Texture2D>(iconPath) : null;
 
             int cost = weapon.GetUpgradeCost(GameStateManager.Instance.CurrentWave);
-            _upgradeBtn.Text = $"Улучшить ({cost} монет)";
+            _upgradeBtn.Text = $"{Tr("UI_UPGRADE")} ({cost} {Tr("UI_COINS").ToString().ToLower()})";
             _upgradeBtn.Disabled = GameStateManager.Instance.Coins < cost;
-            _coinsLabel.Text = $"Coins: {GameStateManager.Instance.Coins}";
+            _coinsLabel.Text = $"{Tr("UI_COINS")}: {GameStateManager.Instance.Coins}";
         }
 
         private void OnHeroToggled()
@@ -229,14 +251,6 @@ namespace AlJourney.Scripts.UI
             foreach (Node child in node.GetChildren())
             {
                 FindAndRefreshGrid(child);
-            }
-        }
-
-        public override void _Process(double delta)
-        {
-            if (Engine.GetPhysicsFrames() % 60 == 0)
-            {
-                _coinsLabel.Text = $"Coins: {GameStateManager.Instance.Coins}";
             }
         }
     }

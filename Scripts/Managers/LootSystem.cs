@@ -184,12 +184,14 @@ namespace AlJourney.Scripts.Managers
             return new EquipmentData(
                 $"{rarity}_{slot}",
                 name,
+                "", // DescriptionKey
                 slot,
                 rarity,
                 1,
                 maxLevel,
                 stats,
-                []);
+                new Dictionary<string, string>()
+            );
         }
     }
 }

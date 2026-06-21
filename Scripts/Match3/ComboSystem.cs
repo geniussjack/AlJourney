@@ -189,8 +189,18 @@ namespace AlJourney.Scripts.Match3
             string weaponId = weapon?.Id ?? "fireball";
 
             StatusEffect effectType = StatusEffect.Burning;
-            if (weaponId == "iceball") effectType = StatusEffect.Freeze;
-            else if (weaponId == "electroball") effectType = StatusEffect.Shock;
+            int effectPower = weapon?.BaseStats.GetValueOrDefault("burn_damage", GameConstants.FIRE_4_BURN_DAMAGE) ?? GameConstants.FIRE_4_BURN_DAMAGE;
+
+            if (weaponId == "iceball")
+            {
+                effectType = StatusEffect.Freeze;
+                effectPower = weapon?.BaseStats.GetValueOrDefault("weaken_amount", 0) ?? 0;
+            }
+            else if (weaponId == "electroball")
+            {
+                effectType = StatusEffect.Shock;
+                effectPower = weapon?.BaseStats.GetValueOrDefault("shock_amount", 0) ?? 0;
+            }
 
             switch (level)
             {
@@ -205,7 +215,7 @@ namespace AlJourney.Scripts.Match3
                     effect.StatusEffect = new Data.StatusEffectData(
                         effectType,
                         GameConstants.FIRE_4_BURN_DURATION,
-                        effectType == StatusEffect.Burning ? GameConstants.FIRE_4_BURN_DAMAGE : 0
+                        effectPower
                     );
                     break;
 
@@ -215,14 +225,14 @@ namespace AlJourney.Scripts.Match3
                     effect.StatusEffect = new Data.StatusEffectData(
                         effectType,
                         GameConstants.FIRE_5_BURN_DURATION,
-                        effectType == StatusEffect.Burning ? GameConstants.FIRE_5_BURN_DAMAGE : 0
+                        effectPower
                     );
                     break;
             }
 
             GD.Print($"[ComboSystem] Mage combo level {level}: {effect.Damage} damage" +
                      (effect.IsAoE ? " (AoE)" : "") +
-                     (effect.StatusEffect != null ? $" + {effectType}" : ""));
+                     (effect.StatusEffect != null ? $" + {effectType} (power {effectPower})" : ""));
         }
 
         private static void ProcessSwordCombo(ComboEffect effect, int level)
@@ -230,9 +240,19 @@ namespace AlJourney.Scripts.Match3
             AlJourney.Scripts.Data.EquipmentData weapon = AlJourney.Scripts.Managers.InventoryManager.Instance?.GetEquippedItem(CharacterClass.Warrior, EquipmentSlot.Weapon);
             string weaponId = weapon?.Id ?? "sword";
 
-            StatusEffect effectType = StatusEffect.Stunned; // default level 3 effect
-            if (weaponId == "axe") effectType = StatusEffect.Bleeding;
-            else if (weaponId == "spear") effectType = StatusEffect.Vulnerable;
+            StatusEffect effectType = StatusEffect.Stunned;
+            int effectPower = 0;
+
+            if (weaponId == "axe")
+            {
+                effectType = StatusEffect.Bleeding;
+                effectPower = weapon?.BaseStats.GetValueOrDefault("bleed_damage", 0) ?? 0;
+            }
+            else if (weaponId == "spear")
+            {
+                effectType = StatusEffect.Vulnerable;
+                effectPower = weapon?.BaseStats.GetValueOrDefault("vulnerable_amount", 0) ?? 0;
+            }
 
             switch (level)
             {
@@ -244,11 +264,14 @@ namespace AlJourney.Scripts.Match3
                 case 2:
                     effect.Damage = GameConstants.SWORD_4_DAMAGE;
                     effect.IsAoE = false;
-                    effect.StatusEffect = new Data.StatusEffectData(
-                        StatusEffect.Bleeding,
-                        GameConstants.SWORD_4_BLEED_DURATION,
-                        GameConstants.SWORD_4_BLEED_DAMAGE
-                    );
+                    if (effectType != StatusEffect.Stunned) // Sword (stunned) shouldn't apply on lvl 4, let's say only apply status on match 4 for non-sword
+                    {
+                        effect.StatusEffect = new Data.StatusEffectData(
+                            effectType,
+                            GameConstants.SWORD_4_BLEED_DURATION,
+                            effectPower
+                        );
+                    }
                     break;
 
                 case 3:
@@ -257,13 +280,13 @@ namespace AlJourney.Scripts.Match3
                     effect.StatusEffect = new Data.StatusEffectData(
                         effectType,
                         weaponId == "axe" ? 3 : 2,
-                        weaponId == "axe" ? 5 : 0
+                        effectPower
                     );
                     break;
             }
 
             GD.Print($"[ComboSystem] Warrior combo level {level}: {effect.Damage} damage" +
-                     (effect.StatusEffect != null ? $" + {effect.StatusEffect.Type}" : ""));
+                     (effect.StatusEffect != null ? $" + {effectType} (power {effectPower})" : ""));
         }
 
         private static void ProcessHealCombo(ComboEffect effect, int level)

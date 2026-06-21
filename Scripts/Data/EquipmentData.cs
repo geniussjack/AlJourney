@@ -12,6 +12,7 @@ namespace AlJourney.Scripts.Data
     public record EquipmentData(
         string Id,
         string Name,
+        string DescriptionKey,
         EquipmentSlot Slot,
         EquipmentRarity Rarity,
         int CurrentLevel,

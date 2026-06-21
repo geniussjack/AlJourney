@@ -65,3 +65,30 @@ UI_SHOP_DMG,DMG,Урон
 UI_SHOP_DEF,DEF,Защита
 UI_SHOP_COST,Cost,Цена
 UI_SHOP_BUY,Buy,Купить
+UI_COINS,Coins,Монеты
+UI_CLOSE,Close,Закрыть
+UI_EQUIPMENT,Equipment,Снаряжение
+HERO_MAGE,Eltarion,Эльтарион
+HERO_WARRIOR,Eldrik,Элдрик
+STAT_DAMAGE,Damage,Урон
+STAT_BLEED_DAMAGE,Bleed Dmg per turn,Урон от кровотечения / ход
+STAT_BURN_DAMAGE,Burn Dmg per turn,Урон от горения / ход
+STAT_VULNERABLE,Incoming Damage Increase,Увеличение входящего урона
+STAT_SHOCK,Incoming Damage Increase,Увеличение входящего урона
+STAT_WEAKEN,Enemy Attack Reduction,Снижение силы атаки врага
+WPN_NAME_FIREBALL,Fireball,Огненный шар
+WPN_DESC_FIREBALL,Deals high damage and causes burning effect, inflicting damage every turn.,Наносит большой урон и вызывает эффект горения, наносящий врагу урон каждый ход
+WPN_NAME_ICEBALL,Iceball,Ледяной шар
+WPN_DESC_ICEBALL,Deals low damage and reduces enemy attack power.,Наносит малый урон и уменьшает силу атаки у противника
+WPN_NAME_ELECTROBALL,Electroball,Электрошар
+WPN_DESC_ELECTROBALL,Deals medium damage and causes shock, increasing incoming damage.,Наносит средний урон и вызывает шок, увеличивающий входящий урон по врагу
+WPN_NAME_SWORD,Sword,Меч
+WPN_DESC_SWORD,Deals high damage.,Наносит большой урон
+WPN_NAME_AXE,Axe,Топор
+WPN_DESC_AXE,Deals medium damage and causes bleeding, reducing enemy health every turn.,Наносит средний урон и вызывает кровотечение, отнимающее у врага здоровье каждый ход
+WPN_NAME_SPEAR,Spear,Копьё
+WPN_DESC_SPEAR,Deals low damage and increases incoming damage to the enemy.,Наносит малый урон и увеличивает входящий урон по врагу
+WPN_NAME_LEATHER_ARMOR,Leather Armor,Кожаная броня
+WPN_NAME_DRAGON_SCALES,Dragon Scales,Чешуя дракона
+WPN_NAME_POWER_RING,Ring of Power,Кольцо силы
+WPN_NAME_LIFE_AMULET,Amulet of Life,Амулет жизни
