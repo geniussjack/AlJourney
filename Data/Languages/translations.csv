@@ -108,3 +108,6 @@ UI_HP_SHORT,HP,ОЗ
 UI_SHIELD_SHORT,Shield,Щит
 UI_CASCADE,CASCADE,КАСКАД
 UI_COMBO,Combo!,Комбо!
+
+UI_GAMEOVER_SUBTITLE,Both heroes have fallen...,Оба героя пали...
+UI_GAMEOVER_STATS_TITLE,Your Journey,Ваш Путь

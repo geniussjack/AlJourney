@@ -31,7 +31,9 @@ namespace AlJourney.Scripts.UI
 
             _mainMenuButton.Text = Tr("UI_GAMEOVER_MAIN_MENU");
             _newGameButton.Text = Tr("UI_GAMEOVER_RETRY");
-            GetNode<Label>("CenterContainer/VBoxContainer/TitleLabel").Text = Tr("UI_GAMEOVER_TITLE");
+            GetNode<Label>("CenterContainer/VBoxContainer/Title").Text = Tr("UI_GAMEOVER_TITLE");
+            GetNode<Label>("CenterContainer/VBoxContainer/Subtitle").Text = Tr("UI_GAMEOVER_SUBTITLE");
+            GetNode<Label>("CenterContainer/VBoxContainer/StatsContainer/StatsTitle").Text = Tr("UI_GAMEOVER_STATS_TITLE");
 
             DisplayStats();
 
