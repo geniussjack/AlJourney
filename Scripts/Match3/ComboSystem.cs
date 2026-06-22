@@ -207,6 +207,11 @@ namespace AlJourney.Scripts.Match3
                 case 1:
                     effect.Damage = GameConstants.FIRE_3_DAMAGE;
                     effect.IsAoE = false;
+                    effect.StatusEffect = new Data.StatusEffectData(
+                        effectType,
+                        1, // 1 turn duration for match 3
+                        effectPower
+                    );
                     break;
 
                 case 2:
@@ -259,19 +264,21 @@ namespace AlJourney.Scripts.Match3
                 case 1:
                     effect.Damage = GameConstants.SWORD_3_DAMAGE;
                     effect.IsAoE = false;
+                    effect.StatusEffect = new Data.StatusEffectData(
+                        effectType,
+                        1, // 1 turn duration for match 3
+                        effectPower
+                    );
                     break;
 
                 case 2:
                     effect.Damage = GameConstants.SWORD_4_DAMAGE;
                     effect.IsAoE = false;
-                    if (effectType != StatusEffect.Stunned) // Sword (stunned) shouldn't apply on lvl 4, let's say only apply status on match 4 for non-sword
-                    {
-                        effect.StatusEffect = new Data.StatusEffectData(
-                            effectType,
-                            GameConstants.SWORD_4_BLEED_DURATION,
-                            effectPower
-                        );
-                    }
+                    effect.StatusEffect = new Data.StatusEffectData(
+                        effectType,
+                        GameConstants.SWORD_4_BLEED_DURATION,
+                        effectPower
+                    );
                     break;
 
                 case 3:
