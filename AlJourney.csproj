@@ -63,7 +63,6 @@
     <Folder Include="Resources\Themes\" />
     <Folder Include="Scenes\UI\" />
     <Folder Include="Scenes\Battle\" />
-    <Folder Include="Scenes\Match3\" />
     <Folder Include="Scenes\Characters\" />
     <Folder Include="Scenes\Prefabs\" />
   </ItemGroup>
@@ -71,8 +70,6 @@
     <None Include="scenes\battle\BattleScene.tscn" />
     <None Include="scenes\characters\Enemy.tscn" />
     <None Include="scenes\characters\Player.tscn" />
-    <None Include="scenes\match3\ElementSprite.tscn" />
-    <None Include="scenes\match3\GridCell.tscn" />
     <None Include="scenes\ui\BattleHUD.tscn" />
     <None Include="scenes\ui\GameOverScreen.tscn" />
     <None Include="scenes\ui\MainMenu.tscn" />
