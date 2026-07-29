@@ -415,4 +415,5 @@ temp/
 # Local-only design/architecture notes for AI-assisted development (not part of the repo)
 /GAME_DESIGN.md
 /ARCHITECTURE.md
+/REDESIGN_NOTES.md
 
