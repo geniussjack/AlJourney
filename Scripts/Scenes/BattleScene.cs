@@ -3,7 +3,6 @@ using AlJourney.Scripts.Characters;
 using AlJourney.Scripts.Core;
 using AlJourney.Scripts.Data;
 using AlJourney.Scripts.Managers;
-using AlJourney.Scripts.Match3;
 using AlJourney.Scripts.UI;
 using AlJourney.Scripts.Utils;
 using Godot;
@@ -12,19 +11,18 @@ namespace AlJourney.Scripts.Scenes
 {
     /// <summary>
     /// Главный контроллер сцены боя.
-    /// Объединяет и координирует все системы, связанные с битвой: игровое поле,
-    /// пользовательский интерфейс, систему героев и менеджер боя.
+    /// Объединяет и координирует все системы, связанные с битвой:
+    /// пользовательский интерфейс, систему отряда героев и менеджер пошагового боя.
     /// </summary>
     public partial class BattleScene : Node
     {
         private BattleHUD _battleHUD;
-        private GridUI _gridUI;
+        private TurnActionPanel _turnActionPanel;
         private BattleManager _battleManager;
         private DualHeroSystem _heroSystem;
         private Camera2D _camera;
         private CameraShake _cameraShake;
 
-        private GridManager _gridManager;
         private GameStateManager _gameStateManager;
         private bool _isBattleTransitionQueued;
 
@@ -35,11 +33,9 @@ namespace AlJourney.Scripts.Scenes
         /// </summary>
         public override void _Ready()
         {
-            _gridManager = GetNode<GridManager>("/root/GridManager");
             _gameStateManager = GameStateManager.Instance;
 
             _battleHUD = GetNode<BattleHUD>("CanvasLayer/BattleHUD");
-            _gridUI = GetNode<GridUI>("CanvasLayer/CenterContainer/GridUI");
             _battleManager = GetNode<BattleManager>("BattleManager");
             _isBattleTransitionQueued = false;
 
@@ -58,20 +54,19 @@ namespace AlJourney.Scripts.Scenes
 
             InitializeHeroes();
 
-            _battleHUD.Initialize(_heroSystem);
-            _gridUI.Initialize(_heroSystem);
+            _battleHUD.Initialize(_heroSystem, _battleManager);
 
-            _battleManager.Initialize(_gridUI);
+            _turnActionPanel = new TurnActionPanel();
+            GetNode<CanvasLayer>("CanvasLayer").AddChild(_turnActionPanel);
 
             _battleManager.WaveCompleted += OnWaveCompleted;
             _battleManager.BattleEnded += OnBattleEnded;
             _battleManager.EnemyDefeated += OnEnemyDefeated;
-            _battleManager.PhaseChanged += OnPhaseChanged;
-
-            _gridManager.SwapCompleted += OnSwapCompleted;
 
             int currentWave = _gameStateManager.CurrentWave;
             _battleManager.StartBattle(_heroSystem, currentWave, _cameraShake);
+
+            _turnActionPanel.Initialize(_battleManager);
 
             _battleHUD.SetupEnemies(_battleManager.Enemies);
 
@@ -141,22 +136,6 @@ namespace AlJourney.Scripts.Scenes
             }
         }
 
-        private void OnSwapCompleted(bool wasValid)
-        {
-            if (wasValid)
-            {
-                BattleHUD.UpdateSwaps(_gridManager.RemainingSwaps);
-            }
-        }
-
-        private void OnPhaseChanged(BattlePhase newPhase)
-        {
-            if (newPhase == BattlePhase.PlayerSwap)
-            {
-                BattleHUD.UpdateSwaps(_gridManager.RemainingSwaps);
-            }
-        }
-
         private void OnEnemyDefeated(Enemy enemy)
         {
             GD.Print($"[BattleScene] Enemy defeated: {enemy.CharacterName}");
@@ -217,8 +196,6 @@ namespace AlJourney.Scripts.Scenes
                 _battleManager.BattleEnded -= OnBattleEnded;
                 _battleManager.EnemyDefeated -= OnEnemyDefeated;
             }
-
-            _gridManager?.SwapCompleted -= OnSwapCompleted;
 
             _battleManager?.EndBattle();
         }

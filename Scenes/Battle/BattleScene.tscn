@@ -1,9 +1,8 @@
-[gd_scene load_steps=12 format=3 uid="uid://do01lwwh5yf6i"]
+[gd_scene load_steps=11 format=3 uid="uid://do01lwwh5yf6i"]
 
 [ext_resource type="Script" uid="uid://bb6df84rte67u" path="res://Scripts/Scenes/BattleScene.cs" id="1_battle"]
 [ext_resource type="PackedScene" uid="uid://cgmssg1q3f8r3" path="res://Scenes/UI/BattleHUD.tscn" id="2_hud"]
 [ext_resource type="Script" uid="uid://cy2w0fdga4ede" path="res://Scripts/Battle/BattleManager.cs" id="3_manager"]
-[ext_resource type="Script" uid="uid://ckrrtak4uv7w1" path="res://Scripts/UI/GridUI.cs" id="4_grid"]
 [ext_resource type="Theme" uid="uid://d0twkb22dvira" path="res://Resources/Themes/game_theme.tres" id="5_theme"]
 [ext_resource type="Texture2D" uid="uid://3emm2y0omi4k" path="res://Resources/Sprites/Backgrounds/battle_background.png" id="6_bg"]
 [ext_resource type="Texture2D" uid="uid://gnpobh3ck1bi" path="res://Resources/Sprites/UI/panel_background.png" id="7_panel"]
@@ -295,24 +294,6 @@ theme_override_constants/margin_bottom = 12
 layout_mode = 2
 theme_override_constants/separation = 10
 
-
-[node name="CenterContainer" type="CenterContainer" parent="CanvasLayer"]
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -320.0
-offset_top = -330.0
-offset_right = 320.0
-offset_bottom = 390.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="GridUI" type="Control" parent="CanvasLayer/CenterContainer"]
-z_index = 15
-layout_mode = 2
-script = ExtResource("4_grid")
 
 [node name="BattleHUD" parent="CanvasLayer" instance=ExtResource("2_hud")]
 z_index = 20
