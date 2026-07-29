@@ -1,6 +1,3 @@
-using AlJourney.Scripts.Core;
-using AlJourney.Scripts.Match3;
-
 namespace AlJourneyTests.Scripts.Match3
 {
     public class MatchDetectorTests
