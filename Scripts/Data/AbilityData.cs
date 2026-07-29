@@ -17,7 +17,9 @@ namespace AlJourney.Scripts.Data
         string IconPath,
         string Description,
         int UnlockCost,
-        Dictionary<string, int> Effects
+        Dictionary<string, int> Effects,
+        AbilityTargetType TargetType,
+        bool IsAoE = false
     )
     {
         /// <summary>

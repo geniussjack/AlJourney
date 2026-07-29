@@ -16,9 +16,9 @@ namespace AlJourney.Scripts.Utils
         /// </summary>
         /// <param name="parent">Узел, к которому будут прикреплены частицы.</param>
         /// <param name="position">Позиция появления частиц.</param>
-        /// <param name="elementType">Тип элемента для определения цвета эффекта.</param>
-        /// <param name="comboLevel">Уровень комбо, определяющий количество частиц.</param>
-        public static void SpawnComboEffect(Node parent, Vector2 position, ElementType elementType, int comboLevel)
+        /// <param name="element">Элемент способности для определения цвета эффекта.</param>
+        /// <param name="comboLevel">Уровень эффекта, определяющий количество частиц.</param>
+        public static void SpawnComboEffect(Node parent, Vector2 position, AbilityElement element, int comboLevel)
         {
             CpuParticles2D particles = new()
             {
@@ -33,7 +33,7 @@ namespace AlJourney.Scripts.Utils
                 InitialVelocityMax = 150.0f,
                 ScaleAmountMin = 0.5f,
                 ScaleAmountMax = 1.5f,
-                Color = GetElementColor(elementType)
+                Color = GetElementColor(element)
             };
 
             parent.AddChild(particles);
@@ -41,7 +41,7 @@ namespace AlJourney.Scripts.Utils
             SceneTreeTimer timer = parent.GetTree().CreateTimer(particles.Lifetime + 0.1f);
             timer.Timeout += particles.QueueFree;
 
-            GD.Print($"[ComboParticles] Spawned {elementType} particles (combo {comboLevel})");
+            GD.Print($"[ComboParticles] Spawned {element} particles (combo {comboLevel})");
         }
 
         private static int GetParticleAmount(int comboLevel)
@@ -55,14 +55,14 @@ namespace AlJourney.Scripts.Utils
             };
         }
 
-        private static Color GetElementColor(ElementType elementType)
+        private static Color GetElementColor(AbilityElement element)
         {
-            return elementType switch
+            return element switch
             {
-                ElementType.Fire => new Color(1.0f, 0.3f, 0.0f),
-                ElementType.Heal => new Color(0.0f, 1.0f, 0.3f),
-                ElementType.Sword => new Color(1.0f, 0.6f, 0.0f),
-                ElementType.Shield => new Color(0.2f, 0.5f, 1.0f),
+                AbilityElement.Fire => new Color(1.0f, 0.3f, 0.0f),
+                AbilityElement.Heal => new Color(0.0f, 1.0f, 0.3f),
+                AbilityElement.Sword => new Color(1.0f, 0.6f, 0.0f),
+                AbilityElement.Shield => new Color(0.2f, 0.5f, 1.0f),
                 _ => Colors.White
             };
         }

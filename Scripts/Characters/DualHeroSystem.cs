@@ -1,10 +1,16 @@
 using AlJourney.Scripts.Core;
 using Godot;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace AlJourney.Scripts.Characters
 {
     /// <summary>
-    /// Система управления двумя героями. Отвечает за их инициализацию, отслеживание их состояний и маршрутизацию сигналов.
+    /// Система управления отрядом игрока. Исторически называется "DualHeroSystem" (по двум главным героям),
+    /// но с Этапа 1 редизайна представляет собой отряд из трёх слотов: Маг и Воин (Эльтарион и Эльдрик,
+    /// всегда присутствуют) и опциональный третий слот наёмника, который появится на этапе восстановления
+    /// деревни (см. REDESIGN_NOTES.md, разделы 4 и 7). Отвечает за инициализацию бойцов, отслеживание их
+    /// состояний и маршрутизацию сигналов.
     /// </summary>
     public partial class DualHeroSystem : Node
     {
@@ -27,30 +33,26 @@ namespace AlJourney.Scripts.Characters
         public delegate void HeroDiedEventHandler(CharacterClass heroClass);
 
         /// <summary>
-        /// Сигнал, вызываемый, когда оба героя погибают. Это событие обычно приводит к окончанию игры.
+        /// Сигнал, вызываемый, когда весь отряд полностью погибает. Это событие обычно приводит к окончанию игры.
         /// </summary>
         [Signal]
-        public delegate void BothHeroesDiedEventHandler();
+        public delegate void PartyDefeatedEventHandler();
 
         /// <summary>
-        /// Ссылка на персонажа-Мага. Доступна только для чтения извне.
+        /// Ссылка на персонажа-Мага (Эльтарион). Доступна только для чтения извне.
         /// </summary>
         public PlayerCharacter Mage { get; private set; }
 
         /// <summary>
-        /// Ссылка на персонажа-Воина. Доступна только для чтения извне.
+        /// Ссылка на персонажа-Воина (Эльдрик). Доступна только для чтения извне.
         /// </summary>
         public PlayerCharacter Warrior { get; private set; }
 
         /// <summary>
-        /// Возвращает истину, если оба героя в данный момент живы.
+        /// Третий слот отряда — наёмник из поселения. В Этапе 1 всегда пуст: наём появится на этапе
+        /// восстановления деревни. Заложен заранее, чтобы не переделывать структуру отряда позже.
         /// </summary>
-        public bool AreBothAlive => Mage.IsAlive && Warrior.IsAlive;
-
-        /// <summary>
-        /// Возвращает истину, если хотя бы один из героев в данный момент жив.
-        /// </summary>
-        public bool IsAnyAlive => Mage.IsAlive || Warrior.IsAlive;
+        public PlayerCharacter Companion { get; private set; }
 
         /// <summary>
         /// Метод жизненного цикла Godot, вызываемый при добавлении узла в сцену.
@@ -75,7 +77,7 @@ namespace AlJourney.Scripts.Characters
             hero.HealthChanged += (current, max) =>
             {
                 _ = EmitSignal(SignalName.HeroHealthChanged, (int)heroClass, current, max);
-                CheckBothDead();
+                CheckPartyDefeated();
             };
 
             hero.ShieldChanged += (shield) =>
@@ -84,34 +86,35 @@ namespace AlJourney.Scripts.Characters
             hero.CharacterDied += () =>
             {
                 _ = EmitSignal(SignalName.HeroDied, (int)heroClass);
-                CheckBothDead();
+                CheckPartyDefeated();
             };
         }
 
-        private void CheckBothDead()
+        private void CheckPartyDefeated()
         {
-            if (!Mage.IsAlive && !Warrior.IsAlive)
+            if (GetAliveMembers().Count == 0)
             {
-                _ = EmitSignal(SignalName.BothHeroesDied);
-                GD.Print("[DualHeroSystem] Both heroes have died - Game Over!");
+                _ = EmitSignal(SignalName.PartyDefeated);
+                GD.Print("[DualHeroSystem] Entire party has fallen - Game Over!");
             }
         }
 
         /// <summary>
-        /// Возвращает соответствующего героя в зависимости от типа элемента.
+        /// Возвращает всех участников отряда: двух героев и наёмника, если он назначен.
         /// </summary>
-        /// <param name="elementType">Тип элемента.</param>
-        /// <returns>Персонаж-игрок, соответствующий данному элементу, или null при неизвестном элементе.</returns>
-        public PlayerCharacter GetHeroForElement(ElementType elementType)
+        /// <returns>Список участников отряда в фиксированном порядке (Маг, Воин, Наёмник).</returns>
+        public IReadOnlyList<PlayerCharacter> GetPartyMembers()
         {
-            return elementType switch
-            {
-                ElementType.Fire => Mage,
-                ElementType.Heal => Mage,
-                ElementType.Sword => Warrior,
-                ElementType.Shield => Warrior,
-                _ => null
-            };
+            return Companion is null ? [Mage, Warrior] : [Mage, Warrior, Companion];
+        }
+
+        /// <summary>
+        /// Возвращает только тех участников отряда, которые в данный момент живы.
+        /// </summary>
+        /// <returns>Список живых участников отряда.</returns>
+        public IReadOnlyList<PlayerCharacter> GetAliveMembers()
+        {
+            return [.. GetPartyMembers().Where(member => member.IsAlive)];
         }
 
         /// <summary>
@@ -144,12 +147,14 @@ namespace AlJourney.Scripts.Characters
         }
 
         /// <summary>
-        /// Обрабатывает все активные статусные эффекты для обоих героев.
+        /// Обрабатывает все активные статусные эффекты для всех участников отряда.
         /// </summary>
         public void ProcessStatusEffects()
         {
-            Mage.ProcessStatusEffects();
-            Warrior.ProcessStatusEffects();
+            foreach (PlayerCharacter member in GetPartyMembers())
+            {
+                member.ProcessStatusEffects();
+            }
         }
     }
 }
