@@ -1,13 +1,15 @@
 using AlJourney.Scripts.Characters;
 using AlJourney.Scripts.Core;
-using AlJourney.Scripts.UI;
+using AlJourney.Scripts.Data;
 using AlJourney.Scripts.Utils;
+using System.Collections.Generic;
 
 namespace AlJourney.Scripts.Interfaces
 {
     /// <summary>
-    /// Интерфейс для управления логикой боя.
-    /// Контролирует фазы битвы, номера волн врагов и инициализацию боевых систем.
+    /// Интерфейс для управления логикой пошагового боя.
+    /// Контролирует фазы битвы, номер волны врагов и текущее состояние выбора хода игрока
+    /// (выбранный боец → выбранная способность → цель).
     /// </summary>
     public interface IBattleManager
     {
@@ -22,14 +24,44 @@ namespace AlJourney.Scripts.Interfaces
         int CurrentWave { get; }
 
         /// <summary>
-        /// Система управления дуэтом героев, участвующих в битве.
+        /// Система управления отрядом героев, участвующих в битве.
         /// </summary>
         DualHeroSystem HeroSystem { get; }
 
         /// <summary>
-        /// Инициализирует менеджер боя, связывая его с интерфейсом игрового поля.
+        /// Участники отряда, которые ещё не совершили ход в текущем раунде.
         /// </summary>
-        void Initialize(GridUI gridUI);
+        IReadOnlyList<PlayerCharacter> PendingActors { get; }
+
+        /// <summary>
+        /// Боец, выбранный игроком для текущего хода (либо null, если выбор ещё не сделан).
+        /// </summary>
+        PlayerCharacter SelectedActor { get; }
+
+        /// <summary>
+        /// Способность, выбранная для текущего хода (либо null, если выбор ещё не сделан).
+        /// </summary>
+        AbilityData SelectedAbility { get; }
+
+        /// <summary>
+        /// Выбирает бойца, который совершит ход следующим (порядок хода определяет игрок).
+        /// </summary>
+        void SelectActor(PlayerCharacter actor);
+
+        /// <summary>
+        /// Выбирает способность, которую применит выбранный боец.
+        /// </summary>
+        void SelectAbility(AbilityData ability);
+
+        /// <summary>
+        /// Возвращает список допустимых целей для наведения выбранной способности.
+        /// </summary>
+        IReadOnlyList<Character> GetValidTargets();
+
+        /// <summary>
+        /// Подтверждает цель и немедленно разрешает эффект выбранной способности.
+        /// </summary>
+        void ConfirmTarget(Character target);
 
         /// <summary>
         /// Запускает начало битвы для указанной волны, настраивая героев и опционально применяя эффекты тряски камеры.

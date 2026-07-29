@@ -10,6 +10,8 @@ namespace AlJourney.Scripts.Battle
 {
     /// <summary>
     /// Сервис для управления ИИ врагов и обработки их действий.
+    /// Работает с произвольным составом живого отряда игрока (2 героя + опциональный наёмник),
+    /// а не с захардкоженной парой Маг/Воин.
     /// </summary>
     public static class EnemyAIController
     {
@@ -20,23 +22,13 @@ namespace AlJourney.Scripts.Battle
                 return;
             }
 
-            List<PlayerCharacter> aliveHeroes = [];
-            if (battleManager.HeroSystem.Mage.IsAlive)
-            {
-                aliveHeroes.Add(battleManager.HeroSystem.Mage);
-            }
-
-            if (battleManager.HeroSystem.Warrior.IsAlive)
-            {
-                aliveHeroes.Add(battleManager.HeroSystem.Warrior);
-            }
-
-            if (aliveHeroes.Count == 0)
+            List<PlayerCharacter> aliveMembers = [.. battleManager.HeroSystem.GetAliveMembers()];
+            if (aliveMembers.Count == 0)
             {
                 return;
             }
 
-            PlayerCharacter target = SelectTarget(aliveHeroes, enemy);
+            PlayerCharacter target = SelectTarget(aliveMembers, enemy);
 
             if (enemy.IsBoss)
             {
@@ -58,7 +50,7 @@ namespace AlJourney.Scripts.Battle
                 int reflected = target.TakeDamage(damage, enemy.AttackType, canReflect: true);
 
                 AudioManager.Instance?.PlayHitSound();
-                Vector2 targetPos = target == battleManager.HeroSystem.Mage ? new Vector2(200, 100) : new Vector2(1000, 100);
+                Vector2 targetPos = CombatEffectProcessor.GetAllyVfxPosition(target, battleManager.HeroSystem);
                 ComboParticles.SpawnDamageNumber(battleManager, targetPos, damage);
 
                 if (reflected > 0)
@@ -68,16 +60,16 @@ namespace AlJourney.Scripts.Battle
             }
         }
 
-        private static PlayerCharacter SelectTarget(List<PlayerCharacter> aliveHeroes, Enemy enemy)
+        private static PlayerCharacter SelectTarget(List<PlayerCharacter> aliveMembers, Enemy enemy)
         {
-            PlayerCharacter wounded = aliveHeroes
+            PlayerCharacter wounded = aliveMembers
                 .Where(h => h.CurrentHealth < h.MaxHealth * 0.3f)
                 .OrderBy(h => h.CurrentHealth)
                 .FirstOrDefault();
 
             return wounded ?? (enemy.IsMiniboss || enemy.IsBoss
-                ? aliveHeroes.OrderBy(h => h.BaseDefense).First()
-                : aliveHeroes[GD.RandRange(0, aliveHeroes.Count - 1)]);
+                ? aliveMembers.OrderBy(h => h.BaseDefense).First()
+                : aliveMembers[GD.RandRange(0, aliveMembers.Count - 1)]);
         }
 
         private static void PerformNecromancerAction(Enemy necromancer, PlayerCharacter target, BattleManager battleManager)
@@ -111,12 +103,6 @@ namespace AlJourney.Scripts.Battle
                 Enemy skeleton = EnemySpawner.SpawnEnemy(EnemyType.SkeletonWarrior, battleManager.CurrentWave);
                 skeleton.CharacterDied += () => battleManager.OnEnemyDied(skeleton);
 
-                // Рассчитываем позицию для нового скелета, чтобы он не накладывался на других.
-                int maxEnemies = battleManager.Enemies.Count + 1;
-                float totalWidth = (maxEnemies - 1) * 150f;
-                float startX = 640f - (totalWidth / 2f) + 150f;
-                float xOffset = startX + (battleManager.Enemies.Count * 150f);
-
                 battleManager.Enemies.Add(skeleton);
                 battleManager.AddChild(skeleton);
             }
@@ -135,8 +121,10 @@ namespace AlJourney.Scripts.Battle
         private static void ExecuteNecromancerWeaken(BattleManager battleManager)
         {
             Data.StatusEffectData weakenEffect = new(StatusEffect.Weakened, 1, 0);
-            battleManager.HeroSystem.Mage.ApplyStatusEffect(weakenEffect);
-            battleManager.HeroSystem.Warrior.ApplyStatusEffect(weakenEffect);
+            foreach (PlayerCharacter member in battleManager.HeroSystem.GetAliveMembers())
+            {
+                member.ApplyStatusEffect(weakenEffect);
+            }
         }
     }
 }
