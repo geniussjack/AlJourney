@@ -1,113 +1,124 @@
-keys,en,ru
-UI_MAIN_MENU_NEW_GAME,New Game,Новая игра
-UI_MAIN_MENU_CONTINUE,Continue,Продолжить
-UI_MAIN_MENU_PLAY,Play,Играть
-UI_MAIN_MENU_SETTINGS,Settings,Настройки
-UI_MAIN_MENU_CREDITS,Credits,Титры
-UI_MAIN_MENU_QUIT,Quit,Выход
-UI_SETTINGS_TITLE,Settings,Настройки
-UI_SETTINGS_VIDEO,Video,Видео
-UI_SETTINGS_RESOLUTION,Resolution:,Разрешение:
-UI_SETTINGS_WINDOW_MODE,Window Mode:,Режим окна:
-UI_SETTINGS_LANGUAGE,Language:,Язык:
-UI_SETTINGS_FPS_LIMIT,FPS Limit:,Лимит FPS:
-UI_SETTINGS_AUDIO,Audio,Аудио
-UI_SETTINGS_MASTER,Master:,Общая:
-UI_SETTINGS_MUSIC,Music:,Музыка:
-UI_SETTINGS_SFX,SFX:,Эффекты:
-UI_SETTINGS_APPLY,Apply,Применить
-UI_SETTINGS_RESET,Reset,Сброс
-UI_SETTINGS_BACK,Back,Назад
-UI_SETTINGS_CANCEL_TITLE,Cancel Changes,Отмена изменений
-UI_SETTINGS_CANCEL_PROMPT,Are you sure you want to cancel the changes?,"Вы уверены, что хотите отменить внесённые изменения?"
-UI_PAUSE_TITLE,PAUSED,ПАУЗА
-UI_PAUSE_RESUME,Resume,Продолжить
-UI_PAUSE_MAIN_MENU,Main Menu,В главное меню
-UI_CREDITS_TITLE,Credits,Титры
-UI_BATTLE_WAVE,Wave:,Волна:
-UI_BATTLE_SCORE,Score:,Очки:
-UI_BATTLE_SHIELD,Shield:,Щит:
-UI_BATTLE_SWAPS,Swaps:,Ходы:
-UI_BATTLE_ALTARION,Altarion,Эльтарион
-UI_BATTLE_ALDRIC,Aldric,Элдрик
-UI_PAUSE_SAVE,Save Game,Сохранить
-CHARACTER_MAGE,Mage,Маг
-CHARACTER_WARRIOR,Warrior,Воин
-ENEMY_SKELETON_WARRIOR,Skeleton,Скелет
-ENEMY_SKELETON_ARCHER,Skeleton Archer,Скелет-лучник
-ENEMY_ZOMBIE,Zombie,Зомби
-ENEMY_SLIME,Slime,Слайм
-ENEMY_DRAUGR_WARRIOR,Draugr Warrior,Драугр-воин
-ENEMY_DRAUGR_DEFENDER,Draugr Defender,Драугр-защитник
-ENEMY_DRAUGR_CASTER,Draugr Caster,Драугр-маг
-ENEMY_GENERAL_OF_DRAUGR,General of Draugr,Генерал Драугров
-ENEMY_ARHISKELETON,Arhiskeleton,Архискелет
-ENEMY_NECROMANCER,Necromancer,Некромант
-UI_ENGLISH,English,English
-UI_RUSSIAN,Русский,Русский
-UI_FULLSCREEN,Fullscreen,Полный экран
-UI_BORDERLESS,Borderless,Без рамок
-UI_WINDOWED,Windowed,Оконный
-UI_GAMEOVER_TITLE,Game Over,Игра Окончена
-UI_GAMEOVER_RETRY,Try Again,Попробовать снова
-UI_GAMEOVER_MAIN_MENU,Main Menu,В главное меню
-UI_GAMEOVER_WAVE_REACHED,Wave Reached:,Достигнута волна:
-UI_GAMEOVER_COINS,Coins Collected:,Собрано монет:
-UI_GAMEOVER_ENEMIES_DEFEATED,Enemies Defeated:,Врагов побеждено:
-UI_VICTORY_TITLE,Victory!,Победа!
-UI_VICTORY_NEXT_WAVE,Next Wave,Следующая волна
-UI_VICTORY_MAIN_MENU,Main Menu,В главное меню
-UI_SHOP_NEXT_WAVE,Next Wave,Следующая волна
-UI_INVENTORY,Inventory,Инвентарь
-UI_SHOP_TITLE,Shop,Магазин Улучшений
-UI_SHOP_HP,HP,Здоровье
-UI_SHOP_DMG,DMG,Урон
-UI_SHOP_DEF,DEF,Защита
-UI_SHOP_COST,Cost,Цена
-UI_SHOP_BUY,Buy,Купить
-UI_COINS,Coins,Монеты
-UI_CLOSE,Close,Закрыть
-UI_UPGRADE,Upgrade,Улучшить
-UI_EQUIPMENT,Equipment,Снаряжение
-HERO_MAGE,Eltarion,Эльтарион
-HERO_WARRIOR,Eldrik,Элдрик
-STAT_DAMAGE,Damage,Урон
-STAT_BLEED_DAMAGE,Bleed Dmg per turn,Урон от кровотечения / ход
-STAT_BURN_DAMAGE,Burn Dmg per turn,Урон от горения / ход
-STAT_VULNERABLE_AMOUNT,Incoming Damage Increase %,Увеличение входящего урона %
-STAT_SHOCK_AMOUNT,Incoming Damage Increase %,Увеличение входящего урона %
-STAT_WEAKEN_AMOUNT,Enemy Attack Reduction %,Снижение силы атаки врага %
-WPN_NAME_FIREBALL,Fireball,Огненный шар
-WPN_DESC_FIREBALL,Deals high damage and causes burning effect inflicting damage every turn.,Наносит большой урон и вызывает эффект горения наносящий врагу урон каждый ход.
-WPN_NAME_ICEBALL,Iceball,Ледяной шар
-WPN_DESC_ICEBALL,Deals low damage and reduces enemy attack power.,Наносит малый урон и уменьшает силу атаки у противника.
-WPN_NAME_ELECTROBALL,Electroball,Электрошар
-WPN_DESC_ELECTROBALL,Deals medium damage and causes shock increasing incoming damage.,Наносит средний урон и вызывает шок увеличивающий входящий урон по врагу.
-WPN_NAME_SWORD,Sword,Меч
-WPN_DESC_SWORD,Deals high damage.,Наносит большой урон.
-WPN_NAME_AXE,Axe,Топор
-WPN_DESC_AXE,Deals medium damage and causes bleeding reducing enemy health every turn.,Наносит средний урон и вызывает кровотечение отнимающее у врага здоровье каждый ход.
-WPN_NAME_SPEAR,Spear,Копьё
-WPN_DESC_SPEAR,Deals low damage and increases incoming damage to the enemy.,Наносит малый урон и увеличивает входящий урон по врагу.
-WPN_NAME_LEATHER_ARMOR,Leather Armor,Кожаная броня
-WPN_NAME_DRAGON_SCALES,Dragon Scales,Чешуя дракона
-WPN_NAME_POWER_RING,Ring of Power,Кольцо силы
-WPN_NAME_LIFE_AMULET,Amulet of Life,Амулет жизни
-UI_CREDITS_GAME_TITLE,Altarion's Journey,Altarion's Journey
-UI_CREDITS_SUBTITLE,A Match-3 RPG Roguelike,Match-3 RPG Рогалик
-UI_CREDITS_TEAM_TITLE,Development Team,Команда Разработчиков
-UI_CREDITS_PROGRAMMING,Game Design & Programming,Геймдизайн и Программирование
-UI_CREDITS_ART,Art & Graphics,Арт и Графика
-UI_CREDITS_AUDIO,Audio,Звук
-UI_CREDITS_THANKS,Special Thanks,Особая благодарность
-UI_CREDITS_BUILT_WITH,Built with,Создано с помощью
-UI_CREDITS_COPYRIGHT,(C) 2026 All Rights Reserved,(C) 2026 Все права защищены
-AUTHOR_NAME,Maksimov Daniil,Максимов Даниил
-UI_DMG_SHORT,DMG,УРН
-UI_HP_SHORT,HP,ОЗ
-UI_SHIELD_SHORT,Shield,Щит
-UI_CASCADE,CASCADE,КАСКАД
-UI_COMBO,Combo!,Комбо!
+keys,en,ru
+UI_MAIN_MENU_NEW_GAME,New Game,Новая игра
+UI_MAIN_MENU_CONTINUE,Continue,Продолжить
+UI_MAIN_MENU_PLAY,Play,Играть
+UI_MAIN_MENU_SETTINGS,Settings,Настройки
+UI_MAIN_MENU_CREDITS,Credits,Титры
+UI_MAIN_MENU_QUIT,Quit,Выход
+UI_SETTINGS_TITLE,Settings,Настройки
+UI_SETTINGS_VIDEO,Video,Видео
+UI_SETTINGS_RESOLUTION,Resolution:,Разрешение:
+UI_SETTINGS_WINDOW_MODE,Window Mode:,Режим окна:
+UI_SETTINGS_LANGUAGE,Language:,Язык:
+UI_SETTINGS_FPS_LIMIT,FPS Limit:,Лимит FPS:
+UI_SETTINGS_AUDIO,Audio,Аудио
+UI_SETTINGS_MASTER,Master:,Общая:
+UI_SETTINGS_MUSIC,Music:,Музыка:
+UI_SETTINGS_SFX,SFX:,Эффекты:
+UI_SETTINGS_APPLY,Apply,Применить
+UI_SETTINGS_RESET,Reset,Сброс
+UI_SETTINGS_BACK,Back,Назад
+UI_SETTINGS_CANCEL_TITLE,Cancel Changes,Отмена изменений
+UI_SETTINGS_CANCEL_PROMPT,Are you sure you want to cancel the changes?,"Вы уверены, что хотите отменить внесённые изменения?"
+UI_PAUSE_TITLE,PAUSED,ПАУЗА
+UI_PAUSE_RESUME,Resume,Продолжить
+UI_PAUSE_MAIN_MENU,Main Menu,В главное меню
+UI_CREDITS_TITLE,Credits,Титры
+UI_BATTLE_WAVE,Wave:,Волна:
+UI_BATTLE_SCORE,Score:,Очки:
+UI_BATTLE_SHIELD,Shield:,Щит:
+UI_BATTLE_SWAPS,Swaps:,Ходы:
+UI_BATTLE_ALTARION,Altarion,Эльтарион
+UI_BATTLE_ALDRIC,Aldric,Элдрик
+UI_BATTLE_CHOOSE_ACTOR,Choose who acts next,Выберите бойца
+UI_BATTLE_CHOOSE_ABILITY,Choose an ability,Выберите способность
+UI_BATTLE_CHOOSE_TARGET,Choose a target,Выберите цель
+ABILITY_ELTARION_FIREBALL,Fireball,Огненный шар
+ABILITY_ELTARION_FIREBALL_DESC,Hurls a bolt of fire at an enemy,Швыряет во врага сгусток пламени
+ABILITY_ELTARION_HEALING_LIGHT,Healing Light,Свет исцеления
+ABILITY_ELTARION_HEALING_LIGHT_DESC,Restores health to an ally or self,Восстанавливает здоровье себе или союзнику
+ABILITY_ELDRIC_SWORD_STRIKE,Sword Strike,Удар мечом
+ABILITY_ELDRIC_SWORD_STRIKE_DESC,A powerful strike against an enemy,Мощный удар по врагу
+ABILITY_ELDRIC_SHIELD_WALL,Shield Wall,Стена щитов
+ABILITY_ELDRIC_SHIELD_WALL_DESC,Grants a protective shield to an ally or self,Даёт защитный щит себе или союзнику
+UI_PAUSE_SAVE,Save Game,Сохранить
+CHARACTER_MAGE,Mage,Маг
+CHARACTER_WARRIOR,Warrior,Воин
+ENEMY_SKELETON_WARRIOR,Skeleton,Скелет
+ENEMY_SKELETON_ARCHER,Skeleton Archer,Скелет-лучник
+ENEMY_ZOMBIE,Zombie,Зомби
+ENEMY_SLIME,Slime,Слайм
+ENEMY_DRAUGR_WARRIOR,Draugr Warrior,Драугр-воин
+ENEMY_DRAUGR_DEFENDER,Draugr Defender,Драугр-защитник
+ENEMY_DRAUGR_CASTER,Draugr Caster,Драугр-маг
+ENEMY_GENERAL_OF_DRAUGR,General of Draugr,Генерал Драугров
+ENEMY_ARHISKELETON,Arhiskeleton,Архискелет
+ENEMY_NECROMANCER,Necromancer,Некромант
+UI_ENGLISH,English,English
+UI_RUSSIAN,Русский,Русский
+UI_FULLSCREEN,Fullscreen,Полный экран
+UI_BORDERLESS,Borderless,Без рамок
+UI_WINDOWED,Windowed,Оконный
+UI_GAMEOVER_TITLE,Game Over,Игра Окончена
+UI_GAMEOVER_RETRY,Try Again,Попробовать снова
+UI_GAMEOVER_MAIN_MENU,Main Menu,В главное меню
+UI_GAMEOVER_WAVE_REACHED,Wave Reached:,Достигнута волна:
+UI_GAMEOVER_COINS,Coins Collected:,Собрано монет:
+UI_GAMEOVER_ENEMIES_DEFEATED,Enemies Defeated:,Врагов побеждено:
+UI_VICTORY_TITLE,Victory!,Победа!
+UI_VICTORY_NEXT_WAVE,Next Wave,Следующая волна
+UI_VICTORY_MAIN_MENU,Main Menu,В главное меню
+UI_SHOP_NEXT_WAVE,Next Wave,Следующая волна
+UI_INVENTORY,Inventory,Инвентарь
+UI_SHOP_TITLE,Shop,Магазин Улучшений
+UI_SHOP_HP,HP,Здоровье
+UI_SHOP_DMG,DMG,Урон
+UI_SHOP_DEF,DEF,Защита
+UI_SHOP_COST,Cost,Цена
+UI_SHOP_BUY,Buy,Купить
+UI_COINS,Coins,Монеты
+UI_CLOSE,Close,Закрыть
+UI_UPGRADE,Upgrade,Улучшить
+UI_EQUIPMENT,Equipment,Снаряжение
+HERO_MAGE,Eltarion,Эльтарион
+HERO_WARRIOR,Eldrik,Элдрик
+STAT_DAMAGE,Damage,Урон
+STAT_BLEED_DAMAGE,Bleed Dmg per turn,Урон от кровотечения / ход
+STAT_BURN_DAMAGE,Burn Dmg per turn,Урон от горения / ход
+STAT_VULNERABLE_AMOUNT,Incoming Damage Increase %,Увеличение входящего урона %
+STAT_SHOCK_AMOUNT,Incoming Damage Increase %,Увеличение входящего урона %
+STAT_WEAKEN_AMOUNT,Enemy Attack Reduction %,Снижение силы атаки врага %
+WPN_NAME_FIREBALL,Fireball,Огненный шар
+WPN_DESC_FIREBALL,Deals high damage and causes burning effect inflicting damage every turn.,Наносит большой урон и вызывает эффект горения наносящий врагу урон каждый ход.
+WPN_NAME_ICEBALL,Iceball,Ледяной шар
+WPN_DESC_ICEBALL,Deals low damage and reduces enemy attack power.,Наносит малый урон и уменьшает силу атаки у противника.
+WPN_NAME_ELECTROBALL,Electroball,Электрошар
+WPN_DESC_ELECTROBALL,Deals medium damage and causes shock increasing incoming damage.,Наносит средний урон и вызывает шок увеличивающий входящий урон по врагу.
+WPN_NAME_SWORD,Sword,Меч
+WPN_DESC_SWORD,Deals high damage.,Наносит большой урон.
+WPN_NAME_AXE,Axe,Топор
+WPN_DESC_AXE,Deals medium damage and causes bleeding reducing enemy health every turn.,Наносит средний урон и вызывает кровотечение отнимающее у врага здоровье каждый ход.
+WPN_NAME_SPEAR,Spear,Копьё
+WPN_DESC_SPEAR,Deals low damage and increases incoming damage to the enemy.,Наносит малый урон и увеличивает входящий урон по врагу.
+WPN_NAME_LEATHER_ARMOR,Leather Armor,Кожаная броня
+WPN_NAME_DRAGON_SCALES,Dragon Scales,Чешуя дракона
+WPN_NAME_POWER_RING,Ring of Power,Кольцо силы
+WPN_NAME_LIFE_AMULET,Amulet of Life,Амулет жизни
+UI_CREDITS_GAME_TITLE,Altarion's Journey,Altarion's Journey
+UI_CREDITS_SUBTITLE,A Match-3 RPG Roguelike,Match-3 RPG Рогалик
+UI_CREDITS_TEAM_TITLE,Development Team,Команда Разработчиков
+UI_CREDITS_PROGRAMMING,Game Design & Programming,Геймдизайн и Программирование
+UI_CREDITS_ART,Art & Graphics,Арт и Графика
+UI_CREDITS_AUDIO,Audio,Звук
+UI_CREDITS_THANKS,Special Thanks,Особая благодарность
+UI_CREDITS_BUILT_WITH,Built with,Создано с помощью
+UI_CREDITS_COPYRIGHT,(C) 2026 All Rights Reserved,(C) 2026 Все права защищены
+AUTHOR_NAME,Maksimov Daniil,Максимов Даниил
+UI_DMG_SHORT,DMG,УРН
+UI_HP_SHORT,HP,ОЗ
+UI_SHIELD_SHORT,Shield,Щит
+UI_CASCADE,CASCADE,КАСКАД
+UI_COMBO,Combo!,Комбо!
 
 UI_GAMEOVER_SUBTITLE,Both heroes have fallen...,Оба героя пали...
 UI_GAMEOVER_STATS_TITLE,Your Journey,Ваш Путь
