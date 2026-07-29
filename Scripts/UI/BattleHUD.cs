@@ -1,9 +1,11 @@
+using AlJourney.Scripts.Battle;
 using AlJourney.Scripts.Characters;
 using AlJourney.Scripts.Core;
+using AlJourney.Scripts.Data;
 using AlJourney.Scripts.Managers;
-using AlJourney.Scripts.Match3;
 using Godot;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace AlJourney.Scripts.UI
 {
@@ -29,9 +31,9 @@ namespace AlJourney.Scripts.UI
 
 
         private DualHeroSystem _heroSystem;
+        private BattleManager _battleManager;
         private readonly List<EnemyHealthBar> _enemyHealthBars = [];
         private PauseMenu _pauseMenu;
-        private ComboSystem _comboSystem;
 
         private Control _mageInfoContainer;
         private Control _warriorInfoContainer;
@@ -69,11 +71,8 @@ namespace AlJourney.Scripts.UI
             _inventoryButton = GetNode<Button>("MarginContainer/VBoxContainer/TopBar/InventoryButton");
             _inventoryButton.Pressed += OnInventoryButtonPressed;
 
-            _comboSystem = GetNode<ComboSystem>("/root/ComboSystem");
-
             GameStateManager.Instance.CoinsChanged += OnCoinsChanged;
             GameStateManager.Instance.WaveChanged += OnWaveChanged;
-            _comboSystem.CombosProcessed += OnCombosProcessed;
 
             PackedScene pauseScene = GD.Load<PackedScene>("res://Scenes/UI/PauseMenu.tscn");
             if (pauseScene != null)
@@ -90,15 +89,26 @@ namespace AlJourney.Scripts.UI
         }
 
         /// <summary>
-        /// Инициализирует HUD для работы с системой двух героев, настраивает начальные значения здоровья, щитов и эффекты получения урона.
+        /// Инициализирует HUD для работы с отрядом героев и менеджером боя: настраивает начальные значения
+        /// здоровья/щитов, эффекты получения урона, а также клики по портретам для выбора цели способности.
         /// </summary>
-        /// <param name="heroSystem">Система управления двумя героями.</param>
-        public void Initialize(DualHeroSystem heroSystem)
+        /// <param name="heroSystem">Система управления отрядом героев.</param>
+        /// <param name="battleManager">Менеджер пошагового боя, которому передаются подтверждённые цели.</param>
+        public void Initialize(DualHeroSystem heroSystem, BattleManager battleManager)
         {
             _heroSystem = heroSystem;
+            _battleManager = battleManager;
 
             _heroSystem.HeroHealthChanged += OnHeroHealthChanged;
             _heroSystem.HeroShieldChanged += OnHeroShieldChanged;
+
+            _battleManager.TurnStateChanged += RefreshTargetHighlights;
+            _battleManager.PhaseChanged += OnBattlePhaseChanged;
+
+            _mageInfoContainer.MouseFilter = MouseFilterEnum.Stop;
+            _warriorInfoContainer.MouseFilter = MouseFilterEnum.Stop;
+            _mageInfoContainer.GuiInput += @event => OnAllyPortraitGuiInput(@event, _heroSystem.Mage);
+            _warriorInfoContainer.GuiInput += @event => OnAllyPortraitGuiInput(@event, _heroSystem.Warrior);
 
             _heroSystem.Mage.ShieldChanged += (shield) => UpdateHeroShield(CharacterClass.Mage, shield);
             _heroSystem.Warrior.ShieldChanged += (shield) => UpdateHeroShield(CharacterClass.Warrior, shield);
@@ -147,7 +157,7 @@ namespace AlJourney.Scripts.UI
                 child.QueueFree();
             }
 
-            foreach (var effect in hero.GetActiveEffects())
+            foreach (StatusEffectData effect in hero.GetActiveEffects())
             {
                 Color rectColor = Colors.White;
                 string iconEmoji = "❓";
@@ -165,7 +175,7 @@ namespace AlJourney.Scripts.UI
                     case StatusEffect.Regeneration: iconEmoji = "💚"; rectColor = Colors.Green; break;
                 }
 
-                Label icon = new Label()
+                Label icon = new()
                 {
                     Text = iconEmoji,
                     Modulate = rectColor,
@@ -227,7 +237,7 @@ namespace AlJourney.Scripts.UI
             foreach (Enemy enemy in enemies)
             {
                 EnemyHealthBar enemyBar = new();
-                enemyBar.Initialize(enemy);
+                enemyBar.Initialize(enemy, _battleManager);
                 _enemiesContainer.AddChild(enemyBar);
                 _enemyHealthBars.Add(enemyBar);
             }
@@ -277,7 +287,7 @@ namespace AlJourney.Scripts.UI
             PackedScene inventoryScene = GD.Load<PackedScene>("res://Scenes/UI/InventoryUI.tscn");
             if (inventoryScene != null)
             {
-                var inventory = inventoryScene.Instantiate<Control>();
+                Control inventory = inventoryScene.Instantiate<Control>();
                 AddChild(inventory);
             }
             else
@@ -292,67 +302,44 @@ namespace AlJourney.Scripts.UI
             _pauseMenu?.Pause();
         }
 
-        private void OnCombosProcessed(int comboCount)
+        private void OnBattlePhaseChanged(BattlePhase newPhase)
         {
-            if (comboCount == 0 || _comboSystem == null)
+            RefreshTargetHighlights();
+        }
+
+        /// <summary>
+        /// Обновляет подсветку и кликабельность портретов союзников и полосок здоровья врагов
+        /// в соответствии с текущим списком допустимых целей выбранной способности.
+        /// </summary>
+        private void RefreshTargetHighlights()
+        {
+            if (_battleManager == null)
             {
                 return;
             }
 
-            List<ComboEffect> effects = _comboSystem.GetLastProcessedEffects();
-            if (effects == null || effects.Count == 0)
+            IReadOnlyList<Character> validTargets = _battleManager.GetValidTargets();
+
+            SetAllySelectable(_mageInfoContainer, validTargets.Contains(_heroSystem.Mage));
+            SetAllySelectable(_warriorInfoContainer, validTargets.Contains(_heroSystem.Warrior));
+
+            foreach (EnemyHealthBar bar in _enemyHealthBars)
             {
-                return;
-            }
-
-            bool mageActive = false;
-            bool warriorActive = false;
-
-            foreach (ComboEffect effect in effects)
-            {
-                switch (effect.ElementType)
-                {
-                    case ElementType.Fire:
-                    case ElementType.Heal:
-                        mageActive = true;
-                        break;
-
-                    case ElementType.Sword:
-                    case ElementType.Shield:
-                        warriorActive = true;
-                        break;
-                }
-            }
-
-            if (mageActive)
-            {
-                HighlightHero(_mageInfoContainer, new Color(0.5f, 0.8f, 1.0f));
-            }
-
-            if (warriorActive)
-            {
-                HighlightHero(_warriorInfoContainer, new Color(1.0f, 0.7f, 0.3f));
+                bar.SetSelectable(validTargets.Contains(bar.Enemy));
             }
         }
 
-        private void HighlightHero(Control container, Color highlightColor)
+        private static void SetAllySelectable(Control container, bool selectable)
         {
-            if (container == null)
+            container.Modulate = selectable ? new Color(1.2f, 1.2f, 0.5f) : Colors.White;
+        }
+
+        private void OnAllyPortraitGuiInput(InputEvent @event, PlayerCharacter member)
+        {
+            if (@event is InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left })
             {
-                return;
+                _battleManager?.ConfirmTarget(member);
             }
-
-            container.Modulate = Colors.White;
-
-            Tween tween = CreateTween();
-            _ = tween.SetEase(Tween.EaseType.Out);
-            _ = tween.SetTrans(Tween.TransitionType.Cubic);
-
-            _ = tween.TweenProperty(container, "modulate", highlightColor, 0.2f);
-
-            _ = tween.TweenInterval(0.3f);
-
-            _ = tween.TweenProperty(container, "modulate", Colors.White, 0.5f);
         }
 
         /// <summary>
@@ -366,7 +353,11 @@ namespace AlJourney.Scripts.UI
                 _heroSystem.HeroShieldChanged -= OnHeroShieldChanged;
             }
 
-            _comboSystem?.CombosProcessed -= OnCombosProcessed;
+            if (_battleManager != null)
+            {
+                _battleManager.TurnStateChanged -= RefreshTargetHighlights;
+                _battleManager.PhaseChanged -= OnBattlePhaseChanged;
+            }
 
             GameStateManager.Instance.CoinsChanged -= OnCoinsChanged;
             GameStateManager.Instance.WaveChanged -= OnWaveChanged;
@@ -381,15 +372,24 @@ namespace AlJourney.Scripts.UI
         private Label _nameLabel;
         private ProgressBar _healthBar;
         private Label _healthLabel;
-        private Enemy _enemy;
+        private BattleManager _battleManager;
+        private bool _isSelectable;
         private AlJourney.Scripts.Utils.DamageFlash _damageFlash;
         private TextureRect _portrait;
+
+        /// <summary>
+        /// Враг, к которому привязана данная полоска здоровья.
+        /// </summary>
+        public Enemy Enemy { get; private set; }
 
         /// <summary>
         /// Конструктор. Создает и настраивает визуальные элементы полоски здоровья: имя, саму полоску и текст здоровья.
         /// </summary>
         public EnemyHealthBar()
         {
+            MouseFilter = MouseFilterEnum.Stop;
+            GuiInput += OnGuiInput;
+
             HBoxContainer row = new();
             row.AddThemeConstantOverride("separation", 10);
             AddChild(row);
@@ -444,37 +444,39 @@ namespace AlJourney.Scripts.UI
         /// Инициализирует полоску здоровья данными конкретного врага, подписывается на его события изменения здоровья и смерти, а также настраивает цвет в зависимости от типа врага.
         /// </summary>
         /// <param name="enemy">Враг, к которому привязывается данная полоска здоровья.</param>
-        public void Initialize(Enemy enemy)
+        /// <param name="battleManager">Менеджер боя, которому передаётся подтверждённая цель по клику.</param>
+        public void Initialize(Enemy enemy, BattleManager battleManager)
         {
-            _enemy = enemy;
-            _enemy.HealthChanged += OnHealthChanged;
-            _enemy.CharacterDied += OnEnemyDied;
+            Enemy = enemy;
+            _battleManager = battleManager;
+            Enemy.HealthChanged += OnHealthChanged;
+            Enemy.CharacterDied += OnEnemyDied;
 
-            _nameLabel.Text = _enemy.CharacterName;
+            _nameLabel.Text = Enemy.CharacterName;
 
-            string spritePath = _enemy.EnemyType switch
+            string spritePath = Enemy.EnemyType switch
             {
                 EnemyType.Slime => "res://Resources/Sprites/Characters/slime_sprite.png",
                 _ => "res://Resources/Sprites/Characters/skeleton_sprite.png"
             };
             _portrait.Texture = GD.Load<Texture2D>(spritePath);
             AnimatePortrait();
-            UpdateHealth(_enemy.CurrentHealth, _enemy.MaxHealth);
+            UpdateHealth(Enemy.CurrentHealth, Enemy.MaxHealth);
 
-            _healthBar.Modulate = _enemy.IsBoss ? Colors.Purple : _enemy.IsMiniboss ? Colors.Orange : Colors.Red;
+            _healthBar.Modulate = Enemy.IsBoss ? Colors.Purple : Enemy.IsMiniboss ? Colors.Orange : Colors.Red;
 
             _damageFlash = new AlJourney.Scripts.Utils.DamageFlash();
             AddChild(_damageFlash);
-            _enemy.DamageTaken += (_) => _damageFlash.FlashDamage();
-            _enemy.Healed += (_) => _damageFlash.FlashHeal();
+            Enemy.DamageTaken += (_) => _damageFlash.FlashDamage();
+            Enemy.Healed += (_) => _damageFlash.FlashHeal();
 
             _statusContainer = new HBoxContainer() { Alignment = BoxContainer.AlignmentMode.Center };
             // Add _statusContainer to the text container below the health label
-            var textContainer = _healthLabel.GetParent();
+            Node textContainer = _healthLabel.GetParent();
             textContainer.AddChild(_statusContainer);
 
-            _enemy.StatusEffectAdded += (effectType, duration, power) => UpdateStatusEffects();
-            _enemy.StatusEffectRemoved += (effectType) => UpdateStatusEffects();
+            Enemy.StatusEffectAdded += (effectType, duration, power) => UpdateStatusEffects();
+            Enemy.StatusEffectRemoved += (effectType) => UpdateStatusEffects();
             UpdateStatusEffects();
         }
 
@@ -485,7 +487,7 @@ namespace AlJourney.Scripts.UI
                 child.QueueFree();
             }
 
-            foreach (var effect in _enemy.GetActiveEffects())
+            foreach (StatusEffectData effect in Enemy.GetActiveEffects())
             {
                 Color rectColor = Colors.White;
                 string iconEmoji = "❓";
@@ -503,7 +505,7 @@ namespace AlJourney.Scripts.UI
                     case StatusEffect.Regeneration: iconEmoji = "💚"; rectColor = Colors.Green; break;
                 }
 
-                Label icon = new Label()
+                Label icon = new()
                 {
                     Text = iconEmoji,
                     Modulate = rectColor,
@@ -546,7 +548,7 @@ namespace AlJourney.Scripts.UI
             _healthBar.MaxValue = maxHealth;
             _healthBar.Value = currentHealth;
             _healthLabel.Text = $"{currentHealth}/{maxHealth}";
-            _nameLabel.Text = _enemy.CharacterName;
+            _nameLabel.Text = Enemy.CharacterName;
         }
 
         private void OnEnemyDied()
@@ -557,14 +559,32 @@ namespace AlJourney.Scripts.UI
         }
 
         /// <summary>
+        /// Помечает данного врага как допустимую (или недопустимую) цель для наведения текущей способности
+        /// и подсвечивает полоску здоровья соответствующим образом.
+        /// </summary>
+        public void SetSelectable(bool selectable)
+        {
+            _isSelectable = selectable;
+            Modulate = selectable ? new Color(1.3f, 1.3f, 0.6f) : Colors.White;
+        }
+
+        private void OnGuiInput(InputEvent @event)
+        {
+            if (_isSelectable && @event is InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left })
+            {
+                _battleManager?.ConfirmTarget(Enemy);
+            }
+        }
+
+        /// <summary>
         /// Вызывается при удалении узла. Отписывается от событий связанного врага.
         /// </summary>
         public override void _ExitTree()
         {
-            if (_enemy != null)
+            if (Enemy != null)
             {
-                _enemy.HealthChanged -= OnHealthChanged;
-                _enemy.CharacterDied -= OnEnemyDied;
+                Enemy.HealthChanged -= OnHealthChanged;
+                Enemy.CharacterDied -= OnEnemyDied;
             }
         }
     }

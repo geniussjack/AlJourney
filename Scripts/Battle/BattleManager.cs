@@ -1,22 +1,20 @@
+using AlJourney.Scripts.Battle.Rules;
 using AlJourney.Scripts.Characters;
 using AlJourney.Scripts.Core;
 using AlJourney.Scripts.Data;
 using AlJourney.Scripts.Interfaces;
 using AlJourney.Scripts.Managers;
-using AlJourney.Scripts.Match3;
-using AlJourney.Scripts.UI;
 using AlJourney.Scripts.Utils;
 using Godot;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace AlJourney.Scripts.Battle
 {
     /// <summary>
-    /// Глобальный менеджер боевой системы. Управляет ходами,
-    /// волнами противников, обработкой комбо-эффектов от доски Match-3,
-    /// а также начислением урона и выдачей лута.
+    /// Глобальный менеджер пошаговой боевой системы. Управляет очередью хода отряда игрока
+    /// (игрок сам выбирает, кто из живых бойцов ходит следующим, затем его способность и цель),
+    /// ходом врагов, волнами противников, а также начислением урона и выдачей лута.
     /// </summary>
     public partial class BattleManager : Node, IBattleManager
     {
@@ -32,6 +30,13 @@ namespace AlJourney.Scripts.Battle
         /// <param name="newPhase">Новая фаза из перечисления BattlePhase.</param>
         [Signal]
         public delegate void PhaseChangedEventHandler(BattlePhase newPhase);
+
+        /// <summary>
+        /// Сигнал вызывается при любом изменении состояния выбора хода игрока
+        /// (выбор бойца, выбор способности, разрешение цели). Используется UI выбора цели для обновления.
+        /// </summary>
+        [Signal]
+        public delegate void TurnStateChangedEventHandler();
 
         /// <summary>
         /// Сигнал вызывается, когда все враги в текущей волне побеждены.
@@ -59,14 +64,11 @@ namespace AlJourney.Scripts.Battle
             NecromancerTurnCount++;
         }
 
-        private GridManager _gridManager;
-        private ComboSystem _comboSystem;
         private CameraShake _cameraShake;
-        private GridUI _gridUI;
-        private bool _isConnectedToGridManager = false;
         private bool _battleEndedSignaled;
         private bool _isWaveCompleted;
-        private readonly List<ComboEffect> _accumulatedEffects = [];
+
+        private List<PlayerCharacter> _pendingActors = [];
 
         /// <summary>
         /// Текущая фаза битвы.
@@ -79,7 +81,7 @@ namespace AlJourney.Scripts.Battle
         public int CurrentWave { get; private set; }
 
         /// <summary>
-        /// Ссылка на систему двух героев.
+        /// Ссылка на систему отряда героев.
         /// </summary>
         public DualHeroSystem HeroSystem { get; private set; }
 
@@ -89,42 +91,38 @@ namespace AlJourney.Scripts.Battle
         public List<Enemy> Enemies { get; private set; }
 
         /// <summary>
-        /// Инициализация менеджера и привязка к глобальным узлам.
+        /// Участники отряда, которые ещё не совершили ход в текущем раунде.
+        /// </summary>
+        public IReadOnlyList<PlayerCharacter> PendingActors => _pendingActors;
+
+        /// <summary>
+        /// Боец, выбранный игроком для текущего хода.
+        /// </summary>
+        public PlayerCharacter SelectedActor { get; private set; }
+
+        /// <summary>
+        /// Способность, выбранная для текущего хода.
+        /// </summary>
+        public AbilityData SelectedAbility { get; private set; }
+
+        /// <summary>
+        /// Инициализация менеджера боя.
         /// </summary>
         public override void _Ready()
         {
             Enemies = [];
-            CurrentPhase = BattlePhase.PlayerSwap;
+            CurrentPhase = BattlePhase.PlayerTurn;
             NecromancerTurnCount = 0;
             _battleEndedSignaled = false;
             _isWaveCompleted = false;
 
-            _gridManager = GetNode<GridManager>("/root/GridManager");
-            _comboSystem = GetNode<ComboSystem>("/root/ComboSystem");
-
-            if (!_isConnectedToGridManager)
-            {
-                _gridManager.SwapCompleted += OnSwapCompleted;
-                _isConnectedToGridManager = true;
-            }
-
-            GD.Print("[BattleManager] Initialized for dual hero system");
+            GD.Print("[BattleManager] Initialized for party-based turn combat");
         }
 
         /// <summary>
-        /// Привязывает интерфейс сетки к боевому менеджеру.
-        /// Необходимо для визуализации комбо-эффектов.
+        /// Запускает битву для указанной волны с переданной системой отряда.
         /// </summary>
-        /// <param name="gridUI">Экземпляр UI сетки.</param>
-        public void Initialize(GridUI gridUI)
-        {
-            _gridUI = gridUI;
-        }
-
-        /// <summary>
-        /// Запускает битву для указанной волны с переданной системой героев.
-        /// </summary>
-        /// <param name="heroSystem">Объект системы героев игрока.</param>
+        /// <param name="heroSystem">Объект системы отряда игрока.</param>
         /// <param name="waveNumber">Номер волны для генерации сложности.</param>
         /// <param name="cameraShake">Опциональный контроллер тряски камеры.</param>
         public void StartBattle(DualHeroSystem heroSystem, int waveNumber, CameraShake cameraShake = null)
@@ -136,21 +134,124 @@ namespace AlJourney.Scripts.Battle
             _battleEndedSignaled = false;
             _isWaveCompleted = false;
 
-            HeroSystem.BothHeroesDied += OnBothHeroesDied;
+            HeroSystem.PartyDefeated += OnPartyDefeated;
 
             GenerateWaveEnemies();
-            _gridManager.InitializeGrid();
+            StartPlayerTurn();
 
-            ChangePhase(BattlePhase.PlayerSwap);
             _ = EmitSignal(SignalName.BattleStarted);
+        }
+
+        private void StartPlayerTurn()
+        {
+            HeroSystem.ProcessStatusEffects();
+
+            _pendingActors = [.. HeroSystem.GetAliveMembers()];
+            SelectedActor = null;
+            SelectedAbility = null;
+
+            ChangePhase(BattlePhase.PlayerTurn);
         }
 
         private void ChangePhase(BattlePhase newPhase)
         {
             CurrentPhase = newPhase;
-            _ = _gridUI?.CanInteract = CurrentPhase == BattlePhase.PlayerSwap;
             _ = EmitSignal(SignalName.PhaseChanged, (int)CurrentPhase);
-            GD.Print($"[BattleManager] Phase changed to {CurrentPhase}");
+        }
+
+        /// <summary>
+        /// Выбирает бойца, который совершит ход следующим. Игрок сам определяет порядок хода
+        /// среди ещё не действовавших в этом раунде живых участников отряда.
+        /// </summary>
+        public void SelectActor(PlayerCharacter actor)
+        {
+            if (CurrentPhase != BattlePhase.PlayerTurn || actor is null || !_pendingActors.Contains(actor))
+            {
+                return;
+            }
+
+            SelectedActor = actor;
+            SelectedAbility = null;
+            _ = EmitSignal(SignalName.TurnStateChanged);
+        }
+
+        /// <summary>
+        /// Выбирает способность, которую применит выбранный боец (одна из ровно двух: атака или защита/поддержка).
+        /// </summary>
+        public void SelectAbility(AbilityData ability)
+        {
+            if (CurrentPhase != BattlePhase.PlayerTurn || SelectedActor is null || ability is null)
+            {
+                return;
+            }
+
+            SelectedAbility = ability;
+            _ = EmitSignal(SignalName.TurnStateChanged);
+        }
+
+        /// <summary>
+        /// Возвращает список допустимых целей для наведения выбранной способности.
+        /// </summary>
+        public IReadOnlyList<Character> GetValidTargets()
+        {
+            if (SelectedAbility is null)
+            {
+                return [];
+            }
+
+            IReadOnlyList<Character> allies = [.. HeroSystem.GetAliveMembers()];
+            IReadOnlyList<Character> enemies = [.. Enemies.Where(e => e.IsAlive)];
+
+            return AbilityTargetingRules.GetValidTargets(SelectedAbility.TargetType, allies, enemies, static c => c.IsAlive);
+        }
+
+        /// <summary>
+        /// Подтверждает цель и немедленно разрешает эффект выбранной способности.
+        /// Если это был последний ещё не походивший боец отряда — начинается ход врагов.
+        /// </summary>
+        public void ConfirmTarget(Character target)
+        {
+            if (CurrentPhase != BattlePhase.PlayerTurn || SelectedActor is null || SelectedAbility is null)
+            {
+                return;
+            }
+
+            if (!GetValidTargets().Contains(target))
+            {
+                return;
+            }
+
+            ResolveAbility(SelectedActor, SelectedAbility, target);
+
+            _ = _pendingActors.Remove(SelectedActor);
+            SelectedActor = null;
+            SelectedAbility = null;
+
+            if (_pendingActors.Count == 0)
+            {
+                StartEnemyTurn();
+            }
+            else
+            {
+                _ = EmitSignal(SignalName.TurnStateChanged);
+            }
+        }
+
+        private void ResolveAbility(PlayerCharacter caster, AbilityData ability, Character primaryTarget)
+        {
+            IReadOnlyList<Character> allies = [.. HeroSystem.GetAliveMembers()];
+            IReadOnlyList<Character> enemies = [.. Enemies.Where(e => e.IsAlive)];
+            IReadOnlyList<Character> targets = AbilityTargetingRules.ResolveEffectTargets(
+                ability.TargetType, ability.IsAoE, primaryTarget, allies, enemies, static c => c.IsAlive);
+
+            if (ability.IsAttackAbility)
+            {
+                CombatEffectProcessor.ApplyAttackAbility(ability, caster, targets, this, _cameraShake);
+            }
+            else
+            {
+                CombatEffectProcessor.ApplySupportAbility(ability, targets, HeroSystem, this, _cameraShake);
+            }
         }
 
         private void GenerateWaveEnemies()
@@ -165,115 +266,7 @@ namespace AlJourney.Scripts.Battle
             }
         }
 
-        private async void OnSwapCompleted(bool wasValid)
-        {
-            if (!wasValid)
-            {
-                return;
-            }
-
-            ChangePhase(BattlePhase.PlayerCombo);
-            _accumulatedEffects.Clear();
-
-            await ProcessMatchesRecursive();
-        }
-
-        private async void ProcessPlayerTurn()
-        {
-            ChangePhase(BattlePhase.PlayerCombo);
-            _accumulatedEffects.Clear();
-            _comboSystem.ResetCascade();
-
-            await ProcessMatchesRecursive();
-        }
-
-        private async Task ProcessMatchesRecursive(bool isCascade = false)
-        {
-            List<MatchResult> matches = _gridManager.FindAllMatches();
-
-            if (matches.Count == 0)
-            {
-                await ApplyAccumulatedEffects();
-                return;
-            }
-
-            List<ComboEffect> comboEffects = _comboSystem.ProcessMatches(matches, isCascade);
-            for (int i = 0; i < comboEffects.Count; i++)
-            {
-                PlayerCharacter activeHero = HeroSystem.GetHeroForElement(comboEffects[i].ElementType);
-                if (activeHero?.IsAlive == false)
-                {
-                    comboEffects[i] = null;
-                }
-            }
-            _accumulatedEffects.AddRange(comboEffects);
-
-            _gridUI?.VisualizeMatchesAndEffects(matches, comboEffects);
-            _gridManager.ProcessMatches(matches);
-
-            _ = await ToSignal(GetTree().CreateTimer(0.6f), SceneTreeTimer.SignalName.Timeout);
-            await ProcessMatchesRecursive(true);
-        }
-
-        private async Task ApplyAccumulatedEffects()
-        {
-            if (_accumulatedEffects.Count == 0)
-            {
-                await HandleEndOfPlayerTurn();
-                return;
-            }
-
-            foreach (ComboEffect effect in _accumulatedEffects)
-            {
-                if (effect == null)
-                {
-                    continue;
-                }
-                
-                ApplyComboEffect(effect);
-                _ = await ToSignal(GetTree().CreateTimer(0.3f), SceneTreeTimer.SignalName.Timeout);
-            }
-
-            _accumulatedEffects.Clear();
-            HeroSystem.ProcessStatusEffects();
-
-            await HandleEndOfPlayerTurn();
-        }
-
-        private async Task HandleEndOfPlayerTurn()
-        {
-            if (_gridManager.RemainingSwaps > 0)
-            {
-                ChangePhase(BattlePhase.PlayerSwap);
-            }
-            else
-            {
-                await StartEnemyTurn();
-            }
-        }
-
-        private void ApplyComboEffect(ComboEffect effect)
-        {
-            PlayerCharacter activeHero = HeroSystem.GetHeroForElement(effect.ElementType);
-            if (activeHero?.IsAlive != true)
-            {
-                return;
-            }
-
-            if (effect.ElementType is ElementType.Fire or ElementType.Sword)
-            {
-                CombatEffectProcessor.ApplyDamageEffect(effect, activeHero, this, _cameraShake);
-            }
-            else if (effect.ElementType == ElementType.Heal)
-            {
-                CombatEffectProcessor.ApplyHealEffect(effect, HeroSystem, this, _cameraShake);
-            }
-            else if (effect.ElementType == ElementType.Shield)
-            {
-                CombatEffectProcessor.ApplyShieldEffect(effect, HeroSystem, this, _cameraShake);
-            }
-        }
-        private async Task StartEnemyTurn()
+        private async void StartEnemyTurn()
         {
             ChangePhase(BattlePhase.EnemyTurn);
 
@@ -296,7 +289,7 @@ namespace AlJourney.Scripts.Battle
                     _ = await ToSignal(GetTree().CreateTimer(0.5f), SceneTreeTimer.SignalName.Timeout);
                 }
 
-                if (!HeroSystem.IsAnyAlive)
+                if (HeroSystem.GetAliveMembers().Count == 0)
                 {
                     return;
                 }
@@ -312,13 +305,7 @@ namespace AlJourney.Scripts.Battle
                 GD.PrintErr($"[BattleManager] Error during enemy turn: {ex}");
             }
 
-            StartNextTurn();
-        }
-
-        private void StartNextTurn()
-        {
-            _gridManager.ResetSwaps();
-            ChangePhase(BattlePhase.PlayerSwap);
+            StartPlayerTurn();
         }
 
         internal void OnEnemyDied(Enemy enemy)
@@ -346,7 +333,7 @@ namespace AlJourney.Scripts.Battle
             }
         }
 
-        private void OnBothHeroesDied()
+        private void OnPartyDefeated()
         {
             if (_battleEndedSignaled)
             {
@@ -391,13 +378,7 @@ namespace AlJourney.Scripts.Battle
         /// </summary>
         public void EndBattle()
         {
-            if (_gridManager != null && _isConnectedToGridManager)
-            {
-                _gridManager.SwapCompleted -= OnSwapCompleted;
-                _isConnectedToGridManager = false;
-            }
-
-            HeroSystem?.BothHeroesDied -= OnBothHeroesDied;
+            HeroSystem?.PartyDefeated -= OnPartyDefeated;
 
             foreach (Enemy enemy in Enemies)
             {

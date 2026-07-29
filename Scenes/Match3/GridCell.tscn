@@ -1,5 +1,0 @@
-[gd_scene format=3 uid="uid://match3_gridcell"]
-
-[node name="GridCell" type="Control"]
-layout_mode = 3
-anchors_preset = 0

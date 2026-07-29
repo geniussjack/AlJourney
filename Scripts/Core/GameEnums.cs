@@ -13,18 +13,6 @@ namespace AlJourney.Scripts.Core
     }
 
     /// <summary>
-    /// Типы элементов на игровом поле. Каждый элемент соответствует определенной механике.
-    /// </summary>
-    public enum ElementType
-    {
-        None,
-        Fire,
-        Heal,
-        Sword,
-        Shield
-    }
-
-    /// <summary>
     /// Классы игровых персонажей, определяющие их роли в бою.
     /// </summary>
     public enum CharacterClass
@@ -80,12 +68,11 @@ namespace AlJourney.Scripts.Core
     }
 
     /// <summary>
-    /// Фазы хода в боевой системе. Определяют порядок действий: перемещение фишек, расчет комбо, ход врагов и переход к следующей волне.
+    /// Фазы хода в пошаговой боевой системе. Определяют, чей сейчас ход и не идёт ли переход между волнами.
     /// </summary>
     public enum BattlePhase
     {
-        PlayerSwap,
-        PlayerCombo,
+        PlayerTurn,
         EnemyTurn,
         WaveTransition
     }
@@ -134,5 +121,14 @@ namespace AlJourney.Scripts.Core
         Heal,
         Sword,
         Shield
+    }
+
+    /// <summary>
+    /// Определяет, на кого можно навести способность: на врага или на себя/союзника.
+    /// </summary>
+    public enum AbilityTargetType
+    {
+        Enemy,
+        AllyOrSelf
     }
 }

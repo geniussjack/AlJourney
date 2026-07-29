@@ -119,10 +119,9 @@ namespace AlJourney.Scripts.Characters
         /// <summary>
         /// Рассчитывает итоговый урон атаки, учитывая базовый урон, бонусы от экипировки, способностей и статусные эффекты.
         /// </summary>
-        /// <param name="baseDamage">Базовый урон, наносимый атакой.</param>
-        /// <param name="elementType">Тип элемента атаки, определяющий, будет ли урон магическим или физическим.</param>
+        /// <param name="baseDamage">Базовый урон, наносимый атакой (значение эффекта способности).</param>
         /// <returns>Конечное количество урона после всех расчетов.</returns>
-        public int CalculateDamage(int baseDamage, ElementType elementType)
+        public int CalculateDamage(int baseDamage)
         {
             int equipBonus = GetEquipmentStat("damage");
             int abilityBonus = GetAbilityStat("damage");

@@ -28,7 +28,7 @@ namespace AlJourney.Scripts.UI
         private Button _upgradeBtn;
 
         private CharacterClass _selectedHero = CharacterClass.Mage;
-        private List<EquipmentData> _availableWeapons = [];
+        private readonly List<EquipmentData> _availableWeapons = [];
         private int _selectedWeaponIndex = 0;
 
         public override void _Ready()
@@ -79,7 +79,7 @@ namespace AlJourney.Scripts.UI
             // Spacer
             mainVBox.AddChild(new Control() { CustomMinimumSize = new Vector2(0, 20) });
 
-            Label equipmentTitle = new Label() { Text = Tr("UI_EQUIPMENT"), HorizontalAlignment = HorizontalAlignment.Center };
+            Label equipmentTitle = new() { Text = Tr("UI_EQUIPMENT"), HorizontalAlignment = HorizontalAlignment.Center };
             mainVBox.AddChild(equipmentTitle);
 
             // Weapon Selector
@@ -107,9 +107,9 @@ namespace AlJourney.Scripts.UI
 
             _weaponStatsLabel = new Label() { HorizontalAlignment = HorizontalAlignment.Center };
             mainVBox.AddChild(_weaponStatsLabel);
-            
-            _weaponDescLabel = new Label() 
-            { 
+
+            _weaponDescLabel = new Label()
+            {
                 HorizontalAlignment = HorizontalAlignment.Center,
                 AutowrapMode = TextServer.AutowrapMode.Word,
                 CustomMinimumSize = new Vector2(250, 0)
@@ -134,8 +134,8 @@ namespace AlJourney.Scripts.UI
             _heroToggleBtn.TextureNormal = ResourceLoader.Exists(portraitPath) ? GD.Load<Texture2D>(portraitPath) : null;
 
             _availableWeapons.Clear();
-            var allItems = InventoryManager.Instance.GetInventory();
-            foreach (var item in allItems)
+            IReadOnlyList<EquipmentData> allItems = InventoryManager.Instance.GetInventory();
+            foreach (EquipmentData item in allItems)
             {
                 if (item.Slot == EquipmentSlot.Weapon &&
                     ((_selectedHero == CharacterClass.Mage && (item.Id.Contains("ball") || item.Id == "staff")) ||
@@ -161,14 +161,24 @@ namespace AlJourney.Scripts.UI
 
         private void CycleWeapon(int direction)
         {
-            if (_availableWeapons.Count == 0) return;
+            if (_availableWeapons.Count == 0)
+            {
+                return;
+            }
 
             _selectedWeaponIndex += direction;
-            if (_selectedWeaponIndex < 0) _selectedWeaponIndex = _availableWeapons.Count - 1;
-            if (_selectedWeaponIndex >= _availableWeapons.Count) _selectedWeaponIndex = 0;
+            if (_selectedWeaponIndex < 0)
+            {
+                _selectedWeaponIndex = _availableWeapons.Count - 1;
+            }
+
+            if (_selectedWeaponIndex >= _availableWeapons.Count)
+            {
+                _selectedWeaponIndex = 0;
+            }
 
             EquipmentData newWeapon = _availableWeapons[_selectedWeaponIndex];
-            InventoryManager.Instance.EquipItem(_selectedHero, newWeapon);
+            _ = InventoryManager.Instance.EquipItem(_selectedHero, newWeapon);
             UpdateWeaponDisplay();
         }
 
@@ -189,7 +199,7 @@ namespace AlJourney.Scripts.UI
             _weaponNameLabel.Modulate = weapon.GetRarityColor();
 
             string stats = "";
-            foreach (var stat in weapon.BaseStats)
+            foreach (KeyValuePair<string, int> stat in weapon.BaseStats)
             {
                 string statName = Tr($"STAT_{stat.Key.ToUpper()}");
                 stats += $"{statName}: {stat.Value}\n";
@@ -198,12 +208,30 @@ namespace AlJourney.Scripts.UI
             _weaponDescLabel.Text = Tr(weapon.DescriptionKey);
 
             string iconPath = $"res://Resources/Sprites/Elements/{weapon.Id}_sprite.png";
-            if (weapon.Id == "fireball") iconPath = "res://Resources/Sprites/Elements/fireball_sprite.png";
-            else if (weapon.Id == "iceball") iconPath = "res://Resources/Sprites/Elements/iceball_sprite.png";
-            else if (weapon.Id == "electroball") iconPath = "res://Resources/Sprites/Elements/electroball_sprite.png";
-            else if (weapon.Id == "sword") iconPath = "res://Resources/Sprites/Elements/sword_icon.png";
-            else if (weapon.Id == "axe") iconPath = "res://Resources/Sprites/Elements/axe_sprite.png";
-            else if (weapon.Id == "spear") iconPath = "res://Resources/Sprites/Elements/spear_sprite.png";
+            if (weapon.Id == "fireball")
+            {
+                iconPath = "res://Resources/Sprites/Elements/fireball_sprite.png";
+            }
+            else if (weapon.Id == "iceball")
+            {
+                iconPath = "res://Resources/Sprites/Elements/iceball_sprite.png";
+            }
+            else if (weapon.Id == "electroball")
+            {
+                iconPath = "res://Resources/Sprites/Elements/electroball_sprite.png";
+            }
+            else if (weapon.Id == "sword")
+            {
+                iconPath = "res://Resources/Sprites/Elements/sword_icon.png";
+            }
+            else if (weapon.Id == "axe")
+            {
+                iconPath = "res://Resources/Sprites/Elements/axe_sprite.png";
+            }
+            else if (weapon.Id == "spear")
+            {
+                iconPath = "res://Resources/Sprites/Elements/spear_sprite.png";
+            }
 
             _weaponIcon.Texture = ResourceLoader.Exists(iconPath) ? GD.Load<Texture2D>(iconPath) : null;
 
@@ -221,9 +249,13 @@ namespace AlJourney.Scripts.UI
 
         private void OnUpgradePressed()
         {
-            if (_availableWeapons.Count == 0) return;
+            if (_availableWeapons.Count == 0)
+            {
+                return;
+            }
+
             EquipmentData weapon = _availableWeapons[_selectedWeaponIndex];
-            
+
             if (InventoryManager.Instance.UpgradeEquipment(weapon))
             {
                 LoadHeroData();
@@ -232,25 +264,7 @@ namespace AlJourney.Scripts.UI
 
         private void OnClosePressed()
         {
-            // Find the GridUI in the scene and refresh it
-            GridUI gridUi = GetTree().Root.GetNodeOrNull<GridUI>("BattleScene/Grid/GridUI"); // Or use an event/signal. The simplest is a tree lookup if the path is known, but better to use a signal or find the node.
-            
-            // Let's use a dynamic search to be safe
-            FindAndRefreshGrid(GetTree().Root);
-
             QueueFree();
-        }
-
-        private void FindAndRefreshGrid(Node node)
-        {
-            if (node is GridUI grid)
-            {
-                grid.RefreshTextures();
-            }
-            foreach (Node child in node.GetChildren())
-            {
-                FindAndRefreshGrid(child);
-            }
         }
     }
 }
