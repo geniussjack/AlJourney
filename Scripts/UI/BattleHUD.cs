@@ -1,6 +1,7 @@
 using AlJourney.Scripts.Battle;
 using AlJourney.Scripts.Characters;
 using AlJourney.Scripts.Core;
+using AlJourney.Scripts.Data;
 using AlJourney.Scripts.Managers;
 using Godot;
 using System.Collections.Generic;
@@ -156,7 +157,7 @@ namespace AlJourney.Scripts.UI
                 child.QueueFree();
             }
 
-            foreach (var effect in hero.GetActiveEffects())
+            foreach (StatusEffectData effect in hero.GetActiveEffects())
             {
                 Color rectColor = Colors.White;
                 string iconEmoji = "❓";
@@ -174,7 +175,7 @@ namespace AlJourney.Scripts.UI
                     case StatusEffect.Regeneration: iconEmoji = "💚"; rectColor = Colors.Green; break;
                 }
 
-                Label icon = new Label()
+                Label icon = new()
                 {
                     Text = iconEmoji,
                     Modulate = rectColor,
@@ -286,7 +287,7 @@ namespace AlJourney.Scripts.UI
             PackedScene inventoryScene = GD.Load<PackedScene>("res://Scenes/UI/InventoryUI.tscn");
             if (inventoryScene != null)
             {
-                var inventory = inventoryScene.Instantiate<Control>();
+                Control inventory = inventoryScene.Instantiate<Control>();
                 AddChild(inventory);
             }
             else
@@ -371,7 +372,6 @@ namespace AlJourney.Scripts.UI
         private Label _nameLabel;
         private ProgressBar _healthBar;
         private Label _healthLabel;
-        private Enemy _enemy;
         private BattleManager _battleManager;
         private bool _isSelectable;
         private AlJourney.Scripts.Utils.DamageFlash _damageFlash;
@@ -380,7 +380,7 @@ namespace AlJourney.Scripts.UI
         /// <summary>
         /// Враг, к которому привязана данная полоска здоровья.
         /// </summary>
-        public Enemy Enemy => _enemy;
+        public Enemy Enemy { get; private set; }
 
         /// <summary>
         /// Конструктор. Создает и настраивает визуальные элементы полоски здоровья: имя, саму полоску и текст здоровья.
@@ -447,36 +447,36 @@ namespace AlJourney.Scripts.UI
         /// <param name="battleManager">Менеджер боя, которому передаётся подтверждённая цель по клику.</param>
         public void Initialize(Enemy enemy, BattleManager battleManager)
         {
-            _enemy = enemy;
+            Enemy = enemy;
             _battleManager = battleManager;
-            _enemy.HealthChanged += OnHealthChanged;
-            _enemy.CharacterDied += OnEnemyDied;
+            Enemy.HealthChanged += OnHealthChanged;
+            Enemy.CharacterDied += OnEnemyDied;
 
-            _nameLabel.Text = _enemy.CharacterName;
+            _nameLabel.Text = Enemy.CharacterName;
 
-            string spritePath = _enemy.EnemyType switch
+            string spritePath = Enemy.EnemyType switch
             {
                 EnemyType.Slime => "res://Resources/Sprites/Characters/slime_sprite.png",
                 _ => "res://Resources/Sprites/Characters/skeleton_sprite.png"
             };
             _portrait.Texture = GD.Load<Texture2D>(spritePath);
             AnimatePortrait();
-            UpdateHealth(_enemy.CurrentHealth, _enemy.MaxHealth);
+            UpdateHealth(Enemy.CurrentHealth, Enemy.MaxHealth);
 
-            _healthBar.Modulate = _enemy.IsBoss ? Colors.Purple : _enemy.IsMiniboss ? Colors.Orange : Colors.Red;
+            _healthBar.Modulate = Enemy.IsBoss ? Colors.Purple : Enemy.IsMiniboss ? Colors.Orange : Colors.Red;
 
             _damageFlash = new AlJourney.Scripts.Utils.DamageFlash();
             AddChild(_damageFlash);
-            _enemy.DamageTaken += (_) => _damageFlash.FlashDamage();
-            _enemy.Healed += (_) => _damageFlash.FlashHeal();
+            Enemy.DamageTaken += (_) => _damageFlash.FlashDamage();
+            Enemy.Healed += (_) => _damageFlash.FlashHeal();
 
             _statusContainer = new HBoxContainer() { Alignment = BoxContainer.AlignmentMode.Center };
             // Add _statusContainer to the text container below the health label
-            var textContainer = _healthLabel.GetParent();
+            Node textContainer = _healthLabel.GetParent();
             textContainer.AddChild(_statusContainer);
 
-            _enemy.StatusEffectAdded += (effectType, duration, power) => UpdateStatusEffects();
-            _enemy.StatusEffectRemoved += (effectType) => UpdateStatusEffects();
+            Enemy.StatusEffectAdded += (effectType, duration, power) => UpdateStatusEffects();
+            Enemy.StatusEffectRemoved += (effectType) => UpdateStatusEffects();
             UpdateStatusEffects();
         }
 
@@ -487,7 +487,7 @@ namespace AlJourney.Scripts.UI
                 child.QueueFree();
             }
 
-            foreach (var effect in _enemy.GetActiveEffects())
+            foreach (StatusEffectData effect in Enemy.GetActiveEffects())
             {
                 Color rectColor = Colors.White;
                 string iconEmoji = "❓";
@@ -505,7 +505,7 @@ namespace AlJourney.Scripts.UI
                     case StatusEffect.Regeneration: iconEmoji = "💚"; rectColor = Colors.Green; break;
                 }
 
-                Label icon = new Label()
+                Label icon = new()
                 {
                     Text = iconEmoji,
                     Modulate = rectColor,
@@ -548,7 +548,7 @@ namespace AlJourney.Scripts.UI
             _healthBar.MaxValue = maxHealth;
             _healthBar.Value = currentHealth;
             _healthLabel.Text = $"{currentHealth}/{maxHealth}";
-            _nameLabel.Text = _enemy.CharacterName;
+            _nameLabel.Text = Enemy.CharacterName;
         }
 
         private void OnEnemyDied()
@@ -572,7 +572,7 @@ namespace AlJourney.Scripts.UI
         {
             if (_isSelectable && @event is InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left })
             {
-                _battleManager?.ConfirmTarget(_enemy);
+                _battleManager?.ConfirmTarget(Enemy);
             }
         }
 
@@ -581,10 +581,10 @@ namespace AlJourney.Scripts.UI
         /// </summary>
         public override void _ExitTree()
         {
-            if (_enemy != null)
+            if (Enemy != null)
             {
-                _enemy.HealthChanged -= OnHealthChanged;
-                _enemy.CharacterDied -= OnEnemyDied;
+                Enemy.HealthChanged -= OnHealthChanged;
+                Enemy.CharacterDied -= OnEnemyDied;
             }
         }
     }

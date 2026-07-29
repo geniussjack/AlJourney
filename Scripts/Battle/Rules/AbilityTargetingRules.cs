@@ -60,12 +60,9 @@ namespace AlJourney.Scripts.Battle.Rules
             IReadOnlyList<T> enemies,
             Func<T, bool> isAlive) where T : class
         {
-            if (!isAoE)
-            {
-                return chosenTarget is not null && isAlive(chosenTarget) ? [chosenTarget] : [];
-            }
-
-            return GetValidTargets(targetType, allies, enemies, isAlive);
+            return !isAoE
+                ? chosenTarget is not null && isAlive(chosenTarget) ? [chosenTarget] : []
+                : GetValidTargets(targetType, allies, enemies, isAlive);
         }
     }
 }

@@ -242,7 +242,10 @@ namespace AlJourney.Scripts.Managers
             if (node is BaseButton button)
             {
                 // To avoid multiple connections if somehow called twice
-                if (!button.HasSignal("pressed") || button.IsConnected("pressed", Callable.From(PlayChoiceRightSound))) return;
+                if (!button.HasSignal("pressed") || button.IsConnected("pressed", Callable.From(PlayChoiceRightSound)))
+                {
+                    return;
+                }
 
                 button.Pressed += PlayChoiceRightSound;
                 button.GuiInput += (InputEvent @event) =>
@@ -293,10 +296,7 @@ namespace AlJourney.Scripts.Managers
 
             Tween tween = CreateTween();
             _ = tween.TweenProperty(_musicPlayer, "volume_db", -80.0f, duration);
-            _ = tween.TweenCallback(Callable.From(() =>
-            {
-                _musicPlayer.Stop();
-            }));
+            _ = tween.TweenCallback(Callable.From(_musicPlayer.Stop));
 
             GD.Print($"[AudioManager] Fading out music over {duration}s");
         }

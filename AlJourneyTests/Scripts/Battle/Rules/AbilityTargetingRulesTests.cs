@@ -1,6 +1,5 @@
 using AlJourney.Scripts.Battle.Rules;
 using AlJourney.Scripts.Core;
-using System.Collections.Generic;
 
 namespace AlJourneyTests.Scripts.Battle.Rules
 {
@@ -15,7 +14,10 @@ namespace AlJourneyTests.Scripts.Battle.Rules
 
     public class AbilityTargetingRulesTests
     {
-        private static bool IsAlive(FakeCombatant c) => c.IsAlive;
+        private static bool IsAlive(FakeCombatant c)
+        {
+            return c.IsAlive;
+        }
 
         [Fact]
         public void GetValidTargets_EnemyAbility_ReturnsOnlyAliveEnemies()
@@ -26,7 +28,7 @@ namespace AlJourneyTests.Scripts.Battle.Rules
             IReadOnlyList<FakeCombatant> result = AbilityTargetingRules.GetValidTargets(
                 AbilityTargetType.Enemy, allies, enemies, IsAlive);
 
-            Assert.Single(result);
+            _ = Assert.Single(result);
             Assert.Equal("Skeleton", result[0].Name);
         }
 
@@ -39,7 +41,7 @@ namespace AlJourneyTests.Scripts.Battle.Rules
             IReadOnlyList<FakeCombatant> result = AbilityTargetingRules.GetValidTargets(
                 AbilityTargetType.AllyOrSelf, allies, enemies, IsAlive);
 
-            Assert.Single(result);
+            _ = Assert.Single(result);
             Assert.Equal("Eltarion", result[0].Name);
         }
 
@@ -65,7 +67,7 @@ namespace AlJourneyTests.Scripts.Battle.Rules
             IReadOnlyList<FakeCombatant> result = AbilityTargetingRules.ResolveEffectTargets(
                 AbilityTargetType.Enemy, isAoE: false, chosen, allies, enemies, IsAlive);
 
-            Assert.Single(result);
+            _ = Assert.Single(result);
             Assert.Same(chosen, result[0]);
         }
 

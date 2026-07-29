@@ -190,7 +190,7 @@ namespace AlJourney.Scripts.Managers
                 1,
                 maxLevel,
                 stats,
-                new Dictionary<string, string>()
+                []
             );
         }
     }

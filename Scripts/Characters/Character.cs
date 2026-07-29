@@ -305,7 +305,7 @@ namespace AlJourney.Scripts.Characters
             {
                 _activeEffects.Add(effect);
             }
-            
+
             _ = EmitSignal(SignalName.StatusEffectAdded, (int)effect.Type, effect.Duration, effect.Power);
             GD.Print($"[{_name}] Applied status effect: {effect.Type} for {effect.Duration} turns");
         }

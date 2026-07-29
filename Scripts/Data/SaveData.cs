@@ -92,7 +92,7 @@ namespace AlJourney.Scripts.Data
                 WarriorDefense = GameConstants.WARRIOR_BASE_DEFENSE
             };
 
-            string[] startingWeapons = { "fireball", "iceball", "electroball", "sword", "axe", "spear" };
+            string[] startingWeapons = ["fireball", "iceball", "electroball", "sword", "axe", "spear"];
             foreach (string weaponId in startingWeapons)
             {
                 if (EquipmentDatabase.Templates.TryGetValue(weaponId, out EquipmentData weaponData))
