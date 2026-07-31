@@ -4,38 +4,38 @@ using System.Collections.Generic;
 namespace AlJourney.Scripts.Data
 {
     /// <summary>
-    /// Описывает один спавн внутри волны: тип врага и размер стека (см. <see cref="Characters.Enemy.Create"/>).
+    /// Describes a single spawn within a wave: the enemy type and stack size (see <see cref="Characters.Enemy.Create"/>).
     /// </summary>
-    /// <param name="Type">Тип врага.</param>
-    /// <param name="Count">Количество существ в стеке.</param>
+    /// <param name="Type">The enemy type.</param>
+    /// <param name="Count">The number of creatures in the stack.</param>
     public record EnemySpawnDefinition(EnemyType Type, int Count = 1);
 
     /// <summary>
-    /// Описывает один заход волны внутри уровня — набор спавнов, появляющихся одновременно.
+    /// Describes a single wave pass within a level — a set of spawns that appear at the same time.
     /// </summary>
-    /// <param name="Enemies">Список спавнов данной волны.</param>
+    /// <param name="Enemies">The list of spawns for this wave.</param>
     public record WaveDefinition(IReadOnlyList<EnemySpawnDefinition> Enemies);
 
     /// <summary>
-    /// Описывает один уровень карты кампании: локацию, позицию внутри неё, условие разблокировки
-    /// и курируемую (заранее определённую) последовательность волн, которые идут подряд без выхода
-    /// из боя в рамках одной попытки прохождения уровня.
+    /// Describes a single campaign map level: its location, position within it, unlock requirement, and
+    /// the curated (predetermined) sequence of waves that play out back-to-back without leaving combat
+    /// within a single attempt at the level.
     /// </summary>
-    /// <param name="Id">Уникальный идентификатор уровня.</param>
-    /// <param name="Location">Локация, к которой относится уровень.</param>
-    /// <param name="OrderInLocation">Порядковый номер уровня внутри локации (для отображения на карте).</param>
-    /// <param name="Waves">Курируемая последовательность волн уровня.</param>
+    /// <param name="Id">The level's unique identifier.</param>
+    /// <param name="Location">The location this level belongs to.</param>
+    /// <param name="OrderInLocation">The level's order within its location (for display on the map).</param>
+    /// <param name="Waves">The level's curated wave sequence.</param>
     /// <param name="DifficultyRating">
-    /// Числовая сложность уровня, используемая вместо номера волны как вход для
-    /// <see cref="Core.ScalingSystem"/> (масштабирование характеристик врагов, наград и цен).
+    /// The level's numeric difficulty, used in place of a wave number as the input for
+    /// <see cref="Core.ScalingSystem"/> (scaling of enemy stats, rewards and shop prices).
     /// </param>
     /// <param name="IsBranch">
-    /// Истина, если уровень — необязательное ответвление от основной линии (источник ресурсов
-    /// и, в будущем, катализаторов редкости), а не часть обязательной линейной цепочки к некроманту.
+    /// True if the level is an optional branch off the main line (a source of resources and, in the
+    /// future, rarity catalysts) rather than part of the mandatory linear chain to the necromancer.
     /// </param>
     /// <param name="RequiredLevelId">
-    /// Id уровня, который должен быть пройден для разблокировки этого уровня, либо <c>null</c>
-    /// для самого первого уровня кампании.
+    /// The Id of the level that must be completed to unlock this one, or <c>null</c> for the very first
+    /// level of the campaign.
     /// </param>
     public record LevelDefinition(
         string Id,

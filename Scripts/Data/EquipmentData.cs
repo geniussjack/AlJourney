@@ -6,8 +6,8 @@ using System.Linq;
 namespace AlJourney.Scripts.Data
 {
     /// <summary>
-    /// Структура данных, представляющая предмет экипировки.
-    /// Содержит информацию о типе, редкости, уровне прокачки, а также базовые характеристики и специальные способности предмета.
+    /// Data structure representing an equipment item.
+    /// Holds its type, rarity, upgrade level, and base stats and special abilities.
     /// </summary>
     public record EquipmentData(
         string Id,
@@ -22,10 +22,10 @@ namespace AlJourney.Scripts.Data
     )
     {
         /// <summary>
-        /// Возвращает цвет, соответствующий уровню редкости предмета.
-        /// Используется для подсветки предмета в инвентаре или интерфейсе.
+        /// Returns the color associated with the item's rarity tier.
+        /// Used to highlight the item in the inventory or UI.
         /// </summary>
-        /// <returns>Цвет, соответствующий редкости.</returns>
+        /// <returns>The color matching the rarity.</returns>
         public Color GetRarityColor()
         {
             return Rarity switch
@@ -40,9 +40,9 @@ namespace AlJourney.Scripts.Data
         }
 
         /// <summary>
-        /// Возвращает шанс выпадения предмета в зависимости от его редкости.
+        /// Returns the drop chance of the item based on its rarity.
         /// </summary>
-        /// <returns>Вероятность выпадения.</returns>
+        /// <returns>The drop probability.</returns>
         public float GetDropChance()
         {
             return Rarity switch
@@ -57,11 +57,11 @@ namespace AlJourney.Scripts.Data
         }
 
         /// <summary>
-        /// Вычисляет стоимость улучшения предмета до следующего уровня.
-        /// Стоимость может масштабироваться в зависимости от текущей волны.
+        /// Computes the cost to upgrade the item to its next level.
+        /// The cost may scale based on the current wave.
         /// </summary>
-        /// <param name="waveNumber">Номер текущей волны для расчёта наценки. При значении 0 возвращается базовая стоимость.</param>
-        /// <returns>Количество монет, необходимое для улучшения, или 0, если достигнут максимальный уровень.</returns>
+        /// <param name="waveNumber">Current wave number used for the price markup. When 0, the base cost is returned.</param>
+        /// <returns>The number of coins required to upgrade, or 0 if the max level has been reached.</returns>
         public int GetUpgradeCost(int waveNumber = 0)
         {
             if (CurrentLevel >= MaxLevel)
@@ -85,10 +85,10 @@ namespace AlJourney.Scripts.Data
         }
 
         /// <summary>
-        /// Создает и возвращает улучшенную копию предмета, повышая его уровень и базовые характеристики.
-        /// Если предмет уже достиг максимального уровня, возвращается текущий экземпляр.
+        /// Creates and returns an upgraded copy of the item, raising its level and base stats.
+        /// If the item has already reached its max level, the current instance is returned.
         /// </summary>
-        /// <returns>Новый экземпляр EquipmentData с повышенным уровнем и характеристиками.</returns>
+        /// <returns>A new EquipmentData instance with an increased level and stats.</returns>
         public EquipmentData Upgrade()
         {
             if (CurrentLevel >= MaxLevel)
@@ -106,9 +106,9 @@ namespace AlJourney.Scripts.Data
         }
 
         /// <summary>
-        /// Возвращает итоговые характеристики предмета, учитывающие его базовые значения и текущий уровень улучшения.
+        /// Returns the item's total stats, accounting for its base values and current upgrade level.
         /// </summary>
-        /// <returns>Словарь, содержащий названия характеристик и их итоговые числовые значения.</returns>
+        /// <returns>A dictionary of stat names and their total numeric values.</returns>
         public Dictionary<string, int> GetTotalStats()
         {
             Dictionary<string, int> totalStats = new(BaseStats);
@@ -120,9 +120,9 @@ namespace AlJourney.Scripts.Data
         }
 
         /// <summary>
-        /// Возвращает строковое представление предмета, включающее его название, редкость и текущий уровень относительно максимального.
+        /// Returns a string representation of the item, including its name, rarity and current level relative to the max.
         /// </summary>
-        /// <returns>Строка в формате "Название - Level Текущий/Максимальный".</returns>
+        /// <returns>A string in the format "Name (Rarity) - Level Current/Max".</returns>
         public override string ToString()
         {
             return $"{Name} ({Rarity}) - Level {CurrentLevel}/{MaxLevel}";

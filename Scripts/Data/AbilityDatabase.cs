@@ -4,17 +4,17 @@ using System.Collections.Generic;
 namespace AlJourney.Scripts.Data
 {
     /// <summary>
-    /// База данных способностей персонажей.
-    /// У Эльтариона (Маг) и Элдрика (Пехотинец) — по одной атакующей и одной защитной/поддерживающей
-    /// способности каждый (Этап 1), плюс уникальная ультимативная способность у каждого (Этап 2). Это
-    /// финальный набор способностей для самих героев (не заглушка) — они не привязаны к экипировке и не
-    /// разблокируются за монеты, в отличие от будущих наёмников, чьи способности будут определяться
-    /// подклассом/типом снаряжения.
+    /// Database of character abilities.
+    /// Altarion (Mage) and Aldric (Warrior) each have one attack and one defensive/support ability
+    /// (Stage 1), plus a unique ultimate ability each (Stage 2). This is the final ability set for the
+    /// main heroes themselves (not a placeholder) — they are not tied to equipment and are not unlocked
+    /// with coins, unlike future mercenaries, whose abilities will be determined by their equipment
+    /// subclass/type.
     /// </summary>
     public static class AbilityDatabase
     {
         /// <summary>
-        /// Атакующая способность Эльтариона: одиночный урон по врагу.
+        /// Altarion's attack ability: single-target damage to an enemy.
         /// </summary>
         public static readonly AbilityData AltarionAttack = new(
             "altarion_fireball", "ABILITY_ALTARION_FIREBALL", AbilityType.Attack, AbilityElement.Fire,
@@ -26,7 +26,7 @@ namespace AlJourney.Scripts.Data
         );
 
         /// <summary>
-        /// Защитная способность Эльтариона: исцеление себя или союзника.
+        /// Altarion's support ability: heals himself or an ally.
         /// </summary>
         public static readonly AbilityData AltarionSupport = new(
             "altarion_healing_light", "ABILITY_ALTARION_HEALING_LIGHT", AbilityType.Support, AbilityElement.Heal,
@@ -38,7 +38,7 @@ namespace AlJourney.Scripts.Data
         );
 
         /// <summary>
-        /// Ультимативная способность Эльтариона: огненный шторм по всем живым врагам (AoE).
+        /// Altarion's ultimate ability: a firestorm hitting every living enemy (AoE).
         /// </summary>
         public static readonly AbilityData AltarionUltimate = new(
             "altarion_meteor_storm", "ABILITY_ALTARION_METEOR_STORM", AbilityType.Attack, AbilityElement.Fire,
@@ -52,7 +52,7 @@ namespace AlJourney.Scripts.Data
         );
 
         /// <summary>
-        /// Атакующая способность Элдрика: одиночный удар по врагу.
+        /// Aldric's attack ability: single-target strike against an enemy.
         /// </summary>
         public static readonly AbilityData AldricAttack = new(
             "aldric_sword_strike", "ABILITY_ALDRIC_SWORD_STRIKE", AbilityType.Attack, AbilityElement.Sword,
@@ -64,7 +64,7 @@ namespace AlJourney.Scripts.Data
         );
 
         /// <summary>
-        /// Защитная способность Элдрика: щит на себя или союзника.
+        /// Aldric's support ability: shields himself or an ally.
         /// </summary>
         public static readonly AbilityData AldricSupport = new(
             "aldric_shield_wall", "ABILITY_ALDRIC_SHIELD_WALL", AbilityType.Support, AbilityElement.Shield,
@@ -76,9 +76,9 @@ namespace AlJourney.Scripts.Data
         );
 
         /// <summary>
-        /// Ультимативная способность Элдрика: сокрушающий удар по врагу с наибольшим текущим HP.
-        /// Цель выбирается автоматически (см. <see cref="Battle.Rules.AbilityTargetingRules.SelectHighestHealthTarget"/>),
-        /// без подтверждения игроком.
+        /// Aldric's ultimate ability: a crushing blow against the enemy with the highest current HP.
+        /// The target is selected automatically (see <see cref="Battle.Rules.AbilityTargetingRules.SelectHighestHealthTarget"/>),
+        /// without player confirmation.
         /// </summary>
         public static readonly AbilityData AldricUltimate = new(
             "aldric_crushing_blow", "ABILITY_ALDRIC_CRUSHING_BLOW", AbilityType.Attack, AbilityElement.Sword,
@@ -92,9 +92,10 @@ namespace AlJourney.Scripts.Data
         );
 
         /// <summary>
-        /// Плоский реестр всех способностей по Id. Используется только устаревшей системой разблокировки/
-        /// экипировки способностей (<see cref="AlJourney.Scripts.Managers.AbilitySystem"/>), которая в бою
-        /// не участвует в боевой логике героев (см. REDESIGN_NOTES.md) и оставлена нетронутой вне рамок задачи.
+        /// Flat registry of every ability by Id. Only used by the legacy ability unlock/equip system
+        /// (<see cref="AlJourney.Scripts.Managers.AbilitySystem"/>), which does not participate in the
+        /// heroes' combat logic (see REDESIGN_NOTES.md) and has been left untouched outside the scope of
+        /// this task.
         /// </summary>
         public static readonly Dictionary<string, AbilityData> Templates = new()
         {
@@ -105,12 +106,12 @@ namespace AlJourney.Scripts.Data
         };
 
         /// <summary>
-        /// Возвращает пару фиксированных способностей (атака, защита) для главного героя указанного класса.
-        /// Применимо только к Эльтариону/Элдрику — у наёмников способности будут определяться подклассом
-        /// снаряжения, а не этим методом (см. REDESIGN_NOTES.md, раздел 4).
+        /// Returns the fixed pair of abilities (attack, support) for the main hero of the given class.
+        /// Only applies to Altarion/Aldric — mercenaries' abilities will be determined by their equipment
+        /// subclass, not by this method (see REDESIGN_NOTES.md, section 4).
         /// </summary>
-        /// <param name="heroClass">Класс героя.</param>
-        /// <returns>Кортеж с атакующей и защитной способностью героя.</returns>
+        /// <param name="heroClass">The hero's class.</param>
+        /// <returns>A tuple with the hero's attack and support ability.</returns>
         public static (AbilityData Attack, AbilityData Support) GetHeroAbilities(CharacterClass heroClass)
         {
             return heroClass switch
@@ -122,10 +123,10 @@ namespace AlJourney.Scripts.Data
         }
 
         /// <summary>
-        /// Возвращает уникальную ультимативную способность главного героя указанного класса.
+        /// Returns the unique ultimate ability of the main hero of the given class.
         /// </summary>
-        /// <param name="heroClass">Класс героя.</param>
-        /// <returns>Ультимативная способность героя.</returns>
+        /// <param name="heroClass">The hero's class.</param>
+        /// <returns>The hero's ultimate ability.</returns>
         public static AbilityData GetHeroUltimate(CharacterClass heroClass)
         {
             return heroClass switch

@@ -4,12 +4,12 @@ using System.Collections.Generic;
 namespace AlJourney.Scripts.Data
 {
     /// <summary>
-    /// Класс данных EquipmentDatabase. Сохраняет информацию и параметры.
+    /// Equipment data class. Stores equipment templates and their parameters.
     /// </summary>
     public static class EquipmentDatabase
     {
         /// <summary>
-        /// Элемент Templates.
+        /// The registry of equipment templates, keyed by item Id.
         /// </summary>
         public static readonly Dictionary<string, EquipmentData> Templates = new()
         {

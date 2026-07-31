@@ -4,21 +4,21 @@ using System.Collections.Generic;
 namespace AlJourney.Scripts.Data
 {
     /// <summary>
-    /// Статическая база данных карты кампании: локации, основная линейная цепочка уровней от руин
-    /// деревни до логова некроманта, и ответвления с мини-боссами.
-    /// Это рабочий, легко донастраиваемый набор уровней — конкретный состав волн будет
-    /// уточняться отдельно по мере балансировки (см. REDESIGN_NOTES.md, Этап 3).
+    /// Static campaign map database: locations, the main linear level chain from the village ruins to
+    /// the necromancer's lair, and branches with minibosses.
+    /// This is a working, easily adjustable level set — the exact wave composition will be tuned
+    /// separately during balancing (see REDESIGN_NOTES.md, Stage 3).
     /// </summary>
     public static class CampaignDatabase
     {
         /// <summary>
-        /// Первый уровень кампании, доступный без каких-либо условий разблокировки.
+        /// The first campaign level, available with no unlock conditions.
         /// </summary>
         public const string FirstLevelId = "village_ruins_1";
 
         /// <summary>
-        /// Все уровни кампании по порядку добавления (основная линия и ответвления вперемешку),
-        /// в том порядке, в котором они объявлены ниже в <see cref="BuildLevels"/>.
+        /// Every campaign level in declaration order (main line and branches interleaved), in the
+        /// order they are declared below in <see cref="BuildLevels"/>.
         /// </summary>
         public static readonly IReadOnlyList<LevelDefinition> Levels = BuildLevels();
 
@@ -26,8 +26,8 @@ namespace AlJourney.Scripts.Data
         {
             List<LevelDefinition> levels = [];
 
-            // --- Локация 1: Руины деревни ---
-            // Стартовая локация. Простейшие противники: слаймы и зомби.
+            // --- Location 1: Village Ruins ---
+            // Starting location. Simplest enemies: slimes and zombies.
             AddMainLevel(levels, LocationId.VillageRuins, 1, difficulty: 1, requiredLevelId: null,
                 Wave(Spawn(EnemyType.Slime, 2)));
             AddMainLevel(levels, LocationId.VillageRuins, 2, difficulty: 2,
@@ -38,8 +38,8 @@ namespace AlJourney.Scripts.Data
                 Wave(Spawn(EnemyType.Zombie, 2)),
                 Wave(Spawn(EnemyType.Zombie, 1), Spawn(EnemyType.Slime, 2)));
 
-            // --- Локация 2: Тёмный лес ---
-            // Вводятся скелеты (воин и лучник), зомби остаются проходным противником.
+            // --- Location 2: Dark Forest ---
+            // Skeletons (warrior and archer) are introduced; zombies remain a filler enemy.
             AddMainLevel(levels, LocationId.DarkForest, 1, difficulty: 5, requiredLevelId: LevelId(LocationId.VillageRuins, 4),
                 Wave(Spawn(EnemyType.SkeletonWarrior, 2)));
             AddMainLevel(levels, LocationId.DarkForest, 2, difficulty: 6,
@@ -50,14 +50,14 @@ namespace AlJourney.Scripts.Data
             AddMainLevel(levels, LocationId.DarkForest, 4, difficulty: 8,
                 Wave(Spawn(EnemyType.SkeletonWarrior, 2), Spawn(EnemyType.SkeletonArcher, 2)),
                 Wave(Spawn(EnemyType.Zombie, 2)));
-            // Ответвление: первый мини-босс, Генерал Драугров.
+            // Branch: the first miniboss, the General of Draugr.
             AddBranchLevel(levels, LocationId.DarkForest, "dark_forest_branch_1", difficulty: 7,
                 requiredLevelId: LevelId(LocationId.DarkForest, 1),
                 Wave(Spawn(EnemyType.SkeletonWarrior, 2)),
                 Wave(Spawn(EnemyType.GeneralOfDraugr)));
 
-            // --- Локация 3: Погребённые катакомбы ---
-            // Вводится триада Драугров, скелеты остаются проходными.
+            // --- Location 3: Buried Catacombs ---
+            // The Draugr trio is introduced; skeletons remain a filler enemy.
             AddMainLevel(levels, LocationId.BuriedCatacombs, 1, difficulty: 9, requiredLevelId: LevelId(LocationId.DarkForest, 4),
                 Wave(Spawn(EnemyType.DraugrWarrior, 2)));
             AddMainLevel(levels, LocationId.BuriedCatacombs, 2, difficulty: 10,
@@ -68,14 +68,14 @@ namespace AlJourney.Scripts.Data
             AddMainLevel(levels, LocationId.BuriedCatacombs, 4, difficulty: 12,
                 Wave(Spawn(EnemyType.DraugrWarrior, 1), Spawn(EnemyType.DraugrDefender, 1), Spawn(EnemyType.DraugrCaster, 1)),
                 Wave(Spawn(EnemyType.DraugrWarrior, 2), Spawn(EnemyType.DraugrCaster, 1)));
-            // Ответвление: второй мини-босс, Архискелет.
+            // Branch: the second miniboss, the Archskeleton.
             AddBranchLevel(levels, LocationId.BuriedCatacombs, "buried_catacombs_branch_1", difficulty: 11,
                 requiredLevelId: LevelId(LocationId.BuriedCatacombs, 1),
                 Wave(Spawn(EnemyType.SkeletonWarrior, 2), Spawn(EnemyType.SkeletonArcher, 1)),
                 Wave(Spawn(EnemyType.Arhiskeleton)));
 
-            // --- Локация 4: Ледяные пустоши ---
-            // Самые тяжёлые "рядовые" смешанные волны перед логовом некроманта.
+            // --- Location 4: Frozen Wastes ---
+            // The heaviest "regular" mixed waves before the necromancer's lair.
             AddMainLevel(levels, LocationId.FrozenWastes, 1, difficulty: 13, requiredLevelId: LevelId(LocationId.BuriedCatacombs, 4),
                 Wave(Spawn(EnemyType.DraugrWarrior, 2), Spawn(EnemyType.SkeletonArcher, 1)));
             AddMainLevel(levels, LocationId.FrozenWastes, 2, difficulty: 14,
@@ -86,14 +86,14 @@ namespace AlJourney.Scripts.Data
             AddMainLevel(levels, LocationId.FrozenWastes, 4, difficulty: 16,
                 Wave(Spawn(EnemyType.DraugrWarrior, 2), Spawn(EnemyType.DraugrDefender, 1)),
                 Wave(Spawn(EnemyType.DraugrCaster, 2), Spawn(EnemyType.SkeletonArcher, 1)));
-            // Ответвление: третий заход на мини-босса (Генерал Драугров) с усиленной охраной.
+            // Branch: a third encounter with the miniboss (General of Draugr) with reinforced guards.
             AddBranchLevel(levels, LocationId.FrozenWastes, "frozen_wastes_branch_1", difficulty: 15,
                 requiredLevelId: LevelId(LocationId.FrozenWastes, 1),
                 Wave(Spawn(EnemyType.DraugrWarrior, 2), Spawn(EnemyType.DraugrDefender, 1)),
                 Wave(Spawn(EnemyType.GeneralOfDraugr)));
 
-            // --- Локация 5: Логово Некроманта ---
-            // Финальные тяжёлые смешанные волны и бой с главным боссом.
+            // --- Location 5: Necromancer's Lair ---
+            // Final heavy mixed waves and the fight against the main boss.
             AddMainLevel(levels, LocationId.NecromancerLair, 1, difficulty: 17, requiredLevelId: LevelId(LocationId.FrozenWastes, 4),
                 Wave(Spawn(EnemyType.DraugrWarrior, 2), Spawn(EnemyType.DraugrCaster, 2)));
             AddMainLevel(levels, LocationId.NecromancerLair, 2, difficulty: 18,
@@ -106,7 +106,7 @@ namespace AlJourney.Scripts.Data
         }
 
         /// <summary>
-        /// Возвращает ключ локализации отображаемого названия локации (см. Data/Languages/translations.csv).
+        /// Returns the localization key for the location's display name (see Data/Languages/translations.csv).
         /// </summary>
         public static string GetLocationNameKey(LocationId location)
         {
@@ -122,7 +122,7 @@ namespace AlJourney.Scripts.Data
         }
 
         /// <summary>
-        /// Возвращает уровень кампании по его идентификатору, либо <c>null</c>, если такого уровня нет.
+        /// Returns the campaign level with the given Id, or <c>null</c> if no such level exists.
         /// </summary>
         public static LevelDefinition GetLevel(string levelId)
         {
@@ -138,10 +138,10 @@ namespace AlJourney.Scripts.Data
         }
 
         /// <summary>
-        /// Возвращает уровень, идущий следующим за указанным на основной линии в пределах его локации,
-        /// либо первый уровень следующей локации, если это был последний уровень текущей.
-        /// Ответвления в основную последовательность не входят. Возвращает <c>null</c> после
-        /// финального уровня кампании.
+        /// Returns the level that comes next on the main line after the given one, within the same
+        /// location, or the first level of the next location if the given level was the last one in its
+        /// location. Branches are not part of the main sequence. Returns <c>null</c> after the final
+        /// campaign level.
         /// </summary>
         public static LevelDefinition GetNextMainLevel(string completedLevelId)
         {
@@ -194,7 +194,7 @@ namespace AlJourney.Scripts.Data
         }
 
         /// <summary>
-        /// Формирует стандартный идентификатор уровня основной линии по локации и порядковому номеру.
+        /// Builds the standard main-line level identifier from a location and order number.
         /// </summary>
         private static string LevelId(LocationId location, int orderInLocation)
         {
@@ -214,9 +214,9 @@ namespace AlJourney.Scripts.Data
 
         private static void AddBranchLevel(List<LevelDefinition> levels, LocationId location, string id, int difficulty, string requiredLevelId, params WaveDefinition[] waves)
         {
-            // Ответвления используют отрицательный порядок, чтобы не участвовать в подсчёте следующего
-            // уровня основной линии (см. GetNextMainLevel/GetFirstLevelOfLocation), но оставаться
-            // привязанными к своей локации для отображения на карте.
+            // Branches use a negative order so they don't participate in computing the next main-line
+            // level (see GetNextMainLevel/GetFirstLevelOfLocation), while still staying tied to their
+            // location for display purposes on the map.
             levels.Add(new LevelDefinition(id, location, -1, waves, difficulty, IsBranch: true, requiredLevelId));
         }
 

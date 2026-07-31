@@ -6,8 +6,8 @@ using System.Linq;
 namespace AlJourney.Scripts.Data
 {
     /// <summary>
-    /// Структура данных, представляющая способность персонажа.
-    /// Хранит идентификатор, название, тип, элемент, путь к иконке, описание, стоимость разблокировки и эффекты способности.
+    /// Data structure representing a character ability.
+    /// Stores the id, name, type, element, icon path, description, unlock cost and effects of the ability.
     /// </summary>
     public record AbilityData(
         string Id,
@@ -24,10 +24,10 @@ namespace AlJourney.Scripts.Data
     )
     {
         /// <summary>
-        /// Возвращает цвет, соответствующий элементу данной способности.
-        /// Используется для цветового кодирования в пользовательском интерфейсе.
+        /// Returns the color associated with this ability's element.
+        /// Used for color coding in the user interface.
         /// </summary>
-        /// <returns>Цвет элемента для отображения.</returns>
+        /// <returns>The color to display for the element.</returns>
         public Color GetElementColor()
         {
             return Element switch
@@ -41,39 +41,39 @@ namespace AlJourney.Scripts.Data
         }
 
         /// <summary>
-        /// Указывает, является ли данная способность атакующей.
+        /// Indicates whether this ability is an attack ability.
         /// </summary>
         public bool IsAttackAbility => Type == AbilityType.Attack;
 
         /// <summary>
-        /// Указывает, является ли данная способность поддерживающей.
+        /// Indicates whether this ability is a support ability.
         /// </summary>
         public bool IsSupportAbility => Type == AbilityType.Support;
 
         /// <summary>
-        /// Возвращает значение первого эффекта из словаря эффектов способности.
-        /// Удобно использовать для способностей, имеющих только один числовой показатель.
+        /// Returns the value of the first effect in the ability's effect dictionary.
+        /// Convenient for abilities that only have a single numeric effect.
         /// </summary>
-        /// <returns>Значение основного эффекта или 0, если эффектов нет.</returns>
+        /// <returns>The value of the primary effect, or 0 if there are no effects.</returns>
         public int GetPrimaryEffect()
         {
             return Effects.Values.FirstOrDefault();
         }
 
         /// <summary>
-        /// Возвращает значение конкретного эффекта по его названию.
+        /// Returns the value of a specific effect by its name.
         /// </summary>
-        /// <param name="effectName">Название эффекта.</param>
-        /// <returns>Числовое значение эффекта, если он найден, иначе 0.</returns>
+        /// <param name="effectName">The name of the effect.</param>
+        /// <returns>The numeric value of the effect if found, otherwise 0.</returns>
         public int GetEffect(string effectName)
         {
             return Effects.TryGetValue(effectName, out int value) ? value : 0;
         }
 
         /// <summary>
-        /// Возвращает строковое представление способности, включающее её название, тип и элемент.
+        /// Returns a string representation of the ability, including its name, type and element.
         /// </summary>
-        /// <returns>Строка в формате "Название".</returns>
+        /// <returns>A string in the format "Name (Type - Element)".</returns>
         public override string ToString()
         {
             return $"{Name} ({Type} - {Element})";

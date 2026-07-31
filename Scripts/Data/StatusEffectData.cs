@@ -3,21 +3,21 @@ using AlJourney.Scripts.Core;
 namespace AlJourney.Scripts.Data
 {
     /// <summary>
-    /// Структура, описывающая статусный эффект, наложенный на персонажа или врага.
+    /// Structure describing a status effect applied to a character or enemy.
     /// </summary>
     public record StatusEffectData(StatusEffect Type, int Duration, int Power, float ExtraData = 0f)
     {
         /// <summary>
-        /// Возвращает копию текущего статусного эффекта с уменьшенной на 1 длительностью.
+        /// Returns a copy of this status effect with its duration reduced by 1.
         /// </summary>
-        /// <returns>Новый экземпляр StatusEffectData с обновленной длительностью.</returns>
+        /// <returns>A new StatusEffectData instance with the updated duration.</returns>
         public StatusEffectData TickDuration()
         {
             return this with { Duration = Duration - 1 };
         }
 
         /// <summary>
-        /// Указывает, должен ли данный статусный эффект быть удален.
+        /// Indicates whether this status effect should be removed.
         /// </summary>
         public bool ShouldRemove => Duration <= 0;
     }

@@ -5,14 +5,14 @@ using System.Collections.Generic;
 namespace AlJourney.Scripts.Data
 {
     /// <summary>
-    /// Класс, представляющий структуру данных для сохранения и загрузки прогресса игрока.
-    /// Хранит состояние характеристик героев, инвентарь, экипировку, разблокированные способности и прогресс по волнам.
+    /// Class representing the data structure used to save and load player progress.
+    /// Stores hero stat state, inventory, equipment, unlocked abilities and wave progress.
     /// </summary>
     [Serializable]
     public class SaveData
     {
         /// <summary>
-        /// Версия схемы данных сохранения. Используется для миграции старых сохранений при обновлении игры.
+        /// Save data schema version. Used to migrate old saves when the game is updated.
         /// </summary>
         public int SchemaVersion { get; set; } = 1;
 
@@ -21,13 +21,13 @@ namespace AlJourney.Scripts.Data
         public int HighestWave { get; set; }
 
         /// <summary>
-        /// Id уровня карты кампании, который игрок сейчас проходит или должен пройти следующим.
-        /// См. <see cref="CampaignDatabase"/>.
+        /// Id of the campaign map level the player is currently on or should attempt next.
+        /// See <see cref="CampaignDatabase"/>.
         /// </summary>
         public string CurrentLevelId { get; set; }
 
         /// <summary>
-        /// Id всех уже пройденных уровней кампании (основной линии и ответвлений).
+        /// Ids of every campaign level already completed (main line and branches).
         /// </summary>
         public HashSet<string> CompletedLevelIds { get; set; }
 
@@ -83,10 +83,10 @@ namespace AlJourney.Scripts.Data
         }
 
         /// <summary>
-        /// Фабричный метод, создающий новый профиль сохранения со стартовыми значениями по умолчанию.
-        /// Устанавливает начальные характеристики для Мага и Воина, а также сбрасывает прогресс до первой волны.
+        /// Factory method that creates a new save profile with default starting values.
+        /// Sets initial stats for the Mage and Warrior, and resets progress back to the first wave.
         /// </summary>
-        /// <returns>Новый экземпляр SaveData с начальными параметрами.</returns>
+        /// <returns>A new SaveData instance with starting parameters.</returns>
         public static SaveData CreateNew()
         {
             SaveData save = new()
@@ -129,11 +129,11 @@ namespace AlJourney.Scripts.Data
         }
 
         /// <summary>
-        /// Метод для адаптации данных из старых версий игры в новую структуру сохранения.
-        /// Если версия схемы устарела, данные преобразуются для обеспечения совместимости.
+        /// Adapts data from older game versions into the current save structure.
+        /// If the schema version is outdated, the data is converted to ensure compatibility.
         /// </summary>
-        /// <param name="oldData">Данные старого сохранения.</param>
-        /// <returns>Обновленный объект SaveData или null, если миграция не удалась.</returns>
+        /// <param name="oldData">The old save data.</param>
+        /// <returns>The migrated SaveData object, or null if migration failed.</returns>
         public static SaveData Migrate(SaveData oldData)
         {
             if (oldData.SchemaVersion == 1)
