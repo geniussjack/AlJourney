@@ -1,14 +1,10 @@
 namespace AlJourney.Scripts.Core
 {
     /// <summary>
-    /// Storage for all game constants: grid settings, base stats, damage formulas and enemy parameters.
+    /// Storage for all game constants: base hero stats, enemy stats, wave scaling, shop pricing and save data settings.
     /// </summary>
     public static class GameConstants
     {
-        /// <summary>
-        /// Size of the game board, in cells.
-        /// </summary>
-        public const int GRID_SIZE = 5;
         /// <summary>
         /// Number of tile swaps available to the player per turn.
         /// </summary>
@@ -17,95 +13,6 @@ namespace AlJourney.Scripts.Core
         /// Minimum number of identical tiles in a row required for a successful match.
         /// </summary>
         public const int MATCH_MIN_LENGTH = 3;
-
-
-        /// <summary>
-        /// Damage dealt by a match of 3 fire elements.
-        /// </summary>
-        public const int FIRE_3_DAMAGE = 10;
-        /// <summary>
-        /// Damage dealt by a match of 4 fire elements.
-        /// </summary>
-        public const int FIRE_4_DAMAGE = 15;
-        /// <summary>
-        /// Damage dealt by a match of 5 fire elements.
-        /// </summary>
-        public const int FIRE_5_DAMAGE = 25;
-        /// <summary>
-        /// Burning status damage applied by a match of 4 fire elements.
-        /// </summary>
-        public const int FIRE_4_BURN_DAMAGE = 3;
-        /// <summary>
-        /// Burning status duration applied by a match of 4 fire elements.
-        /// </summary>
-        public const int FIRE_4_BURN_DURATION = 2;
-        /// <summary>
-        /// Burning status damage applied by a match of 5 fire elements.
-        /// </summary>
-        public const int FIRE_5_BURN_DAMAGE = 5;
-        /// <summary>
-        /// Burning status duration applied by a match of 5 fire elements.
-        /// </summary>
-        public const int FIRE_5_BURN_DURATION = 3;
-
-        /// <summary>
-        /// Damage dealt by a match of 3 sword elements.
-        /// </summary>
-        public const int SWORD_3_DAMAGE = 10;
-        /// <summary>
-        /// Damage dealt by a match of 4 sword elements.
-        /// </summary>
-        public const int SWORD_4_DAMAGE = 20;
-        /// <summary>
-        /// Damage dealt by a match of 5 sword elements.
-        /// </summary>
-        public const int SWORD_5_DAMAGE = 35;
-        /// <summary>
-        /// Bleed damage applied by a match of 4 sword elements.
-        /// </summary>
-        public const int SWORD_4_BLEED_DAMAGE = 4;
-        /// <summary>
-        /// Bleed duration applied by a match of 4 sword elements.
-        /// </summary>
-        public const int SWORD_4_BLEED_DURATION = 2;
-
-        /// <summary>
-        /// Health restored by a match of 3 heal elements.
-        /// </summary>
-        public const int HEAL_3_AMOUNT = 15;
-        /// <summary>
-        /// Health restored by a match of 4 heal elements.
-        /// </summary>
-        public const int HEAL_4_AMOUNT = 25;
-        /// <summary>
-        /// Health restored by a match of 5 heal elements.
-        /// </summary>
-        public const int HEAL_5_AMOUNT = 40;
-        /// <summary>
-        /// Per-turn regeneration amount granted by a match of 5 heal elements.
-        /// </summary>
-        public const int HEAL_5_REGEN_AMOUNT = 5;
-        /// <summary>
-        /// Duration of the regeneration effect granted by a match of 5 heal elements.
-        /// </summary>
-        public const int HEAL_5_REGEN_DURATION = 3;
-
-        /// <summary>
-        /// Shield strength granted by a match of 3 shield elements.
-        /// </summary>
-        public const int SHIELD_3_AMOUNT = 10;
-        /// <summary>
-        /// Shield strength granted by a match of 4 shield elements.
-        /// </summary>
-        public const int SHIELD_4_AMOUNT = 20;
-        /// <summary>
-        /// Shield strength granted by a match of 5 shield elements.
-        /// </summary>
-        public const int SHIELD_5_AMOUNT = 35;
-        /// <summary>
-        /// Percentage of damage reflected by a match of 4 shield elements.
-        /// </summary>
-        public const float SHIELD_4_REFLECT_PERCENT = 0.2f;
 
         /// <summary>
         /// Coefficient by which enemy health increases with each new wave.
@@ -120,15 +27,6 @@ namespace AlJourney.Scripts.Core
         /// number of creatures the necromancer can summon — see EnemyAIController).
         /// </summary>
         public const int MAX_ENEMIES_PER_WAVE = 5;
-
-        /// <summary>
-        /// Interval between miniboss appearances.
-        /// </summary>
-        public const int MINIBOSS_WAVE_INTERVAL = 999;
-        /// <summary>
-        /// Interval between main boss appearances.
-        /// </summary>
-        public const int BOSS_WAVE_INTERVAL = 999;
 
 
         /// <summary>
