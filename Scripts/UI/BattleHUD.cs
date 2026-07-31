@@ -10,7 +10,7 @@ using System.Linq;
 namespace AlJourney.Scripts.UI
 {
     /// <summary>
-    /// Пользовательский интерфейс боевого экрана. Отвечает за отображение здоровья, щитов героев, информации о врагах, текущей волне и количестве доступных ходов.
+    /// UI for the battle screen. Responsible for displaying hero health and shields, enemy info, the current wave, and available actions.
     /// </summary>
     public partial class BattleHUD : Control
     {
@@ -47,7 +47,7 @@ namespace AlJourney.Scripts.UI
         private Button _inventoryButton;
 
         /// <summary>
-        /// Вызывается при инициализации узла. Настраивает ссылки на дочерние элементы интерфейса, подписывается на события изменения состояния игры и комбо.
+        /// Called when the node is initialized. Sets up references to child UI elements and subscribes to game state and combo change events.
         /// </summary>
         public override void _Ready()
         {
@@ -95,11 +95,11 @@ namespace AlJourney.Scripts.UI
         }
 
         /// <summary>
-        /// Инициализирует HUD для работы с отрядом героев и менеджером боя: настраивает начальные значения
-        /// здоровья/щитов, эффекты получения урона, а также клики по портретам для выбора цели способности.
+        /// Initializes the HUD for the hero party and battle manager: sets up initial health/shield values,
+        /// damage-taken effects, and portrait clicks for confirming an ability's target.
         /// </summary>
-        /// <param name="heroSystem">Система управления отрядом героев.</param>
-        /// <param name="battleManager">Менеджер пошагового боя, которому передаются подтверждённые цели.</param>
+        /// <param name="heroSystem">The hero party management system.</param>
+        /// <param name="battleManager">The turn-based battle manager that confirmed targets are passed to.</param>
         public void Initialize(DualHeroSystem heroSystem, BattleManager battleManager)
         {
             _heroSystem = heroSystem;
@@ -234,9 +234,9 @@ namespace AlJourney.Scripts.UI
         }
 
         /// <summary>
-        /// Создает и настраивает полоски здоровья для предоставленного списка врагов, предварительно очищая старые данные.
+        /// Creates and configures health bars for the given list of enemies, first clearing any old data.
         /// </summary>
-        /// <param name="enemies">Список текущих врагов на уровне.</param>
+        /// <param name="enemies">The current list of enemies in the level.</param>
         public void SetupEnemies(List<Enemy> enemies)
         {
             ClearEnemies();
@@ -262,7 +262,7 @@ namespace AlJourney.Scripts.UI
         }
 
         /// <summary>
-        /// Обновляет текстовое отображение количества оставшихся перемещений элементов на поле.
+        /// Updates the text display of the remaining move count on the board.
         /// </summary>
         public static void UpdateSwaps(int _)
         {
@@ -315,8 +315,8 @@ namespace AlJourney.Scripts.UI
         }
 
         /// <summary>
-        /// Обновляет подсветку и кликабельность портретов союзников и полосок здоровья врагов
-        /// в соответствии с текущим списком допустимых целей выбранной способности.
+        /// Updates the highlight and clickability of ally portraits and enemy health bars
+        /// to match the current list of valid targets for the selected ability.
         /// </summary>
         private void RefreshTargetHighlights()
         {
@@ -361,7 +361,7 @@ namespace AlJourney.Scripts.UI
         }
 
         /// <summary>
-        /// Вызывается при удалении узла из дерева. Отписывается от всех глобальных и локальных событий для предотвращения утечек памяти.
+        /// Called when the node is removed from the tree. Unsubscribes from all global and local events to prevent memory leaks.
         /// </summary>
         public override void _ExitTree()
         {
@@ -384,7 +384,7 @@ namespace AlJourney.Scripts.UI
     }
 
     /// <summary>
-    /// UI-компонент, представляющий полоску здоровья конкретного врага. Отображает имя, текущее здоровье и реагирует на получение урона или лечение.
+    /// UI component representing a single enemy's health bar. Displays the name and current health, and reacts to damage or healing.
     /// </summary>
     public partial class EnemyHealthBar : VBoxContainer
     {
@@ -397,12 +397,12 @@ namespace AlJourney.Scripts.UI
         private TextureRect _portrait;
 
         /// <summary>
-        /// Враг, к которому привязана данная полоска здоровья.
+        /// The enemy this health bar is bound to.
         /// </summary>
         public Enemy Enemy { get; private set; }
 
         /// <summary>
-        /// Конструктор. Создает и настраивает визуальные элементы полоски здоровья: имя, саму полоску и текст здоровья.
+        /// Constructor. Creates and configures the visual elements of the health bar: name, the bar itself, and the health text.
         /// </summary>
         public EnemyHealthBar()
         {
@@ -460,10 +460,10 @@ namespace AlJourney.Scripts.UI
         private HBoxContainer _statusContainer;
 
         /// <summary>
-        /// Инициализирует полоску здоровья данными конкретного врага, подписывается на его события изменения здоровья и смерти, а также настраивает цвет в зависимости от типа врага.
+        /// Initializes the health bar with a specific enemy's data, subscribes to its health-change and death events, and sets the color based on the enemy type.
         /// </summary>
-        /// <param name="enemy">Враг, к которому привязывается данная полоска здоровья.</param>
-        /// <param name="battleManager">Менеджер боя, которому передаётся подтверждённая цель по клику.</param>
+        /// <param name="enemy">The enemy this health bar is bound to.</param>
+        /// <param name="battleManager">The battle manager that the confirmed target on click is passed to.</param>
         public void Initialize(Enemy enemy, BattleManager battleManager)
         {
             Enemy = enemy;
@@ -578,8 +578,8 @@ namespace AlJourney.Scripts.UI
         }
 
         /// <summary>
-        /// Помечает данного врага как допустимую (или недопустимую) цель для наведения текущей способности
-        /// и подсвечивает полоску здоровья соответствующим образом.
+        /// Marks this enemy as a valid (or invalid) target for the currently selected ability
+        /// and highlights the health bar accordingly.
         /// </summary>
         public void SetSelectable(bool selectable)
         {
@@ -596,7 +596,7 @@ namespace AlJourney.Scripts.UI
         }
 
         /// <summary>
-        /// Вызывается при удалении узла. Отписывается от событий связанного врага.
+        /// Called when the node is removed. Unsubscribes from the associated enemy's events.
         /// </summary>
         public override void _ExitTree()
         {

@@ -4,7 +4,7 @@ using Godot;
 namespace AlJourney.Scripts.UI
 {
     /// <summary>
-    /// Пользовательский интерфейс меню настроек. Управляет изменениями графики и звука.
+    /// UI for the settings menu. Manages video and audio setting changes.
     /// </summary>
     public partial class SettingsMenuUI : Control
     {
@@ -37,7 +37,7 @@ namespace AlJourney.Scripts.UI
         private readonly int[] _fpsLimits = [30, 60, 120, 144, 240, 0];
 
         /// <summary>
-        /// Вызывается при инициализации узла. Настраивает ссылки на элементы управления, подписывается на их события и загружает текущие настройки.
+        /// Called when the node is initialized. Sets up references to the controls, subscribes to their events, and loads the current settings.
         /// </summary>
         public override void _Ready()
         {

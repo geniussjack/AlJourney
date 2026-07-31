@@ -4,8 +4,8 @@ using Godot;
 namespace AlJourney.Scripts.UI
 {
     /// <summary>
-    /// UI-компонент PauseMenu. Отвечает за логику меню паузы, приостановку игры и возврат в главное меню.
-    /// Работает в связке с PauseMenu.tscn.
+    /// UI component for the pause menu. Handles pause menu logic, pausing the game, and returning to the main menu.
+    /// Works together with PauseMenu.tscn.
     /// </summary>
     public partial class PauseMenu : Control
     {
@@ -15,8 +15,8 @@ namespace AlJourney.Scripts.UI
         private Button _mainMenuButton;
 
         /// <summary>
-        /// Вызывается при инициализации узла. Настраивает кнопки продолжения, сохранения и выхода,
-        /// скрывает меню по умолчанию и устанавливает режим обработки Always.
+        /// Called when the node is initialized. Sets up the resume, save and quit buttons,
+        /// hides the menu by default, and sets the process mode to Always.
         /// </summary>
         public override void _Ready()
         {
@@ -42,9 +42,9 @@ namespace AlJourney.Scripts.UI
         }
 
         /// <summary>
-        /// Обрабатывает пользовательский ввод. При нажатии Esc переключает состояние паузы.
+        /// Handles user input. Pressing Esc toggles the pause state.
         /// </summary>
-        /// <param name="event">Событие пользовательского ввода.</param>
+        /// <param name="event">The input event.</param>
         public override void _Input(InputEvent @event)
         {
             if (@event.IsActionPressed("ui_cancel") || @event.IsActionPressed("ui_accept"))
@@ -63,7 +63,7 @@ namespace AlJourney.Scripts.UI
         }
 
         /// <summary>
-        /// Ставит игру на паузу и отображает меню с анимацией появления.
+        /// Pauses the game and shows the menu with a fade-in animation.
         /// </summary>
         public void Pause()
         {
@@ -79,7 +79,7 @@ namespace AlJourney.Scripts.UI
         }
 
         /// <summary>
-        /// Снимает игру с паузы с анимацией исчезновения.
+        /// Unpauses the game with a fade-out animation.
         /// </summary>
         public void Resume()
         {

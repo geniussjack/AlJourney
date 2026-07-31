@@ -5,7 +5,7 @@ using Godot;
 namespace AlJourney.Scripts.UI
 {
     /// <summary>
-    /// Пользовательский интерфейс главного меню игры. Управляет навигацией между разделами: продолжение/новая игра, настройки, титры и выход из игры.
+    /// UI for the game's main menu. Handles navigation between sections: continue/new game, settings, credits and quitting the game.
     /// </summary>
     public partial class MainMenuUI : Control
     {
@@ -22,7 +22,7 @@ namespace AlJourney.Scripts.UI
         private static bool _hasPlayedGameStart = false;
 
         /// <summary>
-        /// Вызывается при готовности узла. Инициализирует ссылки на кнопки и панели, подписывается на события нажатия и отображает основной экран меню.
+        /// Called when the node is ready. Initializes references to buttons and panels, subscribes to press events, and shows the main menu screen.
         /// </summary>
         public override void _Ready()
         {
@@ -124,7 +124,7 @@ namespace AlJourney.Scripts.UI
         }
 
         /// <summary>
-        /// Скрывает все дополнительные панели и возвращает пользователя на основной экран главного меню.
+        /// Hides every secondary panel and returns the user to the main menu's home screen.
         /// </summary>
         public void OnBackToMainMenu()
         {

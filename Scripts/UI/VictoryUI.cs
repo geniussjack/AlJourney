@@ -5,7 +5,7 @@ using Godot;
 namespace AlJourney.Scripts.UI
 {
     /// <summary>
-    /// Пользовательский интерфейс победного экрана. Отображает финальную статистику при успешном завершении игры.
+    /// UI for the victory screen. Displays final stats when the game is completed successfully.
     /// </summary>
     public partial class VictoryUI : Control
     {
@@ -17,7 +17,7 @@ namespace AlJourney.Scripts.UI
         private Button _newGameButton;
 
         /// <summary>
-        /// Вызывается при готовности узла. Инициализирует ссылки на текстовые метки и кнопки навигации, подписывается на их события и отображает победную статистику.
+        /// Called when the node is ready. Initializes references to labels and navigation buttons, subscribes to their events, and displays the victory stats.
         /// </summary>
         public override void _Ready()
         {

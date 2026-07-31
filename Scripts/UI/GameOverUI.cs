@@ -5,7 +5,7 @@ using Godot;
 namespace AlJourney.Scripts.UI
 {
     /// <summary>
-    /// Пользовательский интерфейс экрана завершения игры. Отображает финальную статистику и предоставляет кнопки для начала новой игры или выхода в главное меню.
+    /// UI for the game over screen. Displays final stats and provides buttons to start a new game or return to the main menu.
     /// </summary>
     public partial class GameOverUI : Control
     {
@@ -16,7 +16,7 @@ namespace AlJourney.Scripts.UI
         private Button _newGameButton;
 
         /// <summary>
-        /// Вызывается при инициализации узла. Настраивает ссылки на текстовые метки и кнопки, подписывается на события нажатия и запускает отображение статистики.
+        /// Called when the node is initialized. Sets up references to labels and buttons, subscribes to press events, and displays the stats.
         /// </summary>
         public override void _Ready()
         {
