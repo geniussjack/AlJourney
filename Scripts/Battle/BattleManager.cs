@@ -58,6 +58,25 @@ namespace AlJourney.Scripts.Battle
         [Signal]
         public delegate void EnemyDefeatedEventHandler(Enemy enemy);
 
+        /// <summary>
+        /// Сигнал вызывается при изменении общего заряда ульты отряда.
+        /// </summary>
+        /// <param name="charge">Текущее значение заряда.</param>
+        /// <param name="maxCharge">Максимальное значение заряда.</param>
+        [Signal]
+        public delegate void UltimateChargeChangedEventHandler(int charge, int maxCharge);
+
+        /// <summary>
+        /// Максимальное значение общего заряда ульты отряда.
+        /// </summary>
+        public const int MaxUltimateCharge = 100;
+
+        /// <summary>
+        /// Фиксированный прирост заряда ульты за одно результативное действие
+        /// (атака отряда, попавшая по врагу, либо атака врага, попавшая по отряду).
+        /// </summary>
+        public const int UltimateChargePerAction = 25;
+
         public int NecromancerTurnCount { get; private set; }
         public void IncrementNecromancerTurnCount()
         {
@@ -69,6 +88,16 @@ namespace AlJourney.Scripts.Battle
         private bool _isWaveCompleted;
 
         private List<PlayerCharacter> _pendingActors = [];
+
+        /// <summary>
+        /// Текущее значение общего заряда ульты отряда (0..<see cref="MaxUltimateCharge"/>).
+        /// </summary>
+        public int UltimateCharge { get; private set; }
+
+        /// <summary>
+        /// Истина, если заряд ульты полон и она доступна к применению.
+        /// </summary>
+        public bool IsUltimateReady => UltimateCharge >= MaxUltimateCharge;
 
         /// <summary>
         /// Текущая фаза битвы.
@@ -115,6 +144,7 @@ namespace AlJourney.Scripts.Battle
             NecromancerTurnCount = 0;
             _battleEndedSignaled = false;
             _isWaveCompleted = false;
+            UltimateCharge = 0;
 
             GD.Print("[BattleManager] Initialized for party-based turn combat");
         }
@@ -133,6 +163,7 @@ namespace AlJourney.Scripts.Battle
             _cameraShake = cameraShake;
             _battleEndedSignaled = false;
             _isWaveCompleted = false;
+            UltimateCharge = 0;
 
             HeroSystem.PartyDefeated += OnPartyDefeated;
 
@@ -176,12 +207,26 @@ namespace AlJourney.Scripts.Battle
         }
 
         /// <summary>
-        /// Выбирает способность, которую применит выбранный боец (одна из ровно двух: атака или защита/поддержка).
+        /// Выбирает способность, которую применит выбранный боец: атака, защита/поддержка,
+        /// либо (при полном заряде) ультимативная способность. Ультимата разрешается немедленно,
+        /// без отдельного подтверждения цели — она либо бьёт по площади, либо сама выбирает цель
+        /// по своим правилам (см. <see cref="ResolveUltimate"/>).
         /// </summary>
         public void SelectAbility(AbilityData ability)
         {
             if (CurrentPhase != BattlePhase.PlayerTurn || SelectedActor is null || ability is null)
             {
+                return;
+            }
+
+            if (ability.IsUltimate)
+            {
+                if (!IsUltimateReady)
+                {
+                    return;
+                }
+
+                ResolveUltimate(SelectedActor, ability);
                 return;
             }
 
@@ -222,8 +267,66 @@ namespace AlJourney.Scripts.Battle
             }
 
             ResolveAbility(SelectedActor, SelectedAbility, target);
+            AdvanceTurnAfterAction(SelectedActor);
+        }
 
-            _ = _pendingActors.Remove(SelectedActor);
+        private void ResolveAbility(PlayerCharacter caster, AbilityData ability, Character primaryTarget)
+        {
+            IReadOnlyList<Character> allies = [.. HeroSystem.GetAliveMembers()];
+            IReadOnlyList<Character> enemies = [.. Enemies.Where(e => e.IsAlive)];
+            IReadOnlyList<Character> targets = AbilityTargetingRules.ResolveEffectTargets(
+                ability.TargetType, ability.IsAoE, primaryTarget, allies, enemies, static c => c.IsAlive);
+
+            if (ability.IsAttackAbility)
+            {
+                CombatEffectProcessor.ApplyAttackAbility(ability, caster, targets, this, _cameraShake);
+                if (targets.Count > 0)
+                {
+                    AddUltimateCharge(UltimateChargePerAction);
+                }
+            }
+            else
+            {
+                CombatEffectProcessor.ApplySupportAbility(ability, targets, HeroSystem, this, _cameraShake);
+            }
+        }
+
+        /// <summary>
+        /// Немедленно разрешает ультимативную способность выбранного бойца и обнуляет общий заряд отряда.
+        /// AoE-ульты бьют по всем живым врагам; одиночные — по врагу с наибольшим текущим HP (автовыбор,
+        /// без участия игрока).
+        /// </summary>
+        private void ResolveUltimate(PlayerCharacter caster, AbilityData ultimate)
+        {
+            IReadOnlyList<Character> aliveEnemies = [.. Enemies.Where(e => e.IsAlive)];
+            IReadOnlyList<Character> targets;
+
+            if (ultimate.IsAoE)
+            {
+                targets = aliveEnemies;
+            }
+            else
+            {
+                Character highestHealthEnemy = AbilityTargetingRules.SelectHighestHealthTarget(
+                    aliveEnemies, static c => c.CurrentHealth, static c => c.IsAlive);
+                targets = highestHealthEnemy is null ? [] : [highestHealthEnemy];
+            }
+
+            CombatEffectProcessor.ApplyAttackAbility(ultimate, caster, targets, this, _cameraShake);
+
+            UltimateCharge = 0;
+            _ = EmitSignal(SignalName.UltimateChargeChanged, UltimateCharge, MaxUltimateCharge);
+
+            AdvanceTurnAfterAction(caster);
+        }
+
+        /// <summary>
+        /// Убирает бойца из очереди ещё не походивших участников раунда и либо передаёт ход дальше
+        /// внутри отряда, либо (если это был последний боец) запускает ход врагов.
+        /// </summary>
+        private void AdvanceTurnAfterAction(PlayerCharacter actor)
+        {
+            _ = _pendingActors.Remove(actor);
             SelectedActor = null;
             SelectedAbility = null;
 
@@ -237,21 +340,21 @@ namespace AlJourney.Scripts.Battle
             }
         }
 
-        private void ResolveAbility(PlayerCharacter caster, AbilityData ability, Character primaryTarget)
+        /// <summary>
+        /// Увеличивает (с ограничением сверху и снизу) общий заряд ульты отряда и оповещает подписчиков.
+        /// Вызывается как при результативных атаках отряда, так и при попаданиях атак врагов по отряду.
+        /// </summary>
+        /// <param name="amount">Величина прироста заряда.</param>
+        internal void AddUltimateCharge(int amount)
         {
-            IReadOnlyList<Character> allies = [.. HeroSystem.GetAliveMembers()];
-            IReadOnlyList<Character> enemies = [.. Enemies.Where(e => e.IsAlive)];
-            IReadOnlyList<Character> targets = AbilityTargetingRules.ResolveEffectTargets(
-                ability.TargetType, ability.IsAoE, primaryTarget, allies, enemies, static c => c.IsAlive);
+            int clamped = Mathf.Clamp(UltimateCharge + amount, 0, MaxUltimateCharge);
+            if (clamped == UltimateCharge)
+            {
+                return;
+            }
 
-            if (ability.IsAttackAbility)
-            {
-                CombatEffectProcessor.ApplyAttackAbility(ability, caster, targets, this, _cameraShake);
-            }
-            else
-            {
-                CombatEffectProcessor.ApplySupportAbility(ability, targets, HeroSystem, this, _cameraShake);
-            }
+            UltimateCharge = clamped;
+            _ = EmitSignal(SignalName.UltimateChargeChanged, UltimateCharge, MaxUltimateCharge);
         }
 
         private void GenerateWaveEnemies()
