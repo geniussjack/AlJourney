@@ -82,7 +82,7 @@ namespace AlJourney.Scripts.Managers
         /// <summary>
         /// Id всех уже пройденных уровней кампании.
         /// </summary>
-        public IReadOnlyCollection<string> CompletedLevelIds => CurrentSave?.CompletedLevelIds ?? System.Array.Empty<string>();
+        public IReadOnlyCollection<string> CompletedLevelIds => CurrentSave?.CompletedLevelIds ?? (IReadOnlyCollection<string>)System.Array.Empty<string>();
 
         /// <summary>
         /// Текущее количество монет у игрока.
