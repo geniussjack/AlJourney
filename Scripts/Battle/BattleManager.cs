@@ -39,10 +39,23 @@ namespace AlJourney.Scripts.Battle
         public delegate void TurnStateChangedEventHandler();
 
         /// <summary>
-        /// Сигнал вызывается, когда все враги в текущей волне побеждены.
+        /// Сигнал вызывается, когда все волны текущего уровня побеждены (уровень пройден целиком).
+        /// До Этапа 3 карты кампании волна и уровень совпадали один-к-одному; теперь уровень может
+        /// состоять из нескольких волн подряд (см. <see cref="WaveAdvanced"/>), и этот сигнал
+        /// вызывается только по завершении последней из них.
         /// </summary>
         [Signal]
-        public delegate void WaveCompletedEventHandler();
+        public delegate void LevelCompletedEventHandler();
+
+        /// <summary>
+        /// Сигнал вызывается при переходе к следующей волне внутри одного и того же уровня
+        /// (не последней) — бой продолжается без выхода из сцены, но UI (например, полоски здоровья
+        /// врагов в <see cref="Scripts.UI.BattleHUD"/>) нужно обновить под новый состав <see cref="Enemies"/>.
+        /// </summary>
+        /// <param name="waveIndex">Индекс новой текущей волны (с нуля) внутри уровня.</param>
+        /// <param name="totalWaves">Общее количество волн в уровне.</param>
+        [Signal]
+        public delegate void WaveAdvancedEventHandler(int waveIndex, int totalWaves);
 
         /// <summary>
         /// Сигнал вызывается при окончании битвы.
@@ -85,7 +98,9 @@ namespace AlJourney.Scripts.Battle
 
         private CameraShake _cameraShake;
         private bool _battleEndedSignaled;
-        private bool _isWaveCompleted;
+        private bool _isLevelCompleted;
+        private LevelDefinition _level;
+        private int _currentWaveIndex;
 
         private List<PlayerCharacter> _pendingActors = [];
 
@@ -105,9 +120,20 @@ namespace AlJourney.Scripts.Battle
         public BattlePhase CurrentPhase { get; private set; }
 
         /// <summary>
-        /// Номер текущей волны врагов.
+        /// Сложность текущего уровня (см. <see cref="Data.LevelDefinition.DifficultyRating"/>),
+        /// используемая как вход для <see cref="ScalingSystem"/> — единая для всех волн одного уровня.
         /// </summary>
         public int CurrentWave { get; private set; }
+
+        /// <summary>
+        /// Индекс текущей волны (с нуля) внутри волн уровня.
+        /// </summary>
+        public int CurrentWaveIndex => _currentWaveIndex;
+
+        /// <summary>
+        /// Общее количество волн в текущем уровне.
+        /// </summary>
+        public int TotalWavesInLevel => _level?.Waves.Count ?? 0;
 
         /// <summary>
         /// Ссылка на систему отряда героев.
@@ -143,31 +169,35 @@ namespace AlJourney.Scripts.Battle
             CurrentPhase = BattlePhase.PlayerTurn;
             NecromancerTurnCount = 0;
             _battleEndedSignaled = false;
-            _isWaveCompleted = false;
+            _isLevelCompleted = false;
             UltimateCharge = 0;
 
             GD.Print("[BattleManager] Initialized for party-based turn combat");
         }
 
         /// <summary>
-        /// Запускает битву для указанной волны с переданной системой отряда.
+        /// Запускает битву для указанного уровня карты кампании с переданной системой отряда.
+        /// Волны уровня будут спавниться последовательно по мере зачистки, без выхода из боя
+        /// (см. <see cref="OnEnemiesCleared"/>).
         /// </summary>
         /// <param name="heroSystem">Объект системы отряда игрока.</param>
-        /// <param name="waveNumber">Номер волны для генерации сложности.</param>
+        /// <param name="level">Уровень карты кампании, определяющий волны и их сложность.</param>
         /// <param name="cameraShake">Опциональный контроллер тряски камеры.</param>
-        public void StartBattle(DualHeroSystem heroSystem, int waveNumber, CameraShake cameraShake = null)
+        public void StartBattle(DualHeroSystem heroSystem, LevelDefinition level, CameraShake cameraShake = null)
         {
             HeroSystem = heroSystem;
-            CurrentWave = waveNumber;
+            _level = level;
+            CurrentWave = level.DifficultyRating;
+            _currentWaveIndex = 0;
             NecromancerTurnCount = 0;
             _cameraShake = cameraShake;
             _battleEndedSignaled = false;
-            _isWaveCompleted = false;
+            _isLevelCompleted = false;
             UltimateCharge = 0;
 
             HeroSystem.PartyDefeated += OnPartyDefeated;
 
-            GenerateWaveEnemies();
+            SpawnCurrentWave();
             StartPlayerTurn();
 
             _ = EmitSignal(SignalName.BattleStarted);
@@ -357,13 +387,29 @@ namespace AlJourney.Scripts.Battle
             _ = EmitSignal(SignalName.UltimateChargeChanged, UltimateCharge, MaxUltimateCharge);
         }
 
-        private void GenerateWaveEnemies()
+        /// <summary>
+        /// Спавнит врагов текущей волны уровня (<see cref="_currentWaveIndex"/>) по курируемому составу
+        /// из <see cref="LevelDefinition.Waves"/>, заменяя предыдущий состав <see cref="Enemies"/>.
+        /// </summary>
+        private void SpawnCurrentWave()
         {
+            // Враги базового состава волны в дерево сцены не добавляются, но призванные боссом
+            // существа (см. EnemyAIController.ExecuteNecromancerSummon) — добавляются, и их нужно
+            // явно освободить, иначе при переходе к следующей волне внутри уровня они останутся
+            // висеть дочерними узлами BattleManager до конца всей битвы.
+            foreach (Enemy leftover in Enemies)
+            {
+                if (leftover.IsInsideTree())
+                {
+                    leftover.QueueFree();
+                }
+            }
             Enemies.Clear();
 
-            List<Enemy> newEnemies = EnemySpawner.GenerateWaveEnemies(CurrentWave);
-            foreach (Enemy enemy in newEnemies)
+            WaveDefinition wave = _level.Waves[_currentWaveIndex];
+            foreach (EnemySpawnDefinition spawn in wave.Enemies)
             {
+                Enemy enemy = EnemySpawner.SpawnEnemy(spawn.Type, CurrentWave, spawn.Count);
                 enemy.CharacterDied += () => OnEnemyDied(enemy);
                 Enemies.Add(enemy);
             }
@@ -399,7 +445,7 @@ namespace AlJourney.Scripts.Battle
 
                 if (Enemies.All(e => !e.IsAlive))
                 {
-                    OnWaveCompleted();
+                    OnEnemiesCleared();
                     return;
                 }
             }
@@ -432,7 +478,7 @@ namespace AlJourney.Scripts.Battle
 
             if (Enemies.All(e => !e.IsAlive))
             {
-                Callable.From(OnWaveCompleted).CallDeferred();
+                Callable.From(OnEnemiesCleared).CallDeferred();
             }
         }
 
@@ -453,17 +499,37 @@ namespace AlJourney.Scripts.Battle
             InventoryManager.Instance.AddItems(loot);
         }
 
-        private void OnWaveCompleted()
+        /// <summary>
+        /// Вызывается, когда все враги на поле мертвы. Может сработать из двух независимых мест —
+        /// <see cref="OnEnemyDied"/> отложенно (через <c>CallDeferred</c>) и <see cref="StartEnemyTurn"/>
+        /// синхронно сразу после хода врагов — поэтому в начале заново проверяет текущее состояние
+        /// <see cref="Enemies"/>, а не полагается только на факт вызова: к моменту срабатывания
+        /// отложенного вызова волна могла уже смениться (см. <see cref="SpawnCurrentWave"/>), и тогда
+        /// повторный вызов должен молча ничего не делать, а не сработать против уже другой, живой волны.
+        /// Отдельный флаг <see cref="_isLevelCompleted"/> защищает только ветку завершения уровня целиком,
+        /// где состав <see cref="Enemies"/> остаётся неизменным (все мертвы) до конца всей битвы.
+        /// </summary>
+        private void OnEnemiesCleared()
         {
-            if (_isWaveCompleted)
+            if (_isLevelCompleted || Enemies.Count == 0 || Enemies.Any(e => e.IsAlive))
             {
                 return;
             }
 
-            _isWaveCompleted = true;
+            if (_currentWaveIndex + 1 < _level.Waves.Count)
+            {
+                _currentWaveIndex++;
+                SpawnCurrentWave();
+
+                _ = EmitSignal(SignalName.WaveAdvanced, _currentWaveIndex, _level.Waves.Count);
+                StartPlayerTurn();
+                return;
+            }
+
+            _isLevelCompleted = true;
 
             ChangePhase(BattlePhase.WaveTransition);
-            _ = EmitSignal(SignalName.WaveCompleted);
+            _ = EmitSignal(SignalName.LevelCompleted);
 
             (int mageHealth, int mageMaxHealth, int mageDamage, int mageDefense, int warriorHealth, int warriorMaxHealth, int warriorDamage, int warriorDefense) = HeroSystem.GetCombinedStats();
             GameStateManager.Instance.UpdateHeroStats(
@@ -471,7 +537,7 @@ namespace AlJourney.Scripts.Battle
                 warriorHealth, warriorMaxHealth, warriorDamage, warriorDefense
             );
 
-            GameStateManager.Instance.NextWave();
+            GameStateManager.Instance.CompleteLevel(_level.Id);
             SaveSystem.Instance.AutoSave();
         }
 

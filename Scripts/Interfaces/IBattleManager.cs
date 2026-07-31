@@ -19,9 +19,19 @@ namespace AlJourney.Scripts.Interfaces
         BattlePhase CurrentPhase { get; }
 
         /// <summary>
-        /// Номер текущей волны врагов в рамках боя.
+        /// Сложность текущего уровня, единая для всех его волн (см. <see cref="LevelDefinition.DifficultyRating"/>).
         /// </summary>
         int CurrentWave { get; }
+
+        /// <summary>
+        /// Индекс текущей волны (с нуля) внутри волн текущего уровня.
+        /// </summary>
+        int CurrentWaveIndex { get; }
+
+        /// <summary>
+        /// Общее количество волн в текущем уровне.
+        /// </summary>
+        int TotalWavesInLevel { get; }
 
         /// <summary>
         /// Система управления отрядом героев, участвующих в битве.
@@ -74,9 +84,10 @@ namespace AlJourney.Scripts.Interfaces
         void ConfirmTarget(Character target);
 
         /// <summary>
-        /// Запускает начало битвы для указанной волны, настраивая героев и опционально применяя эффекты тряски камеры.
+        /// Запускает начало битвы для указанного уровня карты кампании, настраивая героев и опционально
+        /// применяя эффекты тряски камеры.
         /// </summary>
-        void StartBattle(DualHeroSystem heroSystem, int waveNumber, CameraShake cameraShake = null);
+        void StartBattle(DualHeroSystem heroSystem, LevelDefinition level, CameraShake cameraShake = null);
 
         /// <summary>
         /// Завершает текущую битву, очищая ресурсы и подводя итоги столкновения.
