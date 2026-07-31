@@ -33,14 +33,20 @@ UI_BATTLE_ALDRIC,Aldric,Элдрик
 UI_BATTLE_CHOOSE_ACTOR,Choose who acts next,Выберите бойца
 UI_BATTLE_CHOOSE_ABILITY,Choose an ability,Выберите способность
 UI_BATTLE_CHOOSE_TARGET,Choose a target,Выберите цель
-ABILITY_ELTARION_FIREBALL,Fireball,Огненный шар
-ABILITY_ELTARION_FIREBALL_DESC,Hurls a bolt of fire at an enemy,Швыряет во врага сгусток пламени
-ABILITY_ELTARION_HEALING_LIGHT,Healing Light,Свет исцеления
-ABILITY_ELTARION_HEALING_LIGHT_DESC,Restores health to an ally or self,Восстанавливает здоровье себе или союзнику
-ABILITY_ELDRIC_SWORD_STRIKE,Sword Strike,Удар мечом
-ABILITY_ELDRIC_SWORD_STRIKE_DESC,A powerful strike against an enemy,Мощный удар по врагу
-ABILITY_ELDRIC_SHIELD_WALL,Shield Wall,Стена щитов
-ABILITY_ELDRIC_SHIELD_WALL_DESC,Grants a protective shield to an ally or self,Даёт защитный щит себе или союзнику
+ABILITY_ALTARION_FIREBALL,Fireball,Огненный шар
+ABILITY_ALTARION_FIREBALL_DESC,Hurls a bolt of fire at an enemy,Швыряет во врага сгусток пламени
+ABILITY_ALTARION_HEALING_LIGHT,Healing Light,Свет исцеления
+ABILITY_ALTARION_HEALING_LIGHT_DESC,Restores health to an ally or self,Восстанавливает здоровье себе или союзнику
+ABILITY_ALTARION_METEOR_STORM,Meteor Storm,Метеоритный шторм
+ABILITY_ALTARION_METEOR_STORM_DESC,Calls down meteors on all enemies,Обрушивает метеориты на всех врагов
+ABILITY_ALDRIC_SWORD_STRIKE,Sword Strike,Удар мечом
+ABILITY_ALDRIC_SWORD_STRIKE_DESC,A powerful strike against an enemy,Мощный удар по врагу
+ABILITY_ALDRIC_SHIELD_WALL,Shield Wall,Стена щитов
+ABILITY_ALDRIC_SHIELD_WALL_DESC,Grants a protective shield to an ally or self,Даёт защитный щит себе или союзнику
+ABILITY_ALDRIC_CRUSHING_BLOW,Crushing Blow,Сокрушающий удар
+ABILITY_ALDRIC_CRUSHING_BLOW_DESC,A devastating strike against the toughest enemy,Разрушительный удар по самому живучему врагу
+UI_BATTLE_ULTIMATE_READY,Ultimate,Ультимата
+UI_BATTLE_ULTIMATE_CHARGE,Ultimate charge:,Заряд ульты:
 UI_PAUSE_SAVE,Save Game,Сохранить
 CHARACTER_MAGE,Mage,Маг
 CHARACTER_WARRIOR,Warrior,Воин
@@ -80,8 +86,8 @@ UI_COINS,Coins,Монеты
 UI_CLOSE,Close,Закрыть
 UI_UPGRADE,Upgrade,Улучшить
 UI_EQUIPMENT,Equipment,Снаряжение
-HERO_MAGE,Eltarion,Эльтарион
-HERO_WARRIOR,Eldrik,Элдрик
+HERO_MAGE,Altarion,Эльтарион
+HERO_WARRIOR,Aldric,Элдрик
 STAT_DAMAGE,Damage,Урон
 STAT_BLEED_DAMAGE,Bleed Dmg per turn,Урон от кровотечения / ход
 STAT_BURN_DAMAGE,Burn Dmg per turn,Урон от горения / ход
