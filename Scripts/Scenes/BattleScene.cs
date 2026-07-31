@@ -1,10 +1,12 @@
 using AlJourney.Scripts.Battle;
 using AlJourney.Scripts.Characters;
+using AlJourney.Scripts.Core;
 using AlJourney.Scripts.Data;
 using AlJourney.Scripts.Managers;
 using AlJourney.Scripts.UI;
 using AlJourney.Scripts.Utils;
 using Godot;
+using System.Linq;
 
 namespace AlJourney.Scripts.Scenes
 {
@@ -24,6 +26,7 @@ namespace AlJourney.Scripts.Scenes
 
         private GameStateManager _gameStateManager;
         private bool _isBattleTransitionQueued;
+        private LevelDefinition _level;
 
         /// <summary>
         /// Initializes the battle scene. Sets up the camera, loads hero data from the save,
@@ -63,11 +66,11 @@ namespace AlJourney.Scripts.Scenes
             _battleManager.BattleEnded += OnBattleEnded;
             _battleManager.EnemyDefeated += OnEnemyDefeated;
 
-            LevelDefinition level = CampaignDatabase.GetLevel(_gameStateManager.CurrentLevelId)
+            _level = CampaignDatabase.GetLevel(_gameStateManager.CurrentLevelId)
                 ?? CampaignDatabase.GetLevel(CampaignDatabase.FirstLevelId);
 
-            _gameStateManager.StartLevel(level);
-            _battleManager.StartBattle(_heroSystem, level, _cameraShake);
+            _gameStateManager.StartLevel(_level);
+            _battleManager.StartBattle(_heroSystem, _level, _cameraShake);
 
             _turnActionPanel.Initialize(_battleManager);
 
@@ -75,7 +78,7 @@ namespace AlJourney.Scripts.Scenes
 
             StartPortraitAnimations();
 
-            GD.Print($"[BattleScene] Battle started - Level {level.Id} (difficulty {level.DifficultyRating})");
+            GD.Print($"[BattleScene] Battle started - Level {_level.Id} (difficulty {_level.DifficultyRating})");
         }
 
         private void StartPortraitAnimations()
@@ -147,6 +150,7 @@ namespace AlJourney.Scripts.Scenes
         /// <summary>
         /// Called once every wave of the current level has been cleared. The level (not the wave) is the
         /// unit of exiting combat: the shop no longer opens here, the player returns to the campaign map.
+        /// If the cleared level was the Necromancer's, the defeat cutscene plays first.
         /// </summary>
         private void OnLevelCompleted()
         {
@@ -160,7 +164,19 @@ namespace AlJourney.Scripts.Scenes
 
             SaveHeroStats();
 
-            GetTree().CreateTimer(1.0f).Timeout += SceneManager.GoToMap;
+            bool defeatedNecromancer = _level.Waves.Any(wave => wave.Enemies.Any(spawn => spawn.Type == EnemyType.Necromancer));
+
+            GetTree().CreateTimer(1.0f).Timeout += () =>
+            {
+                if (defeatedNecromancer)
+                {
+                    CutscenePlayer.Play(GetNode<CanvasLayer>("CanvasLayer"), CutsceneDatabase.NecromancerDefeat, SceneManager.GoToMap);
+                }
+                else
+                {
+                    SceneManager.GoToMap();
+                }
+            };
         }
 
         /// <summary>
