@@ -6,15 +6,6 @@ namespace AlJourney.Scripts.Core
     public static class GameConstants
     {
         /// <summary>
-        /// Number of tile swaps available to the player per turn.
-        /// </summary>
-        public const int PLAYER_SWAPS_PER_TURN = 1;
-        /// <summary>
-        /// Minimum number of identical tiles in a row required for a successful match.
-        /// </summary>
-        public const int MATCH_MIN_LENGTH = 3;
-
-        /// <summary>
         /// Coefficient by which enemy health increases with each new wave.
         /// </summary>
         public const float ENEMY_HP_SCALE_PER_WAVE = 0.10f;
