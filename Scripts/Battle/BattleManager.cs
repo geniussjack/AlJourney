@@ -12,68 +12,81 @@ using System.Linq;
 namespace AlJourney.Scripts.Battle
 {
     /// <summary>
-    /// Глобальный менеджер пошаговой боевой системы. Управляет очередью хода отряда игрока
-    /// (игрок сам выбирает, кто из живых бойцов ходит следующим, затем его способность и цель),
-    /// ходом врагов, волнами противников, а также начислением урона и выдачей лута.
+    /// Global manager for the turn-based combat system. Manages the player party's turn queue
+    /// (the player chooses which of the living combatants acts next, then their ability and target),
+    /// enemy turns, enemy waves, and damage and loot payouts.
     /// </summary>
     public partial class BattleManager : Node, IBattleManager
     {
         /// <summary>
-        /// Сигнал вызывается в начале новой битвы.
+        /// Raised at the start of a new battle.
         /// </summary>
         [Signal]
         public delegate void BattleStartedEventHandler();
 
         /// <summary>
-        /// Сигнал вызывается при смене текущей фазы боя.
+        /// Raised when the current battle phase changes.
         /// </summary>
-        /// <param name="newPhase">Новая фаза из перечисления BattlePhase.</param>
+        /// <param name="newPhase">The new phase, from the BattlePhase enum.</param>
         [Signal]
         public delegate void PhaseChangedEventHandler(BattlePhase newPhase);
 
         /// <summary>
-        /// Сигнал вызывается при любом изменении состояния выбора хода игрока
-        /// (выбор бойца, выбор способности, разрешение цели). Используется UI выбора цели для обновления.
+        /// Raised on any change to the player's turn selection state (actor selection, ability selection,
+        /// target resolution). Used by the target-selection UI to refresh itself.
         /// </summary>
         [Signal]
         public delegate void TurnStateChangedEventHandler();
 
         /// <summary>
-        /// Сигнал вызывается, когда все враги в текущей волне побеждены.
+        /// Raised when every wave of the current level has been cleared (the level is fully completed).
+        /// Before Stage 3's campaign map, a wave and a level matched one-to-one; now a level can consist
+        /// of several consecutive waves (see <see cref="WaveAdvanced"/>), and this signal only fires once
+        /// the last one is cleared.
         /// </summary>
         [Signal]
-        public delegate void WaveCompletedEventHandler();
+        public delegate void LevelCompletedEventHandler();
 
         /// <summary>
-        /// Сигнал вызывается при окончании битвы.
+        /// Raised when advancing to the next wave within the same level (not the last one) — combat
+        /// continues without leaving the scene, but the UI (e.g. enemy health bars in
+        /// <see cref="Scripts.UI.BattleHUD"/>) needs to refresh for the new <see cref="Enemies"/> lineup.
         /// </summary>
-        /// <param name="playerWon">True, если игрок победил.</param>
+        /// <param name="waveIndex">The new current wave's index (zero-based) within the level.</param>
+        /// <param name="totalWaves">The total number of waves in the level.</param>
+        [Signal]
+        public delegate void WaveAdvancedEventHandler(int waveIndex, int totalWaves);
+
+        /// <summary>
+        /// Raised when the battle ends.
+        /// </summary>
+        /// <param name="playerWon">True if the player won.</param>
         [Signal]
         public delegate void BattleEndedEventHandler(bool playerWon);
 
         /// <summary>
-        /// Сигнал вызывается каждый раз, когда погибает один из противников.
+        /// Raised every time one of the enemies dies.
         /// </summary>
-        /// <param name="enemy">Ссылка на побежденного врага.</param>
+        /// <param name="enemy">A reference to the defeated enemy.</param>
         [Signal]
         public delegate void EnemyDefeatedEventHandler(Enemy enemy);
 
         /// <summary>
-        /// Сигнал вызывается при изменении общего заряда ульты отряда.
+        /// Raised when the party's shared ultimate charge changes.
         /// </summary>
-        /// <param name="charge">Текущее значение заряда.</param>
-        /// <param name="maxCharge">Максимальное значение заряда.</param>
+        /// <param name="charge">The current charge value.</param>
+        /// <param name="maxCharge">The maximum charge value.</param>
         [Signal]
         public delegate void UltimateChargeChangedEventHandler(int charge, int maxCharge);
 
         /// <summary>
-        /// Максимальное значение общего заряда ульты отряда.
+        /// The maximum value of the party's shared ultimate charge.
         /// </summary>
         public const int MaxUltimateCharge = 100;
 
         /// <summary>
-        /// Фиксированный прирост заряда ульты за одно результативное действие
-        /// (атака отряда, попавшая по врагу, либо атака врага, попавшая по отряду).
+        /// The fixed ultimate charge gained per successful action
+        /// (a party attack landing on an enemy, or an enemy attack landing on the party).
         /// </summary>
         public const int UltimateChargePerAction = 25;
 
@@ -85,57 +98,70 @@ namespace AlJourney.Scripts.Battle
 
         private CameraShake _cameraShake;
         private bool _battleEndedSignaled;
-        private bool _isWaveCompleted;
+        private bool _isLevelCompleted;
+        private LevelDefinition _level;
+        private int _currentWaveIndex;
 
         private List<PlayerCharacter> _pendingActors = [];
 
         /// <summary>
-        /// Текущее значение общего заряда ульты отряда (0..<see cref="MaxUltimateCharge"/>).
+        /// The party's current total ultimate charge (0..<see cref="MaxUltimateCharge"/>).
         /// </summary>
         public int UltimateCharge { get; private set; }
 
         /// <summary>
-        /// Истина, если заряд ульты полон и она доступна к применению.
+        /// True if the ultimate charge is full and it's ready to use.
         /// </summary>
         public bool IsUltimateReady => UltimateCharge >= MaxUltimateCharge;
 
         /// <summary>
-        /// Текущая фаза битвы.
+        /// The current battle phase.
         /// </summary>
         public BattlePhase CurrentPhase { get; private set; }
 
         /// <summary>
-        /// Номер текущей волны врагов.
+        /// The current level's difficulty (see <see cref="Data.LevelDefinition.DifficultyRating"/>),
+        /// used as the input to <see cref="ScalingSystem"/> — shared by every wave of a single level.
         /// </summary>
         public int CurrentWave { get; private set; }
 
         /// <summary>
-        /// Ссылка на систему отряда героев.
+        /// The current wave's index (zero-based) within the level's waves.
+        /// </summary>
+        public int CurrentWaveIndex => _currentWaveIndex;
+
+        /// <summary>
+        /// The total number of waves in the current level.
+        /// </summary>
+        public int TotalWavesInLevel => _level?.Waves.Count ?? 0;
+
+        /// <summary>
+        /// Reference to the hero party system.
         /// </summary>
         public DualHeroSystem HeroSystem { get; private set; }
 
         /// <summary>
-        /// Список всех активных врагов на поле.
+        /// The list of every enemy currently active on the field.
         /// </summary>
         public List<Enemy> Enemies { get; private set; }
 
         /// <summary>
-        /// Участники отряда, которые ещё не совершили ход в текущем раунде.
+        /// Party members who have not yet acted in the current round.
         /// </summary>
         public IReadOnlyList<PlayerCharacter> PendingActors => _pendingActors;
 
         /// <summary>
-        /// Боец, выбранный игроком для текущего хода.
+        /// The actor selected by the player for the current turn.
         /// </summary>
         public PlayerCharacter SelectedActor { get; private set; }
 
         /// <summary>
-        /// Способность, выбранная для текущего хода.
+        /// The ability selected for the current turn.
         /// </summary>
         public AbilityData SelectedAbility { get; private set; }
 
         /// <summary>
-        /// Инициализация менеджера боя.
+        /// Initializes the battle manager.
         /// </summary>
         public override void _Ready()
         {
@@ -143,31 +169,35 @@ namespace AlJourney.Scripts.Battle
             CurrentPhase = BattlePhase.PlayerTurn;
             NecromancerTurnCount = 0;
             _battleEndedSignaled = false;
-            _isWaveCompleted = false;
+            _isLevelCompleted = false;
             UltimateCharge = 0;
 
             GD.Print("[BattleManager] Initialized for party-based turn combat");
         }
 
         /// <summary>
-        /// Запускает битву для указанной волны с переданной системой отряда.
+        /// Starts the battle for the given campaign map level with the provided party system.
+        /// The level's waves spawn one after another as they're cleared, without leaving combat
+        /// (see <see cref="OnEnemiesCleared"/>).
         /// </summary>
-        /// <param name="heroSystem">Объект системы отряда игрока.</param>
-        /// <param name="waveNumber">Номер волны для генерации сложности.</param>
-        /// <param name="cameraShake">Опциональный контроллер тряски камеры.</param>
-        public void StartBattle(DualHeroSystem heroSystem, int waveNumber, CameraShake cameraShake = null)
+        /// <param name="heroSystem">The player's party system object.</param>
+        /// <param name="level">The campaign map level defining the waves and their difficulty.</param>
+        /// <param name="cameraShake">Optional camera shake controller.</param>
+        public void StartBattle(DualHeroSystem heroSystem, LevelDefinition level, CameraShake cameraShake = null)
         {
             HeroSystem = heroSystem;
-            CurrentWave = waveNumber;
+            _level = level;
+            CurrentWave = level.DifficultyRating;
+            _currentWaveIndex = 0;
             NecromancerTurnCount = 0;
             _cameraShake = cameraShake;
             _battleEndedSignaled = false;
-            _isWaveCompleted = false;
+            _isLevelCompleted = false;
             UltimateCharge = 0;
 
             HeroSystem.PartyDefeated += OnPartyDefeated;
 
-            GenerateWaveEnemies();
+            SpawnCurrentWave();
             StartPlayerTurn();
 
             _ = EmitSignal(SignalName.BattleStarted);
@@ -191,8 +221,8 @@ namespace AlJourney.Scripts.Battle
         }
 
         /// <summary>
-        /// Выбирает бойца, который совершит ход следующим. Игрок сам определяет порядок хода
-        /// среди ещё не действовавших в этом раунде живых участников отряда.
+        /// Selects the actor who will take the next turn. The player determines the turn order among
+        /// the living party members who haven't acted yet this round.
         /// </summary>
         public void SelectActor(PlayerCharacter actor)
         {
@@ -207,10 +237,9 @@ namespace AlJourney.Scripts.Battle
         }
 
         /// <summary>
-        /// Выбирает способность, которую применит выбранный боец: атака, защита/поддержка,
-        /// либо (при полном заряде) ультимативная способность. Ультимата разрешается немедленно,
-        /// без отдельного подтверждения цели — она либо бьёт по площади, либо сама выбирает цель
-        /// по своим правилам (см. <see cref="ResolveUltimate"/>).
+        /// Selects the ability the chosen actor will use: attack, support, or (once fully charged) the
+        /// ultimate ability. The ultimate resolves immediately, without a separate target confirmation —
+        /// it either hits an area, or picks its own target by its own rules (see <see cref="ResolveUltimate"/>).
         /// </summary>
         public void SelectAbility(AbilityData ability)
         {
@@ -235,7 +264,7 @@ namespace AlJourney.Scripts.Battle
         }
 
         /// <summary>
-        /// Возвращает список допустимых целей для наведения выбранной способности.
+        /// Returns the list of valid targets for the selected ability's targeting.
         /// </summary>
         public IReadOnlyList<Character> GetValidTargets()
         {
@@ -251,8 +280,8 @@ namespace AlJourney.Scripts.Battle
         }
 
         /// <summary>
-        /// Подтверждает цель и немедленно разрешает эффект выбранной способности.
-        /// Если это был последний ещё не походивший боец отряда — начинается ход врагов.
+        /// Confirms the target and immediately resolves the selected ability's effect.
+        /// If this was the last party member who hadn't acted yet, the enemy turn begins.
         /// </summary>
         public void ConfirmTarget(Character target)
         {
@@ -292,9 +321,9 @@ namespace AlJourney.Scripts.Battle
         }
 
         /// <summary>
-        /// Немедленно разрешает ультимативную способность выбранного бойца и обнуляет общий заряд отряда.
-        /// AoE-ульты бьют по всем живым врагам; одиночные — по врагу с наибольшим текущим HP (автовыбор,
-        /// без участия игрока).
+        /// Immediately resolves the selected actor's ultimate ability and resets the party's shared charge.
+        /// AoE ultimates hit every living enemy; single-target ones hit the enemy with the highest current
+        /// HP (auto-selected, without player involvement).
         /// </summary>
         private void ResolveUltimate(PlayerCharacter caster, AbilityData ultimate)
         {
@@ -321,8 +350,8 @@ namespace AlJourney.Scripts.Battle
         }
 
         /// <summary>
-        /// Убирает бойца из очереди ещё не походивших участников раунда и либо передаёт ход дальше
-        /// внутри отряда, либо (если это был последний боец) запускает ход врагов.
+        /// Removes an actor from the queue of party members who haven't acted this round, and either
+        /// passes the turn to the next party member, or (if this was the last one) starts the enemy turn.
         /// </summary>
         private void AdvanceTurnAfterAction(PlayerCharacter actor)
         {
@@ -341,10 +370,10 @@ namespace AlJourney.Scripts.Battle
         }
 
         /// <summary>
-        /// Увеличивает (с ограничением сверху и снизу) общий заряд ульты отряда и оповещает подписчиков.
-        /// Вызывается как при результативных атаках отряда, так и при попаданиях атак врагов по отряду.
+        /// Increases (clamped) the party's shared ultimate charge and notifies subscribers.
+        /// Called both for successful party attacks and for enemy attacks landing on the party.
         /// </summary>
-        /// <param name="amount">Величина прироста заряда.</param>
+        /// <param name="amount">The amount of charge to add.</param>
         internal void AddUltimateCharge(int amount)
         {
             int clamped = Mathf.Clamp(UltimateCharge + amount, 0, MaxUltimateCharge);
@@ -357,13 +386,30 @@ namespace AlJourney.Scripts.Battle
             _ = EmitSignal(SignalName.UltimateChargeChanged, UltimateCharge, MaxUltimateCharge);
         }
 
-        private void GenerateWaveEnemies()
+        /// <summary>
+        /// Spawns the enemies for the level's current wave (<see cref="_currentWaveIndex"/>) using the
+        /// curated composition from <see cref="LevelDefinition.Waves"/>, replacing the previous
+        /// <see cref="Enemies"/> lineup.
+        /// </summary>
+        private void SpawnCurrentWave()
         {
+            // The base wave's enemies aren't added to the scene tree, but creatures summoned by a boss
+            // (see EnemyAIController.ExecuteNecromancerSummon) are — and they need to be explicitly
+            // freed here, otherwise on advancing to the next wave within the level they'd remain hanging
+            // as BattleManager child nodes until the end of the whole battle.
+            foreach (Enemy leftover in Enemies)
+            {
+                if (leftover.IsInsideTree())
+                {
+                    leftover.QueueFree();
+                }
+            }
             Enemies.Clear();
 
-            List<Enemy> newEnemies = EnemySpawner.GenerateWaveEnemies(CurrentWave);
-            foreach (Enemy enemy in newEnemies)
+            WaveDefinition wave = _level.Waves[_currentWaveIndex];
+            foreach (EnemySpawnDefinition spawn in wave.Enemies)
             {
+                Enemy enemy = EnemySpawner.SpawnEnemy(spawn.Type, CurrentWave, spawn.Count);
                 enemy.CharacterDied += () => OnEnemyDied(enemy);
                 Enemies.Add(enemy);
             }
@@ -399,7 +445,7 @@ namespace AlJourney.Scripts.Battle
 
                 if (Enemies.All(e => !e.IsAlive))
                 {
-                    OnWaveCompleted();
+                    OnEnemiesCleared();
                     return;
                 }
             }
@@ -432,7 +478,7 @@ namespace AlJourney.Scripts.Battle
 
             if (Enemies.All(e => !e.IsAlive))
             {
-                Callable.From(OnWaveCompleted).CallDeferred();
+                Callable.From(OnEnemiesCleared).CallDeferred();
             }
         }
 
@@ -453,17 +499,38 @@ namespace AlJourney.Scripts.Battle
             InventoryManager.Instance.AddItems(loot);
         }
 
-        private void OnWaveCompleted()
+        /// <summary>
+        /// Called when every enemy on the field is dead. Can fire from two independent places —
+        /// <see cref="OnEnemyDied"/> deferred (via <c>CallDeferred</c>) and <see cref="StartEnemyTurn"/>
+        /// synchronously right after the enemy turn — so it re-checks the current state of
+        /// <see cref="Enemies"/> at the start rather than relying solely on being called: by the time the
+        /// deferred call fires, the wave may have already changed (see <see cref="SpawnCurrentWave"/>),
+        /// in which case the repeat call should silently do nothing instead of firing against an
+        /// already-different, alive wave. The separate <see cref="_isLevelCompleted"/> flag only guards
+        /// the branch that completes the level as a whole, where the <see cref="Enemies"/> lineup stays
+        /// unchanged (all dead) until the end of the battle.
+        /// </summary>
+        private void OnEnemiesCleared()
         {
-            if (_isWaveCompleted)
+            if (_isLevelCompleted || Enemies.Count == 0 || Enemies.Any(e => e.IsAlive))
             {
                 return;
             }
 
-            _isWaveCompleted = true;
+            if (_currentWaveIndex + 1 < _level.Waves.Count)
+            {
+                _currentWaveIndex++;
+                SpawnCurrentWave();
+
+                _ = EmitSignal(SignalName.WaveAdvanced, _currentWaveIndex, _level.Waves.Count);
+                StartPlayerTurn();
+                return;
+            }
+
+            _isLevelCompleted = true;
 
             ChangePhase(BattlePhase.WaveTransition);
-            _ = EmitSignal(SignalName.WaveCompleted);
+            _ = EmitSignal(SignalName.LevelCompleted);
 
             (int mageHealth, int mageMaxHealth, int mageDamage, int mageDefense, int warriorHealth, int warriorMaxHealth, int warriorDamage, int warriorDefense) = HeroSystem.GetCombinedStats();
             GameStateManager.Instance.UpdateHeroStats(
@@ -471,13 +538,13 @@ namespace AlJourney.Scripts.Battle
                 warriorHealth, warriorMaxHealth, warriorDamage, warriorDefense
             );
 
-            GameStateManager.Instance.NextWave();
+            GameStateManager.Instance.CompleteLevel(_level.Id);
             SaveSystem.Instance.AutoSave();
         }
 
         /// <summary>
-        /// Очищает состояние битвы, отписывается от сигналов и удаляет врагов.
-        /// Вызывается при переходе на экран результатов или меню.
+        /// Clears the battle state, unsubscribes from signals and removes enemies.
+        /// Called when transitioning to the results screen or a menu.
         /// </summary>
         public void EndBattle()
         {

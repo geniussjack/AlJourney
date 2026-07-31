@@ -3,8 +3,8 @@ using Godot;
 namespace AlJourney.Scripts.Utils
 {
     /// <summary>
-    /// Компонент для кратковременного изменения цвета родительского CanvasItem.
-    /// Используется для создания эффекта "вспышки" при получении урона, лечении или других событиях.
+    /// Component that briefly changes the color of the parent CanvasItem.
+    /// Used to create a "flash" effect when taking damage, healing, or on other events.
     /// </summary>
     public partial class DamageFlash : Node
     {
@@ -12,8 +12,8 @@ namespace AlJourney.Scripts.Utils
         private Color _originalModulate;
 
         /// <summary>
-        /// Инициализирует компонент. Ищет родительский узел типа CanvasItem
-        /// и сохраняет его исходный цвет для корректного возврата после завершения анимации вспышки.
+        /// Initializes the component. Looks for a parent node of type CanvasItem
+        /// and stores its original color so it can be correctly restored after the flash animation ends.
         /// </summary>
         public override void _Ready()
         {
@@ -31,11 +31,11 @@ namespace AlJourney.Scripts.Utils
         }
 
         /// <summary>
-        /// Запускает анимацию изменения цвета родительского узла на указанный,
-        /// а затем плавно возвращает его к исходному состоянию.
+        /// Starts an animation changing the parent node's color to the given one,
+        /// then smoothly returns it to its original state.
         /// </summary>
-        /// <param name="flashColor">Цвет, в который окрасится объект во время вспышки.</param>
-        /// <param name="duration">Общая продолжительность эффекта в секундах.</param>
+        /// <param name="flashColor">The color the object will flash.</param>
+        /// <param name="duration">The total duration of the effect, in seconds.</param>
         public void Flash(Color flashColor, float duration = 0.15f)
         {
             if (_target == null)
@@ -49,8 +49,8 @@ namespace AlJourney.Scripts.Utils
         }
 
         /// <summary>
-        /// Запускает вспышку красного цвета.
-        /// Предназначено для визуализации получения урона.
+        /// Starts a red flash.
+        /// Intended to visualize taking damage.
         /// </summary>
         public void FlashDamage()
         {
@@ -58,8 +58,8 @@ namespace AlJourney.Scripts.Utils
         }
 
         /// <summary>
-        /// Запускает вспышку зеленого цвета.
-        /// Предназначено для визуализации применения эффектов лечения.
+        /// Starts a green flash.
+        /// Intended to visualize a healing effect.
         /// </summary>
         public void FlashHeal()
         {
@@ -67,8 +67,8 @@ namespace AlJourney.Scripts.Utils
         }
 
         /// <summary>
-        /// Запускает вспышку синего цвета.
-        /// Предназначено для визуализации получения щита или магической защиты.
+        /// Starts a blue flash.
+        /// Intended to visualize gaining a shield or magical protection.
         /// </summary>
         public void FlashShield()
         {
@@ -76,8 +76,8 @@ namespace AlJourney.Scripts.Utils
         }
 
         /// <summary>
-        /// Запускает яркую белую вспышку.
-        /// Предназначено для визуализации критических попаданий или мощных событий.
+        /// Starts a bright white flash.
+        /// Intended to visualize critical hits or other powerful events.
         /// </summary>
         public void FlashCritical()
         {
@@ -85,11 +85,11 @@ namespace AlJourney.Scripts.Utils
         }
 
         /// <summary>
-        /// Запускает вспышку пользовательского цвета с заданными параметрами.
-        /// Позволяет гибко использовать эффект для нестандартных ситуаций.
+        /// Starts a flash with a custom color and the given parameters.
+        /// Allows flexible use of the effect for non-standard situations.
         /// </summary>
-        /// <param name="color">Специфический цвет вспышки.</param>
-        /// <param name="duration">Длительность вспышки.</param>
+        /// <param name="color">The specific flash color.</param>
+        /// <param name="duration">The flash duration.</param>
         public void FlashCustom(Color color, float duration = 0.15f)
         {
             Flash(color, duration);

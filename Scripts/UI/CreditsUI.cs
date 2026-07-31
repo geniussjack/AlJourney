@@ -4,7 +4,7 @@ using Godot;
 namespace AlJourney.Scripts.UI
 {
     /// <summary>
-    /// UI-компонент экрана титров. Отвечает за отображение информации о разработчиках и используемых технологиях.
+    /// UI component for the credits screen. Responsible for displaying developer and technology credits.
     /// </summary>
     public partial class CreditsUI : Control
     {
@@ -12,7 +12,7 @@ namespace AlJourney.Scripts.UI
         private RichTextLabel _creditsText;
 
         /// <summary>
-        /// Вызывается при готовности узла. Инициализирует элементы интерфейса, подписывается на нажатие кнопки "Назад" и заполняет текст титров.
+        /// Called when the node is ready. Initializes UI elements, subscribes to the "Back" button press, and fills in the credits text.
         /// </summary>
         public override void _Ready()
         {

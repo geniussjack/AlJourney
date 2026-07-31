@@ -8,14 +8,14 @@ using System.Linq;
 namespace AlJourney.Scripts.Managers
 {
     /// <summary>
-    /// Глобальный менеджер системы лута. Отвечает за генерацию экипировки
-    /// после победы над врагами.
-    /// Определяет редкость предметов и их характеристики на основе текущей волны.
+    /// Global loot system manager. Responsible for generating equipment
+    /// after defeating enemies.
+    /// Determines item rarity and stats based on the current wave.
     /// </summary>
     public partial class LootSystem : Node, ILootSystem
     {
         /// <summary>
-        /// Глобальный доступ к синглтону системы лута.
+        /// Global access point for the loot system singleton.
         /// </summary>
         public static LootSystem Instance { get; private set; } = null!;
 
@@ -40,7 +40,7 @@ namespace AlJourney.Scripts.Managers
         ];
 
         /// <summary>
-        /// Инициализация синглтона. Если объект уже существует, дубликат удаляется.
+        /// Initializes the singleton. If an instance already exists, the duplicate is removed.
         /// </summary>
         public override void _Ready()
         {
@@ -54,10 +54,10 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Генерирует расширенный список предметов после победы над боссом.
+        /// Generates an expanded list of items after defeating a boss.
         /// </summary>
-        /// <param name="waveNumber">Номер текущей волны для скалирования редкости.</param>
-        /// <returns>Список сгенерированных предметов экипировки.</returns>
+        /// <param name="waveNumber">The current wave number, used to scale rarity.</param>
+        /// <returns>The list of generated equipment items.</returns>
         public List<EquipmentData> GenerateBossLoot(int waveNumber)
         {
             int dropCount = GD.RandRange(3, 11);
@@ -81,16 +81,16 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Генерирует один предмет после победы над обычным врагом.
-        /// Вероятность высокой редкости искусственно занижается для баланса.
+        /// Generates a single item after defeating a normal enemy.
+        /// The chance of high rarity is artificially lowered for balance.
         /// </summary>
-        /// <param name="waveNumber">Номер текущей волны.</param>
-        /// <returns>Сгенерированный предмет экипировки или null в случае ошибки.</returns>
+        /// <param name="waveNumber">The current wave number.</param>
+        /// <returns>The generated equipment item, or null on failure.</returns>
         public EquipmentData GenerateNormalLoot(int waveNumber)
         {
             EquipmentRarity rarity = DetermineRarity();
 
-            // Снижение редкости для обычных врагов
+            // Lower the rarity for normal enemies
             if (rarity == EquipmentRarity.Legendary)
             {
                 rarity = EquipmentRarity.Epic;

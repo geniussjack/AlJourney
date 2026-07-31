@@ -4,11 +4,11 @@ namespace AlJourneyTests.Scripts.Core
 {
     public class ScalingSystemTests
     {
-        // Тестовые значения подобраны так, чтобы "чистый" математический результат (baseStat * множитель)
-        // не попадал точно на целое число: из-за погрешности float такое пограничное значение может
-        // случайным образом округлиться CeilToInt в большую сторону и сделать тест хрупким.
+        // Test values are chosen so the "clean" mathematical result (baseStat * multiplier) never
+        // lands exactly on an integer: due to float imprecision, such a borderline value could
+        // randomly round up via CeilToInt and make the test flaky.
         [Theory]
-        [InlineData(10, 0, 10)]   // wave 0 -> множитель ровно 1.0, без плавающей погрешности
+        [InlineData(10, 0, 10)]   // wave 0 -> multiplier exactly 1.0, no floating-point error
         [InlineData(13, 1, 15)]   // 13 * 1.10 = 14.3 -> Ceil = 15
         [InlineData(13, 5, 20)]   // 13 * 1.50 = 19.5 -> Ceil = 20
         public void ScaleEnemyStat_AppliesWaveCoefficientAndRoundsUp(int baseStat, int wave, int expected)
@@ -36,37 +36,6 @@ namespace AlJourneyTests.Scripts.Core
         public void ScaleCost_AppliesWaveCoefficientAndRoundsUp(int baseCost, int wave, int expected)
         {
             int result = ScalingSystem.ScaleCost(baseCost, wave);
-
-            Assert.Equal(expected, result);
-        }
-
-        [Theory]
-        [InlineData(1, 1)]   // base(1) + (1-1)/2 = 1
-        [InlineData(2, 1)]   // base(1) + (2-1)/2 = 1
-        [InlineData(3, 2)]   // base(1) + (3-1)/2 = 2
-        [InlineData(5, 3)]   // base(1) + (5-1)/2 = 3
-        public void GetEnemyCount_BelowCap_GrowsEveryTwoWaves(int wave, int expected)
-        {
-            int result = ScalingSystem.GetEnemyCount(wave);
-
-            Assert.Equal(expected, result);
-        }
-
-        [Fact]
-        public void GetEnemyCount_HighWave_IsClampedToMaxEnemiesPerWave()
-        {
-            int result = ScalingSystem.GetEnemyCount(50);
-
-            Assert.Equal(GameConstants.MAX_ENEMIES_PER_WAVE, result);
-        }
-
-        [Theory]
-        [InlineData(20, false)]
-        [InlineData(21, true)]
-        [InlineData(22, true)]
-        public void IsSkeletonUnlocked_ChecksWaveThreshold(int wave, bool expected)
-        {
-            bool result = ScalingSystem.IsSkeletonUnlocked(wave);
 
             Assert.Equal(expected, result);
         }

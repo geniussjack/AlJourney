@@ -3,36 +3,36 @@ using AlJourney.Scripts.Data;
 namespace AlJourney.Scripts.Interfaces
 {
     /// <summary>
-    /// Интерфейс для системы сохранений.
-    /// Предоставляет функционал для сохранения и загрузки прогресса игрока в файл, а также автосохранения.
+    /// Interface for the save system.
+    /// Provides functionality to save and load the player's progress to/from a file, as well as auto-saving.
     /// </summary>
     public interface ISaveSystem
     {
         /// <summary>
-        /// Сохраняет текущий прогресс игры в файл.
-        /// Возвращает true в случае успешного сохранения.
+        /// Saves the current game progress to a file.
+        /// Returns true on a successful save.
         /// </summary>
         bool SaveGame();
 
         /// <summary>
-        /// Загружает прогресс игрока из файла сохранения.
-        /// Возвращает загруженные данные, либо null, если сохранение не найдено или повреждено.
+        /// Loads the player's progress from the save file.
+        /// Returns the loaded data, or null if no save was found or it was corrupted.
         /// </summary>
         SaveData LoadGame();
 
         /// <summary>
-        /// Удаляет текущий файл сохранения.
-        /// Возвращает true в случае успешного удаления.
+        /// Deletes the current save file.
+        /// Returns true on a successful deletion.
         /// </summary>
         bool DeleteSave();
 
         /// <summary>
-        /// Проверяет, существует ли файл сохранения на устройстве.
+        /// Checks whether a save file exists on the device.
         /// </summary>
         bool SaveFileExists();
 
         /// <summary>
-        /// Выполняет автоматическое сохранение игры в фоновом режиме.
+        /// Performs an automatic background save of the game.
         /// </summary>
         void AutoSave();
     }

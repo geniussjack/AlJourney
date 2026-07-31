@@ -7,50 +7,50 @@ using System.Linq;
 namespace AlJourney.Scripts.Characters
 {
     /// <summary>
-    /// Базовый класс для всех живых существ в игре.
-    /// Управляет здоровьем, броней, щитами, статусными эффектами и
-    /// базовыми характеристиками.
+    /// Base class for every living creature in the game.
+    /// Manages health, armor, shields, status effects and
+    /// base stats.
     /// </summary>
     public partial class Character : Node
     {
         /// <summary>
-        /// Вызывается при изменении текущего или максимального здоровья.
+        /// Raised when current or maximum health changes.
         /// </summary>
         [Signal]
         public delegate void HealthChangedEventHandler(int currentHealth, int maxHealth);
 
         /// <summary>
-        /// Вызывается при получении прямого урона.
+        /// Raised when direct damage is taken.
         /// </summary>
         [Signal]
         public delegate void DamageTakenEventHandler(int amount);
 
         /// <summary>
-        /// Вызывается при успешном восстановлении здоровья.
+        /// Raised when health is successfully restored.
         /// </summary>
         [Signal]
         public delegate void HealedEventHandler(int amount);
 
         /// <summary>
-        /// Вызывается при изменении прочности магического щита.
+        /// Raised when the magic shield's strength changes.
         /// </summary>
         [Signal]
         public delegate void ShieldChangedEventHandler(int amount);
 
         /// <summary>
-        /// Вызывается, когда на персонажа накладывается новый статусный эффект.
+        /// Raised when a new status effect is applied to the character.
         /// </summary>
         [Signal]
         public delegate void StatusEffectAppliedEventHandler(StatusEffect effect);
 
         /// <summary>
-        /// Вызывается, когда статусный эффект завершает действие или очищается.
+        /// Raised when a status effect expires or is cleared.
         /// </summary>
         [Signal]
         public delegate void StatusEffectRemovedEventHandler(StatusEffect effect);
 
         /// <summary>
-        /// Вызывается, когда здоровье персонажа опускается до нуля.
+        /// Raised when the character's health reaches zero.
         /// </summary>
         [Signal]
         public delegate void CharacterDiedEventHandler();
@@ -68,62 +68,62 @@ namespace AlJourney.Scripts.Characters
         protected List<StatusEffectData> _activeEffects;
 
         /// <summary>
-        /// Отображаемое имя персонажа.
+        /// The character's display name.
         /// </summary>
         public string CharacterName => _name;
 
         /// <summary>
-        /// Базовое максимальное здоровье.
+        /// Base maximum health.
         /// </summary>
         public int MaxHealth => _maxHealth;
 
         /// <summary>
-        /// Текущее количество очков здоровья.
+        /// Current health points.
         /// </summary>
         public int CurrentHealth => _currentHealth;
 
         /// <summary>
-        /// Базовый наносимый урон.
+        /// Base damage dealt.
         /// </summary>
         public int BaseDamage => _baseDamage;
 
         /// <summary>
-        /// Базовый показатель защиты.
+        /// Base defense stat.
         /// </summary>
         public int BaseDefense => _baseDefense;
 
         /// <summary>
-        /// Суммарный показатель защиты. Может переопределяться у героев для учета экипировки.
+        /// Total defense stat. May be overridden by heroes to account for equipment.
         /// </summary>
         public virtual int TotalDefense => _baseDefense;
 
         /// <summary>
-        /// Суммарное максимальное здоровье. Может переопределяться у героев.
+        /// Total maximum health. May be overridden by heroes.
         /// </summary>
         public virtual int TotalMaxHealth => _maxHealth;
 
         /// <summary>
-        /// Текущая прочность магического щита. Щит поглощает любой урон до того, как он затронет здоровье.
+        /// The magic shield's current strength. The shield absorbs any damage before it affects health.
         /// </summary>
         public int CurrentShield => _currentShield;
 
         /// <summary>
-        /// Тип атаки персонажа.
+        /// The character's attack type.
         /// </summary>
         public AttackType AttackType => _attackType;
 
         /// <summary>
-        /// Возвращает True, если персонаж еще жив.
+        /// Returns True if the character is still alive.
         /// </summary>
         public bool IsAlive => CurrentHealth > 0;
 
         /// <summary>
-        /// Возвращает True, если на персонаже висит эффект оглушения.
+        /// Returns True if the character has a stun effect active.
         /// </summary>
         public bool IsStunned => _activeEffects.Any(e => e.Type == StatusEffect.Stunned);
 
         /// <summary>
-        /// Инициализация внутренних структур при добавлении узла на сцену.
+        /// Initializes internal structures when the node is added to the scene.
         /// </summary>
         public override void _Ready()
         {
@@ -131,13 +131,13 @@ namespace AlJourney.Scripts.Characters
         }
 
         /// <summary>
-        /// Устанавливает начальные характеристики персонажа.
+        /// Sets the character's starting stats.
         /// </summary>
-        /// <param name="name">Имя.</param>
-        /// <param name="maxHealth">Стартовое здоровье.</param>
-        /// <param name="damage">Стартовый урон.</param>
-        /// <param name="defense">Стартовая броня.</param>
-        /// <param name="attackType">Тип атаки.</param>
+        /// <param name="name">The name.</param>
+        /// <param name="maxHealth">Starting health.</param>
+        /// <param name="damage">Starting damage.</param>
+        /// <param name="defense">Starting defense.</param>
+        /// <param name="attackType">The attack type.</param>
         public virtual void Initialize(string name, int maxHealth, int damage, int defense, AttackType attackType = AttackType.Physical)
         {
             _name = name;
@@ -153,12 +153,12 @@ namespace AlJourney.Scripts.Characters
         }
 
         /// <summary>
-        /// Наносит урон персонажу с учетом его брони, щитов и статусных эффектов.
+        /// Deals damage to the character, accounting for armor, shields and status effects.
         /// </summary>
-        /// <param name="damage">Сырой входящий урон.</param>
-        /// <param name="attackType">Тип входящей атаки.</param>
-        /// <param name="canReflect">Можно ли отразить этот урон обратно атакующему.</param>
-        /// <returns>Количество урона, которое было отражено обратно.</returns>
+        /// <param name="damage">The raw incoming damage.</param>
+        /// <param name="attackType">The incoming attack's type.</param>
+        /// <param name="canReflect">Whether this damage can be reflected back at the attacker.</param>
+        /// <returns>The amount of damage that was reflected back.</returns>
         public virtual int TakeDamage(int damage, AttackType attackType, bool canReflect = true)
         {
             if (!IsAlive || HasStatusEffect(StatusEffect.Immunity))
@@ -242,9 +242,9 @@ namespace AlJourney.Scripts.Characters
         }
 
         /// <summary>
-        /// Восстанавливает здоровье персонажа, не превышая максимального лимита.
+        /// Restores the character's health, without exceeding the maximum.
         /// </summary>
-        /// <param name="amount">Количество очков лечения.</param>
+        /// <param name="amount">The amount to heal.</param>
         public virtual void Heal(int amount)
         {
             if (!IsAlive)
@@ -264,9 +264,9 @@ namespace AlJourney.Scripts.Characters
         }
 
         /// <summary>
-        /// Накладывает магический щит на персонажа. Щиты могут стакаться.
+        /// Applies a magic shield to the character. Shields can stack.
         /// </summary>
-        /// <param name="amount">Прочность добавляемого щита.</param>
+        /// <param name="amount">The strength of the shield to add.</param>
         public virtual void AddShield(int amount)
         {
             if (!IsAlive)
@@ -281,10 +281,11 @@ namespace AlJourney.Scripts.Characters
         }
 
         /// <summary>
-        /// Применяет новый статусный эффект.
-        /// Если эффект такого типа уже висит, обновляет его длительность при условии, что новая длительность больше.
+        /// Applies a new status effect.
+        /// If an effect of that type is already active, its duration is updated, provided the new
+        /// duration is longer.
         /// </summary>
-        /// <param name="effect">Объект с данными статусного эффекта.</param>
+        /// <param name="effect">The status effect data.</param>
         public virtual void ApplyStatusEffect(StatusEffectData effect)
         {
             if (!IsAlive || HasStatusEffect(StatusEffect.Immunity))
@@ -311,8 +312,8 @@ namespace AlJourney.Scripts.Characters
         }
 
         /// <summary>
-        /// Снимает все негативные эффекты.
-        /// Обычно вызывается при мощном исцелении.
+        /// Clears every negative effect.
+        /// Typically triggered by a powerful heal.
         /// </summary>
         public virtual void ClearNegativeEffects()
         {
@@ -328,8 +329,8 @@ namespace AlJourney.Scripts.Characters
         }
 
         /// <summary>
-        /// Вызывается каждый ход. Обрабатывает периодический урон, регенерацию
-        /// и уменьшает счетчики длительности эффектов.
+        /// Called every turn. Processes damage/heal-over-time effects
+        /// and ticks down effect duration counters.
         /// </summary>
         public virtual void ProcessStatusEffects()
         {
@@ -382,18 +383,18 @@ namespace AlJourney.Scripts.Characters
         }
 
         /// <summary>
-        /// Проверяет, действует ли на персонажа конкретный статусный эффект.
+        /// Checks whether a specific status effect is active on the character.
         /// </summary>
-        /// <param name="effectType">Тип искомого эффекта.</param>
-        /// <returns>True, если эффект найден.</returns>
+        /// <param name="effectType">The effect type to look for.</param>
+        /// <returns>True if the effect is found.</returns>
         public bool HasStatusEffect(StatusEffect effectType)
         {
             return _activeEffects.Any(e => e.Type == effectType);
         }
 
         /// <summary>
-        /// Возвращает список всех активных на данный момент эффектов.
-        /// Возвращается копия, чтобы предотвратить случайные модификации.
+        /// Returns the list of every effect currently active.
+        /// A copy is returned to prevent accidental modification.
         /// </summary>
         public List<StatusEffectData> GetActiveEffects()
         {
@@ -401,7 +402,7 @@ namespace AlJourney.Scripts.Characters
         }
 
         /// <summary>
-        /// Вызывается при смерти персонажа.
+        /// Called when the character dies.
         /// </summary>
         protected virtual void OnDeath()
         {
@@ -410,10 +411,10 @@ namespace AlJourney.Scripts.Characters
         }
 
         /// <summary>
-        /// Перманентно увеличивает базовое максимальное здоровье персонажа.
-        /// Текущее здоровье увеличивается пропорционально.
+        /// Permanently increases the character's base maximum health.
+        /// Current health increases proportionally.
         /// </summary>
-        /// <param name="amount">Размер прибавки.</param>
+        /// <param name="amount">The amount to increase by.</param>
         public void IncreaseMaxHealth(int amount)
         {
             _maxHealth += amount;
@@ -422,18 +423,18 @@ namespace AlJourney.Scripts.Characters
         }
 
         /// <summary>
-        /// Перманентно увеличивает базовый урон.
+        /// Permanently increases base damage.
         /// </summary>
-        /// <param name="amount">Размер прибавки.</param>
+        /// <param name="amount">The amount to increase by.</param>
         public void IncreaseDamage(int amount)
         {
             _baseDamage += amount;
         }
 
         /// <summary>
-        /// Перманентно увеличивает базовую броню.
+        /// Permanently increases base armor.
         /// </summary>
-        /// <param name="amount">Размер прибавки.</param>
+        /// <param name="amount">The amount to increase by.</param>
         public void IncreaseDefense(int amount)
         {
             _baseDefense += amount;

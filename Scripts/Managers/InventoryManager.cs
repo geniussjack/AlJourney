@@ -8,12 +8,12 @@ using System.Linq;
 namespace AlJourney.Scripts.Managers
 {
     /// <summary>
-    /// Менеджер инвентаря. Отвечает за хранение предметов, экипировку героев и улучшение снаряжения.
+    /// Inventory manager. Responsible for storing items, equipping heroes, and upgrading equipment.
     /// </summary>
     public partial class InventoryManager : Node, IInventoryManager
     {
         /// <summary>
-        /// Глобальный экземпляр менеджера инвентаря.
+        /// Global instance of the inventory manager.
         /// </summary>
         public static InventoryManager Instance { get; private set; } = null!;
 
@@ -21,8 +21,8 @@ namespace AlJourney.Scripts.Managers
         private readonly Dictionary<CharacterClass, Dictionary<EquipmentSlot, EquipmentData>> _heroEquipment = [];
 
         /// <summary>
-        /// Инициализирует узел менеджера инвентаря при его добавлении в дерево сцены.
-        /// Гарантирует существование только одного экземпляра.
+        /// Initializes the inventory manager node when it is added to the scene tree.
+        /// Ensures only a single instance exists.
         /// </summary>
         public override void _Ready()
         {
@@ -36,9 +36,9 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Добавляет список предметов в общий инвентарь игрока.
+        /// Adds a list of items to the player's shared inventory.
         /// </summary>
-        /// <param name="items">Список предметов для добавления.</param>
+        /// <param name="items">The list of items to add.</param>
         public void AddItems(List<EquipmentData> items)
         {
             foreach (EquipmentData item in items)
@@ -49,11 +49,11 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Экипирует указанный предмет на выбранного героя. Если слот уже занят, старый предмет снимается и возвращается в инвентарь.
+        /// Equips the given item to the selected hero. If the slot is already occupied, the old item is unequipped and returned to the inventory.
         /// </summary>
-        /// <param name="hero">Класс героя, на которого надевается предмет.</param>
-        /// <param name="item">Предмет экипировки для надевания.</param>
-        /// <returns><c>true</c>, если предмет успешно экипирован.</returns>
+        /// <param name="hero">The hero class the item is equipped to.</param>
+        /// <param name="item">The equipment item to equip.</param>
+        /// <returns><c>true</c> if the item was successfully equipped.</returns>
         public bool EquipItem(CharacterClass hero, EquipmentData item)
         {
             if (!_heroEquipment.TryGetValue(hero, out Dictionary<EquipmentSlot, EquipmentData> value))
@@ -73,11 +73,11 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Снимает предмет экипировки из указанного слота у выбранного героя и возвращает его в общий инвентарь.
+        /// Unequips the item from the given slot on the selected hero and returns it to the shared inventory.
         /// </summary>
-        /// <param name="hero">Класс героя, с которого снимается предмет.</param>
-        /// <param name="slot">Слот экипировки, который нужно освободить.</param>
-        /// <returns>Снятый предмет, или <c>null</c>, если слот был пуст.</returns>
+        /// <param name="hero">The hero class the item is unequipped from.</param>
+        /// <param name="slot">The equipment slot to clear.</param>
+        /// <returns>The unequipped item, or <c>null</c> if the slot was empty.</returns>
         public EquipmentData UnequipItem(CharacterClass hero, EquipmentSlot slot)
         {
             if (!_heroEquipment.TryGetValue(hero, out Dictionary<EquipmentSlot, EquipmentData> heroSlots))
@@ -97,10 +97,10 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Улучшает предмет экипировки за монеты, если хватает средств.
+        /// Upgrades an equipment item for coins, if there are enough funds.
         /// </summary>
-        /// <param name="item">Предмет экипировки для улучшения.</param>
-        /// <returns><c>true</c>, если предмет успешно улучшен; иначе <c>false</c>.</returns>
+        /// <param name="item">The equipment item to upgrade.</param>
+        /// <returns><c>true</c> if the item was successfully upgraded; otherwise <c>false</c>.</returns>
         public bool UpgradeEquipment(EquipmentData item)
         {
             int waveNumber = GameStateManager.Instance.CurrentWave;
@@ -138,18 +138,18 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Возвращает список всех предметов, находящихся в инвентаре игрока.
+        /// Returns the list of every item currently in the player's inventory.
         /// </summary>
-        /// <returns>Список предметов инвентаря только для чтения.</returns>
+        /// <returns>A read-only list of inventory items.</returns>
         public IReadOnlyList<EquipmentData> GetInventory()
         {
             return _inventory.AsReadOnly();
         }
 
         /// <summary>
-        /// Сохраняет текущее состояние инвентаря и экипировки героев в объект сохранения данных.
+        /// Saves the current state of the inventory and hero equipment into a save data object.
         /// </summary>
-        /// <param name="data">Объект сохранения данных.</param>
+        /// <param name="data">The save data object.</param>
         public void SaveToData(SaveData data)
         {
             data.Inventory = [.. _inventory];
@@ -161,9 +161,9 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Загружает состояние инвентаря и экипировки героев из объекта сохранения данных.
+        /// Loads the state of the inventory and hero equipment from a save data object.
         /// </summary>
-        /// <param name="data">Объект сохранения данных, из которого загружается состояние.</param>
+        /// <param name="data">The save data object to load state from.</param>
         public void LoadFromData(SaveData data)
         {
             _inventory.Clear();
@@ -184,10 +184,10 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Получает всю экипировку, надетую на указанного героя.
+        /// Gets all equipment currently equipped by the given hero.
         /// </summary>
-        /// <param name="hero">Класс героя.</param>
-        /// <returns>Словарь, в котором ключи — это слоты экипировки, а значения — надетые предметы.</returns>
+        /// <param name="hero">The hero class.</param>
+        /// <returns>A dictionary where the keys are equipment slots and the values are the equipped items.</returns>
         public Dictionary<EquipmentSlot, EquipmentData> GetHeroEquipment(CharacterClass hero)
         {
             return _heroEquipment.TryGetValue(hero, out Dictionary<EquipmentSlot, EquipmentData> equipment) ? equipment : [];
@@ -199,20 +199,20 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Получает список предметов из инвентаря, отфильтрованный по их редкости.
+        /// Gets the list of inventory items filtered by their rarity.
         /// </summary>
-        /// <param name="rarity">Редкость предметов для фильтрации.</param>
-        /// <returns>Список предметов указанной редкости.</returns>
+        /// <param name="rarity">The rarity to filter by.</param>
+        /// <returns>The list of items with the given rarity.</returns>
         public List<EquipmentData> GetEquipmentByRarity(EquipmentRarity rarity)
         {
             return [.. _inventory.Where(item => item.Rarity == rarity)];
         }
 
         /// <summary>
-        /// Получает список предметов из инвентаря, отфильтрованный по слоту экипировки, для которого они предназначены.
+        /// Gets the list of inventory items filtered by the equipment slot they are intended for.
         /// </summary>
-        /// <param name="slot">Слот экипировки для фильтрации.</param>
-        /// <returns>Список предметов для указанного слота.</returns>
+        /// <param name="slot">The equipment slot to filter by.</param>
+        /// <returns>The list of items for the given slot.</returns>
         public List<EquipmentData> GetEquipmentBySlot(EquipmentSlot slot)
         {
             return [.. _inventory.Where(item => item.Slot == slot)];

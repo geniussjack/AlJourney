@@ -6,7 +6,7 @@ using Godot;
 namespace AlJourney.Scripts.UI
 {
     /// <summary>
-    /// Пользовательский интерфейс внутриигрового магазина. Позволяет игроку тратить монеты на улучшение характеристик героев между волнами.
+    /// UI for the in-game shop. Lets the player spend coins to upgrade hero stats between waves.
     /// </summary>
     public partial class ShopUI : Control
     {
@@ -52,7 +52,7 @@ namespace AlJourney.Scripts.UI
         private int _warriorDefenseUpgrade;
 
         /// <summary>
-        /// Вызывается при готовности узла. Настраивает все текстовые метки и кнопки для каждого типа улучшений, подписывается на события покупки и инициализирует данные магазина.
+        /// Called when the node is ready. Sets up all labels and buttons for each upgrade type, subscribes to purchase events, and initializes the shop data.
         /// </summary>
         public override void _Ready()
         {
@@ -317,10 +317,10 @@ namespace AlJourney.Scripts.UI
 
         private void OnContinuePressed()
         {
-            GD.Print("[ShopUI] Continue to next wave");
+            GD.Print("[ShopUI] Closing shop, returning to campaign map");
             _ = (AudioManager.Instance?.TryPlaySfx("res://Resources/Audio/SFX/button_click.wav"));
             _ = SaveSystem.Instance.SaveGame();
-            SceneManager.ReturnToBattle();
+            SceneManager.GoToMap();
         }
 
         private void OnHomePressed()

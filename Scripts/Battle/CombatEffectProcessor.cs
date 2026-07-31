@@ -8,13 +8,13 @@ using System.Collections.Generic;
 namespace AlJourney.Scripts.Battle
 {
     /// <summary>
-    /// Сервис для применения эффектов способностей во время пошагового боя:
-    /// нанесение урона атакующими способностями и лечение/щит защитными/поддерживающими.
+    /// Service for applying ability effects during turn-based combat:
+    /// dealing damage with attack abilities and healing/shielding with support abilities.
     /// </summary>
     public static class CombatEffectProcessor
     {
         /// <summary>
-        /// Применяет атакующую способность ко всем разрешённым целям (одна цель либо все враги при AoE).
+        /// Applies an attack ability to every resolved target (a single target, or every enemy for AoE).
         /// </summary>
         public static void ApplyAttackAbility(AbilityData ability, PlayerCharacter caster, IReadOnlyList<Character> targets, BattleManager battleManager, CameraShake cameraShake)
         {
@@ -59,8 +59,8 @@ namespace AlJourney.Scripts.Battle
         }
 
         /// <summary>
-        /// Применяет защитную/поддерживающую способность ко всем разрешённым целям
-        /// (одна цель либо весь отряд при AoE). Поддерживает лечение и/или щит в зависимости от эффектов способности.
+        /// Applies a support ability to every resolved target (a single target, or the whole party for AoE).
+        /// Supports healing and/or shielding depending on the ability's effects.
         /// </summary>
         public static void ApplySupportAbility(AbilityData ability, IReadOnlyList<Character> targets, DualHeroSystem heroSystem, BattleManager battleManager, CameraShake cameraShake)
         {
@@ -96,8 +96,8 @@ namespace AlJourney.Scripts.Battle
         }
 
         /// <summary>
-        /// Возвращает экранную позицию для визуальных эффектов над указанным участником отряда.
-        /// Используется как боевыми способностями героев, так и атаками врагов по отряду.
+        /// Returns the on-screen position for visual effects above the given party member.
+        /// Used both by heroes' combat abilities and by enemy attacks against the party.
         /// </summary>
         internal static Vector2 GetAllyVfxPosition(Character member, DualHeroSystem heroSystem)
         {
@@ -111,7 +111,7 @@ namespace AlJourney.Scripts.Battle
                 return new Vector2(1000, 100);
             }
 
-            // Резерв под слот наёмника (Companion), который в Этапе 1 ещё не используется.
+            // Reserved for the mercenary (Companion) slot, not yet used as of Stage 1.
             return new Vector2(600, 100);
         }
     }

@@ -3,9 +3,9 @@ using Godot;
 namespace AlJourney.Scripts.Utils
 {
     /// <summary>
-    /// Компонент для создания плавных переходов между сценами.
-    /// Использует полноэкранный прямоугольник для создания эффектов затемнения,
-    /// осветления и вспышек. Помогает избежать резких смен кадров в игре.
+    /// Component that creates smooth transitions between scenes.
+    /// Uses a full-screen rectangle to create fade-out, fade-in
+    /// and flash effects. Helps avoid jarring frame changes in the game.
     /// </summary>
     public partial class SceneTransition : CanvasLayer
     {
@@ -13,8 +13,8 @@ namespace AlJourney.Scripts.Utils
         private bool _isTransitioning;
 
         /// <summary>
-        /// Инициализирует компонент. Создает полноэкранный ColorRect, делает его полностью прозрачным
-        /// и настраивает так, чтобы он не перехватывал события мыши.
+        /// Initializes the component. Creates a full-screen ColorRect, makes it fully transparent,
+        /// and sets it up so it doesn't intercept mouse events.
         /// </summary>
         public override void _Ready()
         {
@@ -32,11 +32,11 @@ namespace AlJourney.Scripts.Utils
         }
 
         /// <summary>
-        /// Выполняет плавный переход к указанной сцене.
-        /// Сначала затемняет экран, затем загружает новую сцену и осветляет экран обратно.
+        /// Performs a smooth transition to the given scene.
+        /// First fades the screen to black, then loads the new scene and fades back in.
         /// </summary>
-        /// <param name="scenePath">Путь к файлу целевой сцены.</param>
-        /// <param name="duration">Общее время перехода в секундах.</param>
+        /// <param name="scenePath">The path to the target scene file.</param>
+        /// <param name="duration">The total transition time, in seconds.</param>
         public void TransitionToScene(string scenePath, float duration = 0.5f)
         {
             if (_isTransitioning)
@@ -61,9 +61,9 @@ namespace AlJourney.Scripts.Utils
         }
 
         /// <summary>
-        /// Выполняет плавное затемнение экрана до полностью непрозрачного состояния.
+        /// Smoothly fades the screen out to fully opaque.
         /// </summary>
-        /// <param name="duration">Длительность затемнения в секундах.</param>
+        /// <param name="duration">The fade-out duration, in seconds.</param>
         public void FadeOut(float duration = 0.3f)
         {
             Tween tween = CreateTween();
@@ -71,9 +71,9 @@ namespace AlJourney.Scripts.Utils
         }
 
         /// <summary>
-        /// Выполняет плавное осветление экрана до полностью прозрачного состояния.
+        /// Smoothly fades the screen in to fully transparent.
         /// </summary>
-        /// <param name="duration">Длительность осветления в секундах.</param>
+        /// <param name="duration">The fade-in duration, in seconds.</param>
         public void FadeIn(float duration = 0.3f)
         {
             Tween tween = CreateTween();
@@ -81,11 +81,11 @@ namespace AlJourney.Scripts.Utils
         }
 
         /// <summary>
-        /// Создает кратковременную вспышку экрана указанным цветом.
-        /// Полезно для визуализации получения сильного урона, критических атак или других значимых событий.
+        /// Creates a brief screen flash of the given color.
+        /// Useful for visualizing heavy damage, critical hits, or other significant events.
         /// </summary>
-        /// <param name="color">Цвет вспышки.</param>
-        /// <param name="duration">Длительность эффекта вспышки в секундах.</param>
+        /// <param name="color">The flash color.</param>
+        /// <param name="duration">The flash effect's duration, in seconds.</param>
         public void Flash(Color color, float duration = 0.2f)
         {
             Color originalColor = _fadeRect.Color;

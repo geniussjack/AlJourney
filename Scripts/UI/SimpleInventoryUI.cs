@@ -186,7 +186,7 @@ namespace AlJourney.Scripts.UI
         {
             if (_availableWeapons.Count == 0 || _selectedWeaponIndex < 0 || _selectedWeaponIndex >= _availableWeapons.Count)
             {
-                _weaponNameLabel.Text = "Нет оружия";
+                _weaponNameLabel.Text = Tr("UI_INVENTORY_NO_WEAPON");
                 _weaponStatsLabel.Text = "";
                 _weaponDescLabel.Text = "";
                 _weaponIcon.Texture = null;
@@ -195,7 +195,7 @@ namespace AlJourney.Scripts.UI
             }
 
             EquipmentData weapon = _availableWeapons[_selectedWeaponIndex];
-            _weaponNameLabel.Text = $"{Tr(weapon.Name)} (Ур. {weapon.CurrentLevel})";
+            _weaponNameLabel.Text = $"{Tr(weapon.Name)} ({Tr("UI_INVENTORY_LEVEL_LABEL")} {weapon.CurrentLevel})";
             _weaponNameLabel.Modulate = weapon.GetRarityColor();
 
             string stats = "";

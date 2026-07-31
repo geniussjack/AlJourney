@@ -7,24 +7,24 @@ using System.Linq;
 namespace AlJourney.Scripts.Battle.Rules
 {
     /// <summary>
-    /// Чистые правила выбора целей для способностей: какие цели допустимы для наведения
-    /// и на кого фактически распространяется эффект после подтверждения цели (с учётом AoE).
-    /// Не зависит от Godot.Node — рассчитан на переиспользование с любым типом цели
-    /// (в игре это <c>Character</c>/<c>PlayerCharacter</c>/<c>Enemy</c>) и покрывается модульными тестами.
+    /// Pure target-selection rules for abilities: which targets are valid to aim at, and who the
+    /// effect actually applies to once a target is confirmed (accounting for AoE).
+    /// Has no dependency on Godot.Node — designed for reuse with any target type
+    /// (in-game this is <c>Character</c>/<c>PlayerCharacter</c>/<c>Enemy</c>) and is covered by unit tests.
     /// </summary>
     public static class AbilityTargetingRules
     {
         /// <summary>
-        /// Возвращает список целей, на которые в принципе можно навести способность данного типа наведения.
-        /// Атакующие способности целятся во врагов, защитные/поддерживающие — в союзников (включая себя).
-        /// Мёртвые персонажи никогда не являются допустимой целью.
+        /// Returns the list of targets that can, in principle, be aimed at with an ability of the given
+        /// targeting type. Attack abilities target enemies; defensive/support abilities target allies
+        /// (including the caster). Dead characters are never a valid target.
         /// </summary>
-        /// <typeparam name="T">Тип цели (например, игровой персонаж).</typeparam>
-        /// <param name="targetType">Тип наведения способности.</param>
-        /// <param name="allies">Все союзники, включая самого применяющего способность.</param>
-        /// <param name="enemies">Все враги на поле боя.</param>
-        /// <param name="isAlive">Предикат, определяющий, жива ли цель.</param>
-        /// <returns>Список допустимых целей для наведения.</returns>
+        /// <typeparam name="T">The target type (e.g. a game character).</typeparam>
+        /// <param name="targetType">The ability's targeting type.</param>
+        /// <param name="allies">Every ally, including the caster themselves.</param>
+        /// <param name="enemies">Every enemy on the battlefield.</param>
+        /// <param name="isAlive">A predicate that determines whether a target is alive.</param>
+        /// <returns>The list of valid targets to aim at.</returns>
         public static IReadOnlyList<T> GetValidTargets<T>(
             AbilityTargetType targetType,
             IReadOnlyList<T> allies,
@@ -40,19 +40,19 @@ namespace AlJourney.Scripts.Battle.Rules
         }
 
         /// <summary>
-        /// Возвращает итоговый список целей, на которые распространяется эффект способности после
-        /// того, как игрок навёлся на конкретную цель. Для одиночных способностей — это сама выбранная
-        /// цель (если она всё ещё допустима). Для AoE-способностей эффект распространяется на весь пул
-        /// целей соответствующего типа наведения (всех живых врагов либо весь живой отряд).
+        /// Returns the final list of targets the ability's effect applies to once the player has aimed
+        /// at a specific target. For single-target abilities, this is the chosen target itself (if it's
+        /// still valid). For AoE abilities, the effect spreads to the entire target pool for the
+        /// matching targeting type (every living enemy, or the whole living party).
         /// </summary>
-        /// <typeparam name="T">Тип цели.</typeparam>
-        /// <param name="targetType">Тип наведения способности.</param>
-        /// <param name="isAoE">Является ли способность площадной.</param>
-        /// <param name="chosenTarget">Цель, выбранная игроком (может быть null, если наведение ещё не подтверждено).</param>
-        /// <param name="allies">Все союзники, включая самого применяющего способность.</param>
-        /// <param name="enemies">Все враги на поле боя.</param>
-        /// <param name="isAlive">Предикат, определяющий, жива ли цель.</param>
-        /// <returns>Список целей, на которые фактически будет применён эффект.</returns>
+        /// <typeparam name="T">The target type.</typeparam>
+        /// <param name="targetType">The ability's targeting type.</param>
+        /// <param name="isAoE">Whether the ability is area-of-effect.</param>
+        /// <param name="chosenTarget">The target chosen by the player (may be null if not yet confirmed).</param>
+        /// <param name="allies">Every ally, including the caster themselves.</param>
+        /// <param name="enemies">Every enemy on the battlefield.</param>
+        /// <param name="isAlive">A predicate that determines whether a target is alive.</param>
+        /// <returns>The list of targets the effect will actually be applied to.</returns>
         public static IReadOnlyList<T> ResolveEffectTargets<T>(
             AbilityTargetType targetType,
             bool isAoE,
@@ -67,15 +67,15 @@ namespace AlJourney.Scripts.Battle.Rules
         }
 
         /// <summary>
-        /// Автоматически выбирает живую цель с наибольшим текущим здоровьем из списка кандидатов.
-        /// Используется для одиночных ультимативных способностей, у которых игрок не наводится
-        /// на цель вручную (например, «удар по врагу с наибольшим HP»).
+        /// Automatically selects the living target with the highest current health from the candidate list.
+        /// Used for single-target ultimate abilities the player doesn't manually aim, e.g. "strike the
+        /// enemy with the highest HP".
         /// </summary>
-        /// <typeparam name="T">Тип цели.</typeparam>
-        /// <param name="candidates">Кандидаты на роль цели.</param>
-        /// <param name="currentHealth">Функция, возвращающая текущее здоровье цели.</param>
-        /// <param name="isAlive">Предикат, определяющий, жива ли цель.</param>
-        /// <returns>Живая цель с наибольшим текущим здоровьем, или <c>null</c>, если живых кандидатов нет.</returns>
+        /// <typeparam name="T">The target type.</typeparam>
+        /// <param name="candidates">The candidate targets.</param>
+        /// <param name="currentHealth">A function returning a target's current health.</param>
+        /// <param name="isAlive">A predicate that determines whether a target is alive.</param>
+        /// <returns>The living target with the highest current health, or <c>null</c> if there are no living candidates.</returns>
         public static T? SelectHighestHealthTarget<T>(
             IReadOnlyList<T> candidates,
             Func<T, int> currentHealth,

@@ -2,50 +2,51 @@ using AlJourney.Scripts.Core;
 using AlJourney.Scripts.Data;
 using AlJourney.Scripts.Interfaces;
 using Godot;
+using System.Collections.Generic;
 
 namespace AlJourney.Scripts.Managers
 {
     /// <summary>
-    /// Менеджер состояния игры. Отвечает за управление глобальным состоянием, сохранением данных, волнами и ресурсами.
+    /// Game state manager. Responsible for managing the global state, saving data, waves and resources.
     /// </summary>
     public partial class GameStateManager : Node, IGameStateManager
     {
         /// <summary>
-        /// Глобальный экземпляр менеджера состояния игры.
+        /// Global instance of the game state manager.
         /// </summary>
         public static GameStateManager Instance { get; private set; } = null!;
 
         [Signal]
         /// <summary>
-        /// Событие, вызываемое при изменении глобального состояния игры.
+        /// Raised when the global game state changes.
         /// </summary>
-        /// <param name="newState">Новое состояние игры.</param>
+        /// <param name="newState">The new game state.</param>
         public delegate void StateChangedEventHandler(GameState newState);
 
         [Signal]
         /// <summary>
-        /// Событие, вызываемое при смене текущей волны.
+        /// Raised when the current wave changes.
         /// </summary>
-        /// <param name="waveNumber">Номер новой волны.</param>
+        /// <param name="waveNumber">The new wave number.</param>
         public delegate void WaveChangedEventHandler(int waveNumber);
 
         [Signal]
         /// <summary>
-        /// Событие, вызываемое при изменении количества монет у игрока.
+        /// Raised when the player's coin count changes.
         /// </summary>
-        /// <param name="newAmount">Новое количество монет.</param>
+        /// <param name="newAmount">The new coin amount.</param>
         public delegate void CoinsChangedEventHandler(int newAmount);
 
         [Signal]
         /// <summary>
-        /// Событие, вызываемое при обновлении характеристик героев.
+        /// Raised when the heroes' stats are updated.
         /// </summary>
         public delegate void HeroStatsChangedEventHandler();
 
         private GameState _currentState;
 
         /// <summary>
-        /// Текущее глобальное состояние игры.
+        /// The current global game state.
         /// </summary>
         public GameState CurrentState
         {
@@ -61,27 +62,39 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Текущие данные сохранения игры.
+        /// The current game save data.
         /// </summary>
         public SaveData CurrentSave { get; private set; }
 
         /// <summary>
-        /// Номер текущей волны врагов.
+        /// The current enemy wave number. As of Stage 3, this no longer reflects an endless counter, but
+        /// the <see cref="Data.LevelDefinition.DifficultyRating"/> of the campaign map level the player
+        /// is currently on — used as-is by the existing scaling scale (rewards, shop prices, enemy stats).
         /// </summary>
         public int CurrentWave => CurrentSave?.CurrentWave ?? 1;
 
         /// <summary>
-        /// Текущее количество монет у игрока.
+        /// Id of the campaign map level the player is currently on or should attempt next.
+        /// </summary>
+        public string CurrentLevelId => CurrentSave?.CurrentLevelId ?? CampaignDatabase.FirstLevelId;
+
+        /// <summary>
+        /// Ids of every campaign level already completed.
+        /// </summary>
+        public IReadOnlyCollection<string> CompletedLevelIds => CurrentSave?.CompletedLevelIds ?? (IReadOnlyCollection<string>)System.Array.Empty<string>();
+
+        /// <summary>
+        /// The current number of coins the player has.
         /// </summary>
         public int Coins => CurrentSave?.Coins ?? 0;
 
         /// <summary>
-        /// Указывает, активна ли игра в данный момент.
+        /// Indicates whether a game session is currently active.
         /// </summary>
         public bool IsGameActive { get; private set; }
 
         /// <summary>
-        /// Инициализирует узел менеджера состояния при добавлении в дерево сцены.
+        /// Initializes the state manager node when it is added to the scene tree.
         /// </summary>
         public override void _Ready()
         {
@@ -99,13 +112,13 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Запускает новую игру, сбрасывая прогресс и устанавливая начальные значения.
+        /// Starts a new game, resetting progress and setting initial values.
         /// </summary>
         public void StartNewGame()
         {
             CurrentSave = SaveData.CreateNew();
             IsGameActive = true;
-            CurrentState = GameState.Battle;
+            CurrentState = GameState.Map;
 
             _ = EmitSignal(SignalName.WaveChanged, CurrentSave.CurrentWave);
             _ = EmitSignal(SignalName.CoinsChanged, CurrentSave.Coins);
@@ -117,14 +130,14 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Загружает состояние игры из предоставленных данных сохранения.
+        /// Loads the game state from the provided save data.
         /// </summary>
-        /// <param name="saveData">Данные сохранения для загрузки.</param>
+        /// <param name="saveData">The save data to load.</param>
         public void LoadGame(SaveData saveData)
         {
             CurrentSave = saveData;
             IsGameActive = true;
-            CurrentState = GameState.Battle;
+            CurrentState = GameState.Map;
 
             _ = EmitSignal(SignalName.WaveChanged, CurrentSave.CurrentWave);
             _ = EmitSignal(SignalName.CoinsChanged, CurrentSave.Coins);
@@ -136,7 +149,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Переходит к следующей волне, обновляя номер текущей волны и рекорд.
+        /// Advances to the next wave, updating the current wave number and the record.
         /// </summary>
         public void NextWave()
         {
@@ -159,9 +172,75 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Добавляет указанное количество монет в текущее сохранение.
+        /// Marks the level selected on the campaign map as the current one, without starting it right away
+        /// (unlike <see cref="StartLevel"/>) — used by the map screen before transitioning to the battle
+        /// scene, which will call <see cref="StartLevel"/> itself on start.
         /// </summary>
-        /// <param name="amount">Количество добавляемых монет.</param>
+        /// <param name="levelId">Id of the level selected by the player on the map.</param>
+        public void SelectLevel(string levelId)
+        {
+            if (CurrentSave == null || string.IsNullOrEmpty(levelId))
+            {
+                return;
+            }
+
+            CurrentSave.CurrentLevelId = levelId;
+        }
+
+        /// <summary>
+        /// Begins an attempt at the given campaign map level: records it as the current one and carries
+        /// its <see cref="LevelDefinition.DifficultyRating"/> over into <see cref="CurrentWave"/> for the
+        /// existing scaling scale (enemy stats, rewards, shop prices).
+        /// </summary>
+        /// <param name="level">The level being entered.</param>
+        public void StartLevel(LevelDefinition level)
+        {
+            if (CurrentSave == null || level == null)
+            {
+                return;
+            }
+
+            CurrentSave.CurrentLevelId = level.Id;
+            CurrentSave.CurrentWave = level.DifficultyRating;
+
+            if (CurrentSave.CurrentWave > CurrentSave.HighestWave)
+            {
+                CurrentSave.HighestWave = CurrentSave.CurrentWave;
+            }
+
+            _ = EmitSignal(SignalName.WaveChanged, CurrentSave.CurrentWave);
+
+            GD.Print($"[GameStateManager] Started level {level.Id} (difficulty {level.DifficultyRating})");
+        }
+
+        /// <summary>
+        /// Marks a level as completed. For main-line levels, automatically advances progress to the
+        /// next level on the line (see <see cref="CampaignDatabase.GetNextMainLevel"/>); completing a
+        /// branch does not move main-line progress.
+        /// </summary>
+        /// <param name="levelId">Id of the completed level.</param>
+        public void CompleteLevel(string levelId)
+        {
+            if (CurrentSave == null || string.IsNullOrEmpty(levelId))
+            {
+                return;
+            }
+
+            _ = CurrentSave.CompletedLevelIds.Add(levelId);
+
+            LevelDefinition nextLevel = CampaignDatabase.GetNextMainLevel(levelId);
+            if (nextLevel != null)
+            {
+                CurrentSave.CurrentLevelId = nextLevel.Id;
+            }
+
+            GD.Print($"[GameStateManager] Completed level {levelId}" + (nextLevel != null ? $", next: {nextLevel.Id}" : ""));
+        }
+
+        /// <summary>
+        /// Adds the given number of coins to the current save.
+        /// </summary>
+        /// <param name="amount">The number of coins to add.</param>
         public void AddCoins(int amount)
         {
             if (CurrentSave == null || amount <= 0)
@@ -176,10 +255,10 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Списывает указанное количество монет, если их достаточно на счету.
+        /// Spends the given number of coins, if there are enough available.
         /// </summary>
-        /// <param name="amount">Количество монет для списания.</param>
-        /// <returns><c>true</c>, если списание прошло успешно; иначе <c>false</c>.</returns>
+        /// <param name="amount">The number of coins to spend.</param>
+        /// <returns><c>true</c> if the coins were successfully spent; otherwise <c>false</c>.</returns>
         public bool SpendCoins(int amount)
         {
             if (CurrentSave == null || amount <= 0 || CurrentSave.Coins < amount)
@@ -195,16 +274,16 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Обновляет базовые характеристики обоих героев в данных сохранения.
+        /// Updates the base stats of both heroes in the save data.
         /// </summary>
-        /// <param name="mageHealth">Текущее здоровье мага.</param>
-        /// <param name="mageMaxHealth">Максимальное здоровье мага.</param>
-        /// <param name="mageDamage">Урон мага.</param>
-        /// <param name="mageDefense">Защита мага.</param>
-        /// <param name="warriorHealth">Текущее здоровье воина.</param>
-        /// <param name="warriorMaxHealth">Максимальное здоровье воина.</param>
-        /// <param name="warriorDamage">Урон воина.</param>
-        /// <param name="warriorDefense">Защита воина.</param>
+        /// <param name="mageHealth">The mage's current health.</param>
+        /// <param name="mageMaxHealth">The mage's maximum health.</param>
+        /// <param name="mageDamage">The mage's damage.</param>
+        /// <param name="mageDefense">The mage's defense.</param>
+        /// <param name="warriorHealth">The warrior's current health.</param>
+        /// <param name="warriorMaxHealth">The warrior's maximum health.</param>
+        /// <param name="warriorDamage">The warrior's damage.</param>
+        /// <param name="warriorDefense">The warrior's defense.</param>
         public void UpdateHeroStats(
             int mageHealth, int mageMaxHealth, int mageDamage, int mageDefense,
             int warriorHealth, int warriorMaxHealth, int warriorDamage, int warriorDefense)
@@ -228,9 +307,9 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Изменяет текущее глобальное состояние игры.
+        /// Changes the current global game state.
         /// </summary>
-        /// <param name="newState">Новое состояние игры, в которое нужно перейти.</param>
+        /// <param name="newState">The new game state to transition to.</param>
         public void ChangeState(GameState newState)
         {
             CurrentState = newState;
@@ -238,9 +317,9 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Завершает текущую игру, переводя её в состояние победы или поражения.
+        /// Ends the current game, transitioning it into a victory or defeat state.
         /// </summary>
-        /// <param name="isVictory">Значение <c>true</c>, если игра завершилась победой; иначе <c>false</c>.</param>
+        /// <param name="isVictory"><c>true</c> if the game ended in victory; otherwise <c>false</c>.</param>
         public void EndGame(bool isVictory)
         {
             IsGameActive = false;
@@ -250,7 +329,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Возвращает игру в главное меню, сбрасывая активную сессию.
+        /// Returns the game to the main menu, resetting the active session.
         /// </summary>
         public void ReturnToMainMenu()
         {

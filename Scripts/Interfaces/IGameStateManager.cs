@@ -1,82 +1,108 @@
 using AlJourney.Scripts.Core;
 using AlJourney.Scripts.Data;
+using System.Collections.Generic;
 
 namespace AlJourney.Scripts.Interfaces
 {
     /// <summary>
-    /// Интерфейс для глобального состояния игры.
-    /// Отвечает за высокоуровневое управление игрой: сохранение/загрузку, переход между волнами, управление экономикой и характеристиками героев.
+    /// Interface for the game's global state.
+    /// Responsible for high-level game management: saving/loading, moving between waves, and managing the economy and hero stats.
     /// </summary>
     public interface IGameStateManager
     {
         /// <summary>
-        /// Текущее глобальное состояние игры.
+        /// The current global game state.
         /// </summary>
         GameState CurrentState { get; }
 
         /// <summary>
-        /// Текущие данные сохранения, включающие прогресс игрока.
+        /// The current save data, including the player's progress.
         /// </summary>
         SaveData CurrentSave { get; }
 
         /// <summary>
-        /// Текущая волна врагов, до которой дошел игрок.
+        /// The current enemy wave the player has reached.
         /// </summary>
         int CurrentWave { get; }
 
         /// <summary>
-        /// Количество доступных игроку монет.
+        /// Id of the campaign map level the player is currently on or should attempt next.
+        /// </summary>
+        string CurrentLevelId { get; }
+
+        /// <summary>
+        /// Ids of every campaign level already completed.
+        /// </summary>
+        IReadOnlyCollection<string> CompletedLevelIds { get; }
+
+        /// <summary>
+        /// The number of coins available to the player.
         /// </summary>
         int Coins { get; }
 
         /// <summary>
-        /// Возвращает значение true, если в данный момент идет активная игровая сессия.
+        /// Returns true if there is currently an active game session.
         /// </summary>
         bool IsGameActive { get; }
 
         /// <summary>
-        /// Начинает новую игру, сбрасывая прогресс до начального состояния.
+        /// Starts a new game, resetting progress to its initial state.
         /// </summary>
         void StartNewGame();
 
         /// <summary>
-        /// Загружает игру на основе предоставленных данных сохранения.
+        /// Loads a game from the provided save data.
         /// </summary>
         void LoadGame(SaveData saveData);
 
         /// <summary>
-        /// Совершает переход к следующей волне врагов.
+        /// Advances to the next enemy wave.
         /// </summary>
         void NextWave();
 
         /// <summary>
-        /// Начисляет игроку указанное количество монет.
+        /// Marks the level selected on the campaign map as the current one, without starting it immediately.
+        /// </summary>
+        void SelectLevel(string levelId);
+
+        /// <summary>
+        /// Begins an attempt at the given campaign map level.
+        /// </summary>
+        void StartLevel(LevelDefinition level);
+
+        /// <summary>
+        /// Marks a campaign map level as completed and, if applicable, advances progress further.
+        /// </summary>
+        void CompleteLevel(string levelId);
+
+        /// <summary>
+        /// Grants the player the specified number of coins.
         /// </summary>
         void AddCoins(int amount);
 
         /// <summary>
-        /// Пытается списать указанное количество монет.
-        /// Возвращает true, если средств достаточно и они успешно списаны.
+        /// Attempts to spend the specified number of coins.
+        /// Returns true if the player had enough funds and they were successfully spent.
         /// </summary>
         bool SpendCoins(int amount);
 
         /// <summary>
-        /// Обновляет базовые и текущие характеристики обоих героев.
+        /// Updates the base and current stats of both heroes.
         /// </summary>
         void UpdateHeroStats(int mageHealth, int mageMaxHealth, int mageDamage, int mageDefense, int warriorHealth, int warriorMaxHealth, int warriorDamage, int warriorDefense);
 
         /// <summary>
-        /// Изменяет текущее глобальное состояние игры на новое.
+        /// Changes the current global game state to a new one.
         /// </summary>
         void ChangeState(GameState newState);
 
         /// <summary>
-        /// Завершает игру с указанием результата.
+        /// Ends the game with the given outcome.
         /// </summary>
         void EndGame(bool isVictory);
 
         /// <summary>
-        /// Осуществляет возврат в главное меню игры из текущего состояния.
+        /// Returns to the game's main menu from the current state.
         /// </summary>
         void ReturnToMainMenu();
     }

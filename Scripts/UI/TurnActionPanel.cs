@@ -7,9 +7,9 @@ using Godot;
 namespace AlJourney.Scripts.UI
 {
     /// <summary>
-    /// Панель выбора действия игрока в пошаговом бою. Реализует шаги "выбери бойца → выбери способность"
-    /// (наведение и подтверждение цели выполняется кликом по портрету союзника/полоске здоровья врага,
-    /// см. <see cref="BattleHUD"/>). Появляется только во время фазы <see cref="BattlePhase.PlayerTurn"/>.
+    /// Player action selection panel for turn-based combat. Implements the "choose fighter → choose ability" steps
+    /// (target hover and confirmation is done by clicking an ally portrait/enemy health bar,
+    /// see <see cref="BattleHUD"/>). Only appears during the <see cref="BattlePhase.PlayerTurn"/> phase.
     /// </summary>
     public partial class TurnActionPanel : Control
     {
@@ -20,7 +20,7 @@ namespace AlJourney.Scripts.UI
         private HBoxContainer _abilityRow;
 
         /// <summary>
-        /// Создаёт визуальную структуру панели. Сама панель добавляется в сцену вызывающим кодом (BattleScene).
+        /// Builds the panel's visual structure. The panel itself is added to the scene by the calling code (BattleScene).
         /// </summary>
         public override void _Ready()
         {
@@ -52,9 +52,9 @@ namespace AlJourney.Scripts.UI
         }
 
         /// <summary>
-        /// Связывает панель с менеджером боя и подписывается на изменения состояния хода.
+        /// Links the panel to the battle manager and subscribes to turn state changes.
         /// </summary>
-        /// <param name="battleManager">Менеджер пошагового боя.</param>
+        /// <param name="battleManager">The turn-based battle manager.</param>
         public void Initialize(BattleManager battleManager)
         {
             _battleManager = battleManager;
@@ -139,7 +139,7 @@ namespace AlJourney.Scripts.UI
         }
 
         /// <summary>
-        /// Отписывается от событий менеджера боя при удалении узла из дерева.
+        /// Unsubscribes from the battle manager's events when the node is removed from the tree.
         /// </summary>
         public override void _ExitTree()
         {

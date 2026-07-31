@@ -47,6 +47,18 @@ ABILITY_ALDRIC_CRUSHING_BLOW,Crushing Blow,Сокрушающий удар
 ABILITY_ALDRIC_CRUSHING_BLOW_DESC,A devastating strike against the toughest enemy,Разрушительный удар по самому живучему врагу
 UI_BATTLE_ULTIMATE_READY,Ultimate,Ультимата
 UI_BATTLE_ULTIMATE_CHARGE,Ultimate charge:,Заряд ульты:
+LOCATION_VILLAGE_RUINS,Village Ruins,Руины деревни
+LOCATION_DARK_FOREST,Dark Forest,Тёмный лес
+LOCATION_BURIED_CATACOMBS,Buried Catacombs,Погребённые катакомбы
+LOCATION_FROZEN_WASTES,Frozen Wastes,Ледяные пустоши
+LOCATION_NECROMANCER_LAIR,Necromancer's Lair,Логово Некроманта
+UI_MAP_TITLE,Campaign Map,Карта кампании
+UI_MAP_LEVEL,Level,Уровень
+UI_MAP_BRANCH,Branch,Ответвление
+UI_MAP_LOCKED,Locked,Заблокировано
+UI_MAP_COMPLETED,Completed,Пройдено
+UI_MAP_SHOP,Village Shop,Магазин поселения
+UI_MAP_MAIN_MENU,Main Menu,В главное меню
 UI_PAUSE_SAVE,Save Game,Сохранить
 CHARACTER_MAGE,Mage,Маг
 CHARACTER_WARRIOR,Warrior,Воин
@@ -86,6 +98,9 @@ UI_COINS,Coins,Монеты
 UI_CLOSE,Close,Закрыть
 UI_UPGRADE,Upgrade,Улучшить
 UI_EQUIPMENT,Equipment,Снаряжение
+UI_INVENTORY_NO_WEAPON,No weapon,Нет оружия
+UI_INVENTORY_LEVEL_LABEL,Lvl.,Ур.
+UI_STATUS_DURATION_LABEL,Remaining:,Осталось:
 HERO_MAGE,Altarion,Эльтарион
 HERO_WARRIOR,Aldric,Элдрик
 STAT_DAMAGE,Damage,Урон

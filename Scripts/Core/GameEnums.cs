@@ -1,11 +1,12 @@
 namespace AlJourney.Scripts.Core
 {
     /// <summary>
-    /// Возможные состояния игры, определяющие текущий экран и логику поведения.
+    /// Possible game states, determining the current screen and behavior.
     /// </summary>
     public enum GameState
     {
         MainMenu,
+        Map,
         Battle,
         Shop,
         GameOver,
@@ -13,7 +14,7 @@ namespace AlJourney.Scripts.Core
     }
 
     /// <summary>
-    /// Классы игровых персонажей, определяющие их роли в бою.
+    /// Character classes, defining their role in combat.
     /// </summary>
     public enum CharacterClass
     {
@@ -22,7 +23,7 @@ namespace AlJourney.Scripts.Core
     }
 
     /// <summary>
-    /// Различные типы врагов, с которыми игрок может столкнуться во время прохождения.
+    /// The different enemy types the player can encounter while playing.
     /// </summary>
     public enum EnemyType
     {
@@ -41,7 +42,7 @@ namespace AlJourney.Scripts.Core
     }
 
     /// <summary>
-    /// Типы наносимого урона.
+    /// Types of damage dealt.
     /// </summary>
     public enum AttackType
     {
@@ -50,7 +51,7 @@ namespace AlJourney.Scripts.Core
     }
 
     /// <summary>
-    /// Статусные эффекты, которые могут быть наложены на персонажей или врагов во время боя.
+    /// Status effects that can be applied to characters or enemies during combat.
     /// </summary>
     public enum StatusEffect
     {
@@ -68,7 +69,8 @@ namespace AlJourney.Scripts.Core
     }
 
     /// <summary>
-    /// Фазы хода в пошаговой боевой системе. Определяют, чей сейчас ход и не идёт ли переход между волнами.
+    /// Turn phases of the turn-based combat system. Determine whose turn it currently is and whether
+    /// a wave transition is in progress.
     /// </summary>
     public enum BattlePhase
     {
@@ -78,7 +80,7 @@ namespace AlJourney.Scripts.Core
     }
 
     /// <summary>
-    /// Слоты для экипировки персонажей. Определяют, в какую ячейку можно надеть предмет.
+    /// Equipment slots for characters. Determine which slot an item can be equipped into.
     /// </summary>
     public enum EquipmentSlot
     {
@@ -92,7 +94,7 @@ namespace AlJourney.Scripts.Core
     }
 
     /// <summary>
-    /// Уровни редкости предметов, влияющие на их характеристики, ценность и вероятность выпадения.
+    /// Item rarity tiers, affecting their stats, value and drop chance.
     /// </summary>
     public enum EquipmentRarity
     {
@@ -104,7 +106,7 @@ namespace AlJourney.Scripts.Core
     }
 
     /// <summary>
-    /// Типы способностей, доступных персонажам.
+    /// Types of abilities available to characters.
     /// </summary>
     public enum AbilityType
     {
@@ -113,7 +115,7 @@ namespace AlJourney.Scripts.Core
     }
 
     /// <summary>
-    /// Элементы, связанные с активными способностями персонажей.
+    /// Elements associated with characters' active abilities.
     /// </summary>
     public enum AbilityElement
     {
@@ -124,11 +126,24 @@ namespace AlJourney.Scripts.Core
     }
 
     /// <summary>
-    /// Определяет, на кого можно навести способность: на врага или на себя/союзника.
+    /// Defines who an ability can be targeted at: an enemy, or the caster/an ally.
     /// </summary>
     public enum AbilityTargetType
     {
         Enemy,
         AllyOrSelf
+    }
+
+    /// <summary>
+    /// Campaign map locations, arranged in order of distance from the village to the necromancer's lair.
+    /// Declaration order matches playthrough order.
+    /// </summary>
+    public enum LocationId
+    {
+        VillageRuins,
+        DarkForest,
+        BuriedCatacombs,
+        FrozenWastes,
+        NecromancerLair
     }
 }

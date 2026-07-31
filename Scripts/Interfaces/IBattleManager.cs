@@ -7,79 +7,90 @@ using System.Collections.Generic;
 namespace AlJourney.Scripts.Interfaces
 {
     /// <summary>
-    /// Интерфейс для управления логикой пошагового боя.
-    /// Контролирует фазы битвы, номер волны врагов и текущее состояние выбора хода игрока
-    /// (выбранный боец → выбранная способность → цель).
+    /// Interface for managing turn-based combat logic.
+    /// Controls the battle phases, the enemy wave number, and the current state of the player's turn
+    /// selection (selected actor → selected ability → target).
     /// </summary>
     public interface IBattleManager
     {
         /// <summary>
-        /// Текущая фаза боя.
+        /// The current battle phase.
         /// </summary>
         BattlePhase CurrentPhase { get; }
 
         /// <summary>
-        /// Номер текущей волны врагов в рамках боя.
+        /// The current level's difficulty, shared by all of its waves (see <see cref="LevelDefinition.DifficultyRating"/>).
         /// </summary>
         int CurrentWave { get; }
 
         /// <summary>
-        /// Система управления отрядом героев, участвующих в битве.
+        /// The current wave's index (zero-based) among the current level's waves.
+        /// </summary>
+        int CurrentWaveIndex { get; }
+
+        /// <summary>
+        /// The total number of waves in the current level.
+        /// </summary>
+        int TotalWavesInLevel { get; }
+
+        /// <summary>
+        /// The party system managing the heroes participating in the battle.
         /// </summary>
         DualHeroSystem HeroSystem { get; }
 
         /// <summary>
-        /// Участники отряда, которые ещё не совершили ход в текущем раунде.
+        /// Party members who have not yet acted in the current round.
         /// </summary>
         IReadOnlyList<PlayerCharacter> PendingActors { get; }
 
         /// <summary>
-        /// Боец, выбранный игроком для текущего хода (либо null, если выбор ещё не сделан).
+        /// The actor selected by the player for the current turn (or null if no selection has been made yet).
         /// </summary>
         PlayerCharacter SelectedActor { get; }
 
         /// <summary>
-        /// Способность, выбранная для текущего хода (либо null, если выбор ещё не сделан).
+        /// The ability selected for the current turn (or null if no selection has been made yet).
         /// </summary>
         AbilityData SelectedAbility { get; }
 
         /// <summary>
-        /// Текущее значение общего заряда ульты отряда.
+        /// The party's current total ultimate charge.
         /// </summary>
         int UltimateCharge { get; }
 
         /// <summary>
-        /// Истина, если заряд ульты полон и она доступна к применению.
+        /// True if the ultimate charge is full and the ultimate is ready to use.
         /// </summary>
         bool IsUltimateReady { get; }
 
         /// <summary>
-        /// Выбирает бойца, который совершит ход следующим (порядок хода определяет игрок).
+        /// Selects the actor who will take the next turn (the player determines turn order).
         /// </summary>
         void SelectActor(PlayerCharacter actor);
 
         /// <summary>
-        /// Выбирает способность, которую применит выбранный боец.
+        /// Selects the ability the chosen actor will use.
         /// </summary>
         void SelectAbility(AbilityData ability);
 
         /// <summary>
-        /// Возвращает список допустимых целей для наведения выбранной способности.
+        /// Returns the list of valid targets for the selected ability's targeting.
         /// </summary>
         IReadOnlyList<Character> GetValidTargets();
 
         /// <summary>
-        /// Подтверждает цель и немедленно разрешает эффект выбранной способности.
+        /// Confirms the target and immediately resolves the selected ability's effect.
         /// </summary>
         void ConfirmTarget(Character target);
 
         /// <summary>
-        /// Запускает начало битвы для указанной волны, настраивая героев и опционально применяя эффекты тряски камеры.
+        /// Starts the battle for the given campaign map level, setting up the heroes and optionally
+        /// applying camera shake effects.
         /// </summary>
-        void StartBattle(DualHeroSystem heroSystem, int waveNumber, CameraShake cameraShake = null);
+        void StartBattle(DualHeroSystem heroSystem, LevelDefinition level, CameraShake cameraShake = null);
 
         /// <summary>
-        /// Завершает текущую битву, очищая ресурсы и подводя итоги столкновения.
+        /// Ends the current battle, releasing resources and wrapping up the encounter.
         /// </summary>
         void EndBattle();
     }

@@ -6,21 +6,21 @@ using System.Collections.Generic;
 namespace AlJourney.Scripts.Characters
 {
     /// <summary>
-    /// Основной класс игрового персонажа, наследующийся от Character.
-    /// Управляет базовыми характеристиками, применением экипировки, способностями и расчетом наносимого урона.
+    /// The main player character class, inheriting from Character.
+    /// Manages base stats, applying equipment, abilities, and damage calculation.
     /// </summary>
     public partial class PlayerCharacter : Character
     {
         /// <summary>
-        /// Класс данного персонажа. Доступен только для чтения.
+        /// This character's class. Read-only.
         /// </summary>
         public CharacterClass CharacterClass { get; private set; }
 
         /// <summary>
-        /// Фабричный метод для создания и инициализации нового персонажа определенного класса.
+        /// Factory method that creates and initializes a new character of the given class.
         /// </summary>
-        /// <param name="characterClass">Тип создаваемого класса.</param>
-        /// <returns>Новый настроенный экземпляр персонажа.</returns>
+        /// <param name="characterClass">The class to create.</param>
+        /// <returns>A new, configured character instance.</returns>
         public static PlayerCharacter Create(CharacterClass characterClass)
         {
             PlayerCharacter player = new()
@@ -56,7 +56,7 @@ namespace AlJourney.Scripts.Characters
         }
 
         /// <summary>
-        /// Инициализирует персонажа данными, полученными из файла сохранения.
+        /// Initializes the character with data loaded from a save file.
         /// </summary>
         public void InitializeFromSave(string name, int maxHealth, int currentHealth, int damage, int defense, CharacterClass characterClass)
         {
@@ -98,12 +98,12 @@ namespace AlJourney.Scripts.Characters
         }
 
         /// <summary>
-        /// Общий показатель защиты персонажа, включающий базовую защиту и бонусы от экипировки и активных способностей.
+        /// The character's total defense, including base defense and bonuses from equipment and active abilities.
         /// </summary>
         public override int TotalDefense => _baseDefense + GetEquipmentStat("defense") + GetAbilityStat("defense");
 
         /// <summary>
-        /// Общий максимальный запас здоровья персонажа, рассчитываемый с учетом базового здоровья и как плоских, так и процентных бонусов от экипировки и способностей.
+        /// The character's total maximum health, computed from base health plus both flat and percentage bonuses from equipment and abilities.
         /// </summary>
         public override int TotalMaxHealth
         {
@@ -117,10 +117,10 @@ namespace AlJourney.Scripts.Characters
         }
 
         /// <summary>
-        /// Рассчитывает итоговый урон атаки, учитывая базовый урон, бонусы от экипировки, способностей и статусные эффекты.
+        /// Computes the final attack damage, accounting for base damage, equipment and ability bonuses, and status effects.
         /// </summary>
-        /// <param name="baseDamage">Базовый урон, наносимый атакой (значение эффекта способности).</param>
-        /// <returns>Конечное количество урона после всех расчетов.</returns>
+        /// <param name="baseDamage">The base damage dealt by the attack (the ability effect's value).</param>
+        /// <returns>The final damage amount after every calculation.</returns>
         public int CalculateDamage(int baseDamage)
         {
             int equipBonus = GetEquipmentStat("damage");
@@ -138,29 +138,29 @@ namespace AlJourney.Scripts.Characters
         }
 
         /// <summary>
-        /// Рассчитывает итоговое значение лечения, которое может быть усилено дополнительными модификаторами.
+        /// Computes the final healing value, which can be boosted by additional modifiers.
         /// </summary>
-        /// <param name="baseHealing">Базовое значение исцеления.</param>
-        /// <returns>Конечное значение исцеления.</returns>
+        /// <param name="baseHealing">The base healing value.</param>
+        /// <returns>The final healing value.</returns>
         public static int CalculateHealing(int baseHealing)
         {
             return baseHealing;
         }
 
         /// <summary>
-        /// Рассчитывает итоговое значение прочности щита, которое накладывается на персонажа.
+        /// Computes the final shield strength applied to the character.
         /// </summary>
-        /// <param name="baseShield">Базовое значение щита.</param>
-        /// <returns>Конечное значение прочности щита.</returns>
+        /// <param name="baseShield">The base shield value.</param>
+        /// <returns>The final shield strength.</returns>
         public static int CalculateShield(int baseShield)
         {
             return baseShield;
         }
 
         /// <summary>
-        /// Получает текущие характеристики персонажа: максимальное здоровье, текущее здоровье, урон и защиту.
+        /// Gets the character's current stats: maximum health, current health, damage and defense.
         /// </summary>
-        /// <returns>Кортеж со значениями характеристик персонажа.</returns>
+        /// <returns>A tuple with the character's stat values.</returns>
         public (int maxHealth, int currentHealth, int damage, int defense) GetStats()
         {
             int dmg = _baseDamage + GetEquipmentStat("damage") + GetAbilityStat("damage");

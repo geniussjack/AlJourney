@@ -10,28 +10,28 @@ using GodotFileAccess = Godot.FileAccess;
 namespace AlJourney.Scripts.Managers
 {
     /// <summary>
-    /// Глобальный менеджер сохранения и загрузки прогресса.
-    /// Отвечает за сериализацию игровых данных
-    /// в JSON формат и чтение из локального хранилища.
+    /// Global manager for saving and loading progress.
+    /// Responsible for serializing game data
+    /// to JSON and reading it back from local storage.
     /// </summary>
     public partial class SaveSystem : Node, ISaveSystem
     {
         /// <summary>
-        /// Глобальный доступ к синглтону системы сохранений.
+        /// Global access point for the save system singleton.
         /// </summary>
         public static SaveSystem Instance { get; private set; } = null!;
 
         /// <summary>
-        /// Вызывается после завершения операции сохранения.
+        /// Raised after a save operation completes.
         /// </summary>
-        /// <param name="success">True, если сохранение прошло успешно.</param>
+        /// <param name="success">True if the save completed successfully.</param>
         [Signal]
         public delegate void SaveCompletedEventHandler(bool success);
 
         /// <summary>
-        /// Вызывается после завершения операции загрузки данных.
+        /// Raised after a load operation completes.
         /// </summary>
-        /// <param name="success">True, если загрузка данных и их валидация прошли успешно.</param>
+        /// <param name="success">True if the data was loaded and validated successfully.</param>
         [Signal]
         public delegate void LoadCompletedEventHandler(bool success);
 
@@ -46,7 +46,7 @@ namespace AlJourney.Scripts.Managers
         };
 
         /// <summary>
-        /// Инициализация синглтона и создание директории сохранений, если она не существует.
+        /// Initializes the singleton and creates the save directory if it doesn't exist.
         /// </summary>
         public override void _Ready()
         {
@@ -70,10 +70,10 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Сохраняет текущее состояние игры в файл.
-        /// Включает прогресс волн, характеристики героев и состояние инвентаря.
+        /// Saves the current game state to a file.
+        /// Includes wave progress, hero stats and inventory state.
         /// </summary>
-        /// <returns>True, если сохранение завершилось успешно.</returns>
+        /// <returns>True if the save completed successfully.</returns>
         public bool SaveGame()
         {
             try
@@ -115,11 +115,11 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Читает и десериализует файл сохранения.
-        /// Если структура устарела, пытается произвести миграцию.
-        /// Проводит валидацию целостности данных.
+        /// Reads and deserializes the save file.
+        /// If the structure is outdated, attempts to migrate it.
+        /// Validates the integrity of the loaded data.
         /// </summary>
-        /// <returns>Загруженный объект SaveData, либо null в случае ошибки.</returns>
+        /// <returns>The loaded SaveData object, or null on failure.</returns>
         public SaveData LoadGame()
         {
             try
@@ -208,7 +208,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Проверяет физическое существование файла сохранения.
+        /// Checks whether the save file physically exists.
         /// </summary>
         public bool SaveFileExists()
         {
@@ -216,7 +216,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Удаляет текущий файл сохранения без возможности восстановления.
+        /// Deletes the current save file, without a way to recover it.
         /// </summary>
         public bool DeleteSave()
         {
@@ -296,7 +296,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Выполняет сохранение, если игра находится в активном состоянии.
+        /// Performs a save if the game is currently active.
         /// </summary>
         public void AutoSave()
         {

@@ -5,12 +5,12 @@ using System.Collections.Generic;
 namespace AlJourney.Scripts.Managers
 {
     /// <summary>
-    /// Менеджер аудиосистемы. Отвечает за воспроизведение музыки и звуковых эффектов, а также управление их громкостью.
+    /// Audio system manager. Responsible for playing music and sound effects, and managing their volume.
     /// </summary>
     public partial class AudioManager : Node, IAudioManager
     {
         /// <summary>
-        /// Глобальный экземпляр менеджера аудио.
+        /// Global instance of the audio manager.
         /// </summary>
         public static AudioManager Instance { get; private set; }
 
@@ -20,7 +20,7 @@ namespace AlJourney.Scripts.Managers
         private readonly HashSet<string> _missingResourceWarnings = [];
 
         /// <summary>
-        /// Общая громкость для всех звуков в игре. Значение от 0.0 до 1.0.
+        /// Overall volume for all sounds in the game. Ranges from 0.0 to 1.0.
         /// </summary>
         public float MasterVolume
         {
@@ -33,7 +33,7 @@ namespace AlJourney.Scripts.Managers
         } = 1.0f;
 
         /// <summary>
-        /// Громкость фоновой музыки. Значение от 0.0 до 1.0.
+        /// Background music volume. Ranges from 0.0 to 1.0.
         /// </summary>
         public float MusicVolume
         {
@@ -46,7 +46,7 @@ namespace AlJourney.Scripts.Managers
         } = 0.7f;
 
         /// <summary>
-        /// Громкость звуковых эффектов. Значение от 0.0 до 1.0.
+        /// Sound effects volume. Ranges from 0.0 to 1.0.
         /// </summary>
         public float SfxVolume
         {
@@ -59,11 +59,11 @@ namespace AlJourney.Scripts.Managers
         } = 0.8f;
 
         /// <summary>
-        /// Применяет линейное значение громкости к указанной аудио-шине Godot, переводя его в децибелы.
-        /// Ничего не делает, если шина с таким именем не найдена (например, при кастомной аудио-конфигурации).
+        /// Applies a linear volume value to the given Godot audio bus, converting it to decibels.
+        /// Does nothing if no bus with that name is found (e.g. with a custom audio configuration).
         /// </summary>
-        /// <param name="busName">Имя аудио-шины ("Master", "Music" или "SFX").</param>
-        /// <param name="linearVolume">Громкость в линейной шкале от 0.0 до 1.0.</param>
+        /// <param name="busName">The audio bus name ("Master", "Music" or "SFX").</param>
+        /// <param name="linearVolume">The volume on a linear scale from 0.0 to 1.0.</param>
         private static void ApplyBusVolume(string busName, float linearVolume)
         {
             int busIndex = AudioServer.GetBusIndex(busName);
@@ -74,8 +74,8 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Инициализирует аудиоплееры для музыки и эффектов при добавлении в дерево сцены.
-        /// Настраивает пулы звуковых плееров.
+        /// Initializes the music and sound effect audio players when added to the scene tree.
+        /// Sets up the sound player pools.
         /// </summary>
         public override void _Ready()
         {
@@ -106,7 +106,7 @@ namespace AlJourney.Scripts.Managers
                 _sfxPlayers.Add(sfxPlayer);
             }
 
-            // Инициализация громкости шин значениями, заданными инициализаторами полей.
+            // Initialize bus volumes with the values set by the field initializers.
             ApplyBusVolume("Master", MasterVolume);
             ApplyBusVolume("Music", MusicVolume);
             ApplyBusVolume("SFX", SfxVolume);
@@ -118,21 +118,21 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Воспроизводит фоновую музыку по указанному пути к ресурсу.
+        /// Plays background music from the given resource path.
         /// </summary>
-        /// <param name="musicPath">Путь к файлу аудиоресурса музыки.</param>
-        /// <param name="loop">Указывает, должна ли музыка воспроизводиться в цикле.</param>
+        /// <param name="musicPath">The path to the music audio resource.</param>
+        /// <param name="loop">Whether the music should loop.</param>
         public void PlayMusic(string musicPath, bool loop = true)
         {
             _ = TryPlayMusic(musicPath, loop);
         }
 
         /// <summary>
-        /// Пытается загрузить и воспроизвести фоновую музыку. Выводит предупреждение, если ресурс не найден.
+        /// Attempts to load and play background music. Prints a warning if the resource isn't found.
         /// </summary>
-        /// <param name="musicPath">Путь к файлу аудиоресурса музыки.</param>
-        /// <param name="loop">Должна ли музыка зацикливаться.</param>
-        /// <returns><c>true</c>, если музыка успешно загружена и воспроизводится; иначе <c>false</c>.</returns>
+        /// <param name="musicPath">The path to the music audio resource.</param>
+        /// <param name="loop">Whether the music should loop.</param>
+        /// <returns><c>true</c> if the music was successfully loaded and started playing; otherwise <c>false</c>.</returns>
         public bool TryPlayMusic(string musicPath, bool loop = true)
         {
             AudioStream stream = GD.Load<AudioStream>(musicPath);
@@ -163,7 +163,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Останавливает воспроизведение текущей фоновой музыки.
+        /// Stops the currently playing background music.
         /// </summary>
         public void StopMusic()
         {
@@ -171,21 +171,21 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Воспроизводит звуковой эффект по указанному пути.
+        /// Plays a sound effect from the given path.
         /// </summary>
-        /// <param name="sfxPath">Путь к ресурсу звукового эффекта.</param>
-        /// <param name="pitchVariation">Случайная вариация высоты тона для разнообразия звучания.</param>
+        /// <param name="sfxPath">The path to the sound effect resource.</param>
+        /// <param name="pitchVariation">Random pitch variation for sound variety.</param>
         public void PlaySfx(string sfxPath, float pitchVariation = 0.0f)
         {
             _ = TryPlaySfx(sfxPath, pitchVariation);
         }
 
         /// <summary>
-        /// Пытается найти свободный плеер и воспроизвести звуковой эффект.
+        /// Attempts to find a free player and play the sound effect.
         /// </summary>
-        /// <param name="sfxPath">Путь к ресурсу звукового эффекта.</param>
-        /// <param name="pitchVariation">Вариация высоты тона.</param>
-        /// <returns><c>true</c>, если эффект найден и начал воспроизводиться; иначе <c>false</c>.</returns>
+        /// <param name="sfxPath">The path to the sound effect resource.</param>
+        /// <param name="pitchVariation">The pitch variation.</param>
+        /// <returns><c>true</c> if the effect was found and started playing; otherwise <c>false</c>.</returns>
         public bool TryPlaySfx(string sfxPath, float pitchVariation = 0.0f)
         {
             if (!ResourceLoader.Exists(sfxPath))
@@ -287,9 +287,9 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Плавно уменьшает громкость текущей музыки до полного затухания, а затем останавливает её.
+        /// Smoothly fades the current music's volume down to silence, then stops it.
         /// </summary>
-        /// <param name="duration">Продолжительность затухания в секундах.</param>
+        /// <param name="duration">The fade duration, in seconds.</param>
         public void FadeOutMusic(float duration = 1.0f)
         {
             if (_musicPlayer?.Playing != true)
@@ -305,9 +305,9 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Плавно увеличивает громкость музыки от минимального значения до целевого.
+        /// Smoothly raises the music's volume from silence up to its target level.
         /// </summary>
-        /// <param name="duration">Продолжительность нарастания звука в секундах.</param>
+        /// <param name="duration">The fade-in duration, in seconds.</param>
         public void FadeInMusic(float duration = 1.0f)
         {
             if (_musicPlayer?.Playing != true)
@@ -324,11 +324,11 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Выполняет плавный переход между текущей музыкой и новым треком.
+        /// Performs a smooth transition between the current music and a new track.
         /// </summary>
-        /// <param name="newMusicPath">Путь к новому музыкальному треку.</param>
-        /// <param name="duration">Длительность перехода в секундах.</param>
-        /// <param name="loop">Указывает, должен ли новый трек воспроизводиться в цикле.</param>
+        /// <param name="newMusicPath">The path to the new music track.</param>
+        /// <param name="duration">The transition duration, in seconds.</param>
+        /// <param name="loop">Whether the new track should loop.</param>
         public void CrossfadeMusic(string newMusicPath, float duration = 1.0f, bool loop = true)
         {
             if (_musicPlayer.Playing)

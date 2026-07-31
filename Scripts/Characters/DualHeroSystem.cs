@@ -6,57 +6,58 @@ using System.Linq;
 namespace AlJourney.Scripts.Characters
 {
     /// <summary>
-    /// Система управления отрядом игрока. Исторически называется "DualHeroSystem" (по двум главным героям),
-    /// но с Этапа 1 редизайна представляет собой отряд из трёх слотов: Маг и Воин (Эльтарион и Эльдрик,
-    /// всегда присутствуют) и опциональный третий слот наёмника, который появится на этапе восстановления
-    /// деревни (см. REDESIGN_NOTES.md, разделы 4 и 7). Отвечает за инициализацию бойцов, отслеживание их
-    /// состояний и маршрутизацию сигналов.
+    /// The system managing the player's party. Historically named "DualHeroSystem" (after the two main
+    /// heroes), but as of Stage 1 of the redesign it represents a three-slot party: the Mage and Warrior
+    /// (Altarion and Aldric, always present) and an optional third mercenary slot that will become
+    /// available at the village-restoration stage (see REDESIGN_NOTES.md, sections 4 and 7). Responsible
+    /// for initializing party members, tracking their state, and routing signals.
     /// </summary>
     public partial class DualHeroSystem : Node
     {
         /// <summary>
-        /// Сигнал, вызываемый при изменении здоровья одного из героев. Передает класс героя, его текущее и максимальное количество здоровья.
+        /// Raised when one of the heroes' health changes. Passes the hero's class and their current and maximum health.
         /// </summary>
         [Signal]
         public delegate void HeroHealthChangedEventHandler(CharacterClass heroClass, int currentHealth, int maxHealth);
 
         /// <summary>
-        /// Сигнал, вызываемый при изменении прочности щита одного из героев. Передает класс героя и текущее значение его щита.
+        /// Raised when one of the heroes' shield strength changes. Passes the hero's class and their current shield value.
         /// </summary>
         [Signal]
         public delegate void HeroShieldChangedEventHandler(CharacterClass heroClass, int shieldAmount);
 
         /// <summary>
-        /// Сигнал, вызываемый в случае гибели одного из героев. Передает класс павшего героя.
+        /// Raised when one of the heroes dies. Passes the class of the fallen hero.
         /// </summary>
         [Signal]
         public delegate void HeroDiedEventHandler(CharacterClass heroClass);
 
         /// <summary>
-        /// Сигнал, вызываемый, когда весь отряд полностью погибает. Это событие обычно приводит к окончанию игры.
+        /// Raised when the entire party is defeated. This event typically leads to the game ending.
         /// </summary>
         [Signal]
         public delegate void PartyDefeatedEventHandler();
 
         /// <summary>
-        /// Ссылка на персонажа-Мага (Эльтарион). Доступна только для чтения извне.
+        /// Reference to the Mage character (Altarion). Read-only from outside.
         /// </summary>
         public PlayerCharacter Mage { get; private set; }
 
         /// <summary>
-        /// Ссылка на персонажа-Воина (Эльдрик). Доступна только для чтения извне.
+        /// Reference to the Warrior character (Aldric). Read-only from outside.
         /// </summary>
         public PlayerCharacter Warrior { get; private set; }
 
         /// <summary>
-        /// Третий слот отряда — наёмник из поселения. В Этапе 1 всегда пуст: наём появится на этапе
-        /// восстановления деревни. Заложен заранее, чтобы не переделывать структуру отряда позже.
+        /// The party's third slot — a mercenary hired from the settlement. Always empty in Stage 1:
+        /// hiring becomes available at the village-restoration stage. Included ahead of time so the
+        /// party structure doesn't need to be reworked later.
         /// </summary>
         public PlayerCharacter Companion { get; private set; }
 
         /// <summary>
-        /// Метод жизненного цикла Godot, вызываемый при добавлении узла в сцену.
-        /// Инициализирует Мага и Воина, добавляет их как дочерние узлы и подписывается на их сигналы.
+        /// Godot lifecycle method, called when the node is added to the scene.
+        /// Initializes the Mage and Warrior, adds them as child nodes, and subscribes to their signals.
         /// </summary>
         public override void _Ready()
         {
@@ -100,25 +101,25 @@ namespace AlJourney.Scripts.Characters
         }
 
         /// <summary>
-        /// Возвращает всех участников отряда: двух героев и наёмника, если он назначен.
+        /// Returns every member of the party: the two heroes and the mercenary, if one is assigned.
         /// </summary>
-        /// <returns>Список участников отряда в фиксированном порядке (Маг, Воин, Наёмник).</returns>
+        /// <returns>The list of party members in a fixed order (Mage, Warrior, Companion).</returns>
         public IReadOnlyList<PlayerCharacter> GetPartyMembers()
         {
             return Companion is null ? [Mage, Warrior] : [Mage, Warrior, Companion];
         }
 
         /// <summary>
-        /// Возвращает только тех участников отряда, которые в данный момент живы.
+        /// Returns only the party members who are currently alive.
         /// </summary>
-        /// <returns>Список живых участников отряда.</returns>
+        /// <returns>The list of living party members.</returns>
         public IReadOnlyList<PlayerCharacter> GetAliveMembers()
         {
             return [.. GetPartyMembers().Where(member => member.IsAlive)];
         }
 
         /// <summary>
-        /// Загружает состояние обоих героев из данных сохранения.
+        /// Loads both heroes' state from save data.
         /// </summary>
         public void LoadFromSave(int mageHealth, int mageMaxHealth, int mageDamage, int mageDefense,
                                  int warriorHealth, int warriorMaxHealth, int warriorDamage, int warriorDefense)
@@ -130,9 +131,9 @@ namespace AlJourney.Scripts.Characters
         }
 
         /// <summary>
-        /// Возвращает объединенные характеристики обоих героев в виде единого кортежа.
+        /// Returns both heroes' combined stats as a single tuple.
         /// </summary>
-        /// <returns>Кортеж, содержащий текущее здоровье, максимальное здоровье, урон и защиту для обоих героев.</returns>
+        /// <returns>A tuple containing the current health, maximum health, damage and defense for both heroes.</returns>
         public (int mageHealth, int mageMaxHealth, int mageDamage, int mageDefense,
                 int warriorHealth, int warriorMaxHealth, int warriorDamage, int warriorDefense) GetCombinedStats()
         {
@@ -147,7 +148,7 @@ namespace AlJourney.Scripts.Characters
         }
 
         /// <summary>
-        /// Обрабатывает все активные статусные эффекты для всех участников отряда.
+        /// Processes every active status effect for every party member.
         /// </summary>
         public void ProcessStatusEffects()
         {

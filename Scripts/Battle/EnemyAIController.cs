@@ -9,9 +9,9 @@ using System.Linq;
 namespace AlJourney.Scripts.Battle
 {
     /// <summary>
-    /// Сервис для управления ИИ врагов и обработки их действий.
-    /// Работает с произвольным составом живого отряда игрока (2 героя + опциональный наёмник),
-    /// а не с захардкоженной парой Маг/Воин.
+    /// Service for controlling enemy AI and processing their actions.
+    /// Works with an arbitrary composition of the player's living party (2 heroes + an optional
+    /// mercenary), rather than a hardcoded Mage/Warrior pair.
     /// </summary>
     public static class EnemyAIController
     {
