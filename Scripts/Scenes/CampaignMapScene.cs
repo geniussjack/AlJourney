@@ -69,10 +69,7 @@ namespace AlJourney.Scripts.Scenes
         /// </summary>
         public override void _ExitTree()
         {
-            if (SaveSystem.Instance != null)
-            {
-                SaveSystem.Instance.SaveCompleted -= OnSaveCompleted;
-            }
+            SaveSystem.Instance?.SaveCompleted -= OnSaveCompleted;
         }
 
         /// <summary>

@@ -123,7 +123,7 @@ namespace AlJourney.Scripts.UI
             _ = SaveSystem.Instance.DeleteSave();
             GameStateManager.Instance.StartNewGame();
 
-            CutscenePlayer.Play(this, CutsceneDatabase.NewGameIntro, () => SceneManager.Instance.LoadScene(GameState.Map));
+            _ = CutscenePlayer.Play(this, CutsceneDatabase.NewGameIntro, () => SceneManager.Instance.LoadScene(GameState.Map));
         }
 
         private void OnContinuePressed()

@@ -170,7 +170,7 @@ namespace AlJourney.Scripts.Scenes
             {
                 if (defeatedNecromancer)
                 {
-                    CutscenePlayer.Play(GetNode<CanvasLayer>("CanvasLayer"), CutsceneDatabase.NecromancerDefeat, SceneManager.GoToMap);
+                    _ = CutscenePlayer.Play(GetNode<CanvasLayer>("CanvasLayer"), CutsceneDatabase.NecromancerDefeat, SceneManager.GoToMap);
                 }
                 else
                 {
