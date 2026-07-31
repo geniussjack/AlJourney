@@ -319,7 +319,7 @@ namespace AlJourney.Scripts.UI
         {
             GD.Print("[ShopUI] Closing shop, returning to campaign map");
             _ = (AudioManager.Instance?.TryPlaySfx("res://Resources/Audio/SFX/button_click.wav"));
-            _ = SaveSystem.Instance.SaveGame();
+            // No explicit save here: arriving at the campaign map autosaves once, centrally (see CampaignMapScene).
             SceneManager.GoToMap();
         }
 

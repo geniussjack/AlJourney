@@ -539,7 +539,6 @@ namespace AlJourney.Scripts.Battle
             );
 
             GameStateManager.Instance.CompleteLevel(_level.Id);
-            SaveSystem.Instance.AutoSave();
         }
 
         /// <summary>

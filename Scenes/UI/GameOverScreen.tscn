@@ -85,12 +85,7 @@ layout_mode = 2
 theme_override_constants/separation = 30
 alignment = 1
 
-[node name="MainMenuButton" type="Button" parent="CenterContainer/VBoxContainer/ButtonsContainer"]
+[node name="ExitButton" type="Button" parent="CenterContainer/VBoxContainer/ButtonsContainer"]
 layout_mode = 2
 custom_minimum_size = Vector2(160, 48)
-text = "Main Menu"
-
-[node name="NewGameButton" type="Button" parent="CenterContainer/VBoxContainer/ButtonsContainer"]
-layout_mode = 2
-custom_minimum_size = Vector2(160, 48)
-text = "New Game"
+text = "Exit"

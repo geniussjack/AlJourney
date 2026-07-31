@@ -16,10 +16,17 @@ namespace AlJourney.Scripts.Scenes
     /// </summary>
     public partial class CampaignMapScene : Control
     {
+        private Label _saveIndicatorLabel;
+
         /// <summary>
         /// Initializes the map screen: builds the list of locations and levels based on the current
-        /// save progress (<see cref="GameStateManager.CompletedLevelIds"/>).
+        /// save progress (<see cref="GameStateManager.CompletedLevelIds"/>), and autosaves.
         /// </summary>
+        /// <remarks>
+        /// The map is the single point where progress gets persisted: every "exit" flow (battle won,
+        /// battle lost, shop closed) funnels back here rather than each saving individually — see
+        /// <see cref="OnSaveCompleted"/> for the small indicator this shows the player.
+        /// </remarks>
         public override void _Ready()
         {
             SetAnchorsPreset(LayoutPreset.FullRect);
@@ -51,7 +58,39 @@ namespace AlJourney.Scripts.Scenes
                 locationsContainer.AddChild(BuildLocationSection(location, completedLevelIds));
             }
 
+            SaveSystem.Instance.SaveCompleted += OnSaveCompleted;
+            SaveSystem.Instance.AutoSave();
+
             GD.Print("[CampaignMapScene] Initialized");
+        }
+
+        /// <summary>
+        /// Unsubscribes from the save system when leaving the map, to avoid updating a freed label.
+        /// </summary>
+        public override void _ExitTree()
+        {
+            SaveSystem.Instance?.SaveCompleted -= OnSaveCompleted;
+        }
+
+        /// <summary>
+        /// Briefly shows a "Saved"/"Save failed" indicator next to the map title in response to the
+        /// autosave triggered in <see cref="_Ready"/>, fading it out automatically on success.
+        /// </summary>
+        private void OnSaveCompleted(bool success)
+        {
+            _saveIndicatorLabel.Modulate = success ? Colors.LightGreen : Colors.OrangeRed;
+            _saveIndicatorLabel.Text = success ? Tr("UI_MAP_SAVED") : Tr("UI_MAP_SAVE_FAILED");
+            _saveIndicatorLabel.Visible = true;
+
+            if (!success)
+            {
+                return;
+            }
+
+            Tween tween = CreateTween();
+            _ = tween.TweenInterval(1.2);
+            _ = tween.TweenProperty(_saveIndicatorLabel, "modulate:a", 0.0f, 0.6f);
+            _ = tween.TweenCallback(Callable.From(() => _saveIndicatorLabel.Visible = false));
         }
 
         private HBoxContainer BuildTopBar()
@@ -61,6 +100,9 @@ namespace AlJourney.Scripts.Scenes
 
             Label title = new() { Text = Tr("UI_MAP_TITLE"), SizeFlagsHorizontal = SizeFlags.ExpandFill };
             topBar.AddChild(title);
+
+            _saveIndicatorLabel = new Label { Visible = false };
+            topBar.AddChild(_saveIndicatorLabel);
 
             Button shopButton = new() { Text = Tr("UI_MAP_SHOP") };
             shopButton.Pressed += SceneManager.GoToShop;

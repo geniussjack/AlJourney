@@ -1,4 +1,5 @@
 using AlJourney.Scripts.Core;
+using AlJourney.Scripts.Data;
 using AlJourney.Scripts.Managers;
 using Godot;
 
@@ -79,14 +80,50 @@ namespace AlJourney.Scripts.UI
             _continueButton.Modulate = hasSave ? Colors.White : new Color(1, 1, 1, 0.45f);
         }
 
+        /// <summary>
+        /// Handles the "New Game" button. If a save already exists, asks for confirmation first since
+        /// starting over erases it; otherwise starts right away.
+        /// </summary>
         private void OnNewGamePressed()
+        {
+            GD.Print("[MainMenuUI] New game pressed");
+
+            if (SaveSystem.Instance.SaveFileExists())
+            {
+                ConfirmationDialog dialog = new()
+                {
+                    Title = Tr("UI_MAIN_MENU_NEW_GAME_CONFIRM_TITLE"),
+                    DialogText = Tr("UI_MAIN_MENU_NEW_GAME_CONFIRM_TEXT"),
+                    Theme = Theme
+                };
+
+                dialog.Confirmed += () =>
+                {
+                    dialog.QueueFree();
+                    BeginNewGame();
+                };
+                dialog.Canceled += dialog.QueueFree;
+
+                AddChild(dialog);
+                dialog.PopupCentered();
+                return;
+            }
+
+            BeginNewGame();
+        }
+
+        /// <summary>
+        /// Resets progress and starts a new game, playing the intro cutscene before handing off to the
+        /// campaign map.
+        /// </summary>
+        private void BeginNewGame()
         {
             AudioManager.Instance?.PlayNewGameSound();
             AudioManager.Instance?.PlayMusic("res://Resources/Audio/Music/main_theme.mp3", true);
-            GD.Print("[MainMenuUI] New game pressed");
             _ = SaveSystem.Instance.DeleteSave();
             GameStateManager.Instance.StartNewGame();
-            SceneManager.Instance.LoadScene(GameState.Map);
+
+            _ = CutscenePlayer.Play(this, CutsceneDatabase.NewGameIntro, () => SceneManager.Instance.LoadScene(GameState.Map));
         }
 
         private void OnContinuePressed()

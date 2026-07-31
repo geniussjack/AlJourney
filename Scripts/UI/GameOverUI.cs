@@ -5,15 +5,16 @@ using Godot;
 namespace AlJourney.Scripts.UI
 {
     /// <summary>
-    /// UI for the game over screen. Displays final stats and provides buttons to start a new game or return to the main menu.
+    /// UI for the game over screen. Displays the run's stats and a single "Exit" button that returns to
+    /// the campaign map — a defeat no longer wipes progress or ends the session (see
+    /// <see cref="Managers.SceneManager.GameOver"/>).
     /// </summary>
     public partial class GameOverUI : Control
     {
         private Label _waveReachedLabel;
         private Label _coinsCollectedLabel;
         private Label _enemiesDefeatedLabel;
-        private Button _mainMenuButton;
-        private Button _newGameButton;
+        private Button _exitButton;
 
         /// <summary>
         /// Called when the node is initialized. Sets up references to labels and buttons, subscribes to press events, and displays the stats.
@@ -23,14 +24,11 @@ namespace AlJourney.Scripts.UI
             _waveReachedLabel = GetNode<Label>("CenterContainer/VBoxContainer/StatsContainer/WaveLabel");
             _coinsCollectedLabel = GetNode<Label>("CenterContainer/VBoxContainer/StatsContainer/CoinsLabel");
             _enemiesDefeatedLabel = GetNode<Label>("CenterContainer/VBoxContainer/StatsContainer/EnemiesLabel");
-            _mainMenuButton = GetNode<Button>("CenterContainer/VBoxContainer/ButtonsContainer/MainMenuButton");
-            _newGameButton = GetNode<Button>("CenterContainer/VBoxContainer/ButtonsContainer/NewGameButton");
+            _exitButton = GetNode<Button>("CenterContainer/VBoxContainer/ButtonsContainer/ExitButton");
 
-            _mainMenuButton.Pressed += OnMainMenuPressed;
-            _newGameButton.Pressed += OnNewGamePressed;
+            _exitButton.Pressed += OnExitPressed;
 
-            _mainMenuButton.Text = Tr("UI_GAMEOVER_MAIN_MENU");
-            _newGameButton.Text = Tr("UI_GAMEOVER_RETRY");
+            _exitButton.Text = Tr("UI_GAMEOVER_EXIT");
             GetNode<Label>("CenterContainer/VBoxContainer/Title").Text = Tr("UI_GAMEOVER_TITLE");
             GetNode<Label>("CenterContainer/VBoxContainer/Subtitle").Text = Tr("UI_GAMEOVER_SUBTITLE");
             GetNode<Label>("CenterContainer/VBoxContainer/StatsContainer/StatsTitle").Text = Tr("UI_GAMEOVER_STATS_TITLE");
@@ -69,21 +67,16 @@ namespace AlJourney.Scripts.UI
             return wave * 4;
         }
 
-        private void OnMainMenuPressed()
+        /// <summary>
+        /// Exits the defeated battle back to the campaign map. Progress is kept — no save is deleted —
+        /// and the party is healed to full so the player can immediately retry or pick a different level.
+        /// </summary>
+        private void OnExitPressed()
         {
-            GD.Print("[GameOverUI] Returning to main menu");
+            GD.Print("[GameOverUI] Exiting to campaign map after defeat");
             _ = (AudioManager.Instance?.TryPlaySfx("res://Resources/Audio/SFX/button_click.wav"));
-            _ = SaveSystem.Instance.DeleteSave();
-            SceneManager.GoToMainMenu();
-        }
-
-        private void OnNewGamePressed()
-        {
-            GD.Print("[GameOverUI] Starting new game");
-            _ = (AudioManager.Instance?.TryPlaySfx("res://Resources/Audio/SFX/button_click.wav"));
-            _ = SaveSystem.Instance.DeleteSave();
-            GameStateManager.Instance.StartNewGame();
-            SceneManager.Instance.LoadScene(Core.GameState.Map);
+            GameStateManager.Instance.HealPartyToFull();
+            SceneManager.GoToMap();
         }
     }
 }

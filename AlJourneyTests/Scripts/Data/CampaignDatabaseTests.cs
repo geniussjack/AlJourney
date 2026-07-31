@@ -154,5 +154,11 @@ namespace AlJourneyTests.Scripts.Data
             Assert.Equal(keys.Count, keys.Distinct().Count());
             Assert.All(keys, key => Assert.StartsWith("LOCATION_", key));
         }
+
+        [Fact]
+        public void GetLocationNameKey_UnknownLocation_FallsBackToVillageRuins()
+        {
+            Assert.Equal("LOCATION_VILLAGE_RUINS", CampaignDatabase.GetLocationNameKey((LocationId)999));
+        }
     }
 }
