@@ -5,38 +5,38 @@ using System.Collections.Generic;
 namespace AlJourney.Scripts.Characters
 {
     /// <summary>
-    /// Класс врага. Наследует базовый класс Character.
-    /// Обрабатывает типы врагов, их базовые характеристики, скалирование с волнами
-    /// и специфические атаки.
+    /// Enemy class. Inherits from the base Character class.
+    /// Handles enemy types, their base stats, wave scaling
+    /// and type-specific attacks.
     /// </summary>
     public partial class Enemy : Character
     {
         private int _waveNumber;
 
         /// <summary>
-        /// Тип данного врага.
+        /// This enemy's type.
         /// </summary>
         public EnemyType EnemyType { get; private set; }
 
         /// <summary>
-        /// Награда в виде золотых монет за убийство данного врага.
+        /// The gold coin reward for defeating this enemy.
         /// </summary>
         public int CoinReward { get; private set; }
 
         /// <summary>
-        /// Текущее количество существ в отряде.
+        /// The current number of creatures in the stack.
         /// </summary>
         public int StackCount { get => field > 0 ? Mathf.CeilToInt(CurrentHealth / ((float)TotalMaxHealth / field)) : 1; private set; }
 
         public new string CharacterName => StackCount > 1 ? $"{Tr(_name)} x{StackCount}" : Tr(_name);
 
         /// <summary>
-        /// Является ли данный враг мини-боссом.
+        /// Whether this enemy is a miniboss.
         /// </summary>
         public bool IsMiniboss => EnemyType is EnemyType.GeneralOfDraugr or EnemyType.Arhiskeleton;
 
         /// <summary>
-        /// Является ли данный враг главным боссом.
+        /// Whether this enemy is the main boss.
         /// </summary>
         public bool IsBoss => EnemyType == EnemyType.Necromancer;
 
@@ -56,12 +56,12 @@ namespace AlJourney.Scripts.Characters
             };
 
         /// <summary>
-        /// Фабричный метод для создания и инициализации нового врага определенного типа.
+        /// Factory method that creates and initializes a new enemy of the given type.
         /// </summary>
-        /// <param name="enemyType">Тип врага из перечисления EnemyType.</param>
-        /// <param name="waveNumber">Номер текущей волны для скалирования характеристик врага.</param>
-        /// <param name="stackCount">Количество врагов в стаке.</param>
-        /// <returns>Новый настроенный экземпляр Enemy.</returns>
+        /// <param name="enemyType">The enemy type, from the EnemyType enum.</param>
+        /// <param name="waveNumber">The current wave number, used to scale the enemy's stats.</param>
+        /// <param name="stackCount">The number of enemies in the stack.</param>
+        /// <returns>A new, configured Enemy instance.</returns>
         public static Enemy Create(EnemyType enemyType, int waveNumber, int stackCount = 1)
         {
             Enemy enemy = new()
@@ -79,7 +79,7 @@ namespace AlJourney.Scripts.Characters
             int scaledReward = ScalingSystem.ScaleReward(coinReward, waveNumber);
 
             int totalHp = scaledHp * stackCount;
-            // Урон и защита будут учитываться в методах с учетом StackCount
+            // Damage and defense are accounted for by the methods below, factoring in StackCount
 
             enemy.Initialize(name, totalHp, scaledDmg, scaledDefense, attackType);
             enemy.CoinReward = scaledReward * stackCount;
@@ -94,10 +94,10 @@ namespace AlJourney.Scripts.Characters
         }
 
         /// <summary>
-        /// Вычисляет и возвращает наносимый урон врагом за текущий ход.
-        /// Учитывает особенности некоторых типов врагов.
+        /// Computes and returns the damage this enemy deals on the current turn.
+        /// Accounts for certain enemy types' special behavior.
         /// </summary>
-        /// <returns>Количество базового урона для нанесения героям.</returns>
+        /// <returns>The amount of base damage to deal to the heroes.</returns>
         public int PerformAttack()
         {
             if (!IsAlive || IsStunned)
@@ -145,18 +145,18 @@ namespace AlJourney.Scripts.Characters
         }
 
         /// <summary>
-        /// Определяет способность Некроманта, которую он будет использовать на текущем ходу.
-        /// Некромант использует ротацию способностей.
+        /// Determines which ability the Necromancer will use on the current turn.
+        /// The Necromancer cycles through its abilities.
         /// </summary>
-        /// <param name="turnNumber">Номер хода Некроманта в текущем бою.</param>
-        /// <returns>Способность для применения.</returns>
+        /// <param name="turnNumber">The Necromancer's turn number in the current battle.</param>
+        /// <returns>The ability to use.</returns>
         public NecromancerAbility GetNecromancerAbility(int turnNumber)
         {
             return EnemyType != EnemyType.Necromancer ? NecromancerAbility.None : (NecromancerAbility)((turnNumber % 3) + 1);
         }
 
         /// <summary>
-        /// Список доступных способностей для босса Некроманта.
+        /// The list of abilities available to the Necromancer boss.
         /// </summary>
         public enum NecromancerAbility
         {
