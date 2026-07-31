@@ -1,5 +1,7 @@
 keys,en,ru
 UI_MAIN_MENU_NEW_GAME,New Game,Новая игра
+UI_MAIN_MENU_NEW_GAME_CONFIRM_TITLE,Start New Game?,Начать новую игру?
+UI_MAIN_MENU_NEW_GAME_CONFIRM_TEXT,"This will erase your current progress. Are you sure?","Это сотрёт текущий прогресс. Вы уверены?"
 UI_MAIN_MENU_CONTINUE,Continue,Продолжить
 UI_MAIN_MENU_PLAY,Play,Играть
 UI_MAIN_MENU_SETTINGS,Settings,Настройки
@@ -59,6 +61,8 @@ UI_MAP_LOCKED,Locked,Заблокировано
 UI_MAP_COMPLETED,Completed,Пройдено
 UI_MAP_SHOP,Village Shop,Магазин поселения
 UI_MAP_MAIN_MENU,Main Menu,В главное меню
+UI_MAP_SAVED,Saved,Сохранено
+UI_MAP_SAVE_FAILED,Save failed,Не удалось сохранить
 UI_PAUSE_SAVE,Save Game,Сохранить
 CHARACTER_MAGE,Mage,Маг
 CHARACTER_WARRIOR,Warrior,Воин
@@ -78,6 +82,7 @@ UI_FULLSCREEN,Fullscreen,Полный экран
 UI_BORDERLESS,Borderless,Без рамок
 UI_WINDOWED,Windowed,Оконный
 UI_GAMEOVER_TITLE,Game Over,Игра Окончена
+UI_GAMEOVER_EXIT,Exit,Выйти
 UI_GAMEOVER_RETRY,Try Again,Попробовать снова
 UI_GAMEOVER_MAIN_MENU,Main Menu,В главное меню
 UI_GAMEOVER_WAVE_REACHED,Wave Reached:,Достигнута волна:
@@ -140,6 +145,12 @@ UI_HP_SHORT,HP,ОЗ
 UI_SHIELD_SHORT,Shield,Щит
 UI_CASCADE,CASCADE,КАСКАД
 UI_COMBO,Combo!,Комбо!
-
 UI_GAMEOVER_SUBTITLE,Both heroes have fallen...,Оба героя пали...
 UI_GAMEOVER_STATS_TITLE,Your Journey,Ваш Путь
+UI_CUTSCENE_SKIP_HINT,Hold Enter to skip,"Зажмите Enter, чтобы пропустить"
+CUTSCENE_NEW_GAME_INTRO_1,[Placeholder] New game intro - slide 1. Replace with real story text.,[Плейсхолдер] Интро новой игры - слайд 1. Заменить на настоящий текст.
+CUTSCENE_NEW_GAME_INTRO_2,[Placeholder] New game intro - slide 2. Replace with real story text.,[Плейсхолдер] Интро новой игры - слайд 2. Заменить на настоящий текст.
+CUTSCENE_NEW_GAME_INTRO_3,[Placeholder] New game intro - slide 3. Replace with real story text.,[Плейсхолдер] Интро новой игры - слайд 3. Заменить на настоящий текст.
+CUTSCENE_NECROMANCER_DEFEAT_1,[Placeholder] Necromancer defeat - slide 1. Replace with real story text.,[Плейсхолдер] Победа над некромантом - слайд 1. Заменить на настоящий текст.
+CUTSCENE_NECROMANCER_DEFEAT_2,[Placeholder] Necromancer defeat - slide 2. Replace with real story text.,[Плейсхолдер] Победа над некромантом - слайд 2. Заменить на настоящий текст.
+CUTSCENE_NECROMANCER_DEFEAT_3,[Placeholder] Necromancer defeat - slide 3. Replace with real story text.,[Плейсхолдер] Победа над некромантом - слайд 3. Заменить на настоящий текст.
