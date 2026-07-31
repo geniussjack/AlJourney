@@ -146,7 +146,7 @@ namespace AlJourney.Scripts.Data
         public static LevelDefinition GetNextMainLevel(string completedLevelId)
         {
             LevelDefinition completed = GetLevel(completedLevelId);
-            if (completed is null || completed.IsBranch)
+            if (completed?.IsBranch != false)
             {
                 return null;
             }
@@ -171,12 +171,7 @@ namespace AlJourney.Scripts.Data
             }
 
             int nextLocation = (int)completed.Location + 1;
-            if (nextLocation > (int)LocationId.NecromancerLair)
-            {
-                return null;
-            }
-
-            return GetFirstLevelOfLocation((LocationId)nextLocation);
+            return nextLocation > (int)LocationId.NecromancerLair ? null : GetFirstLevelOfLocation((LocationId)nextLocation);
         }
 
         private static LevelDefinition GetFirstLevelOfLocation(LocationId location)

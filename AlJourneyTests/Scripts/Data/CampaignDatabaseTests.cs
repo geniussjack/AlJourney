@@ -1,7 +1,5 @@
 using AlJourney.Scripts.Core;
 using AlJourney.Scripts.Data;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace AlJourneyTests.Scripts.Data
 {
@@ -60,7 +58,7 @@ namespace AlJourneyTests.Scripts.Data
                 .Where(level => !level.IsBranch)
                 .GroupBy(level => level.Location))
             {
-                List<int> orders = [.. group.Select(level => level.OrderInLocation).OrderBy(order => order)];
+                List<int> orders = [.. group.Select(level => level.OrderInLocation).Order()];
                 List<int> expected = [.. Enumerable.Range(1, orders.Count)];
 
                 Assert.Equal(expected, orders);
