@@ -4,11 +4,11 @@ using System.Collections.Generic;
 
 namespace AlJourney.Scripts.Data
 {
-    [Serializable]
     /// <summary>
     /// Класс, представляющий структуру данных для сохранения и загрузки прогресса игрока.
     /// Хранит состояние характеристик героев, инвентарь, экипировку, разблокированные способности и прогресс по волнам.
     /// </summary>
+    [Serializable]
     public class SaveData
     {
         /// <summary>

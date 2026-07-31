@@ -23,12 +23,10 @@ namespace AlJourney.Scripts.Characters
         /// </summary>
         public int CoinReward { get; private set; }
 
-        private int _initialStackCount;
-
         /// <summary>
         /// Текущее количество существ в отряде.
         /// </summary>
-        public int StackCount { get => _initialStackCount > 0 ? Mathf.CeilToInt(CurrentHealth / ((float)TotalMaxHealth / _initialStackCount)) : 1; private set { } }
+        public int StackCount { get => field > 0 ? Mathf.CeilToInt(CurrentHealth / ((float)TotalMaxHealth / field)) : 1; private set; }
 
         public new string CharacterName => StackCount > 1 ? $"{Tr(_name)} x{StackCount}" : Tr(_name);
 
@@ -70,7 +68,7 @@ namespace AlJourney.Scripts.Characters
             {
                 EnemyType = enemyType,
                 _waveNumber = waveNumber,
-                _initialStackCount = stackCount
+                StackCount = stackCount
             };
 
             (string name, int hp, int damage, int defense, AttackType attackType, int coinReward) = GetEnemyBaseStats(enemyType);
@@ -79,8 +77,6 @@ namespace AlJourney.Scripts.Characters
             int scaledDmg = ScalingSystem.ScaleEnemyStat(damage, waveNumber);
             int scaledDefense = ScalingSystem.ScaleEnemyStat(defense, waveNumber);
             int scaledReward = ScalingSystem.ScaleReward(coinReward, waveNumber);
-
-            enemy.StackCount = scaledHp;
 
             int totalHp = scaledHp * stackCount;
             // Урон и защита будут учитываться в методах с учетом StackCount

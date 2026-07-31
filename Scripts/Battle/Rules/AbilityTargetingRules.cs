@@ -1,3 +1,4 @@
+#nullable enable
 using AlJourney.Scripts.Core;
 using System;
 using System.Collections.Generic;
@@ -55,7 +56,7 @@ namespace AlJourney.Scripts.Battle.Rules
         public static IReadOnlyList<T> ResolveEffectTargets<T>(
             AbilityTargetType targetType,
             bool isAoE,
-            T chosenTarget,
+            T? chosenTarget,
             IReadOnlyList<T> allies,
             IReadOnlyList<T> enemies,
             Func<T, bool> isAlive) where T : class
@@ -75,7 +76,7 @@ namespace AlJourney.Scripts.Battle.Rules
         /// <param name="currentHealth">Функция, возвращающая текущее здоровье цели.</param>
         /// <param name="isAlive">Предикат, определяющий, жива ли цель.</param>
         /// <returns>Живая цель с наибольшим текущим здоровьем, или <c>null</c>, если живых кандидатов нет.</returns>
-        public static T SelectHighestHealthTarget<T>(
+        public static T? SelectHighestHealthTarget<T>(
             IReadOnlyList<T> candidates,
             Func<T, int> currentHealth,
             Func<T, bool> isAlive) where T : class
