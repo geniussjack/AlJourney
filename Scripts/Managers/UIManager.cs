@@ -5,34 +5,34 @@ using System.Collections.Generic;
 namespace AlJourney.Scripts.Managers
 {
     /// <summary>
-    /// Менеджер пользовательского интерфейса. Отвечает за открытие, закрытие и управление стеком экранов меню.
+    /// User interface manager. Responsible for opening, closing and managing the stack of menu screens.
     /// </summary>
     public partial class UIManager : Node, IUIManager
     {
         /// <summary>
-        /// Глобальный экземпляр менеджера интерфейса.
+        /// Global instance of the UI manager.
         /// </summary>
         public static UIManager Instance { get; private set; }
 
         [Signal]
         /// <summary>
-        /// Событие, вызываемое при открытии нового меню.
+        /// Raised when a new menu is opened.
         /// </summary>
-        /// <param name="menuName">Имя открытого меню.</param>
+        /// <param name="menuName">The name of the opened menu.</param>
         public delegate void MenuOpenedEventHandler(string menuName);
 
         [Signal]
         /// <summary>
-        /// Событие, вызываемое при закрытии меню.
+        /// Raised when a menu is closed.
         /// </summary>
-        /// <param name="menuName">Имя закрытого меню.</param>
+        /// <param name="menuName">The name of the closed menu.</param>
         public delegate void MenuClosedEventHandler(string menuName);
 
         private readonly Stack<Control> _menuStack = new();
         private Control _currentMenu;
 
         /// <summary>
-        /// Инициализирует менеджер интерфейса при добавлении в дерево сцены.
+        /// Initializes the UI manager when added to the scene tree.
         /// </summary>
         public override void _Ready()
         {
@@ -47,9 +47,9 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Открывает указанное меню, скрывая текущее и добавляя его в стек возврата.
+        /// Opens the given menu, hiding the current one and pushing it onto the back stack.
         /// </summary>
-        /// <param name="menu">Контрол меню, которое нужно открыть.</param>
+        /// <param name="menu">The menu control to open.</param>
         public void OpenMenu(Control menu)
         {
             if (menu == null)
@@ -72,7 +72,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Закрывает текущее активное меню и возвращает на экран предыдущее меню из стека.
+        /// Closes the currently active menu and returns to the previous menu on the stack.
         /// </summary>
         public void CloseCurrentMenu()
         {
@@ -100,7 +100,7 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Закрывает все открытые меню и очищает стек возврата.
+        /// Closes every open menu and clears the back stack.
         /// </summary>
         public void CloseAllMenus()
         {
