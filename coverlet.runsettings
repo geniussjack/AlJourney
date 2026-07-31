@@ -21,7 +21,7 @@
       <DataCollector friendlyName="XPlat Code Coverage">
         <Configuration>
           <Format>cobertura</Format>
-          <Exclude>[AlJourney]AlJourney.Scripts.Managers.*,[AlJourney]AlJourney.Scripts.UI.*,[AlJourney]AlJourney.Scripts.Scenes.*,[AlJourney]AlJourney.Scripts.Characters.*,[AlJourney]AlJourney.Scripts.Utils.*,[AlJourney]AlJourney.Scripts.Battle.BattleManager,[AlJourney]AlJourney.Scripts.Battle.CombatEffectProcessor,[AlJourney]AlJourney.Scripts.Battle.EnemyAIController,[AlJourney]AlJourney.Scripts.Battle.EnemySpawner</Exclude>
+          <Exclude>[AlJourney]AlJourney.Scripts.Managers.*,[AlJourney]AlJourney.Scripts.UI.*,[AlJourney]AlJourney.Scripts.Scenes.*,[AlJourney]AlJourney.Scripts.Characters.*,[AlJourney]AlJourney.Scripts.Utils.*,[AlJourney]AlJourney.Scripts.Battle.BattleManager,[AlJourney]AlJourney.Scripts.Battle.CombatEffectProcessor,[AlJourney]AlJourney.Scripts.Battle.EnemyAIController,[AlJourney]AlJourney.Scripts.Battle.EnemySpawner,[AlJourney]GodotPlugins.*</Exclude>
         </Configuration>
       </DataCollector>
     </DataCollectors>
