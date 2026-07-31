@@ -86,7 +86,7 @@ namespace AlJourney.Scripts.UI
             GD.Print("[MainMenuUI] New game pressed");
             _ = SaveSystem.Instance.DeleteSave();
             GameStateManager.Instance.StartNewGame();
-            SceneManager.Instance.LoadScene(GameState.Battle);
+            SceneManager.Instance.LoadScene(GameState.Map);
         }
 
         private void OnContinuePressed()

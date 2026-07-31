@@ -317,10 +317,10 @@ namespace AlJourney.Scripts.UI
 
         private void OnContinuePressed()
         {
-            GD.Print("[ShopUI] Continue to next wave");
+            GD.Print("[ShopUI] Closing shop, returning to campaign map");
             _ = (AudioManager.Instance?.TryPlaySfx("res://Resources/Audio/SFX/button_click.wav"));
             _ = SaveSystem.Instance.SaveGame();
-            SceneManager.ReturnToBattle();
+            SceneManager.GoToMap();
         }
 
         private void OnHomePressed()

@@ -85,7 +85,7 @@ namespace AlJourney.Scripts.UI
             _ = (AudioManager.Instance?.TryPlaySfx("res://Resources/Audio/SFX/button_click.wav"));
             _ = SaveSystem.Instance.DeleteSave();
             GameStateManager.Instance.StartNewGame();
-            SceneManager.Instance.LoadScene(Core.GameState.Battle);
+            SceneManager.Instance.LoadScene(Core.GameState.Map);
         }
     }
 }

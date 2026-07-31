@@ -33,6 +33,7 @@ namespace AlJourney.Scripts.Managers
         private readonly Dictionary<GameState, string> _scenePaths = new()
         {
             { GameState.MainMenu, "res://Scenes/UI/MainMenu.tscn" },
+            { GameState.Map, "res://Scenes/UI/CampaignMapScene.tscn" },
             { GameState.Battle, "res://Scenes/Battle/BattleScene.tscn" },
             { GameState.Shop, "res://Scenes/UI/ShopScene.tscn" },
             { GameState.GameOver, "res://Scenes/UI/GameOverScreen.tscn" },
@@ -148,16 +149,16 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Статический вспомогательный метод: запускает новую игру и переходит на сцену битвы.
+        /// Статический вспомогательный метод: запускает новую игру и переходит на карту кампании.
         /// </summary>
         public static void StartNewGame()
         {
             GameStateManager.Instance.StartNewGame();
-            Instance.LoadScene(GameState.Battle);
+            Instance.LoadScene(GameState.Map);
         }
 
         /// <summary>
-        /// Статический вспомогательный метод: загружает сохранение и продолжает игру на сцене битвы.
+        /// Статический вспомогательный метод: загружает сохранение и продолжает игру на карте кампании.
         /// </summary>
         public static void ContinueGame()
         {
@@ -165,7 +166,7 @@ namespace AlJourney.Scripts.Managers
             if (saveData != null)
             {
                 GameStateManager.Instance.LoadGame(saveData);
-                Instance.LoadScene(GameState.Battle);
+                Instance.LoadScene(GameState.Map);
             }
             else
             {
@@ -198,21 +199,22 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
+        /// Статический вспомогательный метод: переходит на карту кампании — хаб между уровнями,
+        /// откуда доступны магазин и выбор следующего уровня.
+        /// </summary>
+        public static void GoToMap()
+        {
+            GameStateManager.Instance.ChangeState(GameState.Map);
+            Instance.LoadScene(GameState.Map);
+        }
+
+        /// <summary>
         /// Статический вспомогательный метод: переходит на сцену магазина.
         /// </summary>
         public static void GoToShop()
         {
             GameStateManager.Instance.ChangeState(GameState.Shop);
             Instance.ShowOverlay("res://Scenes/UI/ShopScene.tscn");
-        }
-
-        /// <summary>
-        /// Статический вспомогательный метод: возвращается из других экранов на сцену битвы.
-        /// </summary>
-        public static void ReturnToBattle()
-        {
-            GameStateManager.Instance.ChangeState(GameState.Battle);
-            Instance.LoadScene(GameState.Battle);
         }
 
         /// <summary>
