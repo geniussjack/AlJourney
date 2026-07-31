@@ -58,12 +58,16 @@ namespace AlJourney.Scripts.Scenes
             _turnActionPanel = new TurnActionPanel();
             GetNode<CanvasLayer>("CanvasLayer").AddChild(_turnActionPanel);
 
-            _battleManager.WaveCompleted += OnWaveCompleted;
+            _battleManager.LevelCompleted += OnLevelCompleted;
+            _battleManager.WaveAdvanced += OnWaveAdvanced;
             _battleManager.BattleEnded += OnBattleEnded;
             _battleManager.EnemyDefeated += OnEnemyDefeated;
 
-            int currentWave = _gameStateManager.CurrentWave;
-            _battleManager.StartBattle(_heroSystem, currentWave, _cameraShake);
+            LevelDefinition level = CampaignDatabase.GetLevel(_gameStateManager.CurrentLevelId)
+                ?? CampaignDatabase.GetLevel(CampaignDatabase.FirstLevelId);
+
+            _gameStateManager.StartLevel(level);
+            _battleManager.StartBattle(_heroSystem, level, _cameraShake);
 
             _turnActionPanel.Initialize(_battleManager);
 
@@ -71,7 +75,7 @@ namespace AlJourney.Scripts.Scenes
 
             StartPortraitAnimations();
 
-            GD.Print($"[BattleScene] Battle started - Wave {currentWave}");
+            GD.Print($"[BattleScene] Battle started - Level {level.Id} (difficulty {level.DifficultyRating})");
         }
 
         private void StartPortraitAnimations()
@@ -140,7 +144,11 @@ namespace AlJourney.Scripts.Scenes
             GD.Print($"[BattleScene] Enemy defeated: {enemy.CharacterName}");
         }
 
-        private void OnWaveCompleted()
+        /// <summary>
+        /// Вызывается, когда все волны текущего уровня пройдены. Уровень (не волна) — это единица
+        /// выхода из боя: магазин здесь больше не открывается, игрок возвращается на карту кампании.
+        /// </summary>
+        private void OnLevelCompleted()
         {
             if (_isBattleTransitionQueued)
             {
@@ -148,11 +156,21 @@ namespace AlJourney.Scripts.Scenes
             }
 
             _isBattleTransitionQueued = true;
-            GD.Print("[BattleScene] Wave completed! Transitioning to shop...");
+            GD.Print("[BattleScene] Level completed! Transitioning to campaign map...");
 
             SaveHeroStats();
 
-            GetTree().CreateTimer(1.0f).Timeout += SceneManager.GoToShop;
+            GetTree().CreateTimer(1.0f).Timeout += SceneManager.GoToMap;
+        }
+
+        /// <summary>
+        /// Вызывается при переходе к следующей волне внутри того же уровня (бой продолжается без
+        /// выхода из сцены) — нужно обновить полоски здоровья врагов под новый состав.
+        /// </summary>
+        private void OnWaveAdvanced(int waveIndex, int totalWaves)
+        {
+            _battleHUD.SetupEnemies(_battleManager.Enemies);
+            GD.Print($"[BattleScene] Advanced to wave {waveIndex + 1}/{totalWaves} within the level");
         }
 
         private void OnBattleEnded(bool playerWon)
@@ -191,7 +209,8 @@ namespace AlJourney.Scripts.Scenes
         {
             if (_battleManager != null)
             {
-                _battleManager.WaveCompleted -= OnWaveCompleted;
+                _battleManager.LevelCompleted -= OnLevelCompleted;
+                _battleManager.WaveAdvanced -= OnWaveAdvanced;
                 _battleManager.BattleEnded -= OnBattleEnded;
                 _battleManager.EnemyDefeated -= OnEnemyDefeated;
             }
