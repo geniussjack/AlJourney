@@ -307,6 +307,26 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
+        /// Fully restores both heroes' health in the current save. Used when the player exits to the
+        /// campaign map after a defeat: the party keeps its progress but starts the next attempt at
+        /// full health rather than being permanently punished for the loss.
+        /// </summary>
+        public void HealPartyToFull()
+        {
+            if (CurrentSave == null)
+            {
+                return;
+            }
+
+            CurrentSave.MageHealth = CurrentSave.MageMaxHealth;
+            CurrentSave.WarriorHealth = CurrentSave.WarriorMaxHealth;
+
+            _ = EmitSignal(SignalName.HeroStatsChanged);
+
+            GD.Print("[GameStateManager] Party healed to full");
+        }
+
+        /// <summary>
         /// Changes the current global game state.
         /// </summary>
         /// <param name="newState">The new game state to transition to.</param>

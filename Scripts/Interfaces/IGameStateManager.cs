@@ -92,6 +92,11 @@ namespace AlJourney.Scripts.Interfaces
         void UpdateHeroStats(int mageHealth, int mageMaxHealth, int mageDamage, int mageDefense, int warriorHealth, int warriorMaxHealth, int warriorDamage, int warriorDefense);
 
         /// <summary>
+        /// Fully restores both heroes' health in the current save.
+        /// </summary>
+        void HealPartyToFull();
+
+        /// <summary>
         /// Changes the current global game state to a new one.
         /// </summary>
         void ChangeState(GameState newState);

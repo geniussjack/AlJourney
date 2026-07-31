@@ -218,11 +218,14 @@ namespace AlJourney.Scripts.Managers
         }
 
         /// <summary>
-        /// Static helper method: ends the game in defeat and navigates to the "Game Over" screen.
+        /// Static helper method: shows the "Game Over" screen after a defeat. Unlike a true
+        /// <see cref="GameStateManager.EndGame"/>, a defeat no longer ends the session: progress is kept,
+        /// and the player heals up and returns to the campaign map from the Game Over screen — so only the
+        /// display state changes here, <see cref="GameStateManager.IsGameActive"/> stays true.
         /// </summary>
         public static void GameOver()
         {
-            GameStateManager.Instance.EndGame(false);
+            GameStateManager.Instance.ChangeState(GameState.GameOver);
             Instance.ShowOverlay("res://Scenes/UI/GameOverScreen.tscn");
         }
     }
