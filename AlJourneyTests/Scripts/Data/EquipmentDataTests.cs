@@ -147,7 +147,7 @@ namespace AlJourneyTests.Scripts.Data
             Assert.Equal(6, result.BaseStats["damage"]);
             Assert.Equal(3, result.BaseStats["burn_damage"]);
 
-            // Исходный экземпляр не должен изменяться (иммутабельность record).
+            // The original instance must remain unchanged (record immutability).
             Assert.Equal(1, item.CurrentLevel);
             Assert.Equal(5, item.BaseStats["damage"]);
         }

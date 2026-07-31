@@ -86,9 +86,9 @@ namespace AlJourneyTests.Scripts.Data
 
             SaveData? result = SaveData.Migrate(save);
 
-            // SchemaVersion всегда равен 1 в текущей версии игры, поэтому только эта ветка
-            // достижима без запущенного движка Godot (иначе SaveData.Migrate обращается к Godot.GD.Print,
-            // недоступному в headless xUnit-процессе без Godot).
+            // SchemaVersion is always 1 in the current game version, so this is the only branch
+            // reachable without a running Godot engine (otherwise SaveData.Migrate calls Godot.GD.Print,
+            // which is unavailable in a headless xUnit process without Godot).
             Assert.Same(save, result);
         }
     }

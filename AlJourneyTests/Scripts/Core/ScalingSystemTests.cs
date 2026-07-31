@@ -4,11 +4,11 @@ namespace AlJourneyTests.Scripts.Core
 {
     public class ScalingSystemTests
     {
-        // Тестовые значения подобраны так, чтобы "чистый" математический результат (baseStat * множитель)
-        // не попадал точно на целое число: из-за погрешности float такое пограничное значение может
-        // случайным образом округлиться CeilToInt в большую сторону и сделать тест хрупким.
+        // Test values are chosen so the "clean" mathematical result (baseStat * multiplier) never
+        // lands exactly on an integer: due to float imprecision, such a borderline value could
+        // randomly round up via CeilToInt and make the test flaky.
         [Theory]
-        [InlineData(10, 0, 10)]   // wave 0 -> множитель ровно 1.0, без плавающей погрешности
+        [InlineData(10, 0, 10)]   // wave 0 -> multiplier exactly 1.0, no floating-point error
         [InlineData(13, 1, 15)]   // 13 * 1.10 = 14.3 -> Ceil = 15
         [InlineData(13, 5, 20)]   // 13 * 1.50 = 19.5 -> Ceil = 20
         public void ScaleEnemyStat_AppliesWaveCoefficientAndRoundsUp(int baseStat, int wave, int expected)

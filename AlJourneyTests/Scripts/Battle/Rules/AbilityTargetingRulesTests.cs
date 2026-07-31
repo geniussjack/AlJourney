@@ -4,7 +4,7 @@ using AlJourney.Scripts.Core;
 namespace AlJourneyTests.Scripts.Battle.Rules
 {
     /// <summary>
-    /// Лёгкий двойник цели для юнит-тестов, не зависящий от Godot.Node.
+    /// Lightweight target double for unit tests, independent of Godot.Node.
     /// </summary>
     public class FakeCombatant(string name, bool isAlive, int currentHealth = 0)
     {
