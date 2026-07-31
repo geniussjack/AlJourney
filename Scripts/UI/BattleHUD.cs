@@ -186,7 +186,7 @@ namespace AlJourney.Scripts.UI
                 {
                     Text = iconEmoji,
                     Modulate = rectColor,
-                    TooltipText = $"{effect.Type} (Осталось: {effect.Duration})",
+                    TooltipText = $"{effect.Type} ({Tr("UI_STATUS_DURATION_LABEL")} {effect.Duration})",
                     HorizontalAlignment = HorizontalAlignment.Center,
                     VerticalAlignment = VerticalAlignment.Center
                 };
@@ -528,7 +528,7 @@ namespace AlJourney.Scripts.UI
                 {
                     Text = iconEmoji,
                     Modulate = rectColor,
-                    TooltipText = $"{effect.Type} (Осталось: {effect.Duration})",
+                    TooltipText = $"{effect.Type} ({Tr("UI_STATUS_DURATION_LABEL")} {effect.Duration})",
                     HorizontalAlignment = HorizontalAlignment.Center,
                     VerticalAlignment = VerticalAlignment.Center
                 };
