@@ -5,16 +5,16 @@ namespace AlJourney.Scripts.Data
 {
     /// <summary>
     /// База данных способностей персонажей.
-    /// У Альтариона (Маг) и Алдрика (Пехотинец) — по одной атакующей и одной защитной/поддерживающей
-    /// способности каждый (Этап 1), плюс уникальная бespoke-ультимата у каждого (Этап 2). Это финальный
-    /// набор способностей для самих героев (не заглушка) — они не привязаны к экипировке и не
+    /// У Эльтариона (Маг) и Элдрика (Пехотинец) — по одной атакующей и одной защитной/поддерживающей
+    /// способности каждый (Этап 1), плюс уникальная ультимативная способность у каждого (Этап 2). Это
+    /// финальный набор способностей для самих героев (не заглушка) — они не привязаны к экипировке и не
     /// разблокируются за монеты, в отличие от будущих наёмников, чьи способности будут определяться
     /// подклассом/типом снаряжения.
     /// </summary>
     public static class AbilityDatabase
     {
         /// <summary>
-        /// Атакующая способность Альтариона: одиночный урон по врагу.
+        /// Атакующая способность Эльтариона: одиночный урон по врагу.
         /// </summary>
         public static readonly AbilityData AltarionAttack = new(
             "altarion_fireball", "ABILITY_ALTARION_FIREBALL", AbilityType.Attack, AbilityElement.Fire,
@@ -26,7 +26,7 @@ namespace AlJourney.Scripts.Data
         );
 
         /// <summary>
-        /// Защитная способность Альтариона: исцеление себя или союзника.
+        /// Защитная способность Эльтариона: исцеление себя или союзника.
         /// </summary>
         public static readonly AbilityData AltarionSupport = new(
             "altarion_healing_light", "ABILITY_ALTARION_HEALING_LIGHT", AbilityType.Support, AbilityElement.Heal,
@@ -38,7 +38,7 @@ namespace AlJourney.Scripts.Data
         );
 
         /// <summary>
-        /// Ультимативная способность Альтариона: огненный шторм по всем живым врагам (AoE).
+        /// Ультимативная способность Эльтариона: огненный шторм по всем живым врагам (AoE).
         /// </summary>
         public static readonly AbilityData AltarionUltimate = new(
             "altarion_meteor_storm", "ABILITY_ALTARION_METEOR_STORM", AbilityType.Attack, AbilityElement.Fire,
@@ -52,7 +52,7 @@ namespace AlJourney.Scripts.Data
         );
 
         /// <summary>
-        /// Атакующая способность Алдрика: одиночный удар по врагу.
+        /// Атакующая способность Элдрика: одиночный удар по врагу.
         /// </summary>
         public static readonly AbilityData AldricAttack = new(
             "aldric_sword_strike", "ABILITY_ALDRIC_SWORD_STRIKE", AbilityType.Attack, AbilityElement.Sword,
@@ -64,7 +64,7 @@ namespace AlJourney.Scripts.Data
         );
 
         /// <summary>
-        /// Защитная способность Алдрика: щит на себя или союзника.
+        /// Защитная способность Элдрика: щит на себя или союзника.
         /// </summary>
         public static readonly AbilityData AldricSupport = new(
             "aldric_shield_wall", "ABILITY_ALDRIC_SHIELD_WALL", AbilityType.Support, AbilityElement.Shield,
@@ -76,7 +76,7 @@ namespace AlJourney.Scripts.Data
         );
 
         /// <summary>
-        /// Ультимативная способность Алдрика: сокрушающий удар по врагу с наибольшим текущим HP.
+        /// Ультимативная способность Элдрика: сокрушающий удар по врагу с наибольшим текущим HP.
         /// Цель выбирается автоматически (см. <see cref="Battle.Rules.AbilityTargetingRules.SelectHighestHealthTarget"/>),
         /// без подтверждения игроком.
         /// </summary>
@@ -106,7 +106,7 @@ namespace AlJourney.Scripts.Data
 
         /// <summary>
         /// Возвращает пару фиксированных способностей (атака, защита) для главного героя указанного класса.
-        /// Применимо только к Альтариону/Алдрику — у наёмников способности будут определяться подклассом
+        /// Применимо только к Эльтариону/Элдрику — у наёмников способности будут определяться подклассом
         /// снаряжения, а не этим методом (см. REDESIGN_NOTES.md, раздел 4).
         /// </summary>
         /// <param name="heroClass">Класс героя.</param>
