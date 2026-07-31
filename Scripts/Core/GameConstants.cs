@@ -116,23 +116,10 @@ namespace AlJourney.Scripts.Core
         /// </summary>
         public const float ENEMY_DAMAGE_SCALE_PER_WAVE = 0.06f;
         /// <summary>
-        /// Максимально допустимое количество врагов в одной волне.
+        /// Максимально допустимое количество врагов в одной волне (используется, например, как предел
+        /// количества существ, которых может призвать некромант — см. EnemyAIController).
         /// </summary>
         public const int MAX_ENEMIES_PER_WAVE = 5;
-
-        /// <summary>
-        /// Базовое количество врагов на начальных волнах.
-        /// </summary>
-        public const int ENEMY_COUNT_BASE = 1;
-        /// <summary>
-        /// Интервал, через который количество врагов увеличивается на 1.
-        /// </summary>
-        public const int ENEMY_COUNT_INCREASE_EVERY = 2;
-
-        /// <summary>
-        /// Номер волны, начиная с которой могут появляться враги-скелеты.
-        /// </summary>
-        public const int SKELETON_UNLOCK_WAVE = 21;
 
         /// <summary>
         /// Интервал между появлениями мини-боссов.

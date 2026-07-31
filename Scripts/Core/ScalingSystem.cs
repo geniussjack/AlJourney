@@ -44,28 +44,5 @@ namespace AlJourney.Scripts.Core
         {
             return Mathf.CeilToInt(baseCost * (1 + (waveNumber * COST_COEFFICIENT)));
         }
-
-        /// <summary>
-        /// Определяет количество врагов, которые должны появиться на указанной волне.
-        /// Количество врагов постепенно увеличивается, но не превышает установленный максимум.
-        /// </summary>
-        /// <param name="waveNumber">Номер текущей волны.</param>
-        /// <returns>Количество врагов для генерации.</returns>
-        public static int GetEnemyCount(int waveNumber)
-        {
-            int count = GameConstants.ENEMY_COUNT_BASE
-                + ((waveNumber - 1) / GameConstants.ENEMY_COUNT_INCREASE_EVERY);
-            return Mathf.Min(count, GameConstants.MAX_ENEMIES_PER_WAVE);
-        }
-
-        /// <summary>
-        /// Проверяет, достигнута ли волна, на которой начинают появляться враги типа Скелет.
-        /// </summary>
-        /// <param name="waveNumber">Номер текущей волны.</param>
-        /// <returns>True, если текущая волна больше или равна волне разблокировки скелетов.</returns>
-        public static bool IsSkeletonUnlocked(int waveNumber)
-        {
-            return waveNumber >= GameConstants.SKELETON_UNLOCK_WAVE;
-        }
     }
 }
