@@ -28,6 +28,7 @@ namespace AlJourney.Scripts.UI
 
         private Label _coinsLabel;
         private Label _waveLabel;
+        private Label _ultimateChargeLabel;
 
 
         private DualHeroSystem _heroSystem;
@@ -68,6 +69,11 @@ namespace AlJourney.Scripts.UI
             _waveLabel = GetNode<Label>("MarginContainer/VBoxContainer/BottomBar/WaveLabel");
             _coinsLabel = GetNode<Label>("MarginContainer/VBoxContainer/BottomBar/CoinsContainer/CoinsLabel");
 
+            HBoxContainer bottomBar = GetNode<HBoxContainer>("MarginContainer/VBoxContainer/BottomBar");
+            _ultimateChargeLabel = new Label { HorizontalAlignment = HorizontalAlignment.Center };
+            bottomBar.AddChild(_ultimateChargeLabel);
+            UpdateUltimateCharge(0, BattleManager.MaxUltimateCharge);
+
             _inventoryButton = GetNode<Button>("MarginContainer/VBoxContainer/TopBar/InventoryButton");
             _inventoryButton.Pressed += OnInventoryButtonPressed;
 
@@ -104,6 +110,7 @@ namespace AlJourney.Scripts.UI
 
             _battleManager.TurnStateChanged += RefreshTargetHighlights;
             _battleManager.PhaseChanged += OnBattlePhaseChanged;
+            _battleManager.UltimateChargeChanged += OnUltimateChargeChanged;
 
             _mageInfoContainer.MouseFilter = MouseFilterEnum.Stop;
             _warriorInfoContainer.MouseFilter = MouseFilterEnum.Stop;
@@ -342,6 +349,17 @@ namespace AlJourney.Scripts.UI
             }
         }
 
+        private void OnUltimateChargeChanged(int charge, int maxCharge)
+        {
+            UpdateUltimateCharge(charge, maxCharge);
+        }
+
+        private void UpdateUltimateCharge(int charge, int maxCharge)
+        {
+            _ultimateChargeLabel.Text = $"{Tr("UI_BATTLE_ULTIMATE_CHARGE")} {charge}/{maxCharge}";
+            _ultimateChargeLabel.Modulate = charge >= maxCharge ? Colors.Gold : Colors.White;
+        }
+
         /// <summary>
         /// Вызывается при удалении узла из дерева. Отписывается от всех глобальных и локальных событий для предотвращения утечек памяти.
         /// </summary>
@@ -357,6 +375,7 @@ namespace AlJourney.Scripts.UI
             {
                 _battleManager.TurnStateChanged -= RefreshTargetHighlights;
                 _battleManager.PhaseChanged -= OnBattlePhaseChanged;
+                _battleManager.UltimateChargeChanged -= OnUltimateChargeChanged;
             }
 
             GameStateManager.Instance.CoinsChanged -= OnCoinsChanged;

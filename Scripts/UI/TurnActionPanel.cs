@@ -61,7 +61,13 @@ namespace AlJourney.Scripts.UI
 
             _battleManager.TurnStateChanged += Refresh;
             _battleManager.PhaseChanged += OnPhaseChanged;
+            _battleManager.UltimateChargeChanged += OnUltimateChargeChanged;
 
+            Refresh();
+        }
+
+        private void OnUltimateChargeChanged(int charge, int maxCharge)
+        {
             Refresh();
         }
 
@@ -109,6 +115,15 @@ namespace AlJourney.Scripts.UI
                 Button supportButton = new() { Text = Tr(support.Name) };
                 supportButton.Pressed += () => _battleManager.SelectAbility(support);
                 _abilityRow.AddChild(supportButton);
+
+                if (_battleManager.IsUltimateReady)
+                {
+                    AbilityData ultimate = AbilityDatabase.GetHeroUltimate(_battleManager.SelectedActor.CharacterClass);
+                    Button ultimateButton = new() { Text = $"{Tr("UI_BATTLE_ULTIMATE_READY")}: {Tr(ultimate.Name)}" };
+                    ultimateButton.Pressed += () => _battleManager.SelectAbility(ultimate);
+                    _abilityRow.AddChild(ultimateButton);
+                }
+
                 return;
             }
 
@@ -132,6 +147,7 @@ namespace AlJourney.Scripts.UI
             {
                 _battleManager.TurnStateChanged -= Refresh;
                 _battleManager.PhaseChanged -= OnPhaseChanged;
+                _battleManager.UltimateChargeChanged -= OnUltimateChargeChanged;
             }
         }
     }
