@@ -146,10 +146,10 @@ namespace AlJourney.Scripts.UI
             _warriorStatusContainer = new HBoxContainer() { Alignment = BoxContainer.AlignmentMode.Center };
             _warriorInfoContainer.AddChild(_warriorStatusContainer);
 
-            _heroSystem.Mage.StatusEffectAdded += (effectType, duration, power) => UpdateHeroStatusEffects(CharacterClass.Mage);
-            _heroSystem.Mage.StatusEffectRemoved += (effectType) => UpdateHeroStatusEffects(CharacterClass.Mage);
-            _heroSystem.Warrior.StatusEffectAdded += (effectType, duration, power) => UpdateHeroStatusEffects(CharacterClass.Warrior);
-            _heroSystem.Warrior.StatusEffectRemoved += (effectType) => UpdateHeroStatusEffects(CharacterClass.Warrior);
+            _heroSystem.Mage.StatusEffectAdded += (_, _, _) => UpdateHeroStatusEffects(CharacterClass.Mage);
+            _heroSystem.Mage.StatusEffectRemoved += (_) => UpdateHeroStatusEffects(CharacterClass.Mage);
+            _heroSystem.Warrior.StatusEffectAdded += (_, _, _) => UpdateHeroStatusEffects(CharacterClass.Warrior);
+            _heroSystem.Warrior.StatusEffectRemoved += (_) => UpdateHeroStatusEffects(CharacterClass.Warrior);
 
             GD.Print($"[BattleHUD] Initialized for {_heroSystem.Mage.CharacterName} and {_heroSystem.Warrior.CharacterName}");
         }
@@ -494,8 +494,8 @@ namespace AlJourney.Scripts.UI
             Node textContainer = _healthLabel.GetParent();
             textContainer.AddChild(_statusContainer);
 
-            Enemy.StatusEffectAdded += (effectType, duration, power) => UpdateStatusEffects();
-            Enemy.StatusEffectRemoved += (effectType) => UpdateStatusEffects();
+            Enemy.StatusEffectAdded += (_, _, _) => UpdateStatusEffects();
+            Enemy.StatusEffectRemoved += (_) => UpdateStatusEffects();
             UpdateStatusEffects();
         }
 
