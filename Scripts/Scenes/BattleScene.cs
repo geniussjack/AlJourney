@@ -9,9 +9,9 @@ using Godot;
 namespace AlJourney.Scripts.Scenes
 {
     /// <summary>
-    /// Главный контроллер сцены боя.
-    /// Объединяет и координирует все системы, связанные с битвой:
-    /// пользовательский интерфейс, систему отряда героев и менеджер пошагового боя.
+    /// Main controller for the battle scene.
+    /// Wires together and coordinates every system involved in combat:
+    /// the UI, the hero party system, and the turn-based combat manager.
     /// </summary>
     public partial class BattleScene : Node
     {
@@ -26,9 +26,9 @@ namespace AlJourney.Scripts.Scenes
         private bool _isBattleTransitionQueued;
 
         /// <summary>
-        /// Инициализирует сцену боя. Настраивает камеру, загружает данные героев из сохранения,
-        /// инициализирует интерфейс и подписывается на события.
-        /// Запускает начало битвы для текущей волны.
+        /// Initializes the battle scene. Sets up the camera, loads hero data from the save,
+        /// initializes the UI, and subscribes to events.
+        /// Starts the battle for the current wave.
         /// </summary>
         public override void _Ready()
         {
@@ -145,8 +145,8 @@ namespace AlJourney.Scripts.Scenes
         }
 
         /// <summary>
-        /// Вызывается, когда все волны текущего уровня пройдены. Уровень (не волна) — это единица
-        /// выхода из боя: магазин здесь больше не открывается, игрок возвращается на карту кампании.
+        /// Called once every wave of the current level has been cleared. The level (not the wave) is the
+        /// unit of exiting combat: the shop no longer opens here, the player returns to the campaign map.
         /// </summary>
         private void OnLevelCompleted()
         {
@@ -164,8 +164,8 @@ namespace AlJourney.Scripts.Scenes
         }
 
         /// <summary>
-        /// Вызывается при переходе к следующей волне внутри того же уровня (бой продолжается без
-        /// выхода из сцены) — нужно обновить полоски здоровья врагов под новый состав.
+        /// Called when advancing to the next wave within the same level (combat continues without
+        /// leaving the scene) — the enemy health bars need to refresh for the new lineup.
         /// </summary>
         private void OnWaveAdvanced(int waveIndex, int totalWaves)
         {
@@ -201,9 +201,9 @@ namespace AlJourney.Scripts.Scenes
         }
 
         /// <summary>
-        /// Выполняется при удалении сцены боя из дерева узлов.
-        /// Отписывается от всех событий менеджеров, чтобы избежать утечек памяти и вызовов методов уничтоженных объектов,
-        /// а также корректно завершает бой.
+        /// Runs when the battle scene is removed from the node tree.
+        /// Unsubscribes from every manager event to avoid memory leaks and calls into destroyed
+        /// objects, and properly wraps up the battle.
         /// </summary>
         public override void _ExitTree()
         {

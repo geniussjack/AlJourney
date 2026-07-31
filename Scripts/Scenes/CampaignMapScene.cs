@@ -8,17 +8,17 @@ using System.Linq;
 namespace AlJourney.Scripts.Scenes
 {
     /// <summary>
-    /// Экран карты кампании — хаб между уровнями. Показывает локации по порядку прохождения
-    /// (от руин деревни к логову некроманта), последовательно разблокирующиеся уровни основной линии
-    /// и их ответвления, а также предоставляет вход в магазин поселения (см. REDESIGN_NOTES.md, Этап 3).
-    /// Строится полностью в коде по аналогии с <see cref="UI.BattleHUD"/>/<see cref="UI.TurnActionPanel"/>,
-    /// не использует заранее подготовленные в редакторе дочерние узлы кроме корневого Control.
+    /// The campaign map screen — the hub between levels. Shows locations in playthrough order (from
+    /// the village ruins to the necromancer's lair), the main line's sequentially unlocking levels and
+    /// their branches, and provides access to the settlement shop (see REDESIGN_NOTES.md, Stage 3).
+    /// Built entirely in code, similar to <see cref="UI.BattleHUD"/>/<see cref="UI.TurnActionPanel"/> —
+    /// doesn't use any editor-authored child nodes besides the root Control.
     /// </summary>
     public partial class CampaignMapScene : Control
     {
         /// <summary>
-        /// Инициализирует экран карты: строит список локаций и уровней на основе текущего прогресса
-        /// сохранения (<see cref="GameStateManager.CompletedLevelIds"/>).
+        /// Initializes the map screen: builds the list of locations and levels based on the current
+        /// save progress (<see cref="GameStateManager.CompletedLevelIds"/>).
         /// </summary>
         public override void _Ready()
         {

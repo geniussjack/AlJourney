@@ -3,9 +3,9 @@ using Godot;
 namespace AlJourney.Scripts.Utils
 {
     /// <summary>
-    /// Компонент для создания эффекта тряски камеры.
-    /// Должен быть добавлен как дочерний узел к объекту Camera2D.
-    /// Используется для усиления визуальной обратной связи при получении урона, мощных атаках или взрывах.
+    /// Component that creates a camera shake effect.
+    /// Must be added as a child node of a Camera2D.
+    /// Used to reinforce visual feedback when taking damage, on powerful attacks, or during explosions.
     /// </summary>
     public partial class CameraShake : Node
     {
@@ -17,8 +17,8 @@ namespace AlJourney.Scripts.Utils
         private bool _isShaking;
 
         /// <summary>
-        /// Метод инициализации. Проверяет наличие родительской камеры
-        /// и сохраняет ее изначальное смещение для последующего возврата в исходное состояние.
+        /// Initialization method. Checks for a parent camera
+        /// and stores its original offset so it can be restored afterward.
         /// </summary>
         public override void _Ready()
         {
@@ -36,11 +36,11 @@ namespace AlJourney.Scripts.Utils
         }
 
         /// <summary>
-        /// Выполняется каждый кадр.
-        /// Если тряска активна, применяет случайное смещение к родительской камере с учетом текущей интенсивности.
-        /// По истечении времени возвращает камеру в исходную позицию.
+        /// Runs every frame.
+        /// If shaking is active, applies a random offset to the parent camera based on the current intensity.
+        /// Once the timer runs out, restores the camera to its original position.
         /// </summary>
-        /// <param name="delta">Время, прошедшее с предыдущего кадра.</param>
+        /// <param name="delta">Time elapsed since the previous frame.</param>
         public override void _Process(double delta)
         {
             if (!_isShaking || _camera == null)
@@ -67,10 +67,10 @@ namespace AlJourney.Scripts.Utils
         }
 
         /// <summary>
-        /// Запускает эффект тряски камеры с заданными параметрами.
+        /// Starts the camera shake effect with the given parameters.
         /// </summary>
-        /// <param name="intensity">Интенсивность тряски в пикселях.</param>
-        /// <param name="duration">Продолжительность эффекта в секундах.</param>
+        /// <param name="intensity">Shake intensity, in pixels.</param>
+        /// <param name="duration">Effect duration, in seconds.</param>
         public void Shake(float intensity = 10.0f, float duration = 0.3f)
         {
             if (_camera == null)
@@ -87,8 +87,8 @@ namespace AlJourney.Scripts.Utils
         }
 
         /// <summary>
-        /// Запускает легкую тряску камеры.
-        /// Подходит для слабых ударов или незначительных событий.
+        /// Starts a light camera shake.
+        /// Suited for weak hits or minor events.
         /// </summary>
         public void ShakeLight()
         {
@@ -96,8 +96,8 @@ namespace AlJourney.Scripts.Utils
         }
 
         /// <summary>
-        /// Запускает среднюю тряску камеры.
-        /// Подходит для обычных атак или стандартных эффектов.
+        /// Starts a medium camera shake.
+        /// Suited for regular attacks or standard effects.
         /// </summary>
         public void ShakeMedium()
         {
@@ -105,8 +105,8 @@ namespace AlJourney.Scripts.Utils
         }
 
         /// <summary>
-        /// Запускает сильную тряску камеры.
-        /// Подходит для критических ударов, взрывов или мощных заклинаний.
+        /// Starts a strong camera shake.
+        /// Suited for critical hits, explosions, or powerful spells.
         /// </summary>
         public void ShakeStrong()
         {
@@ -114,7 +114,7 @@ namespace AlJourney.Scripts.Utils
         }
 
         /// <summary>
-        /// Немедленно останавливает тряску камеры и возвращает ее в исходное положение.
+        /// Immediately stops the camera shake and returns it to its original position.
         /// </summary>
         public void StopShake()
         {

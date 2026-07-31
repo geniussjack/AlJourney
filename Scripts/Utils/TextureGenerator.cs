@@ -3,18 +3,18 @@ using Godot;
 namespace AlJourney.Scripts.Utils
 {
     /// <summary>
-    /// Утилитарный статический класс для программной генерации текстур.
-    /// Используется для создания простых графических примитивов,
-    /// что позволяет избежать необходимости импортировать внешние изображения для прототипирования.
+    /// Utility static class for generating textures programmatically.
+    /// Used to create simple graphic primitives,
+    /// avoiding the need to import external images for prototyping.
     /// </summary>
     public static class TextureGenerator
     {
         /// <summary>
-        /// Создает сплошную квадратную текстуру заданного цвета и размера.
+        /// Creates a solid square texture of the given color and size.
         /// </summary>
-        /// <param name="color">Цвет текстуры.</param>
-        /// <param name="size">Ширина и высота квадрата в пикселях.</param>
-        /// <returns>Сгенерированная текстура, готовая к использованию в UI или спрайтах.</returns>
+        /// <param name="color">The texture color.</param>
+        /// <param name="size">The width and height of the square, in pixels.</param>
+        /// <returns>The generated texture, ready to use in UI or sprites.</returns>
         public static Texture2D CreateColorSquare(Color color, int size = 64)
         {
             Image image = Image.CreateEmpty(size, size, false, Image.Format.Rgba8);
@@ -23,13 +23,13 @@ namespace AlJourney.Scripts.Utils
         }
 
         /// <summary>
-        /// Создает квадратную текстуру с заливкой и рамкой по краям.
+        /// Creates a square texture with a fill color and a border.
         /// </summary>
-        /// <param name="fillColor">Основной цвет заливки.</param>
-        /// <param name="borderColor">Цвет рамки.</param>
-        /// <param name="size">Ширина и высота квадрата в пикселях.</param>
-        /// <param name="borderWidth">Толщина рамки в пикселях.</param>
-        /// <returns>Сгенерированная текстура с рамкой.</returns>
+        /// <param name="fillColor">The main fill color.</param>
+        /// <param name="borderColor">The border color.</param>
+        /// <param name="size">The width and height of the square, in pixels.</param>
+        /// <param name="borderWidth">The border thickness, in pixels.</param>
+        /// <returns>The generated texture with a border.</returns>
         public static Texture2D CreateColorSquareWithBorder(Color fillColor, Color borderColor, int size = 64, int borderWidth = 4)
         {
             Image image = Image.CreateEmpty(size, size, false, Image.Format.Rgba8);
