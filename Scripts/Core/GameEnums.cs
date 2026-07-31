@@ -6,6 +6,7 @@ namespace AlJourney.Scripts.Core
     public enum GameState
     {
         MainMenu,
+        Map,
         Battle,
         Shop,
         GameOver,
@@ -130,5 +131,18 @@ namespace AlJourney.Scripts.Core
     {
         Enemy,
         AllyOrSelf
+    }
+
+    /// <summary>
+    /// Локации карты кампании, расположенные по мере удаления от деревни к логову некроманта.
+    /// Порядок объявления соответствует порядку прохождения.
+    /// </summary>
+    public enum LocationId
+    {
+        VillageRuins,
+        DarkForest,
+        BuriedCatacombs,
+        FrozenWastes,
+        NecromancerLair
     }
 }
