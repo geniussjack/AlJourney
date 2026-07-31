@@ -140,7 +140,7 @@ namespace AlJourneyTests.Scripts.Battle.Rules
                 new("Slime", true, currentHealth: 50)
             ];
 
-            FakeCombatant result = AbilityTargetingRules.SelectHighestHealthTarget(candidates, CurrentHealth, IsAlive);
+            FakeCombatant? result = AbilityTargetingRules.SelectHighestHealthTarget(candidates, CurrentHealth, IsAlive);
 
             Assert.Same(candidates[1], result);
         }
@@ -154,7 +154,7 @@ namespace AlJourneyTests.Scripts.Battle.Rules
                 new("Zombie", false, currentHealth: 999)
             ];
 
-            FakeCombatant result = AbilityTargetingRules.SelectHighestHealthTarget(candidates, CurrentHealth, IsAlive);
+            FakeCombatant? result = AbilityTargetingRules.SelectHighestHealthTarget(candidates, CurrentHealth, IsAlive);
 
             Assert.Same(candidates[0], result);
         }
@@ -164,9 +164,51 @@ namespace AlJourneyTests.Scripts.Battle.Rules
         {
             List<FakeCombatant> candidates = [new("Skeleton", false, currentHealth: 30)];
 
-            FakeCombatant result = AbilityTargetingRules.SelectHighestHealthTarget(candidates, CurrentHealth, IsAlive);
+            FakeCombatant? result = AbilityTargetingRules.SelectHighestHealthTarget(candidates, CurrentHealth, IsAlive);
 
             Assert.Null(result);
+        }
+
+        [Fact]
+        public void GetValidTargets_NullAllies_ThrowsArgumentNullException()
+        {
+            _ = Assert.Throws<ArgumentNullException>(
+                () => AbilityTargetingRules.GetValidTargets<FakeCombatant>(AbilityTargetType.Enemy, null!, [], IsAlive));
+        }
+
+        [Fact]
+        public void GetValidTargets_NullEnemies_ThrowsArgumentNullException()
+        {
+            _ = Assert.Throws<ArgumentNullException>(
+                () => AbilityTargetingRules.GetValidTargets<FakeCombatant>(AbilityTargetType.Enemy, [], null!, IsAlive));
+        }
+
+        [Fact]
+        public void GetValidTargets_NullIsAlivePredicate_ThrowsArgumentNullException()
+        {
+            _ = Assert.Throws<ArgumentNullException>(
+                () => AbilityTargetingRules.GetValidTargets<FakeCombatant>(AbilityTargetType.Enemy, [], [], null!));
+        }
+
+        [Fact]
+        public void SelectHighestHealthTarget_NullCandidates_ThrowsArgumentNullException()
+        {
+            _ = Assert.Throws<ArgumentNullException>(
+                () => AbilityTargetingRules.SelectHighestHealthTarget<FakeCombatant>(null!, CurrentHealth, IsAlive));
+        }
+
+        [Fact]
+        public void SelectHighestHealthTarget_NullCurrentHealthSelector_ThrowsArgumentNullException()
+        {
+            _ = Assert.Throws<ArgumentNullException>(
+                () => AbilityTargetingRules.SelectHighestHealthTarget<FakeCombatant>([], null!, IsAlive));
+        }
+
+        [Fact]
+        public void SelectHighestHealthTarget_NullIsAlivePredicate_ThrowsArgumentNullException()
+        {
+            _ = Assert.Throws<ArgumentNullException>(
+                () => AbilityTargetingRules.SelectHighestHealthTarget<FakeCombatant>([], CurrentHealth, null!));
         }
     }
 }
