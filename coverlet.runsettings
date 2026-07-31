@@ -13,7 +13,7 @@
   the pure-logic code that unit tests are expected to exercise: Scripts.Core, Scripts.Data and
   Scripts.Battle.Rules.
 
-  Usage: dotnet test --collect:"XPlat Code Coverage" --settings coverlet.runsettings
+  Usage: dotnet test /collect:"XPlat Code Coverage" /settings:coverlet.runsettings
 -->
 <RunSettings>
   <DataCollectionRunSettings>
