@@ -19,7 +19,8 @@ namespace AlJourney.Scripts.Data
         int UnlockCost,
         Dictionary<string, int> Effects,
         AbilityTargetType TargetType,
-        bool IsAoE = false
+        bool IsAoE = false,
+        bool IsUltimate = false
     )
     {
         /// <summary>

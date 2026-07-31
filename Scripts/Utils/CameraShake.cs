@@ -119,7 +119,7 @@ namespace AlJourney.Scripts.Utils
         public void StopShake()
         {
             _isShaking = false;
-            _ = _camera?.Offset = _originalOffset;
+            _camera?.Offset = _originalOffset;
         }
     }
 }

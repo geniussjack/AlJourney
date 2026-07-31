@@ -144,10 +144,7 @@ namespace AlJourney.Scripts.Characters
         /// <returns>Конечное значение исцеления.</returns>
         public static int CalculateHealing(int baseHealing)
         {
-            int finalHealing = baseHealing;
-
-
-            return finalHealing;
+            return baseHealing;
         }
 
         /// <summary>
@@ -157,10 +154,7 @@ namespace AlJourney.Scripts.Characters
         /// <returns>Конечное значение прочности щита.</returns>
         public static int CalculateShield(int baseShield)
         {
-            int finalShield = baseShield;
-
-
-            return finalShield;
+            return baseShield;
         }
 
         /// <summary>

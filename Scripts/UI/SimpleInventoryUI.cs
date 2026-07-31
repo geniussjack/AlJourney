@@ -236,7 +236,7 @@ namespace AlJourney.Scripts.UI
             _weaponIcon.Texture = ResourceLoader.Exists(iconPath) ? GD.Load<Texture2D>(iconPath) : null;
 
             int cost = weapon.GetUpgradeCost(GameStateManager.Instance.CurrentWave);
-            _upgradeBtn.Text = $"{Tr("UI_UPGRADE")} ({cost} {Tr("UI_COINS").ToString().ToLower()})";
+            _upgradeBtn.Text = $"{Tr("UI_UPGRADE")} ({cost} {Tr("UI_COINS").ToLower()})";
             _upgradeBtn.Disabled = GameStateManager.Instance.Coins < cost;
             _coinsLabel.Text = $"{Tr("UI_COINS")}: {GameStateManager.Instance.Coins}";
         }

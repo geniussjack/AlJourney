@@ -48,6 +48,7 @@ namespace AlJourney.Scripts.Battle
                 AudioManager.Instance?.PlayAttackSound();
                 cameraShake?.ShakeLight();
                 int reflected = target.TakeDamage(damage, enemy.AttackType, canReflect: true);
+                battleManager.AddUltimateCharge(BattleManager.UltimateChargePerAction);
 
                 AudioManager.Instance?.PlayHitSound();
                 Vector2 targetPos = CombatEffectProcessor.GetAllyVfxPosition(target, battleManager.HeroSystem);
@@ -88,7 +89,7 @@ namespace AlJourney.Scripts.Battle
             }
             else if (ability == Enemy.NecromancerAbility.DarkBolt)
             {
-                ExecuteNecromancerDarkBolt(necromancer, target);
+                ExecuteNecromancerDarkBolt(necromancer, target, battleManager);
             }
             else if (ability == Enemy.NecromancerAbility.WeakeningDarkness)
             {
@@ -108,10 +109,12 @@ namespace AlJourney.Scripts.Battle
             }
         }
 
-        private static void ExecuteNecromancerDarkBolt(Enemy necromancer, PlayerCharacter target)
+        private static void ExecuteNecromancerDarkBolt(Enemy necromancer, PlayerCharacter target, BattleManager battleManager)
         {
             int damage = necromancer.PerformAttack();
             int reflected = target.TakeDamage(damage, AttackType.Magical, canReflect: true);
+            battleManager.AddUltimateCharge(BattleManager.UltimateChargePerAction);
+
             if (reflected > 0)
             {
                 _ = necromancer.TakeDamage(reflected, target.AttackType, canReflect: false);

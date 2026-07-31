@@ -24,15 +24,11 @@ namespace AlJourney.Scripts.Managers
         /// </summary>
         public float MasterVolume
         {
-            get => field;
+            get;
             set
             {
                 field = Mathf.Clamp(value, 0.0f, 1.0f);
-                int busIndex = AudioServer.GetBusIndex("Master");
-                if (busIndex >= 0)
-                {
-                    AudioServer.SetBusVolumeDb(busIndex, Mathf.LinearToDb(field));
-                }
+                ApplyBusVolume("Master", field);
             }
         } = 1.0f;
 
@@ -41,15 +37,11 @@ namespace AlJourney.Scripts.Managers
         /// </summary>
         public float MusicVolume
         {
-            get => field;
+            get;
             set
             {
                 field = Mathf.Clamp(value, 0.0f, 1.0f);
-                int busIndex = AudioServer.GetBusIndex("Music");
-                if (busIndex >= 0)
-                {
-                    AudioServer.SetBusVolumeDb(busIndex, Mathf.LinearToDb(field));
-                }
+                ApplyBusVolume("Music", field);
             }
         } = 0.7f;
 
@@ -58,17 +50,28 @@ namespace AlJourney.Scripts.Managers
         /// </summary>
         public float SfxVolume
         {
-            get => field;
+            get;
             set
             {
                 field = Mathf.Clamp(value, 0.0f, 1.0f);
-                int busIndex = AudioServer.GetBusIndex("SFX");
-                if (busIndex >= 0)
-                {
-                    AudioServer.SetBusVolumeDb(busIndex, Mathf.LinearToDb(field));
-                }
+                ApplyBusVolume("SFX", field);
             }
         } = 0.8f;
+
+        /// <summary>
+        /// Применяет линейное значение громкости к указанной аудио-шине Godot, переводя его в децибелы.
+        /// Ничего не делает, если шина с таким именем не найдена (например, при кастомной аудио-конфигурации).
+        /// </summary>
+        /// <param name="busName">Имя аудио-шины ("Master", "Music" или "SFX").</param>
+        /// <param name="linearVolume">Громкость в линейной шкале от 0.0 до 1.0.</param>
+        private static void ApplyBusVolume(string busName, float linearVolume)
+        {
+            int busIndex = AudioServer.GetBusIndex(busName);
+            if (busIndex >= 0)
+            {
+                AudioServer.SetBusVolumeDb(busIndex, Mathf.LinearToDb(linearVolume));
+            }
+        }
 
         /// <summary>
         /// Инициализирует аудиоплееры для музыки и эффектов при добавлении в дерево сцены.
@@ -103,10 +106,10 @@ namespace AlJourney.Scripts.Managers
                 _sfxPlayers.Add(sfxPlayer);
             }
 
-            // Инициализация громкости шин
-            MasterVolume = MasterVolume;
-            MusicVolume = MusicVolume;
-            SfxVolume = SfxVolume;
+            // Инициализация громкости шин значениями, заданными инициализаторами полей.
+            ApplyBusVolume("Master", MasterVolume);
+            ApplyBusVolume("Music", MusicVolume);
+            ApplyBusVolume("SFX", SfxVolume);
 
             GetTree().NodeAdded += OnNodeAdded;
             HookExistingNodes(GetTree().Root);
@@ -248,7 +251,7 @@ namespace AlJourney.Scripts.Managers
                 }
 
                 button.Pressed += PlayChoiceRightSound;
-                button.GuiInput += (InputEvent @event) =>
+                button.GuiInput += (@event) =>
                 {
                     if (button.Disabled && @event is InputEventMouseButton mouseEvent && mouseEvent.Pressed && mouseEvent.ButtonIndex == MouseButton.Left)
                     {

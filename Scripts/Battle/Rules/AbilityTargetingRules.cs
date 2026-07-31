@@ -1,3 +1,4 @@
+#nullable enable
 using AlJourney.Scripts.Core;
 using System;
 using System.Collections.Generic;
@@ -55,7 +56,7 @@ namespace AlJourney.Scripts.Battle.Rules
         public static IReadOnlyList<T> ResolveEffectTargets<T>(
             AbilityTargetType targetType,
             bool isAoE,
-            T chosenTarget,
+            T? chosenTarget,
             IReadOnlyList<T> allies,
             IReadOnlyList<T> enemies,
             Func<T, bool> isAlive) where T : class
@@ -63,6 +64,28 @@ namespace AlJourney.Scripts.Battle.Rules
             return !isAoE
                 ? chosenTarget is not null && isAlive(chosenTarget) ? [chosenTarget] : []
                 : GetValidTargets(targetType, allies, enemies, isAlive);
+        }
+
+        /// <summary>
+        /// Автоматически выбирает живую цель с наибольшим текущим здоровьем из списка кандидатов.
+        /// Используется для одиночных ультимативных способностей, у которых игрок не наводится
+        /// на цель вручную (например, «удар по врагу с наибольшим HP»).
+        /// </summary>
+        /// <typeparam name="T">Тип цели.</typeparam>
+        /// <param name="candidates">Кандидаты на роль цели.</param>
+        /// <param name="currentHealth">Функция, возвращающая текущее здоровье цели.</param>
+        /// <param name="isAlive">Предикат, определяющий, жива ли цель.</param>
+        /// <returns>Живая цель с наибольшим текущим здоровьем, или <c>null</c>, если живых кандидатов нет.</returns>
+        public static T? SelectHighestHealthTarget<T>(
+            IReadOnlyList<T> candidates,
+            Func<T, int> currentHealth,
+            Func<T, bool> isAlive) where T : class
+        {
+            ArgumentNullException.ThrowIfNull(candidates);
+            ArgumentNullException.ThrowIfNull(currentHealth);
+            ArgumentNullException.ThrowIfNull(isAlive);
+
+            return candidates.Where(isAlive).OrderByDescending(currentHealth).FirstOrDefault();
         }
     }
 }

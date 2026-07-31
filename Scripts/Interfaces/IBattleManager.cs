@@ -44,6 +44,16 @@ namespace AlJourney.Scripts.Interfaces
         AbilityData SelectedAbility { get; }
 
         /// <summary>
+        /// Текущее значение общего заряда ульты отряда.
+        /// </summary>
+        int UltimateCharge { get; }
+
+        /// <summary>
+        /// Истина, если заряд ульты полон и она доступна к применению.
+        /// </summary>
+        bool IsUltimateReady { get; }
+
+        /// <summary>
         /// Выбирает бойца, который совершит ход следующим (порядок хода определяет игрок).
         /// </summary>
         void SelectActor(PlayerCharacter actor);
