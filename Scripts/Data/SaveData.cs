@@ -20,6 +20,17 @@ namespace AlJourney.Scripts.Data
 
         public int HighestWave { get; set; }
 
+        /// <summary>
+        /// Id уровня карты кампании, который игрок сейчас проходит или должен пройти следующим.
+        /// См. <see cref="CampaignDatabase"/>.
+        /// </summary>
+        public string CurrentLevelId { get; set; }
+
+        /// <summary>
+        /// Id всех уже пройденных уровней кампании (основной линии и ответвлений).
+        /// </summary>
+        public HashSet<string> CompletedLevelIds { get; set; }
+
         public int Coins { get; set; }
 
         public int MageHealth { get; set; }
@@ -56,6 +67,8 @@ namespace AlJourney.Scripts.Data
         {
             CurrentWave = 1;
             HighestWave = 1;
+            CurrentLevelId = CampaignDatabase.FirstLevelId;
+            CompletedLevelIds = [];
             Coins = 0;
             PermanentUpgrades = [];
             ActiveArtifacts = [];
@@ -80,6 +93,8 @@ namespace AlJourney.Scripts.Data
             {
                 CurrentWave = 1,
                 HighestWave = 1,
+                CurrentLevelId = CampaignDatabase.FirstLevelId,
+                CompletedLevelIds = [],
                 Coins = 0,
                 MageMaxHealth = GameConstants.MAGE_BASE_HP,
                 MageHealth = GameConstants.MAGE_BASE_HP,

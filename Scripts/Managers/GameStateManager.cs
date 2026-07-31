@@ -2,6 +2,7 @@ using AlJourney.Scripts.Core;
 using AlJourney.Scripts.Data;
 using AlJourney.Scripts.Interfaces;
 using Godot;
+using System.Collections.Generic;
 
 namespace AlJourney.Scripts.Managers
 {
@@ -66,9 +67,22 @@ namespace AlJourney.Scripts.Managers
         public SaveData CurrentSave { get; private set; }
 
         /// <summary>
-        /// Номер текущей волны врагов.
+        /// Номер текущей волны врагов. Начиная с Этапа 3 отражает не бесконечный счётчик,
+        /// а <see cref="Data.LevelDefinition.DifficultyRating"/> уровня карты кампании, на котором
+        /// сейчас находится игрок — используется как есть для существующей шкалы масштабирования
+        /// (награды, цены в магазине, характеристики врагов).
         /// </summary>
         public int CurrentWave => CurrentSave?.CurrentWave ?? 1;
+
+        /// <summary>
+        /// Id уровня карты кампании, который игрок проходит или должен пройти следующим.
+        /// </summary>
+        public string CurrentLevelId => CurrentSave?.CurrentLevelId ?? CampaignDatabase.FirstLevelId;
+
+        /// <summary>
+        /// Id всех уже пройденных уровней кампании.
+        /// </summary>
+        public IReadOnlyCollection<string> CompletedLevelIds => CurrentSave?.CompletedLevelIds ?? System.Array.Empty<string>();
 
         /// <summary>
         /// Текущее количество монет у игрока.
@@ -105,7 +119,7 @@ namespace AlJourney.Scripts.Managers
         {
             CurrentSave = SaveData.CreateNew();
             IsGameActive = true;
-            CurrentState = GameState.Battle;
+            CurrentState = GameState.Map;
 
             _ = EmitSignal(SignalName.WaveChanged, CurrentSave.CurrentWave);
             _ = EmitSignal(SignalName.CoinsChanged, CurrentSave.Coins);
@@ -124,7 +138,7 @@ namespace AlJourney.Scripts.Managers
         {
             CurrentSave = saveData;
             IsGameActive = true;
-            CurrentState = GameState.Battle;
+            CurrentState = GameState.Map;
 
             _ = EmitSignal(SignalName.WaveChanged, CurrentSave.CurrentWave);
             _ = EmitSignal(SignalName.CoinsChanged, CurrentSave.Coins);
@@ -156,6 +170,72 @@ namespace AlJourney.Scripts.Managers
             _ = EmitSignal(SignalName.WaveChanged, CurrentSave.CurrentWave);
 
             GD.Print($"[GameStateManager] Advanced to wave {CurrentSave.CurrentWave}");
+        }
+
+        /// <summary>
+        /// Отмечает выбранный на карте кампании уровень как текущий, не запуская его сразу
+        /// (в отличие от <see cref="StartLevel"/>) — используется экраном карты перед переходом
+        /// на сцену боя, которая сама вызовет <see cref="StartLevel"/> при старте.
+        /// </summary>
+        /// <param name="levelId">Id уровня, выбранного игроком на карте.</param>
+        public void SelectLevel(string levelId)
+        {
+            if (CurrentSave == null || string.IsNullOrEmpty(levelId))
+            {
+                return;
+            }
+
+            CurrentSave.CurrentLevelId = levelId;
+        }
+
+        /// <summary>
+        /// Начинает попытку прохождения указанного уровня карты кампании: запоминает его как текущий
+        /// и переносит его <see cref="LevelDefinition.DifficultyRating"/> в <see cref="CurrentWave"/>
+        /// для существующей шкалы масштабирования (характеристики врагов, награды, цены в магазине).
+        /// </summary>
+        /// <param name="level">Уровень, вход в который начинается.</param>
+        public void StartLevel(LevelDefinition level)
+        {
+            if (CurrentSave == null || level == null)
+            {
+                return;
+            }
+
+            CurrentSave.CurrentLevelId = level.Id;
+            CurrentSave.CurrentWave = level.DifficultyRating;
+
+            if (CurrentSave.CurrentWave > CurrentSave.HighestWave)
+            {
+                CurrentSave.HighestWave = CurrentSave.CurrentWave;
+            }
+
+            _ = EmitSignal(SignalName.WaveChanged, CurrentSave.CurrentWave);
+
+            GD.Print($"[GameStateManager] Started level {level.Id} (difficulty {level.DifficultyRating})");
+        }
+
+        /// <summary>
+        /// Отмечает уровень как пройденный. Для уровней основной линии автоматически переводит
+        /// прогресс на следующий уровень линии (см. <see cref="CampaignDatabase.GetNextMainLevel"/>);
+        /// ответвления прохождение основной линии не двигают.
+        /// </summary>
+        /// <param name="levelId">Id пройденного уровня.</param>
+        public void CompleteLevel(string levelId)
+        {
+            if (CurrentSave == null || string.IsNullOrEmpty(levelId))
+            {
+                return;
+            }
+
+            _ = CurrentSave.CompletedLevelIds.Add(levelId);
+
+            LevelDefinition nextLevel = CampaignDatabase.GetNextMainLevel(levelId);
+            if (nextLevel != null)
+            {
+                CurrentSave.CurrentLevelId = nextLevel.Id;
+            }
+
+            GD.Print($"[GameStateManager] Completed level {levelId}" + (nextLevel != null ? $", next: {nextLevel.Id}" : ""));
         }
 
         /// <summary>

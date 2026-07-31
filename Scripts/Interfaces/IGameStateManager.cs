@@ -1,5 +1,6 @@
 using AlJourney.Scripts.Core;
 using AlJourney.Scripts.Data;
+using System.Collections.Generic;
 
 namespace AlJourney.Scripts.Interfaces
 {
@@ -25,6 +26,16 @@ namespace AlJourney.Scripts.Interfaces
         int CurrentWave { get; }
 
         /// <summary>
+        /// Id уровня карты кампании, который игрок проходит или должен пройти следующим.
+        /// </summary>
+        string CurrentLevelId { get; }
+
+        /// <summary>
+        /// Id всех уже пройденных уровней кампании.
+        /// </summary>
+        IReadOnlyCollection<string> CompletedLevelIds { get; }
+
+        /// <summary>
         /// Количество доступных игроку монет.
         /// </summary>
         int Coins { get; }
@@ -48,6 +59,21 @@ namespace AlJourney.Scripts.Interfaces
         /// Совершает переход к следующей волне врагов.
         /// </summary>
         void NextWave();
+
+        /// <summary>
+        /// Отмечает выбранный на карте кампании уровень как текущий, не запуская его сразу.
+        /// </summary>
+        void SelectLevel(string levelId);
+
+        /// <summary>
+        /// Начинает попытку прохождения указанного уровня карты кампании.
+        /// </summary>
+        void StartLevel(LevelDefinition level);
+
+        /// <summary>
+        /// Отмечает уровень карты кампании как пройденный и при необходимости переводит прогресс дальше.
+        /// </summary>
+        void CompleteLevel(string levelId);
 
         /// <summary>
         /// Начисляет игроку указанное количество монет.
