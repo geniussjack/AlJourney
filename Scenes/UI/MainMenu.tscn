@@ -58,19 +58,19 @@ texture = ExtResource("6_logo")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="NewGameButton" type="Button" parent="MainMenuPanel/VBoxContainer"]
-custom_minimum_size = Vector2(0, 52)
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 24
-text = "UI_MAIN_MENU_NEW_GAME"
-
 [node name="ContinueButton" type="Button" parent="MainMenuPanel/VBoxContainer"]
 custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 24
 text = "UI_MAIN_MENU_CONTINUE"
+
+[node name="NewGameButton" type="Button" parent="MainMenuPanel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 24
+text = "UI_MAIN_MENU_NEW_GAME"
 
 [node name="SettingsButton" type="Button" parent="MainMenuPanel/VBoxContainer"]
 custom_minimum_size = Vector2(0, 52)
