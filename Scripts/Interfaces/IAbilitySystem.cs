@@ -5,38 +5,38 @@ using System.Collections.Generic;
 namespace AlJourney.Scripts.Interfaces
 {
     /// <summary>
-    /// Интерфейс для управления способностями героев.
-    /// Предоставляет методы для получения, разблокировки и экипировки способностей, а также расчета их эффектов.
+    /// Interface for managing hero abilities.
+    /// Provides methods to retrieve, unlock and equip abilities, and to compute their effects.
     /// </summary>
     public interface IAbilitySystem
     {
         /// <summary>
-        /// Возвращает список всех способностей, доступных для указанного класса героя.
+        /// Returns the list of every ability available to the given hero class.
         /// </summary>
         List<AbilityData> GetAvailableAbilities(CharacterClass heroClass);
 
         /// <summary>
-        /// Возвращает список способностей, которые в данный момент экипированы у указанного героя.
+        /// Returns the list of abilities currently equipped by the given hero.
         /// </summary>
         List<AbilityData> GetEquippedAbilities(CharacterClass heroClass);
 
         /// <summary>
-        /// Разблокирует указанную способность для заданного героя, делая ее доступной для экипировки.
+        /// Unlocks the given ability for the given hero, making it available to equip.
         /// </summary>
         bool UnlockAbility(CharacterClass hero, AbilityData ability);
 
         /// <summary>
-        /// Экипирует способность герою, применяя её эффекты в игре.
+        /// Equips an ability to a hero, applying its effects in-game.
         /// </summary>
         bool EquipAbility(CharacterClass hero, AbilityData ability);
 
         /// <summary>
-        /// Получает суммарное числовое значение конкретного эффекта, исходя из экипированных способностей героя.
+        /// Gets the total numeric value of a specific effect, based on the hero's equipped abilities.
         /// </summary>
         int GetAbilityEffect(CharacterClass hero, string effectName);
 
         /// <summary>
-        /// Возвращает словарь всех суммарных бонусов к характеристикам, которые дают активные способности героя.
+        /// Returns a dictionary of every total stat bonus granted by the hero's active abilities.
         /// </summary>
         Dictionary<string, int> GetTotalAbilityStats(CharacterClass hero);
     }

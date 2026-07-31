@@ -4,19 +4,19 @@ using System.Collections.Generic;
 namespace AlJourney.Scripts.Interfaces
 {
     /// <summary>
-    /// Интерфейс для генерации лута.
-    /// Отвечает за создание случайных предметов снаряжения по итогам прохождения обычных волн или боссов.
+    /// Interface for loot generation.
+    /// Responsible for creating random equipment items as rewards for clearing normal waves or defeating bosses.
     /// </summary>
     public interface ILootSystem
     {
         /// <summary>
-        /// Генерирует список предметов в качестве награды за победу над боссом.
-        /// Качество и количество предметов зависят от номера волны.
+        /// Generates a list of items as a reward for defeating a boss.
+        /// Item quality and quantity depend on the wave number.
         /// </summary>
         List<EquipmentData> GenerateBossLoot(int waveNumber);
 
         /// <summary>
-        /// Генерирует один предмет снаряжения в качестве награды за прохождение обычной волны.
+        /// Generates a single equipment item as a reward for clearing a normal wave.
         /// </summary>
         EquipmentData GenerateNormalLoot(int waveNumber);
     }

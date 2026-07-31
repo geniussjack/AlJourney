@@ -5,26 +5,26 @@ using System.Collections.Generic;
 namespace AlJourney.Scripts.Interfaces
 {
     /// <summary>
-    /// Интерфейс управления инвентарем.
-    /// Обеспечивает логику добавления, экипировки и снятия предметов снаряжения героев.
+    /// Interface for inventory management.
+    /// Provides the logic for adding, equipping and unequipping heroes' equipment items.
     /// </summary>
     public interface IInventoryManager
     {
         /// <summary>
-        /// Добавляет список предметов в общий инвентарь игрока.
+        /// Adds a list of items to the player's shared inventory.
         /// </summary>
         void AddItems(List<EquipmentData> items);
 
         /// <summary>
-        /// Экипирует предмет из инвентаря указанному классу героя.
-        /// Возвращает true, если предмет был успешно экипирован.
+        /// Equips an item from the inventory to the given hero class.
+        /// Returns true if the item was successfully equipped.
         /// </summary>
         bool EquipItem(CharacterClass hero, EquipmentData item);
 
         /// <summary>
-        /// Снимает предмет с указанного слота экипировки героя и возвращает его в инвентарь.
+        /// Unequips an item from the given hero's equipment slot and returns it to the inventory.
         /// </summary>
-        /// <returns>Возвращает снятый предмет, либо null, если слот был пуст.</returns>
+        /// <returns>The unequipped item, or null if the slot was empty.</returns>
         EquipmentData UnequipItem(CharacterClass hero, EquipmentSlot slot);
     }
 }

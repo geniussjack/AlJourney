@@ -3,106 +3,106 @@ using Godot;
 namespace AlJourney.Scripts.Interfaces
 {
     /// <summary>
-    /// Интерфейс для управления настройками игры.
-    /// Предоставляет доступ к параметрам графики и звука, а также методы для их изменения и сохранения.
+    /// Interface for managing game settings.
+    /// Provides access to video and audio parameters, as well as methods to change and save them.
     /// </summary>
     public interface ISettingsManager
     {
         /// <summary>
-        /// Текущее разрешение экрана.
+        /// The current screen resolution.
         /// </summary>
         Vector2I Resolution { get; }
 
         /// <summary>
-        /// Режим окна (0 = Fullscreen, 1 = Borderless, 2 = Windowed).
+        /// Window mode (0 = Fullscreen, 1 = Borderless, 2 = Windowed).
         /// </summary>
         int WindowMode { get; }
 
         /// <summary>
-        /// Текущий язык игры (en или ru).
+        /// The game's current language (en or ru).
         /// </summary>
         string Language { get; }
 
         /// <summary>
-        /// Максимальное ограничение кадров в секунду.
+        /// The maximum frames-per-second cap.
         /// </summary>
         int MaxFps { get; }
 
         /// <summary>
-        /// Общая громкость всех звуков в игре.
+        /// The overall volume of all sounds in the game.
         /// </summary>
         float MasterVolume { get; }
 
         /// <summary>
-        /// Уровень громкости фоновой музыки.
+        /// The background music volume level.
         /// </summary>
         float MusicVolume { get; }
 
         /// <summary>
-        /// Уровень громкости звуковых эффектов.
+        /// The sound effects volume level.
         /// </summary>
         float SfxVolume { get; }
 
         /// <summary>
-        /// Устанавливает новое разрешение экрана.
+        /// Sets a new screen resolution.
         /// </summary>
-        /// <param name="resolution">Новое разрешение экрана.</param>
-        /// <param name="applyImmediately">Применить настройки немедленно.</param>
+        /// <param name="resolution">The new screen resolution.</param>
+        /// <param name="applyImmediately">Whether to apply the setting immediately.</param>
         void SetResolution(Vector2I resolution, bool applyImmediately = true);
 
         /// <summary>
-        /// Устанавливает режим окна.
+        /// Sets the window mode.
         /// </summary>
         /// <param name="mode">0 - Fullscreen, 1 - Borderless, 2 - Windowed.</param>
-        /// <param name="applyImmediately">Применить настройки немедленно.</param>
+        /// <param name="applyImmediately">Whether to apply the setting immediately.</param>
         void SetWindowMode(int mode, bool applyImmediately = true);
 
         /// <summary>
-        /// Изменяет язык игры.
+        /// Changes the game's language.
         /// </summary>
-        /// <param name="lang">Код языка (например, "en" или "ru").</param>
-        /// <param name="applyImmediately">Применить настройки немедленно.</param>
+        /// <param name="lang">The language code (e.g. "en" or "ru").</param>
+        /// <param name="applyImmediately">Whether to apply the setting immediately.</param>
         void SetLanguage(string lang, bool applyImmediately = true);
 
         /// <summary>
-        /// Устанавливает лимит максимального количества кадров в секунду.
+        /// Sets the maximum frames-per-second limit.
         /// </summary>
-        /// <param name="fps">Максимальный FPS.</param>
-        /// <param name="applyImmediately">Применить настройки немедленно.</param>
+        /// <param name="fps">The maximum FPS.</param>
+        /// <param name="applyImmediately">Whether to apply the setting immediately.</param>
         void SetMaxFps(int fps, bool applyImmediately = true);
 
         /// <summary>
-        /// Устанавливает уровень общей громкости.
+        /// Sets the overall (master) volume level.
         /// </summary>
         void SetMasterVolume(float volume);
 
         /// <summary>
-        /// Устанавливает уровень громкости фоновой музыки.
+        /// Sets the background music volume level.
         /// </summary>
         void SetMusicVolume(float volume);
 
         /// <summary>
-        /// Устанавливает уровень громкости звуковых эффектов.
+        /// Sets the sound effects volume level.
         /// </summary>
         void SetSfxVolume(float volume);
 
         /// <summary>
-        /// Применяет все изменения видео-настроек в движке Godot.
+        /// Applies all pending video setting changes in the Godot engine.
         /// </summary>
         void ApplyVideoSettings();
 
         /// <summary>
-        /// Сохраняет текущие конфигурации настроек в файл.
+        /// Saves the current settings configuration to a file.
         /// </summary>
         void SaveSettings();
 
         /// <summary>
-        /// Загружает настройки из файла.
+        /// Loads settings from a file.
         /// </summary>
         void LoadSettings();
 
         /// <summary>
-        /// Сбрасывает все настройки игры до их значений по умолчанию.
+        /// Resets all game settings to their default values.
         /// </summary>
         void ResetToDefaults();
     }

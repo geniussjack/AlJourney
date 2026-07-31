@@ -1,63 +1,63 @@
 namespace AlJourney.Scripts.Interfaces
 {
     /// <summary>
-    /// Интерфейс для управления аудиосистемой игры.
-    /// Позволяет настраивать громкость, воспроизводить и останавливать музыку и звуковые эффекты, а также применять эффекты затухания.
+    /// Interface for managing the game's audio system.
+    /// Allows adjusting volume, playing and stopping music and sound effects, and applying fade effects.
     /// </summary>
     public interface IAudioManager
     {
         /// <summary>
-        /// Общая громкость игры. Влияет на все звуки и музыку.
+        /// The game's overall volume. Affects all sounds and music.
         /// </summary>
         float MasterVolume { get; set; }
 
         /// <summary>
-        /// Уровень громкости фоновой музыки.
+        /// The background music volume level.
         /// </summary>
         float MusicVolume { get; set; }
 
         /// <summary>
-        /// Уровень громкости звуковых эффектов.
+        /// The sound effects volume level.
         /// </summary>
         float SfxVolume { get; set; }
 
         /// <summary>
-        /// Запускает воспроизведение музыки по указанному пути.
+        /// Starts playing music from the given path.
         /// </summary>
         void PlayMusic(string musicPath, bool loop = true);
 
         /// <summary>
-        /// Пытается запустить воспроизведение музыки. Возвращает true в случае успеха.
+        /// Attempts to start playing music. Returns true on success.
         /// </summary>
         bool TryPlayMusic(string musicPath, bool loop = true);
 
         /// <summary>
-        /// Останавливает текущую фоновую музыку.
+        /// Stops the current background music.
         /// </summary>
         void StopMusic();
 
         /// <summary>
-        /// Воспроизводит звуковой эффект по указанному пути с возможностью случайного изменения высоты тона.
+        /// Plays a sound effect from the given path, with optional random pitch variation.
         /// </summary>
         void PlaySfx(string sfxPath, float pitchVariation = 0.0f);
 
         /// <summary>
-        /// Пытается воспроизвести звуковой эффект. Возвращает true в случае успеха.
+        /// Attempts to play a sound effect. Returns true on success.
         /// </summary>
         bool TryPlaySfx(string sfxPath, float pitchVariation = 0.0f);
 
         /// <summary>
-        /// Плавно уменьшает громкость текущей музыки до нуля в течение заданного времени.
+        /// Smoothly fades the current music's volume down to zero over the given duration.
         /// </summary>
         void FadeOutMusic(float duration = 1.0f);
 
         /// <summary>
-        /// Плавно увеличивает громкость музыки до целевого значения в течение заданного времени.
+        /// Smoothly fades the music's volume up to its target value over the given duration.
         /// </summary>
         void FadeInMusic(float duration = 1.0f);
 
         /// <summary>
-        /// Плавно переключает текущую музыку на новую композицию за указанное время.
+        /// Smoothly crossfades from the current music to a new track over the given duration.
         /// </summary>
         void CrossfadeMusic(string newMusicPath, float duration = 1.0f, bool loop = true);
     }

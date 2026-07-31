@@ -3,24 +3,24 @@ using Godot;
 namespace AlJourney.Scripts.Interfaces
 {
     /// <summary>
-    /// Интерфейс для управления глобальным пользовательским интерфейсом.
-    /// Отвечает за открытие, закрытие и управление активными меню на экране.
+    /// Interface for managing the global user interface.
+    /// Responsible for opening, closing and managing the menus currently active on screen.
     /// </summary>
     public interface IUIManager
     {
         /// <summary>
-        /// Открывает указанное меню, делая его активным на экране.
+        /// Opens the given menu, making it active on screen.
         /// </summary>
-        /// <param name="menu">Узел интерфейса, который необходимо открыть.</param>
+        /// <param name="menu">The UI node to open.</param>
         void OpenMenu(Control menu);
 
         /// <summary>
-        /// Закрывает самое верхнее меню.
+        /// Closes the topmost menu.
         /// </summary>
         void CloseCurrentMenu();
 
         /// <summary>
-        /// Закрывает все открытые в данный момент меню, полностью очищая экран от окон интерфейса.
+        /// Closes every currently open menu, fully clearing the screen of UI windows.
         /// </summary>
         void CloseAllMenus();
     }
