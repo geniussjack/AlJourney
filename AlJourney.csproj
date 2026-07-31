@@ -53,9 +53,6 @@
     <Content Include="Resources\Sprites\UI\status_icons_sheet.png" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Docs\Architecture\" />
-    <Folder Include="Docs\GameDesign\" />
-    <Folder Include="Docs\API\" />
     <Folder Include="Resources\Audio\Music\" />
     <Folder Include="Resources\Audio\SFX\" />
     <Folder Include="Resources\Data\" />
