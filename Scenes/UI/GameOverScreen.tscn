@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://cym7ptas10hu8"]
 
-[ext_resource type="Script" path="res://Scripts/UI/GameOverUI.cs" id="1_gameover"]
+[ext_resource type="Script" uid="uid://tlf7md8c8okx" path="res://Scripts/UI/game_over_ui.gd" id="1_gameover"]
 [ext_resource type="Theme" path="res://Resources/Themes/game_theme.tres" id="2_theme"]
 
 [node name="GameOverScreen" type="Control"]

@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3]
 
-[ext_resource type="Script" path="res://Scripts/Scenes/CampaignMapScene.cs" id="1_script"]
+[ext_resource type="Script" uid="uid://ea2nstb7j82o" path="res://Scripts/Scenes/campaign_map_scene.gd" id="1_script"]
 [ext_resource type="Theme" uid="uid://d0twkb22dvira" path="res://Resources/Themes/game_theme.tres" id="2_theme"]
 
 [node name="CampaignMapScene" type="Control"]

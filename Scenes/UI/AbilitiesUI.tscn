@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://abilitiesui_uid"]
 
-[ext_resource type="Script" path="res://Scripts/UI/AbilitiesUI.cs" id="1_abilities"]
+[ext_resource type="Script" uid="uid://1fhn4uov32dy" path="res://Scripts/UI/abilities_ui.gd" id="1_abilities"]
 [ext_resource type="Theme" path="res://Resources/Themes/game_theme.tres" id="2_theme"]
 
 [node name="AbilitiesUI" type="Control"]

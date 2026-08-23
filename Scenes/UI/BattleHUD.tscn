@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=3 uid="uid://cgmssg1q3f8r3"]
 
-[ext_resource type="Script" uid="uid://vykqe4gaplol" path="res://Scripts/UI/BattleHUD.cs" id="1_hud"]
+[ext_resource type="Script" uid="uid://cqai6pvgn2441" path="res://Scripts/UI/battle_hud.gd" id="1_hud"]
 [ext_resource type="Theme" path="res://Resources/Themes/game_theme.tres" id="2_theme"]
 [ext_resource type="Texture2D" path="res://Resources/Sprites/UI/coin_icon.png" id="3_coin"]
 [ext_resource type="AtlasTexture" path="res://Resources/Sprites/UI/atlas_btn_resume.tres" id="4_pause"]

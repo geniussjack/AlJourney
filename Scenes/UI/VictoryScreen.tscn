@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://c2qfb3sh8ha50"]
 
-[ext_resource type="Script" path="res://Scripts/UI/VictoryUI.cs" id="1_victory"]
+[ext_resource type="Script" uid="uid://cd21tk6uxmicx" path="res://Scripts/UI/victory_ui.gd" id="1_victory"]
 [ext_resource type="Theme" path="res://Resources/Themes/game_theme.tres" id="2_theme"]
 
 [node name="VictoryScreen" type="Control"]
