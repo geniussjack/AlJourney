@@ -1,5 +1,0 @@
-[*.cs]
-dotnet_diagnostic.IDE0300.severity = warning
-dotnet_diagnostic.IDE0305.severity = warning
-dotnet_diagnostic.RCS1146.severity = warning
-dotnet_diagnostic.RCS1206.severity = warning

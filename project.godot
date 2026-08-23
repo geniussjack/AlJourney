@@ -16,7 +16,7 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 
 config/name="Altarion's Journey"
 run/main_scene="res://Scenes/UI/MainMenu.tscn"
-config/features=PackedStringArray("4.7", "C#", "Mobile")
+config/features=PackedStringArray("4.7", "Mobile")
 boot_splash/bg_color=Color(0, 0, 0, 1)
 boot_splash/stretch_mode=0
 boot_splash/image="res://Resources/Sprites/UI/logo.png"
@@ -39,10 +39,6 @@ AbilitySystem="*res://Scripts/Managers/ability_system.gd"
 window/size/viewport_width=1920
 window/size/viewport_height=1080
 window/stretch/mode="canvas_items"
-
-[dotnet]
-
-project/assembly_name="AlJourney"
 
 [internationalization]
 
