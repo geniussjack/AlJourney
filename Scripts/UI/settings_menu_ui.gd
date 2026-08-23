@@ -111,8 +111,15 @@ func _setup_fps_dropdown() -> void:
 		var label: String = "Unlimited" if fps == 0 else "%d FPS" % fps
 		_fps_limit_dropdown.add_item(label, i)
 
-## Loads every control's value from SettingsManager's current state.
+## Loads every control's value from SettingsManager's current state. Can
+## run before _ready() (SettingsManager applying its loaded settings
+## broadcasts NOTIFICATION_TRANSLATION_CHANGED to every Control already in
+## the tree, including this one, before its own _ready() has assigned the
+## control references below) — bail out until this node is actually ready.
 func _load_current_settings() -> void:
+	if _window_mode_dropdown == null:
+		return
+
 	_window_mode_dropdown.selected = SettingsManager.window_mode
 	_language_dropdown.selected = 1 if SettingsManager.language == "ru" else 0
 
