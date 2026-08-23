@@ -417,3 +417,7 @@ temp/
 /ARCHITECTURE.md
 /REDESIGN_NOTES.md
 
+# Working design documentation (docs/design-document.md and similar) — per the general Godot
+# project instructions (CLAUDE.md), this is local working material, not part of the published repo.
+/docs/
+

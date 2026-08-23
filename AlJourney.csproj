@@ -8,10 +8,6 @@
     <RootNamespace>AlJourney</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Remove="AlJourneyTests\**" />
-    <Content Remove="AlJourneyTests\**" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Resources\Sprites\Backgrounds\battle_background.png" />
     <Content Include="Resources\Sprites\Backgrounds\menu_background.png" />
     <Content Include="Resources\Sprites\Characters\arhiskeleton.png" />
@@ -72,14 +68,5 @@
     <None Include="scenes\ui\MainMenu.tscn" />
     <None Include="scenes\ui\ShopScene.tscn" />
     <None Include="scenes\ui\VictoryScreen.tscn" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Chickensoft.GoDotTest" Version="2.0.35" />
-    <PackageReference Include="coverlet.collector" Version="10.0.1">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="Moq" Version="4.20.72" />
-    <PackageReference Include="Shouldly" Version="4.3.0" />
   </ItemGroup>
 </Project>

@@ -5,8 +5,6 @@ VisualStudioVersion = 18.2.11408.102
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlJourney", "AlJourney.csproj", "{D21B0E4A-E8CB-4139-AAB1-14072D53DE63}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlJourneyTests", "AlJourneyTests\AlJourneyTests.csproj", "{A0BC087E-4EC9-48F4-B5BD-0A296DBBC837}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,12 +18,6 @@ Global
 		{D21B0E4A-E8CB-4139-AAB1-14072D53DE63}.ExportDebug|Any CPU.Build.0 = ExportDebug|Any CPU
 		{D21B0E4A-E8CB-4139-AAB1-14072D53DE63}.ExportRelease|Any CPU.ActiveCfg = ExportRelease|Any CPU
 		{D21B0E4A-E8CB-4139-AAB1-14072D53DE63}.ExportRelease|Any CPU.Build.0 = ExportRelease|Any CPU
-		{A0BC087E-4EC9-48F4-B5BD-0A296DBBC837}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A0BC087E-4EC9-48F4-B5BD-0A296DBBC837}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A0BC087E-4EC9-48F4-B5BD-0A296DBBC837}.ExportDebug|Any CPU.ActiveCfg = Release|Any CPU
-		{A0BC087E-4EC9-48F4-B5BD-0A296DBBC837}.ExportDebug|Any CPU.Build.0 = Release|Any CPU
-		{A0BC087E-4EC9-48F4-B5BD-0A296DBBC837}.ExportRelease|Any CPU.ActiveCfg = Release|Any CPU
-		{A0BC087E-4EC9-48F4-B5BD-0A296DBBC837}.ExportRelease|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
