@@ -32,6 +32,7 @@ func _ready() -> void:
 	add_child(_hero_system)
 
 	_initialize_heroes()
+	_initialize_companion()
 
 	_battle_hud.initialize(_hero_system, _battle_manager)
 
@@ -107,6 +108,19 @@ func _initialize_heroes() -> void:
 		print("[BattleScene] Heroes loaded from save")
 	else:
 		print("[BattleScene] New heroes created with base stats")
+
+## Fills the party's third slot with the currently active mercenary, if
+## one is set (see design document, section 9). No-op if the slot is
+## empty, or if the active mercenary somehow isn't available anymore
+## (defensive - GameStateManager only lets an available one become active
+## in the first place, but a save could theoretically be edited by hand).
+func _initialize_companion() -> void:
+	var subclass: MercenarySubclassData = GameStateManager.get_active_mercenary()
+	if subclass == null or not GameStateManager.is_mercenary_unlocked(subclass):
+		return
+
+	_hero_system.set_companion(PlayerCharacter.create_mercenary(subclass))
+	print("[BattleScene] Companion joined the battle: %s" % subclass.get_key())
 
 func _on_enemy_defeated(enemy: Enemy) -> void:
 	print("[BattleScene] Enemy defeated: %s" % enemy.get_character_name())
