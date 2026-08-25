@@ -55,23 +55,58 @@ func upgrade_equipment(item: EquipmentData) -> bool:
 
 	GameStateManager.spend_coins(cost)
 	var upgraded_item: EquipmentData = item.upgrade()
-
-	var inventory_index: int = _inventory.find(item)
-	if inventory_index >= 0:
-		_inventory[inventory_index] = upgraded_item
-	else:
-		for hero_slots: Dictionary in _hero_equipment.values():
-			var found_slot: Variant = null
-			for slot: GameEnums.EquipmentSlot in hero_slots.keys():
-				if hero_slots[slot] == item:
-					found_slot = slot
-					break
-			if found_slot != null:
-				hero_slots[found_slot] = upgraded_item
-				break
+	_replace_item(item, upgraded_item)
 
 	print("[InventoryManager] Upgraded %s to level %d" % [item.name, upgraded_item.current_level])
 	return true
+
+## Upgrades an equipped item's rarity by one tier, spending both strategic
+## resources and a matching catalyst (see design document, section 10).
+## archetype identifies which hero's catalyst pool to draw from — rarity
+## upgrades are only offered for currently-equipped items, since that's
+## the only place an item's archetype is known (EquipmentData itself
+## doesn't carry one).
+## Returns true if the item was successfully upgraded.
+func upgrade_rarity(item: EquipmentData, archetype: GameEnums.CharacterClass) -> bool:
+	if item.rarity >= GameEnums.EquipmentRarity.LEGENDARY:
+		return false
+
+	var target_rarity: GameEnums.EquipmentRarity = (item.rarity + 1) as GameEnums.EquipmentRarity
+	var catalyst: RarityCatalystData = RarityCatalystDatabase.get_catalyst(archetype, target_rarity)
+	if catalyst == null or GameStateManager.get_catalyst_count(catalyst.id) <= 0:
+		print("[InventoryManager] Missing catalyst to upgrade %s to %s" % [item.name, GameEnums.EquipmentRarity.keys()[target_rarity]])
+		return false
+
+	var cost: Dictionary[GameEnums.StrategicResource, int] = RarityCatalystDatabase.get_resource_cost(target_rarity)
+	if not GameStateManager.spend_strategic_resources(cost):
+		print("[InventoryManager] Not enough resources to upgrade %s to %s" % [item.name, GameEnums.EquipmentRarity.keys()[target_rarity]])
+		return false
+
+	GameStateManager.spend_catalyst(catalyst.id)
+
+	var upgraded_item: EquipmentData = item.upgrade_rarity()
+	_replace_item(item, upgraded_item)
+
+	print("[InventoryManager] Upgraded %s to %s" % [item.name, GameEnums.EquipmentRarity.keys()[target_rarity]])
+	return true
+
+## Replaces every reference to old_item with new_item, wherever it's
+## currently stored. Checks both the shared inventory AND every hero's
+## equipped slots (not either/or) — an item's starting inventory entry and
+## its equipped-slot entry are the same object reference (see SaveData.
+## create_new()), so an item can legitimately need replacing in both
+## places at once; stopping at the first match left the other one stale.
+## Shared by upgrade_equipment() and upgrade_rarity(), which both produce
+## a new EquipmentData instance rather than mutating the old one in place.
+func _replace_item(old_item: EquipmentData, new_item: EquipmentData) -> void:
+	var inventory_index: int = _inventory.find(old_item)
+	if inventory_index >= 0:
+		_inventory[inventory_index] = new_item
+
+	for hero_slots: Dictionary in _hero_equipment.values():
+		for slot: GameEnums.EquipmentSlot in hero_slots.keys():
+			if hero_slots[slot] == old_item:
+				hero_slots[slot] = new_item
 
 ## Returns the list of every item currently in the player's inventory.
 func get_inventory() -> Array[EquipmentData]:

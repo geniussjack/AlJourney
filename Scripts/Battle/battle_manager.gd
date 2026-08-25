@@ -342,6 +342,7 @@ func on_enemy_died(enemy: Enemy) -> void:
 
 	if enemy.is_boss or enemy.is_miniboss:
 		_generate_boss_loot()
+		_grant_rarity_catalysts()
 	elif randf() <= 0.20:
 		var item: EquipmentData = LootSystem.generate_normal_loot(current_wave)
 		if item != null:
@@ -378,6 +379,20 @@ func _on_party_defeated() -> void:
 func _generate_boss_loot() -> void:
 	var loot: Array[EquipmentData] = LootSystem.generate_boss_loot(current_wave)
 	InventoryManager.add_items(loot)
+
+## Grants both archetypes' rarity-upgrade catalysts if the current level is
+## one of the campaign's designated catalyst sources (see design document,
+## section 10 - RarityCatalystDatabase.level_catalyst_rarity). No-op for
+## every other boss/miniboss level.
+func _grant_rarity_catalysts() -> void:
+	if not RarityCatalystDatabase.level_catalyst_rarity.has(_level.id):
+		return
+
+	var rarity: GameEnums.EquipmentRarity = RarityCatalystDatabase.level_catalyst_rarity[_level.id]
+	for archetype: GameEnums.CharacterClass in GameEnums.CharacterClass.values():
+		var catalyst: RarityCatalystData = RarityCatalystDatabase.get_catalyst(archetype, rarity)
+		if catalyst != null:
+			GameStateManager.add_catalyst(catalyst.id)
 
 ## Grants shared party XP and, for every level gained, applies the flat
 ## stat bonus to every live party member. GameStateManager only tracks the

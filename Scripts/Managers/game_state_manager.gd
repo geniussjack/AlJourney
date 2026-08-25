@@ -36,6 +36,8 @@ signal defense_workers_changed(worker_count: int)
 ## Raised when an undead raid is resolved (see design document, section 9).
 ## resources_lost: the amount of each strategic resource lost, keyed by type.
 signal raid_resolved(succeeded: bool, resources_lost: Dictionary[GameEnums.StrategicResource, int])
+## Raised when the owned count of a rarity-upgrade catalyst changes.
+signal catalyst_count_changed(id: String, new_count: int)
 
 ## The current global game state. Only ever changed through change_state().
 var current_state: GameEnums.GameState = GameEnums.GameState.MAIN_MENU
@@ -480,6 +482,36 @@ func brew_potion(potion: PotionData) -> bool:
 	potion_count_changed.emit(potion.id, new_count)
 
 	print("[GameStateManager] Brewed %s (now own %d)" % [potion.id, new_count])
+	return true
+
+## Number of the given rarity-upgrade catalyst currently owned. A catalyst
+## never found reads as 0, not an error.
+func get_catalyst_count(id: String) -> int:
+	return current_save.catalyst_counts.get(id, 0) if current_save != null else 0
+
+## Adds one unit of the given catalyst to the player's stock (see
+## design document, section 10 — dropped by minibosses/the final boss).
+func add_catalyst(id: String) -> void:
+	if current_save == null:
+		return
+
+	var new_count: int = get_catalyst_count(id) + 1
+	current_save.catalyst_counts[id] = new_count
+	catalyst_count_changed.emit(id, new_count)
+
+	print("[GameStateManager] Gained catalyst %s (now own %d)" % [id, new_count])
+
+## Consumes one unit of the given catalyst, if any are owned.
+## Returns true if a catalyst was available and consumed.
+func spend_catalyst(id: String) -> bool:
+	if current_save == null or get_catalyst_count(id) <= 0:
+		return false
+
+	var new_count: int = get_catalyst_count(id) - 1
+	current_save.catalyst_counts[id] = new_count
+	catalyst_count_changed.emit(id, new_count)
+
+	print("[GameStateManager] Spent catalyst %s (now own %d)" % [id, new_count])
 	return true
 
 ## Consumes one unit of the given potion, if any are owned. The caller

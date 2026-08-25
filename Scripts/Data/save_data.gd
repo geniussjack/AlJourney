@@ -79,6 +79,11 @@ var mercenary_recovery: Dictionary[String, int] = {}
 ## PotionData.id. Missing keys mean 0, same as a potion never brewed.
 var potion_counts: Dictionary[String, int] = {}
 
+## Number of each rarity-upgrade catalyst currently owned, keyed by
+## RarityCatalystData.id (see design document, section 10). Missing keys
+## mean 0, same as a catalyst never found.
+var catalyst_counts: Dictionary[String, int] = {}
+
 ## The Mage's current health.
 var mage_health: int = 0
 ## The Mage's maximum health.
@@ -220,6 +225,7 @@ func to_dict() -> Dictionary:
 		"activeMercenaryKey": active_mercenary_key,
 		"mercenaryRecovery": mercenary_recovery.duplicate(),
 		"potionCounts": potion_counts.duplicate(),
+		"catalystCounts": catalyst_counts.duplicate(),
 		"partyLevel": party_level,
 		"partyXp": party_xp,
 		"mageHealth": mage_health,
@@ -284,6 +290,11 @@ static func from_dict(data: Dictionary) -> SaveData:
 	var potion_counts_dict: Dictionary = data.get("potionCounts", {})
 	for key: String in potion_counts_dict.keys():
 		save.potion_counts[key] = int(potion_counts_dict[key])
+
+	save.catalyst_counts = {}
+	var catalyst_counts_dict: Dictionary = data.get("catalystCounts", {})
+	for key: String in catalyst_counts_dict.keys():
+		save.catalyst_counts[key] = int(catalyst_counts_dict[key])
 
 	save.party_level = int(data.get("partyLevel", 1))
 	save.party_xp = int(data.get("partyXp", 0))
