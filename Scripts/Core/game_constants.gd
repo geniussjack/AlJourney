@@ -163,6 +163,13 @@ const MERCENARY_BASE_RECOVERY_BATTLES: int = 3
 ## never available again in the very same battle they were used in.
 const MERCENARY_MIN_RECOVERY_BATTLES: int = 1
 
+## Maximum amount of any single strategic resource that can be stored at
+## Warehouse level 1 (see design document, section 9).
+const WAREHOUSE_BASE_STORAGE_CAP: int = 100
+## Additional storage cap per strategic resource, granted per Warehouse
+## level beyond the first.
+const WAREHOUSE_STORAGE_CAP_PER_LEVEL: int = 50
+
 ## File name used to store the player's save data.
 const SAVE_FILE_NAME: String = "save_data.json"
 ## Directory in which the save file is stored.

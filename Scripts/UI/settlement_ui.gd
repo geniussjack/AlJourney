@@ -268,9 +268,10 @@ func _build_building_row(building: GameEnums.BuildingType) -> HBoxContainer:
 
 ## Refreshes the resource totals label.
 func _refresh_resources_label() -> void:
+	var cap: int = GameStateManager.get_storage_cap()
 	var parts: Array[String] = []
 	for resource: GameEnums.StrategicResource in GameEnums.StrategicResource.values():
-		parts.append("%s: %d" % [tr(_resource_name_key(resource)), GameStateManager.get_strategic_resource(resource)])
+		parts.append("%s: %d/%d" % [tr(_resource_name_key(resource)), GameStateManager.get_strategic_resource(resource), cap])
 	_resources_label.text = " | ".join(parts)
 
 ## Refreshes one building row's level/cost text and the upgrade button's
@@ -313,6 +314,8 @@ func _on_building_upgraded(building: GameEnums.BuildingType, _new_level: int) ->
 	_refresh_building_row(building)
 	if building == GameEnums.BuildingType.HOUSES:
 		_refresh_workers_section()
+	elif building == GameEnums.BuildingType.WAREHOUSE:
+		_refresh_resources_label()
 
 func _on_worker_assignment_changed(_resource: GameEnums.StrategicResource, _worker_count: int) -> void:
 	_refresh_workers_section()

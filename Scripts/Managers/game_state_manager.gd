@@ -190,13 +190,23 @@ func spend_coins(amount: int) -> bool:
 func get_strategic_resource(resource: GameEnums.StrategicResource) -> int:
 	return current_save.strategic_resources.get(resource, 0) if current_save != null else 0
 
-## Adds the given amount of a strategic resource to storage. Uncapped for
-## now — the Warehouse building will introduce a storage limit once it exists.
+## Maximum amount of any single strategic resource that can be stored,
+## based on the Warehouse building's level (see design document, section 9).
+func get_storage_cap() -> int:
+	var warehouse_level: int = get_building_level(GameEnums.BuildingType.WAREHOUSE)
+	return GameConstants.WAREHOUSE_BASE_STORAGE_CAP + ((warehouse_level - 1) * GameConstants.WAREHOUSE_STORAGE_CAP_PER_LEVEL)
+
+## Adds the given amount of a strategic resource to storage, clamped at the
+## Warehouse's storage cap (see get_storage_cap()) — any amount that would
+## overflow it is simply lost, not carried over.
 func add_strategic_resource(resource: GameEnums.StrategicResource, amount: int) -> void:
 	if current_save == null or amount <= 0:
 		return
 
-	var new_amount: int = get_strategic_resource(resource) + amount
+	var new_amount: int = mini(get_strategic_resource(resource) + amount, get_storage_cap())
+	if new_amount == get_strategic_resource(resource):
+		return
+
 	current_save.strategic_resources[resource] = new_amount
 	strategic_resource_changed.emit(resource, new_amount)
 
