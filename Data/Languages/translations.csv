@@ -27,6 +27,7 @@ UI_PAUSE_RESUME,Resume,Продолжить
 UI_PAUSE_MAIN_MENU,Main Menu,В главное меню
 UI_CREDITS_TITLE,Credits,Титры
 UI_BATTLE_WAVE,Wave:,Волна:
+UI_PARTY_LEVEL,Lv.,Ур.
 UI_BATTLE_SCORE,Score:,Очки:
 UI_BATTLE_SHIELD,Shield:,Щит:
 UI_BATTLE_SWAPS,Swaps:,Ходы:

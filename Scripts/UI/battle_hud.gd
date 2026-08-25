@@ -17,6 +17,7 @@ var _enemies_container: Container
 
 var _coins_label: Label
 var _wave_label: Label
+var _party_level_label: Label
 var _ultimate_charge_label: Label
 
 var _hero_system: DualHeroSystem
@@ -61,11 +62,17 @@ func _ready() -> void:
 	bottom_bar.add_child(_ultimate_charge_label)
 	_update_ultimate_charge(0, BattleManager.MAX_ULTIMATE_CHARGE)
 
+	_party_level_label = Label.new()
+	_party_level_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	bottom_bar.add_child(_party_level_label)
+	_update_party_level(GameStateManager.party_level)
+
 	_inventory_button = get_node("MarginContainer/VBoxContainer/TopBar/InventoryButton")
 	_inventory_button.pressed.connect(_on_inventory_button_pressed)
 
 	GameStateManager.coins_changed.connect(_on_coins_changed)
 	GameStateManager.wave_changed.connect(_on_wave_changed)
+	GameStateManager.party_leveled_up.connect(_on_party_leveled_up)
 
 	var pause_scene: PackedScene = load("res://Scenes/UI/PauseMenu.tscn")
 	if pause_scene != null:
@@ -249,6 +256,12 @@ func _on_coins_changed(coins: int) -> void:
 func _update_coins(coins: int) -> void:
 	_coins_label.text = "%d" % coins
 
+func _on_party_leveled_up(new_level: int) -> void:
+	_update_party_level(new_level)
+
+func _update_party_level(level: int) -> void:
+	_party_level_label.text = "%s %d" % [tr("UI_PARTY_LEVEL"), level]
+
 func _on_inventory_button_pressed() -> void:
 	var inventory_scene: PackedScene = load("res://Scenes/UI/InventoryUI.tscn")
 	if inventory_scene != null:
@@ -308,3 +321,4 @@ func _exit_tree() -> void:
 
 	GameStateManager.coins_changed.disconnect(_on_coins_changed)
 	GameStateManager.wave_changed.disconnect(_on_wave_changed)
+	GameStateManager.party_leveled_up.disconnect(_on_party_leveled_up)
