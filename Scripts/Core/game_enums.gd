@@ -115,3 +115,27 @@ enum LocationId {
 	FROZEN_WASTES,
 	NECROMANCER_LAIR,
 }
+
+## Strategic resources gathered by villagers assigned to work the
+## settlement (see design document, section 9). Distinct from the
+## "trophy" loot economy (Coins, EquipmentData) — these fuel building
+## upgrades instead. Working list, adjustable.
+enum StrategicResource {
+	WOOD,
+	STONE,
+	IRON,
+	SILVER,
+	GOLD,
+}
+
+## Settlement buildings. Every building is tied to a concrete gameplay
+## mechanic (see design document, section 9) — deliberately no purely
+## decorative buildings in this list.
+enum BuildingType {
+	FORGE,
+	HERBALIST,
+	BARRACKS,
+	WAREHOUSE,
+	WALL,
+	HOUSES,
+}
