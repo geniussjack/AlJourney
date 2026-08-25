@@ -154,6 +154,15 @@ const SECONDS_PER_RESOURCE_TICK: float = 10.0
 ## Amount of its assigned resource one worker produces per tick.
 const RESOURCE_PER_WORKER_PER_TICK: int = 1
 
+## Number of battles a mercenary spends in recovery after being the active
+## companion for a battle, at Herbalist level 1 (see design document,
+## section 9). Reduced by one for each Herbalist level beyond the first,
+## down to MERCENARY_MIN_RECOVERY_BATTLES.
+const MERCENARY_BASE_RECOVERY_BATTLES: int = 3
+## Floor on recovery time regardless of Herbalist level — a mercenary is
+## never available again in the very same battle they were used in.
+const MERCENARY_MIN_RECOVERY_BATTLES: int = 1
+
 ## File name used to store the player's save data.
 const SAVE_FILE_NAME: String = "save_data.json"
 ## Directory in which the save file is stored.

@@ -49,6 +49,16 @@ var worker_assignments: Dictionary[GameEnums.StrategicResource, int] = {}
 ## catch-up gains after time spent offline. 0 means never initialized yet.
 var last_resource_tick_unix_time: int = 0
 
+## The mercenary currently filling the party's third slot, identified by
+## MercenarySubclassData.get_key() (e.g. "MAGE_HEALER"), or "" if the slot
+## is empty. See design document, section 9.
+var active_mercenary_key: String = ""
+## Battles remaining before each mercenary (keyed by get_key()) becomes
+## available again after being benched — see GameStateManager.
+## on_battle_completed(). Missing keys mean 0 (available), same as a
+## mercenary who has never been used.
+var mercenary_recovery: Dictionary[String, int] = {}
+
 ## The Mage's current health.
 var mage_health: int = 0
 ## The Mage's maximum health.
@@ -183,6 +193,8 @@ func to_dict() -> Dictionary:
 		"buildingLevels": building_levels_dict,
 		"workerAssignments": worker_assignments_dict,
 		"lastResourceTickUnixTime": last_resource_tick_unix_time,
+		"activeMercenaryKey": active_mercenary_key,
+		"mercenaryRecovery": mercenary_recovery.duplicate(),
 		"partyLevel": party_level,
 		"partyXp": party_xp,
 		"mageHealth": mage_health,
@@ -231,6 +243,12 @@ static func from_dict(data: Dictionary) -> SaveData:
 	for resource_key: String in worker_assignments_dict.keys():
 		save.worker_assignments[GameEnums.StrategicResource[resource_key]] = int(worker_assignments_dict[resource_key])
 	save.last_resource_tick_unix_time = int(data.get("lastResourceTickUnixTime", 0))
+
+	save.active_mercenary_key = data.get("activeMercenaryKey", "")
+	save.mercenary_recovery = {}
+	var mercenary_recovery_dict: Dictionary = data.get("mercenaryRecovery", {})
+	for key: String in mercenary_recovery_dict.keys():
+		save.mercenary_recovery[key] = int(mercenary_recovery_dict[key])
 
 	save.party_level = int(data.get("partyLevel", 1))
 	save.party_xp = int(data.get("partyXp", 0))
