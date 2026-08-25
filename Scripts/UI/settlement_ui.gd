@@ -14,6 +14,8 @@ var _defense_count_label: Label
 var _defense_minus_button: Button
 var _defense_plus_button: Button
 var _last_raid_label: Label
+var _forge_rows: Dictionary[String, Dictionary] = {}
+var _catalysts_label: Label
 
 ## Builds the whole settlement layout and subscribes to state changes.
 func _ready() -> void:
@@ -42,6 +44,7 @@ func _ready() -> void:
 	for building: GameEnums.BuildingType in GameEnums.BuildingType.values():
 		buildings_container.add_child(_build_building_row(building))
 
+	root.add_child(_build_forge_section())
 	root.add_child(_build_mercenaries_section())
 	root.add_child(_build_potions_section())
 
@@ -53,6 +56,8 @@ func _ready() -> void:
 	GameStateManager.potion_count_changed.connect(_on_potion_count_changed)
 	GameStateManager.defense_workers_changed.connect(_on_defense_workers_changed)
 	GameStateManager.raid_resolved.connect(_on_raid_resolved)
+	GameStateManager.catalyst_count_changed.connect(_on_catalyst_count_changed)
+	GameStateManager.coins_changed.connect(_on_coins_changed)
 
 	_refresh_resources_label()
 	for building: GameEnums.BuildingType in _building_rows.keys():
@@ -62,8 +67,165 @@ func _ready() -> void:
 		_refresh_mercenary_row(key)
 	for id: String in _potion_rows.keys():
 		_refresh_potion_row(id)
+	_refresh_all_forge_rows()
+	_refresh_catalysts_label()
 
 	print("[SettlementUI] Initialized")
+
+## Builds the Forge panel: one row per currently-equipped item (across both
+## heroes), each with an "upgrade level" action (existing coin-based
+## upgrade, previously not exposed in any UI) and an "upgrade rarity"
+## action (new — see design document, section 10), plus a summary line of
+## owned catalysts.
+func _build_forge_section() -> VBoxContainer:
+	var section := VBoxContainer.new()
+	section.add_theme_constant_override("separation", 4)
+
+	var title := Label.new()
+	title.text = tr("UI_SETTLEMENT_FORGE_TITLE")
+	section.add_child(title)
+
+	_catalysts_label = Label.new()
+	section.add_child(_catalysts_label)
+
+	for archetype: GameEnums.CharacterClass in GameEnums.CharacterClass.values():
+		for slot: GameEnums.EquipmentSlot in InventoryManager.get_hero_equipment(archetype).keys():
+			section.add_child(_build_forge_item_row(archetype, slot))
+
+	return section
+
+## Builds one equipped item's Forge row. Rows are keyed by (archetype,
+## slot) rather than the EquipmentData instance itself, since both upgrade
+## actions replace the item with a new instance (EquipmentData.upgrade()/
+## upgrade_rarity()) — looking the current item up fresh by slot on every
+## refresh/click avoids holding a stale reference.
+func _build_forge_item_row(archetype: GameEnums.CharacterClass, slot: GameEnums.EquipmentSlot) -> HBoxContainer:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 12)
+
+	var name_label := Label.new()
+	name_label.custom_minimum_size = Vector2(200, 0)
+	row.add_child(name_label)
+
+	var level_status_label := Label.new()
+	row.add_child(level_status_label)
+
+	var level_button := Button.new()
+	level_button.text = tr("UI_SETTLEMENT_UPGRADE_LEVEL")
+	level_button.pressed.connect(func() -> void:
+		var current_item: EquipmentData = InventoryManager.get_equipped_item(archetype, slot)
+		if current_item != null:
+			InventoryManager.upgrade_equipment(current_item)
+		_refresh_forge_item_row(archetype, slot)
+	)
+	row.add_child(level_button)
+
+	var rarity_status_label := Label.new()
+	rarity_status_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(rarity_status_label)
+
+	var rarity_button := Button.new()
+	rarity_button.text = tr("UI_SETTLEMENT_UPGRADE_RARITY")
+	rarity_button.pressed.connect(func() -> void:
+		var current_item: EquipmentData = InventoryManager.get_equipped_item(archetype, slot)
+		if current_item != null:
+			InventoryManager.upgrade_rarity(current_item, archetype)
+		_refresh_forge_item_row(archetype, slot)
+		_refresh_catalysts_label()
+	)
+	row.add_child(rarity_button)
+
+	_forge_rows[_forge_row_key(archetype, slot)] = {
+		"archetype": archetype,
+		"slot": slot,
+		"name_label": name_label,
+		"level_status_label": level_status_label,
+		"level_button": level_button,
+		"rarity_status_label": rarity_status_label,
+		"rarity_button": rarity_button,
+	}
+
+	return row
+
+static func _forge_row_key(archetype: GameEnums.CharacterClass, slot: GameEnums.EquipmentSlot) -> String:
+	return "%s_%s" % [GameEnums.CharacterClass.keys()[archetype], GameEnums.EquipmentSlot.keys()[slot]]
+
+func _refresh_all_forge_rows() -> void:
+	for row: Dictionary in _forge_rows.values():
+		_refresh_forge_item_row(row["archetype"], row["slot"])
+
+## Refreshes one Forge row's name/level/rarity status text and both
+## buttons' enabled state, reading the current item fresh from
+## InventoryManager (see _build_forge_item_row).
+func _refresh_forge_item_row(archetype: GameEnums.CharacterClass, slot: GameEnums.EquipmentSlot) -> void:
+	var key: String = _forge_row_key(archetype, slot)
+	if not _forge_rows.has(key):
+		return
+
+	var row: Dictionary = _forge_rows[key]
+	var name_label: Label = row["name_label"]
+	var level_status_label: Label = row["level_status_label"]
+	var level_button: Button = row["level_button"]
+	var rarity_status_label: Label = row["rarity_status_label"]
+	var rarity_button: Button = row["rarity_button"]
+
+	var item: EquipmentData = InventoryManager.get_equipped_item(archetype, slot)
+	if item == null:
+		name_label.text = ""
+		level_status_label.text = ""
+		level_button.disabled = true
+		rarity_status_label.text = ""
+		rarity_button.disabled = true
+		return
+
+	name_label.text = "%s (%s)" % [item.name, tr(item.get_rarity_name_key())]
+	name_label.modulate = item.get_rarity_color()
+
+	var level_cost: int = item.get_upgrade_cost(GameStateManager.current_wave)
+	if level_cost <= 0:
+		level_status_label.text = tr("UI_SETTLEMENT_MAX_LEVEL")
+		level_button.disabled = true
+	else:
+		level_status_label.text = "%s %d/%d (%d)" % [tr("UI_SETTLEMENT_LEVEL"), item.current_level, item.max_level, level_cost]
+		level_button.disabled = GameStateManager.coins < level_cost
+
+	if item.rarity >= GameEnums.EquipmentRarity.LEGENDARY:
+		rarity_status_label.text = tr("UI_SETTLEMENT_MAX_RARITY")
+		rarity_button.disabled = true
+		return
+
+	var target_rarity: GameEnums.EquipmentRarity = (item.rarity + 1) as GameEnums.EquipmentRarity
+	var catalyst: RarityCatalystData = RarityCatalystDatabase.get_catalyst(archetype, target_rarity)
+	var cost: Dictionary[GameEnums.StrategicResource, int] = RarityCatalystDatabase.get_resource_cost(target_rarity)
+
+	var cost_parts: Array[String] = []
+	var can_afford: bool = true
+	for resource: GameEnums.StrategicResource in cost.keys():
+		cost_parts.append("%s: %d" % [tr(_resource_name_key(resource)), cost[resource]])
+		if GameStateManager.get_strategic_resource(resource) < cost[resource]:
+			can_afford = false
+
+	var has_catalyst: bool = catalyst != null and GameStateManager.get_catalyst_count(catalyst.id) > 0
+	var missing_note: String = "" if has_catalyst else " (%s)" % tr("UI_SETTLEMENT_MISSING_CATALYST")
+	rarity_status_label.text = "%s: %s%s" % [tr(catalyst.name_key) if catalyst != null else "?", ", ".join(cost_parts), missing_note]
+	rarity_button.disabled = not can_afford or not has_catalyst
+
+## Refreshes the summary line of every rarity-upgrade catalyst currently owned.
+func _refresh_catalysts_label() -> void:
+	var parts: Array[String] = []
+	for catalyst: RarityCatalystData in RarityCatalystDatabase.get_all_catalysts():
+		var count: int = GameStateManager.get_catalyst_count(catalyst.id)
+		if count > 0:
+			parts.append("%s: %d" % [tr(catalyst.name_key), count])
+
+	_catalysts_label.text = "%s: %s" % [tr("UI_SETTLEMENT_CATALYSTS_TITLE"), ", ".join(parts) if not parts.is_empty() else "-"]
+
+func _on_catalyst_count_changed(_id: String, _new_count: int) -> void:
+	_refresh_catalysts_label()
+	_refresh_all_forge_rows()
+
+func _on_coins_changed(_new_amount: int) -> void:
+	_refresh_all_forge_rows()
 
 ## Builds the Herbalist brewing panel: one row per potion recipe, showing
 ## owned count, brew cost, and a brew button (locked ones show their
@@ -440,6 +602,7 @@ func _on_strategic_resource_changed(_resource: GameEnums.StrategicResource, _new
 		_refresh_building_row(building)
 	for id: String in _potion_rows.keys():
 		_refresh_potion_row(id)
+	_refresh_all_forge_rows()
 
 func _on_building_upgraded(building: GameEnums.BuildingType, _new_level: int) -> void:
 	_refresh_building_row(building)
@@ -481,6 +644,10 @@ func _exit_tree() -> void:
 		GameStateManager.mercenary_recovery_changed.disconnect(_on_mercenary_recovery_changed)
 	if GameStateManager.potion_count_changed.is_connected(_on_potion_count_changed):
 		GameStateManager.potion_count_changed.disconnect(_on_potion_count_changed)
+	if GameStateManager.catalyst_count_changed.is_connected(_on_catalyst_count_changed):
+		GameStateManager.catalyst_count_changed.disconnect(_on_catalyst_count_changed)
+	if GameStateManager.coins_changed.is_connected(_on_coins_changed):
+		GameStateManager.coins_changed.disconnect(_on_coins_changed)
 	if GameStateManager.defense_workers_changed.is_connected(_on_defense_workers_changed):
 		GameStateManager.defense_workers_changed.disconnect(_on_defense_workers_changed)
 	if GameStateManager.raid_resolved.is_connected(_on_raid_resolved):

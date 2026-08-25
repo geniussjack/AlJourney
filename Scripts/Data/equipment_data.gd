@@ -62,6 +62,10 @@ func get_rarity_color() -> Color:
 		_:
 			return Color.WHITE
 
+## Returns the localization key for the item's rarity tier name.
+func get_rarity_name_key() -> String:
+	return "RARITY_%s" % GameEnums.EquipmentRarity.keys()[rarity]
+
 ## Returns the drop chance of the item based on its rarity.
 func get_drop_chance() -> float:
 	match rarity:
@@ -117,6 +121,21 @@ func upgrade() -> EquipmentData:
 		new_stats[stat] += 1
 
 	return EquipmentData.new(id, name, description_key, slot, rarity, current_level + 1, max_level, new_stats, special_abilities.duplicate())
+
+## Creates and returns a copy of the item raised by one rarity tier, with
+## its base stats boosted by GameConstants.RARITY_UPGRADE_STAT_MULTIPLIER
+## (deterministic, no failure chance — see design document, section 10).
+## Level/max_level are left untouched: rarity and level are separate,
+## independently-tracked progressions. If already at LEGENDARY, returns self.
+func upgrade_rarity() -> EquipmentData:
+	if rarity >= GameEnums.EquipmentRarity.LEGENDARY:
+		return self
+
+	var new_stats: Dictionary[String, int] = base_stats.duplicate()
+	for stat: String in new_stats.keys():
+		new_stats[stat] = ceili(new_stats[stat] * GameConstants.RARITY_UPGRADE_STAT_MULTIPLIER)
+
+	return EquipmentData.new(id, name, description_key, slot, (rarity + 1) as GameEnums.EquipmentRarity, current_level, max_level, new_stats, special_abilities.duplicate())
 
 ## Returns the item's total stats, accounting for its base values and
 ## current upgrade level.

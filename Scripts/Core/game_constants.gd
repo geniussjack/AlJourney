@@ -194,6 +194,10 @@ const RAID_SUCCESS_RESOURCE_LOSS_PERCENT: int = 5
 ## deliberately larger than the success case.
 const RAID_FAILURE_RESOURCE_LOSS_PERCENT: int = 20
 
+## Stat multiplier applied to an item's base_stats when it's upgraded one
+## rarity tier (see design document, section 10; EquipmentData.upgrade_rarity()).
+const RARITY_UPGRADE_STAT_MULTIPLIER: float = 1.25
+
 ## File name used to store the player's save data.
 const SAVE_FILE_NAME: String = "save_data.json"
 ## Directory in which the save file is stored.

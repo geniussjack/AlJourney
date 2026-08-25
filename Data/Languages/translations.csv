@@ -92,6 +92,25 @@ UI_SETTLEMENT_NO_RAIDS_YET,No raids yet,Набегов ещё не было
 UI_SETTLEMENT_RAID_REPELLED,Raid repelled,Набег отбит
 UI_SETTLEMENT_RAID_FAILED,Raid failed,Набег не отражён
 UI_SETTLEMENT_SECONDS_AGO,seconds ago,сек. назад
+CATALYST_DRAUGR_RUNE_SHARD,Draugr Rune Shard,Осколок руны драугра
+CATALYST_DRAUGR_CHAIN_LINK,Draugr Chain Link,Звено кольчуги драугра
+CATALYST_ARCHSKELETON_SKULL_FRAGMENT,Archskeleton Skull Fragment,Фрагмент черепа архискелета
+CATALYST_ARCHSKELETON_RIB_BONE,Archskeleton Rib Bone,Ребро архискелета
+CATALYST_FROZEN_DRAUGR_HEART,Frozen Draugr Heart,Замёрзшее сердце драугра
+CATALYST_FROZEN_DRAUGR_GAUNTLET,Frozen Draugr Gauntlet,Мёрзлая рукавица драугра
+CATALYST_NECROMANCER_SOUL_SHARD,Necromancer's Soul Shard,Осколок души некроманта
+CATALYST_NECROMANCER_BONE_PLATE,Necromancer's Bone Plate,Костяная пластина некроманта
+UI_SETTLEMENT_FORGE_TITLE,Forge,Кузница
+UI_SETTLEMENT_UPGRADE_LEVEL,Upgrade Level,Улучшить уровень
+UI_SETTLEMENT_UPGRADE_RARITY,Upgrade Rarity,Повысить редкость
+UI_SETTLEMENT_MAX_RARITY,Max Rarity,Макс. редкость
+UI_SETTLEMENT_MISSING_CATALYST,Missing catalyst,Нет катализатора
+UI_SETTLEMENT_CATALYSTS_TITLE,Catalysts,Катализаторы
+RARITY_COMMON,Common,Обычное
+RARITY_UNCOMMON,Uncommon,Необычное
+RARITY_RARE,Rare,Редкое
+RARITY_EPIC,Epic,Эпическое
+RARITY_LEGENDARY,Legendary,Легендарное
 UI_SETTLEMENT_BACK,Back,Назад
 STRATEGIC_RESOURCE_WOOD,Wood,Дерево
 STRATEGIC_RESOURCE_STONE,Stone,Камень
