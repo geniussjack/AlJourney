@@ -82,7 +82,11 @@ func _refresh() -> void:
 	if _battle_manager.selected_ability == null:
 		_prompt_label.text = tr("UI_BATTLE_CHOOSE_ABILITY")
 
-		var abilities: Array[AbilityData] = AbilityDatabase.get_hero_abilities(_battle_manager.selected_actor.character_class)
+		# Named attack/support for the heroes, who always have one of each -
+		# a mercenary's two abilities can both be the same type instead (see
+		# design document, section 4), but the button wiring below doesn't
+		# care which is which, just which AbilityData each button submits.
+		var abilities: Array[AbilityData] = _get_actor_abilities(_battle_manager.selected_actor)
 		var attack: AbilityData = abilities[0]
 		var support: AbilityData = abilities[1]
 
@@ -96,7 +100,9 @@ func _refresh() -> void:
 		support_button.pressed.connect(func() -> void: _battle_manager.select_ability(support))
 		_ability_row.add_child(support_button)
 
-		if _battle_manager.is_ultimate_ready:
+		# Mercenaries don't have a unique ultimate - see design document,
+		# section 4/9 - only Altarion and Aldric do.
+		if _battle_manager.is_ultimate_ready and not _battle_manager.selected_actor.is_mercenary:
 			var ultimate: AbilityData = AbilityDatabase.get_hero_ultimate(_battle_manager.selected_actor.character_class)
 			var ultimate_button := Button.new()
 			ultimate_button.text = "%s: %s" % [tr("UI_BATTLE_ULTIMATE_READY"), tr(ultimate.name)]
@@ -106,6 +112,15 @@ func _refresh() -> void:
 		return
 
 	_prompt_label.text = tr("UI_BATTLE_CHOOSE_TARGET")
+
+## Returns the given actor's attack/support ability pair — from
+## AbilityDatabase for the two fixed heroes, or from the mercenary's own
+## subclass definition for a companion (see MercenaryDatabase; mercenaries
+## don't share the heroes' AbilityDatabase-driven ability pool).
+static func _get_actor_abilities(actor: PlayerCharacter) -> Array[AbilityData]:
+	if actor.is_mercenary:
+		return [actor.mercenary_subclass.ability_one, actor.mercenary_subclass.ability_two]
+	return AbilityDatabase.get_hero_abilities(actor.character_class)
 
 ## Frees every child of the given container.
 static func _clear_children(container: Node) -> void:
