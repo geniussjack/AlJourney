@@ -136,3 +136,10 @@ func go_to_shop() -> void:
 func game_over() -> void:
 	GameStateManager.change_state(GameEnums.GameState.GAME_OVER)
 	show_overlay("res://Scenes/UI/GameOverScreen.tscn")
+
+## Shows the "Victory" screen after defeating the Necromancer. Unlike
+## game_over(), this is a true GameStateManager.end_game(true) — the run is
+## over; VictoryUI's own buttons start a new game or return to the main menu.
+func go_to_victory() -> void:
+	GameStateManager.end_game(true)
+	show_overlay("res://Scenes/UI/VictoryScreen.tscn")
