@@ -90,6 +90,11 @@ func _build_top_bar() -> HBoxContainer:
 	shop_button.pressed.connect(SceneManager.go_to_shop)
 	top_bar.add_child(shop_button)
 
+	var settlement_button := Button.new()
+	settlement_button.text = tr("UI_MAP_SETTLEMENT")
+	settlement_button.pressed.connect(SceneManager.go_to_settlement)
+	top_bar.add_child(settlement_button)
+
 	var main_menu_button := Button.new()
 	main_menu_button.text = tr("UI_MAP_MAIN_MENU")
 	main_menu_button.pressed.connect(SceneManager.go_to_main_menu)

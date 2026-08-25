@@ -11,6 +11,8 @@ signal coins_changed(new_amount: int)
 ## Raised when a strategic resource's stored amount changes (settlement
 ## economy — see design document, section 9).
 signal strategic_resource_changed(resource: GameEnums.StrategicResource, new_amount: int)
+## Raised when a settlement building's level increases.
+signal building_upgraded(building: GameEnums.BuildingType, new_level: int)
 ## Raised when the heroes' stats are updated.
 signal hero_stats_changed
 ## Raised when the shared party level increases. Carries the new level —
@@ -193,6 +195,41 @@ func spend_strategic_resources(costs: Dictionary[GameEnums.StrategicResource, in
 		strategic_resource_changed.emit(resource, new_amount)
 
 	print("[GameStateManager] Spent strategic resources: %s" % costs)
+	return true
+
+## Returns the current level of the given settlement building. A building
+## that has never been upgraded reads as level 1 (buildings start already
+## built in a basic form — see SaveData.building_levels).
+func get_building_level(building: GameEnums.BuildingType) -> int:
+	return current_save.building_levels.get(building, 1) if current_save != null else 1
+
+## Attempts to upgrade the given building by one level: computes its cost
+## via BuildingDatabase from the current level, spends the resources
+## atomically, and raises the level on success.
+## Returns true if the building was successfully upgraded.
+func upgrade_building(building: GameEnums.BuildingType) -> bool:
+	if current_save == null:
+		return false
+
+	var data: BuildingData = BuildingDatabase.get_building(building)
+	if data == null:
+		return false
+
+	var current_level: int = get_building_level(building)
+	if current_level >= data.max_level:
+		print("[GameStateManager] %s is already at max level" % GameEnums.BuildingType.keys()[building])
+		return false
+
+	var cost: Dictionary[GameEnums.StrategicResource, int] = data.get_upgrade_cost(current_level)
+	if not spend_strategic_resources(cost):
+		print("[GameStateManager] Cannot afford to upgrade %s" % GameEnums.BuildingType.keys()[building])
+		return false
+
+	var new_level: int = current_level + 1
+	current_save.building_levels[building] = new_level
+	building_upgraded.emit(building, new_level)
+
+	print("[GameStateManager] Upgraded %s to level %d" % [GameEnums.BuildingType.keys()[building], new_level])
 	return true
 
 ## Grants the party shared XP, applying as many level-ups as the amount
