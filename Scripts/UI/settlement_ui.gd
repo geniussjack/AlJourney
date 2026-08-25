@@ -10,6 +10,10 @@ var _workers_summary_label: Label
 var _worker_rows: Dictionary[GameEnums.StrategicResource, Dictionary] = {}
 var _mercenary_rows: Dictionary[String, Dictionary] = {}
 var _potion_rows: Dictionary[String, Dictionary] = {}
+var _defense_count_label: Label
+var _defense_minus_button: Button
+var _defense_plus_button: Button
+var _last_raid_label: Label
 
 ## Builds the whole settlement layout and subscribes to state changes.
 func _ready() -> void:
@@ -47,6 +51,8 @@ func _ready() -> void:
 	GameStateManager.active_mercenary_changed.connect(_on_active_mercenary_changed)
 	GameStateManager.mercenary_recovery_changed.connect(_on_mercenary_recovery_changed)
 	GameStateManager.potion_count_changed.connect(_on_potion_count_changed)
+	GameStateManager.defense_workers_changed.connect(_on_defense_workers_changed)
+	GameStateManager.raid_resolved.connect(_on_raid_resolved)
 
 	_refresh_resources_label()
 	for building: GameEnums.BuildingType in _building_rows.keys():
@@ -245,7 +251,38 @@ func _build_workers_section() -> VBoxContainer:
 	for resource: GameEnums.StrategicResource in GameEnums.StrategicResource.values():
 		rows.add_child(_build_worker_row(resource))
 
+	rows.add_child(_build_defense_row())
+
+	_last_raid_label = Label.new()
+	section.add_child(_last_raid_label)
+
 	return section
+
+## Builds the settlement-defense worker assignment row — same shape as a
+## resource row, but draws from the same shared capacity pool without
+## producing a resource (see design document, section 9).
+func _build_defense_row() -> HBoxContainer:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 4)
+
+	var name_label := Label.new()
+	name_label.text = tr("UI_SETTLEMENT_DEFENSE")
+	row.add_child(name_label)
+
+	_defense_minus_button = Button.new()
+	_defense_minus_button.text = "-"
+	_defense_minus_button.pressed.connect(func() -> void: GameStateManager.unassign_defense_worker())
+	row.add_child(_defense_minus_button)
+
+	_defense_count_label = Label.new()
+	row.add_child(_defense_count_label)
+
+	_defense_plus_button = Button.new()
+	_defense_plus_button.text = "+"
+	_defense_plus_button.pressed.connect(func() -> void: GameStateManager.assign_defense_worker())
+	row.add_child(_defense_plus_button)
+
+	return row
 
 ## Builds one resource's worker assignment row: name, count, +/- buttons.
 func _build_worker_row(resource: GameEnums.StrategicResource) -> HBoxContainer:
@@ -289,6 +326,24 @@ func _refresh_workers_section() -> void:
 		(row["count_label"] as Label).text = "%d" % count
 		(row["minus_button"] as Button).disabled = count <= 0
 		(row["plus_button"] as Button).disabled = assigned >= capacity
+
+	var defense_count: int = GameStateManager.get_defense_workers()
+	_defense_count_label.text = "%d" % defense_count
+	_defense_minus_button.disabled = defense_count <= 0
+	_defense_plus_button.disabled = assigned >= capacity
+
+	_refresh_last_raid_label()
+
+## Refreshes the "last raid" status line: outcome and time since it happened.
+func _refresh_last_raid_label() -> void:
+	var save: SaveData = GameStateManager.current_save
+	if save == null or save.last_raid_unix_time <= 0:
+		_last_raid_label.text = tr("UI_SETTLEMENT_NO_RAIDS_YET")
+		return
+
+	var outcome_key: String = "UI_SETTLEMENT_RAID_REPELLED" if save.last_raid_succeeded else "UI_SETTLEMENT_RAID_FAILED"
+	var seconds_ago: int = maxi(0, Time.get_unix_time_from_system() - save.last_raid_unix_time)
+	_last_raid_label.text = "%s (%d %s)" % [tr(outcome_key), seconds_ago, tr("UI_SETTLEMENT_SECONDS_AGO")]
 
 ## Builds the title/back top bar.
 func _build_top_bar() -> HBoxContainer:
@@ -399,6 +454,13 @@ func _on_building_upgraded(building: GameEnums.BuildingType, _new_level: int) ->
 func _on_worker_assignment_changed(_resource: GameEnums.StrategicResource, _worker_count: int) -> void:
 	_refresh_workers_section()
 
+func _on_defense_workers_changed(_worker_count: int) -> void:
+	_refresh_workers_section()
+
+func _on_raid_resolved(_succeeded: bool, _resources_lost: Dictionary) -> void:
+	_refresh_resources_label()
+	_refresh_last_raid_label()
+
 func _on_upgrade_pressed(building: GameEnums.BuildingType) -> void:
 	GameStateManager.upgrade_building(building)
 
@@ -419,3 +481,7 @@ func _exit_tree() -> void:
 		GameStateManager.mercenary_recovery_changed.disconnect(_on_mercenary_recovery_changed)
 	if GameStateManager.potion_count_changed.is_connected(_on_potion_count_changed):
 		GameStateManager.potion_count_changed.disconnect(_on_potion_count_changed)
+	if GameStateManager.defense_workers_changed.is_connected(_on_defense_workers_changed):
+		GameStateManager.defense_workers_changed.disconnect(_on_defense_workers_changed)
+	if GameStateManager.raid_resolved.is_connected(_on_raid_resolved):
+		GameStateManager.raid_resolved.disconnect(_on_raid_resolved)

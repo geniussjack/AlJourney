@@ -31,6 +31,11 @@ signal active_mercenary_changed(key: String)
 signal mercenary_recovery_changed(key: String, battles_remaining: int)
 ## Raised when the owned count of a potion changes (brewed or used).
 signal potion_count_changed(id: String, new_count: int)
+## Raised when the number of villagers assigned to settlement defense changes.
+signal defense_workers_changed(worker_count: int)
+## Raised when an undead raid is resolved (see design document, section 9).
+## resources_lost: the amount of each strategic resource lost, keyed by type.
+signal raid_resolved(succeeded: bool, resources_lost: Dictionary[GameEnums.StrategicResource, int])
 
 ## The current global game state. Only ever changed through change_state().
 var current_state: GameEnums.GameState = GameEnums.GameState.MAIN_MENU
@@ -90,11 +95,13 @@ func _process(delta: float) -> void:
 
 	_resource_tick_check_accumulator = 0.0
 	_apply_elapsed_resource_gains()
+	_apply_elapsed_raid_checks()
 
 ## Starts a new game, resetting progress and setting initial values.
 func start_new_game() -> void:
 	current_save = SaveData.create_new()
 	current_save.last_resource_tick_unix_time = Time.get_unix_time_from_system()
+	current_save.last_raid_check_unix_time = Time.get_unix_time_from_system()
 	is_game_active = true
 	current_state = GameEnums.GameState.MAP
 
@@ -118,6 +125,7 @@ func load_game(save_data: SaveData) -> void:
 
 	InventoryManager.load_from_data(current_save)
 	_apply_elapsed_resource_gains()
+	_apply_elapsed_raid_checks()
 
 	print("[GameStateManager] Game loaded - Wave %d" % current_save.current_wave)
 
@@ -280,12 +288,43 @@ func get_worker_capacity() -> int:
 func get_assigned_workers(resource: GameEnums.StrategicResource) -> int:
 	return current_save.worker_assignments.get(resource, 0) if current_save != null else 0
 
-## Total villagers currently assigned across every resource.
+## Total villagers currently assigned across every resource and defense —
+## a villager gathers a resource or defends the settlement, never both at
+## once (design document, section 9), so both draw from the same capacity.
 func get_total_assigned_workers() -> int:
-	var total: int = 0
+	var total: int = get_defense_workers()
 	for resource: GameEnums.StrategicResource in GameEnums.StrategicResource.values():
 		total += get_assigned_workers(resource)
 	return total
+
+## Number of villagers currently assigned to defend the settlement against
+## undead raids instead of gathering a resource.
+func get_defense_workers() -> int:
+	return current_save.defense_workers if current_save != null else 0
+
+## Assigns one more villager to settlement defense, if capacity allows.
+## Returns true if a villager was assigned.
+func assign_defense_worker() -> bool:
+	if current_save == null or get_total_assigned_workers() >= get_worker_capacity():
+		return false
+
+	current_save.defense_workers += 1
+	defense_workers_changed.emit(current_save.defense_workers)
+
+	print("[GameStateManager] Assigned a worker to defense (now %d)" % current_save.defense_workers)
+	return true
+
+## Removes one villager from settlement defense, if any are assigned.
+## Returns true if a villager was unassigned.
+func unassign_defense_worker() -> bool:
+	if current_save == null or current_save.defense_workers <= 0:
+		return false
+
+	current_save.defense_workers -= 1
+	defense_workers_changed.emit(current_save.defense_workers)
+
+	print("[GameStateManager] Unassigned a worker from defense (now %d)" % current_save.defense_workers)
+	return true
 
 ## Assigns one more villager to gather the given resource, if capacity allows.
 ## Returns true if a villager was assigned.
@@ -485,6 +524,60 @@ func _apply_elapsed_resource_gains() -> void:
 			add_strategic_resource(resource, workers * GameConstants.RESOURCE_PER_WORKER_PER_TICK * ticks)
 
 	current_save.last_resource_tick_unix_time += int(ticks * GameConstants.SECONDS_PER_RESOURCE_TICK)
+
+## Resolves every undead raid attempt that should have happened for every
+## full RAID_CHECK_INTERVAL_SECONDS of real time elapsed since the last
+## check — the same real-time/offline-catch-up pattern as
+## _apply_elapsed_resource_gains(). A long offline gap resolves to several
+## raids in a row, one per elapsed interval, each independently.
+func _apply_elapsed_raid_checks() -> void:
+	if current_save == null:
+		return
+
+	var now: int = Time.get_unix_time_from_system()
+
+	if current_save.last_raid_check_unix_time <= 0:
+		current_save.last_raid_check_unix_time = now
+		return
+
+	var elapsed: int = now - current_save.last_raid_check_unix_time
+	var raids: int = int(float(elapsed) / GameConstants.RAID_CHECK_INTERVAL_SECONDS)
+	if raids <= 0:
+		return
+
+	for i: int in range(raids):
+		_resolve_raid()
+
+	current_save.last_raid_check_unix_time += int(raids * GameConstants.RAID_CHECK_INTERVAL_SECONDS)
+
+## Resolves a single undead raid: compares defense power (villagers
+## assigned to defense, plus the Wall's level) against the raid's
+## strength (scaled by highest_wave reached), then deducts a percentage of
+## every stored strategic resource — more on failure than on success (see
+## design document, section 9; exact numbers are placeholder balance).
+func _resolve_raid() -> void:
+	var defense_power: int = (get_defense_workers() * GameConstants.RAID_DEFENSE_PER_WORKER) + (get_building_level(GameEnums.BuildingType.WALL) * GameConstants.RAID_DEFENSE_PER_WALL_LEVEL)
+	var raid_strength: int = GameConstants.RAID_BASE_STRENGTH + (current_save.highest_wave * GameConstants.RAID_STRENGTH_PER_WAVE)
+	var succeeded: bool = defense_power >= raid_strength
+	var loss_percent: int = GameConstants.RAID_SUCCESS_RESOURCE_LOSS_PERCENT if succeeded else GameConstants.RAID_FAILURE_RESOURCE_LOSS_PERCENT
+
+	var resources_lost: Dictionary[GameEnums.StrategicResource, int] = {}
+	for resource: GameEnums.StrategicResource in GameEnums.StrategicResource.values():
+		var stored: int = get_strategic_resource(resource)
+		var loss: int = (stored * loss_percent) / 100
+		if loss <= 0:
+			continue
+
+		resources_lost[resource] = loss
+		var new_amount: int = stored - loss
+		current_save.strategic_resources[resource] = new_amount
+		strategic_resource_changed.emit(resource, new_amount)
+
+	current_save.last_raid_succeeded = succeeded
+	current_save.last_raid_unix_time = Time.get_unix_time_from_system()
+	raid_resolved.emit(succeeded, resources_lost)
+
+	print("[GameStateManager] Raid %s (defense %d vs strength %d), lost: %s" % ["repelled" if succeeded else "failed", defense_power, raid_strength, resources_lost])
 
 ## Grants the party shared XP, applying as many level-ups as the amount
 ## covers (capped at GameConstants.PARTY_LEVEL_MAX). Only updates the
