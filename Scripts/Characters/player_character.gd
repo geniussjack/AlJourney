@@ -54,6 +54,13 @@ func _get_equipment_stat(stat_name: String) -> int:
 		total += item.get_total_stats().get(stat_name, 0)
 	return total
 
+## Whether any piece of equipped gear grants immunity to the given status
+## effect's key (e.g. "burn" for Dragon Scales' immunity_burn stat). Used
+## for narrow, per-effect immunity — unlike GameEnums.StatusEffect.IMMUNITY,
+## which blocks all damage and effects outright.
+func has_equipment_immunity(status_key: String) -> bool:
+	return _get_equipment_stat("immunity_%s" % status_key) > 0
+
 ## Returns the given stat's total bonus from the legacy ability system's
 ## equipped abilities.
 func _get_ability_stat(stat_name: String) -> int:
@@ -81,8 +88,10 @@ func calculate_damage(attack_base_damage: int) -> int:
 	var total_base_damage: int = _base_damage + equip_bonus + ability_bonus
 	var final_damage: int = attack_base_damage + total_base_damage
 
-	if has_status_effect(GameEnums.StatusEffect.WEAKENED):
-		final_damage = ceili(final_damage * 0.7)
+	var weaken_effect: StatusEffectData = get_active_status_effect(GameEnums.StatusEffect.WEAKENED)
+	if weaken_effect != null:
+		var reduction: float = weaken_effect.extra_data if weaken_effect.extra_data > 0.0 else Character.DEFAULT_WEAKEN_REDUCTION
+		final_damage = ceili(final_damage * (1.0 - reduction))
 		print("[%s] Damage reduced by Weakened status: %d" % [_name, final_damage])
 
 	return final_damage

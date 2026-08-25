@@ -23,6 +23,14 @@ signal character_died
 ## the status effect icons in BattleHUD.
 signal status_effect_added(effect_type: GameEnums.StatusEffect, duration: int, power: int)
 
+## Fallback defense reduction for Weakened when the applied effect doesn't
+## specify its own magnitude via extra_data (e.g. the Necromancer's
+## Weakening Darkness).
+const DEFAULT_WEAKEN_REDUCTION: float = 0.3
+## Fallback damage amplification for Shock/Vulnerable when the applied
+## effect doesn't specify its own magnitude via extra_data.
+const DEFAULT_DAMAGE_AMP_BONUS: float = 0.5
+
 ## The character's display name (a localization key).
 var _name: String
 var _max_health: int
@@ -118,14 +126,23 @@ func take_damage(damage: int, incoming_attack_type: GameEnums.AttackType, can_re
 func _calculate_final_damage(raw_damage: int) -> int:
 	var effective_defense: int = get_total_defense()
 
-	if has_status_effect(GameEnums.StatusEffect.WEAKENED):
-		effective_defense = ceili(effective_defense * 0.7)
+	var weaken_effect: StatusEffectData = get_active_status_effect(GameEnums.StatusEffect.WEAKENED)
+	if weaken_effect != null:
+		var reduction: float = weaken_effect.extra_data if weaken_effect.extra_data > 0.0 else DEFAULT_WEAKEN_REDUCTION
+		effective_defense = ceili(effective_defense * (1.0 - reduction))
 		print("[%s] Defense reduced by Weakened status: %d" % [_name, effective_defense])
 
 	var final_damage: int = maxi(1, raw_damage - effective_defense)
 
-	if has_status_effect(GameEnums.StatusEffect.SHOCK) or has_status_effect(GameEnums.StatusEffect.VULNERABLE):
-		final_damage = ceili(final_damage * 1.5)
+	var shock_effect: StatusEffectData = get_active_status_effect(GameEnums.StatusEffect.SHOCK)
+	var vulnerable_effect: StatusEffectData = get_active_status_effect(GameEnums.StatusEffect.VULNERABLE)
+	if shock_effect != null or vulnerable_effect != null:
+		var bonus: float = DEFAULT_DAMAGE_AMP_BONUS
+		if shock_effect != null and shock_effect.extra_data > 0.0:
+			bonus = shock_effect.extra_data
+		if vulnerable_effect != null and vulnerable_effect.extra_data > 0.0:
+			bonus = maxf(bonus, vulnerable_effect.extra_data)
+		final_damage = ceili(final_damage * (1.0 + bonus))
 		print("[%s] Damage increased by Shock/Vulnerable status: %d" % [_name, final_damage])
 
 	return final_damage
@@ -270,10 +287,16 @@ func _apply_effect_tick(effect: StatusEffectData) -> void:
 
 ## Checks whether a specific status effect is active on the character.
 func has_status_effect(effect_type: GameEnums.StatusEffect) -> bool:
+	return get_active_status_effect(effect_type) != null
+
+## Returns the active status effect instance of the given type, or null if
+## none is active. Used where the effect's stored magnitude (extra_data)
+## matters, not just whether it's present.
+func get_active_status_effect(effect_type: GameEnums.StatusEffect) -> StatusEffectData:
 	for effect: StatusEffectData in _active_effects:
 		if effect.type == effect_type:
-			return true
-	return false
+			return effect
+	return null
 
 ## Returns the list of every effect currently active. A copy is returned to
 ## prevent accidental modification.
