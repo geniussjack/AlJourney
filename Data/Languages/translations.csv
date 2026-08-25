@@ -73,6 +73,13 @@ UI_SETTLEMENT_TITLE,Settlement,Поселение
 UI_SETTLEMENT_LEVEL,Level,Уровень
 UI_SETTLEMENT_MAX_LEVEL,Max Level,Макс. уровень
 UI_SETTLEMENT_UPGRADE,Upgrade,Улучшить
+UI_SETTLEMENT_MERCENARIES_TITLE,Mercenaries,Наёмники
+UI_MERCENARY_SELECT,Recruit,Призвать
+UI_MERCENARY_CLEAR,Dismiss,Отпустить
+UI_MERCENARY_ACTIVE,In the party,В отряде
+UI_MERCENARY_RECOVERING,Recovering (battles left),Восстанавливается (боёв осталось)
+UI_MERCENARY_LOCKED_BARRACKS,Requires Barracks level,Требуется уровень Казармы
+UI_MERCENARY_LOCKED_STORY,Locked by story progress,Откроется по ходу сюжета
 UI_SETTLEMENT_BACK,Back,Назад
 STRATEGIC_RESOURCE_WOOD,Wood,Дерево
 STRATEGIC_RESOURCE_STONE,Stone,Камень
