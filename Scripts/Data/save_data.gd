@@ -20,6 +20,13 @@ var completed_level_ids: Array[String] = []
 ## The number of coins the player has.
 var coins: int = 0
 
+## The party's shared level, grown by combat XP (see
+## GameStateManager.add_party_xp). Increases both heroes' base stats on
+## level-up — a separate growth path from shop-purchased upgrades.
+var party_level: int = 1
+## XP accumulated toward the party's next level (resets on level-up, not cumulative).
+var party_xp: int = 0
+
 ## The Mage's current health.
 var mage_health: int = 0
 ## The Mage's maximum health.
@@ -76,6 +83,8 @@ static func create_new() -> SaveData:
 	save.current_level_id = CampaignDatabase.FIRST_LEVEL_ID
 	save.completed_level_ids = []
 	save.coins = 0
+	save.party_level = 1
+	save.party_xp = 0
 
 	save.mage_max_health = GameConstants.MAGE_BASE_HP
 	save.mage_health = GameConstants.MAGE_BASE_HP
@@ -136,6 +145,8 @@ func to_dict() -> Dictionary:
 		"currentLevelId": current_level_id,
 		"completedLevelIds": completed_level_ids,
 		"coins": coins,
+		"partyLevel": party_level,
+		"partyXp": party_xp,
 		"mageHealth": mage_health,
 		"mageMaxHealth": mage_max_health,
 		"mageDamage": mage_damage,
@@ -166,6 +177,8 @@ static func from_dict(data: Dictionary) -> SaveData:
 		save.completed_level_ids.append(level_id)
 
 	save.coins = int(data.get("coins", 0))
+	save.party_level = int(data.get("partyLevel", 1))
+	save.party_xp = int(data.get("partyXp", 0))
 
 	save.mage_health = int(data.get("mageHealth", 0))
 	save.mage_max_health = int(data.get("mageMaxHealth", 0))

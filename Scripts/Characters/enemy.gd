@@ -33,6 +33,9 @@ var enemy_type: GameEnums.EnemyType
 ## The gold coin reward for defeating this enemy.
 var coin_reward: int
 
+## The shared party XP reward for defeating this enemy.
+var xp_reward: int
+
 ## The original number of creatures in the stack, as set at creation.
 var _stack_count_raw: int = 1
 
@@ -87,7 +90,16 @@ static func create(enemy_type: GameEnums.EnemyType, wave_number: int, stack_coun
 	enemy.initialize(name_key, total_hp, scaled_dmg, scaled_defense, attack_type)
 	enemy.coin_reward = scaled_reward * stack_count
 
-	print("[Enemy] Created %s x%d (Wave %d) - Total HP: %d, Base DMG: %d, Base DEF: %d, Reward: %d" % [name_key, stack_count, wave_number, total_hp, scaled_dmg, scaled_defense, enemy.coin_reward])
+	var xp_base: int
+	if enemy.is_boss:
+		xp_base = GameConstants.XP_PER_BOSS
+	elif enemy.is_miniboss:
+		xp_base = GameConstants.XP_PER_MINIBOSS
+	else:
+		xp_base = GameConstants.XP_PER_BASIC_ENEMY
+	enemy.xp_reward = ScalingSystem.scale_reward(xp_base, wave_number) * stack_count
+
+	print("[Enemy] Created %s x%d (Wave %d) - Total HP: %d, Base DMG: %d, Base DEF: %d, Reward: %d, XP: %d" % [name_key, stack_count, wave_number, total_hp, scaled_dmg, scaled_defense, enemy.coin_reward, enemy.xp_reward])
 	return enemy
 
 ## Looks up an enemy type's base stats, falling back to a generic weak

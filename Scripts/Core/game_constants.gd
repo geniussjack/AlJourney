@@ -120,6 +120,28 @@ const COINS_PER_MINIBOSS: int = 40
 ## Coins dropped for defeating a main boss.
 const COINS_PER_BOSS: int = 150
 
+## Shared party XP granted for defeating a basic enemy.
+const XP_PER_BASIC_ENEMY: int = 5
+## Shared party XP granted for defeating a miniboss.
+const XP_PER_MINIBOSS: int = 25
+## Shared party XP granted for defeating a main boss.
+const XP_PER_BOSS: int = 100
+
+## XP required to advance from party level 1 to level 2. Each further level
+## costs PARTY_LEVEL_XP_GROWTH more than the last (see
+## GameStateManager._xp_to_next_level).
+const PARTY_LEVEL_BASE_XP: int = 100
+## Additional XP required for each party level beyond the first.
+const PARTY_LEVEL_XP_GROWTH: int = 50
+## Highest attainable party level — a sanity cap against unbounded stat growth.
+const PARTY_LEVEL_MAX: int = 50
+## Max health granted to every party member per party level gained.
+const PARTY_LEVEL_HP_BONUS: int = 5
+## Damage granted to every party member per party level gained.
+const PARTY_LEVEL_DAMAGE_BONUS: int = 1
+## Defense granted to every party member per party level gained.
+const PARTY_LEVEL_DEFENSE_BONUS: int = 1
+
 ## File name used to store the player's save data.
 const SAVE_FILE_NAME: String = "save_data.json"
 ## Directory in which the save file is stored.

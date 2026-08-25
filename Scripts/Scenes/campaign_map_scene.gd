@@ -77,6 +77,10 @@ func _build_top_bar() -> HBoxContainer:
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	top_bar.add_child(title)
 
+	var party_level_label := Label.new()
+	party_level_label.text = "%s %d" % [tr("UI_PARTY_LEVEL"), GameStateManager.party_level]
+	top_bar.add_child(party_level_label)
+
 	_save_indicator_label = Label.new()
 	_save_indicator_label.visible = false
 	top_bar.add_child(_save_indicator_label)

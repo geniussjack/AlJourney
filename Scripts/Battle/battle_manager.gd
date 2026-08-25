@@ -310,6 +310,7 @@ func on_enemy_died(enemy: Enemy) -> void:
 	enemy_defeated.emit(enemy)
 
 	GameStateManager.add_coins(enemy.coin_reward)
+	_grant_party_xp(enemy.xp_reward)
 
 	if enemy.is_boss or enemy.is_miniboss:
 		_generate_boss_loot()
@@ -348,6 +349,19 @@ func _on_party_defeated() -> void:
 func _generate_boss_loot() -> void:
 	var loot: Array[EquipmentData] = LootSystem.generate_boss_loot(current_wave)
 	InventoryManager.add_items(loot)
+
+## Grants shared party XP and, for every level gained, applies the flat
+## stat bonus to every live party member. GameStateManager only tracks the
+## level/XP counters in the save — it has no reference to the active
+## DualHeroSystem, so applying bonuses to the live Character instances is
+## this manager's job (it already owns hero_system for the battle).
+func _grant_party_xp(amount: int) -> void:
+	var levels_gained: int = GameStateManager.add_party_xp(amount)
+	for i: int in range(levels_gained):
+		for member: PlayerCharacter in hero_system.get_party_members():
+			member.increase_max_health(GameConstants.PARTY_LEVEL_HP_BONUS)
+			member.increase_damage(GameConstants.PARTY_LEVEL_DAMAGE_BONUS)
+			member.increase_defense(GameConstants.PARTY_LEVEL_DEFENSE_BONUS)
 
 ## Called when every enemy on the field is dead. Can fire from two
 ## independent places — on_enemy_died() deferred (via call_deferred) and

@@ -10,6 +10,10 @@ signal wave_changed(wave_number: int)
 signal coins_changed(new_amount: int)
 ## Raised when the heroes' stats are updated.
 signal hero_stats_changed
+## Raised when the shared party level increases. Carries the new level —
+## if multiple levels were gained from a single XP grant, this only fires
+## once, already at the final level.
+signal party_leveled_up(new_level: int)
 
 ## The current global game state. Only ever changed through change_state().
 var current_state: GameEnums.GameState = GameEnums.GameState.MAIN_MENU
@@ -43,6 +47,11 @@ var completed_level_ids: Array[String]:
 var coins: int:
 	get:
 		return current_save.coins if current_save != null else 0
+
+## The party's current shared level.
+var party_level: int:
+	get:
+		return current_save.party_level if current_save != null else 1
 
 ## Initializes the state manager when it is added to the scene tree.
 func _ready() -> void:
@@ -144,6 +153,39 @@ func spend_coins(amount: int) -> bool:
 
 	print("[GameStateManager] Spent %d coins. Remaining: %d" % [amount, current_save.coins])
 	return true
+
+## Grants the party shared XP, applying as many level-ups as the amount
+## covers (capped at GameConstants.PARTY_LEVEL_MAX). Only updates the
+## level/XP counters in the save — the caller is responsible for applying
+## the resulting per-level stat bonuses to any live Character instances
+## (see BattleManager.on_enemy_died), since this manager has no reference
+## to the active DualHeroSystem during a battle.
+## Returns the number of levels gained.
+func add_party_xp(amount: int) -> int:
+	if current_save == null or amount <= 0:
+		return 0
+
+	current_save.party_xp += amount
+	var levels_gained: int = 0
+
+	while current_save.party_level < GameConstants.PARTY_LEVEL_MAX:
+		var required: int = _xp_to_next_party_level(current_save.party_level)
+		if current_save.party_xp < required:
+			break
+
+		current_save.party_xp -= required
+		current_save.party_level += 1
+		levels_gained += 1
+
+	if levels_gained > 0:
+		party_leveled_up.emit(current_save.party_level)
+		print("[GameStateManager] Party leveled up to %d (+%d)" % [current_save.party_level, levels_gained])
+
+	return levels_gained
+
+## XP required to advance from the given party level to the next one.
+func _xp_to_next_party_level(level: int) -> int:
+	return GameConstants.PARTY_LEVEL_BASE_XP + ((level - 1) * GameConstants.PARTY_LEVEL_XP_GROWTH)
 
 ## Updates the base stats of both heroes in the save data.
 func update_hero_stats(
