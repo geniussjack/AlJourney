@@ -59,6 +59,10 @@ var active_mercenary_key: String = ""
 ## mercenary who has never been used.
 var mercenary_recovery: Dictionary[String, int] = {}
 
+## Number of each Herbalist-brewed potion currently owned, keyed by
+## PotionData.id. Missing keys mean 0, same as a potion never brewed.
+var potion_counts: Dictionary[String, int] = {}
+
 ## The Mage's current health.
 var mage_health: int = 0
 ## The Mage's maximum health.
@@ -195,6 +199,7 @@ func to_dict() -> Dictionary:
 		"lastResourceTickUnixTime": last_resource_tick_unix_time,
 		"activeMercenaryKey": active_mercenary_key,
 		"mercenaryRecovery": mercenary_recovery.duplicate(),
+		"potionCounts": potion_counts.duplicate(),
 		"partyLevel": party_level,
 		"partyXp": party_xp,
 		"mageHealth": mage_health,
@@ -249,6 +254,11 @@ static func from_dict(data: Dictionary) -> SaveData:
 	var mercenary_recovery_dict: Dictionary = data.get("mercenaryRecovery", {})
 	for key: String in mercenary_recovery_dict.keys():
 		save.mercenary_recovery[key] = int(mercenary_recovery_dict[key])
+
+	save.potion_counts = {}
+	var potion_counts_dict: Dictionary = data.get("potionCounts", {})
+	for key: String in potion_counts_dict.keys():
+		save.potion_counts[key] = int(potion_counts_dict[key])
 
 	save.party_level = int(data.get("partyLevel", 1))
 	save.party_xp = int(data.get("partyXp", 0))

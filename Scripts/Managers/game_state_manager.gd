@@ -29,6 +29,8 @@ signal active_mercenary_changed(key: String)
 ## Raised when a mercenary's recovery countdown changes, carrying its key
 ## and the number of battles remaining (0 means available again).
 signal mercenary_recovery_changed(key: String, battles_remaining: int)
+## Raised when the owned count of a potion changes (brewed or used).
+signal potion_count_changed(id: String, new_count: int)
 
 ## The current global game state. Only ever changed through change_state().
 var current_state: GameEnums.GameState = GameEnums.GameState.MAIN_MENU
@@ -413,6 +415,48 @@ func on_battle_completed() -> void:
 func _get_mercenary_recovery_duration() -> int:
 	var herbalist_level: int = get_building_level(GameEnums.BuildingType.HERBALIST)
 	return maxi(GameConstants.MERCENARY_MIN_RECOVERY_BATTLES, GameConstants.MERCENARY_BASE_RECOVERY_BATTLES - (herbalist_level - 1))
+
+## Number of the given potion currently owned. A potion never brewed reads
+## as 0, not an error.
+func get_potion_count(id: String) -> int:
+	return current_save.potion_counts.get(id, 0) if current_save != null else 0
+
+## Whether the given potion's recipe is available yet, based on Herbalist level.
+func is_potion_unlocked(potion: PotionData) -> bool:
+	return get_building_level(GameEnums.BuildingType.HERBALIST) >= potion.required_herbalist_level
+
+## Brews one unit of the given potion: spends its resource cost atomically
+## and adds it to the owned count. Fails if the recipe isn't unlocked yet
+## or the resources can't be afforded.
+## Returns true if the potion was successfully brewed.
+func brew_potion(potion: PotionData) -> bool:
+	if current_save == null or potion == null or not is_potion_unlocked(potion):
+		return false
+
+	if not spend_strategic_resources(potion.brew_cost):
+		return false
+
+	var new_count: int = get_potion_count(potion.id) + 1
+	current_save.potion_counts[potion.id] = new_count
+	potion_count_changed.emit(potion.id, new_count)
+
+	print("[GameStateManager] Brewed %s (now own %d)" % [potion.id, new_count])
+	return true
+
+## Consumes one unit of the given potion, if any are owned. The caller
+## (BattleManager) is responsible for actually applying its effect — this
+## manager has no reference to the live party during a battle.
+## Returns true if a potion was available and consumed.
+func use_potion(id: String) -> bool:
+	if current_save == null or get_potion_count(id) <= 0:
+		return false
+
+	var new_count: int = get_potion_count(id) - 1
+	current_save.potion_counts[id] = new_count
+	potion_count_changed.emit(id, new_count)
+
+	print("[GameStateManager] Used %s (now own %d)" % [id, new_count])
+	return true
 
 ## Credits resources gathered by assigned workers for every full tick
 ## (GameConstants.SECONDS_PER_RESOURCE_TICK) of real time elapsed since

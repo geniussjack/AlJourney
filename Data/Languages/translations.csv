@@ -80,6 +80,13 @@ UI_MERCENARY_ACTIVE,In the party,В отряде
 UI_MERCENARY_RECOVERING,Recovering (battles left),Восстанавливается (боёв осталось)
 UI_MERCENARY_LOCKED_BARRACKS,Requires Barracks level,Требуется уровень Казармы
 UI_MERCENARY_LOCKED_STORY,Locked by story progress,Откроется по ходу сюжета
+UI_SETTLEMENT_POTIONS_TITLE,Potions,Зелья
+UI_SETTLEMENT_BREW,Brew,Сварить
+UI_SETTLEMENT_OWNED,Owned,В запасе
+UI_SETTLEMENT_REQUIRES_HERBALIST_LEVEL,Requires Herbalist level,Требуется уровень Травницы
+POTION_SINGLE_HEAL,Healing Draught,Зелье лечения
+POTION_PARTY_HEAL,Draught of Renewal,Зелье обновления
+POTION_ULTIMATE_FILL,Draught of Fury,Зелье ярости
 UI_SETTLEMENT_BACK,Back,Назад
 STRATEGIC_RESOURCE_WOOD,Wood,Дерево
 STRATEGIC_RESOURCE_STONE,Stone,Камень
