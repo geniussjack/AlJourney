@@ -4,8 +4,21 @@ extends RefCounted
 ## with an arbitrary composition of the player's living party (2 heroes +
 ## an optional mercenary), rather than a hardcoded Mage/Warrior pair.
 
-## Performs one enemy's action for the current turn: a standard attack, or
-## (for the Necromancer boss) one of its special abilities.
+## Fraction of an enemy's max HP below which it becomes eligible to be
+## healed instead of attacked (a wounded ally, or itself). Formalizes the
+## previously-undefined "when does an enemy support instead of attack"
+## decision (see design document, section 3) — open to rebalance.
+const SUPPORT_HP_THRESHOLD: float = 0.5
+## Chance a non-boss enemy skips its attack in favor of healing the most
+## wounded eligible ally when one exists, rather than always healing.
+const SUPPORT_ACTION_CHANCE: float = 0.4
+## Fraction of the healed target's max HP restored by a support action.
+const SUPPORT_HEAL_PERCENT: float = 0.20
+
+## Performs one enemy's action for the current turn: a standard attack, a
+## defensive/support action (healing the most wounded living ally,
+## including itself), or — for the Necromancer boss, which has its own
+## turn-selection logic — one of its special abilities.
 static func perform_enemy_action(enemy: Enemy, battle_manager: BattleManager, camera_shake: CameraShake) -> void:
 	if enemy.is_stunned:
 		return
@@ -14,12 +27,48 @@ static func perform_enemy_action(enemy: Enemy, battle_manager: BattleManager, ca
 	if alive_members.is_empty():
 		return
 
-	var target: PlayerCharacter = _select_target(alive_members, enemy)
-
 	if enemy.is_boss:
-		_perform_necromancer_action(enemy, target, battle_manager)
-	else:
-		_execute_standard_enemy_attack(enemy, target, battle_manager, camera_shake)
+		var boss_target: PlayerCharacter = _select_target(alive_members, enemy)
+		_perform_necromancer_action(enemy, boss_target, battle_manager)
+		return
+
+	var living_allies: Array[Enemy] = []
+	for candidate: Enemy in battle_manager.enemies:
+		if candidate.is_alive:
+			living_allies.append(candidate)
+
+	var support_target: Enemy = _select_support_target(living_allies)
+	if support_target != null and randf() < SUPPORT_ACTION_CHANCE:
+		_execute_support_action(enemy, support_target)
+		return
+
+	var target: PlayerCharacter = _select_target(alive_members, enemy)
+	_execute_standard_enemy_attack(enemy, target, battle_manager, camera_shake)
+
+## Picks the most critically wounded living ally-enemy (including the
+## acting enemy itself) below SUPPORT_HP_THRESHOLD, or null if none
+## qualifies.
+static func _select_support_target(living_allies: Array[Enemy]) -> Enemy:
+	var most_wounded: Enemy = null
+	var lowest_ratio: float = 1.0
+
+	for ally: Enemy in living_allies:
+		var max_hp: int = ally.get_total_max_health()
+		if max_hp <= 0:
+			continue
+
+		var ratio: float = float(ally.current_health) / max_hp
+		if ratio < SUPPORT_HP_THRESHOLD and ratio < lowest_ratio:
+			most_wounded = ally
+			lowest_ratio = ratio
+
+	return most_wounded
+
+## Heals the chosen ally instead of attacking this turn.
+static func _execute_support_action(enemy: Enemy, target: Enemy) -> void:
+	var heal_amount: int = ceili(target.get_total_max_health() * SUPPORT_HEAL_PERCENT)
+	print("[%s] supports %s for %d HP" % [enemy.get_character_name(), target.get_character_name(), heal_amount])
+	target.heal(heal_amount)
 
 ## Executes a standard (non-boss) enemy attack against the chosen target.
 static func _execute_standard_enemy_attack(enemy: Enemy, target: PlayerCharacter, battle_manager: BattleManager, camera_shake: CameraShake) -> void:
