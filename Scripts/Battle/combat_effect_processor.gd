@@ -33,8 +33,52 @@ static func _deal_damage(target: Character, damage: int, caster: PlayerCharacter
 	AudioManager.play_hit_sound()
 	ComboParticles.spawn_damage_number(battle_manager, particle_pos, damage)
 
+	if target.is_alive:
+		_apply_weapon_status_effects(caster, target)
+
 	if reflected > 0:
 		caster.take_damage(reflected, target.attack_type, false)
+
+## Duration (in turns) applied to weapon-driven damage-over-time effects
+## (Burning/Bleeding) on hit.
+const WEAPON_DOT_DURATION: int = 3
+## Duration (in turns) applied to weapon-driven debuffs (Weakened/Shock/
+## Vulnerable) on hit.
+const WEAPON_DEBUFF_DURATION: int = 2
+
+## Reads the caster's equipped weapon for status-inducing stats
+## (burn_damage, bleed_damage, weaken_amount, shock_amount,
+## vulnerable_amount — see EquipmentDatabase) and applies the matching
+## status effect to the target that was just hit. Only the weapon slot is
+## checked, since these are elemental weapon stats, not general equipment
+## bonuses.
+static func _apply_weapon_status_effects(caster: PlayerCharacter, target: Character) -> void:
+	var weapon: EquipmentData = InventoryManager.get_equipped_item(caster.character_class, GameEnums.EquipmentSlot.WEAPON)
+	if weapon == null:
+		return
+
+	var stats: Dictionary[String, int] = weapon.get_total_stats()
+
+	if stats.has("burn_damage") and not _has_immunity(target, "burn"):
+		target.apply_status_effect(StatusEffectData.new(GameEnums.StatusEffect.BURNING, WEAPON_DOT_DURATION, stats["burn_damage"]))
+
+	if stats.has("bleed_damage") and not _has_immunity(target, "bleed"):
+		target.apply_status_effect(StatusEffectData.new(GameEnums.StatusEffect.BLEEDING, WEAPON_DOT_DURATION, stats["bleed_damage"]))
+
+	if stats.has("weaken_amount") and not _has_immunity(target, "weaken"):
+		target.apply_status_effect(StatusEffectData.new(GameEnums.StatusEffect.WEAKENED, WEAPON_DEBUFF_DURATION, 0, stats["weaken_amount"] / 100.0))
+
+	if stats.has("shock_amount") and not _has_immunity(target, "shock"):
+		target.apply_status_effect(StatusEffectData.new(GameEnums.StatusEffect.SHOCK, WEAPON_DEBUFF_DURATION, 0, stats["shock_amount"] / 100.0))
+
+	if stats.has("vulnerable_amount") and not _has_immunity(target, "vulnerable"):
+		target.apply_status_effect(StatusEffectData.new(GameEnums.StatusEffect.VULNERABLE, WEAPON_DEBUFF_DURATION, 0, stats["vulnerable_amount"] / 100.0))
+
+## Whether the target's equipped gear grants immunity to the given status
+## key (e.g. Dragon Scales' immunity_burn). Only PlayerCharacter targets
+## can have equipment; enemies never carry immunity stats today.
+static func _has_immunity(target: Character, status_key: String) -> bool:
+	return target is PlayerCharacter and (target as PlayerCharacter).has_equipment_immunity(status_key)
 
 ## Applies a support ability to every resolved target (a single target, or
 ## the whole party for AoE). Supports healing and/or shielding depending on

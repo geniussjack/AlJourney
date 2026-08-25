@@ -421,3 +421,7 @@ temp/
 # project instructions (CLAUDE.md), this is local working material, not part of the published repo.
 /docs/
 
+# Running list of art/audio assets needed (and existing assets that need to be redrawn at a
+# higher resolution) — local production tracking, not part of the published repo.
+/SPRITES.md
+
