@@ -13,6 +13,9 @@ signal coins_changed(new_amount: int)
 signal strategic_resource_changed(resource: GameEnums.StrategicResource, new_amount: int)
 ## Raised when a settlement building's level increases.
 signal building_upgraded(building: GameEnums.BuildingType, new_level: int)
+## Raised when a villager is assigned to or unassigned from gathering a
+## strategic resource.
+signal worker_assignment_changed(resource: GameEnums.StrategicResource, worker_count: int)
 ## Raised when the heroes' stats are updated.
 signal hero_stats_changed
 ## Raised when the shared party level increases. Carries the new level —
@@ -58,6 +61,8 @@ var party_level: int:
 	get:
 		return current_save.party_level if current_save != null else 1
 
+var _resource_tick_check_accumulator: float = 0.0
+
 ## Initializes the state manager when it is added to the scene tree.
 func _ready() -> void:
 	current_state = GameEnums.GameState.MAIN_MENU
@@ -65,9 +70,22 @@ func _ready() -> void:
 
 	print("[GameStateManager] Initialized")
 
+## Checks for elapsed worker-gathered resource ticks at most once per real
+## second — cheap enough to run continuously while the game is open, and
+## the same code path handles offline catch-up on load (see
+## _apply_elapsed_resource_gains()).
+func _process(delta: float) -> void:
+	_resource_tick_check_accumulator += delta
+	if _resource_tick_check_accumulator < 1.0:
+		return
+
+	_resource_tick_check_accumulator = 0.0
+	_apply_elapsed_resource_gains()
+
 ## Starts a new game, resetting progress and setting initial values.
 func start_new_game() -> void:
 	current_save = SaveData.create_new()
+	current_save.last_resource_tick_unix_time = Time.get_unix_time_from_system()
 	is_game_active = true
 	current_state = GameEnums.GameState.MAP
 
@@ -90,6 +108,7 @@ func load_game(save_data: SaveData) -> void:
 	hero_stats_changed.emit()
 
 	InventoryManager.load_from_data(current_save)
+	_apply_elapsed_resource_gains()
 
 	print("[GameStateManager] Game loaded - Wave %d" % current_save.current_wave)
 
@@ -231,6 +250,81 @@ func upgrade_building(building: GameEnums.BuildingType) -> bool:
 
 	print("[GameStateManager] Upgraded %s to level %d" % [GameEnums.BuildingType.keys()[building], new_level])
 	return true
+
+## Total villagers that can be assigned to gather resources or defend the
+## settlement at once, based on the Houses building's level.
+func get_worker_capacity() -> int:
+	var houses_level: int = get_building_level(GameEnums.BuildingType.HOUSES)
+	return GameConstants.HOUSES_BASE_WORKER_CAPACITY + ((houses_level - 1) * GameConstants.HOUSES_WORKER_CAPACITY_PER_LEVEL)
+
+## Number of villagers currently assigned to gather the given resource.
+func get_assigned_workers(resource: GameEnums.StrategicResource) -> int:
+	return current_save.worker_assignments.get(resource, 0) if current_save != null else 0
+
+## Total villagers currently assigned across every resource.
+func get_total_assigned_workers() -> int:
+	var total: int = 0
+	for resource: GameEnums.StrategicResource in GameEnums.StrategicResource.values():
+		total += get_assigned_workers(resource)
+	return total
+
+## Assigns one more villager to gather the given resource, if capacity allows.
+## Returns true if a villager was assigned.
+func assign_worker(resource: GameEnums.StrategicResource) -> bool:
+	if current_save == null or get_total_assigned_workers() >= get_worker_capacity():
+		return false
+
+	var new_count: int = get_assigned_workers(resource) + 1
+	current_save.worker_assignments[resource] = new_count
+	worker_assignment_changed.emit(resource, new_count)
+
+	print("[GameStateManager] Assigned a worker to %s (now %d)" % [GameEnums.StrategicResource.keys()[resource], new_count])
+	return true
+
+## Removes one villager from gathering the given resource, if any are assigned.
+## Returns true if a villager was unassigned.
+func unassign_worker(resource: GameEnums.StrategicResource) -> bool:
+	if current_save == null:
+		return false
+
+	var current_count: int = get_assigned_workers(resource)
+	if current_count <= 0:
+		return false
+
+	var new_count: int = current_count - 1
+	current_save.worker_assignments[resource] = new_count
+	worker_assignment_changed.emit(resource, new_count)
+
+	print("[GameStateManager] Unassigned a worker from %s (now %d)" % [GameEnums.StrategicResource.keys()[resource], new_count])
+	return true
+
+## Credits resources gathered by assigned workers for every full tick
+## (GameConstants.SECONDS_PER_RESOURCE_TICK) of real time elapsed since
+## the last check. The same code path handles both continuous ticking
+## while the game is running (see _process()) and catching up on
+## resources gathered while the player was offline (see load_game()) —
+## a long elapsed gap just resolves to many ticks at once.
+func _apply_elapsed_resource_gains() -> void:
+	if current_save == null:
+		return
+
+	var now: int = Time.get_unix_time_from_system()
+
+	if current_save.last_resource_tick_unix_time <= 0:
+		current_save.last_resource_tick_unix_time = now
+		return
+
+	var elapsed: int = now - current_save.last_resource_tick_unix_time
+	var ticks: int = int(float(elapsed) / GameConstants.SECONDS_PER_RESOURCE_TICK)
+	if ticks <= 0:
+		return
+
+	for resource: GameEnums.StrategicResource in GameEnums.StrategicResource.values():
+		var workers: int = get_assigned_workers(resource)
+		if workers > 0:
+			add_strategic_resource(resource, workers * GameConstants.RESOURCE_PER_WORKER_PER_TICK * ticks)
+
+	current_save.last_resource_tick_unix_time += int(ticks * GameConstants.SECONDS_PER_RESOURCE_TICK)
 
 ## Grants the party shared XP, applying as many level-ups as the amount
 ## covers (capped at GameConstants.PARTY_LEVEL_MAX). Only updates the

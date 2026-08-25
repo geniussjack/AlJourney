@@ -40,6 +40,15 @@ var strategic_resources: Dictionary[GameEnums.StrategicResource, int] = {}
 ## Missing keys mean level 1, same as a fresh save.
 var building_levels: Dictionary[GameEnums.BuildingType, int] = {}
 
+## Villagers currently assigned to gather each strategic resource (see
+## design document, section 9). Total assigned across all resources is
+## capped by GameStateManager.get_worker_capacity() (Houses level).
+var worker_assignments: Dictionary[GameEnums.StrategicResource, int] = {}
+## Unix timestamp (seconds) of the last time worker-gathered resources
+## were credited — used to compute both real-time ticks while playing and
+## catch-up gains after time spent offline. 0 means never initialized yet.
+var last_resource_tick_unix_time: int = 0
+
 ## The Mage's current health.
 var mage_health: int = 0
 ## The Mage's maximum health.
@@ -159,6 +168,10 @@ func to_dict() -> Dictionary:
 	for building: GameEnums.BuildingType in building_levels.keys():
 		building_levels_dict[GameEnums.BuildingType.keys()[building]] = building_levels[building]
 
+	var worker_assignments_dict: Dictionary = {}
+	for resource: GameEnums.StrategicResource in worker_assignments.keys():
+		worker_assignments_dict[GameEnums.StrategicResource.keys()[resource]] = worker_assignments[resource]
+
 	return {
 		"schemaVersion": schema_version,
 		"currentWave": current_wave,
@@ -168,6 +181,8 @@ func to_dict() -> Dictionary:
 		"coins": coins,
 		"strategicResources": strategic_resources_dict,
 		"buildingLevels": building_levels_dict,
+		"workerAssignments": worker_assignments_dict,
+		"lastResourceTickUnixTime": last_resource_tick_unix_time,
 		"partyLevel": party_level,
 		"partyXp": party_xp,
 		"mageHealth": mage_health,
@@ -210,6 +225,12 @@ static func from_dict(data: Dictionary) -> SaveData:
 	var building_levels_dict: Dictionary = data.get("buildingLevels", {})
 	for building_key: String in building_levels_dict.keys():
 		save.building_levels[GameEnums.BuildingType[building_key]] = int(building_levels_dict[building_key])
+
+	save.worker_assignments = {}
+	var worker_assignments_dict: Dictionary = data.get("workerAssignments", {})
+	for resource_key: String in worker_assignments_dict.keys():
+		save.worker_assignments[GameEnums.StrategicResource[resource_key]] = int(worker_assignments_dict[resource_key])
+	save.last_resource_tick_unix_time = int(data.get("lastResourceTickUnixTime", 0))
 
 	save.party_level = int(data.get("partyLevel", 1))
 	save.party_xp = int(data.get("partyXp", 0))
