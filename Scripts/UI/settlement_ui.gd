@@ -6,6 +6,8 @@ extends Control
 
 var _resources_label: Label
 var _building_rows: Dictionary[GameEnums.BuildingType, Dictionary] = {}
+var _workers_summary_label: Label
+var _worker_rows: Dictionary[GameEnums.StrategicResource, Dictionary] = {}
 
 ## Builds the whole settlement layout and subscribes to state changes.
 func _ready() -> void:
@@ -21,6 +23,8 @@ func _ready() -> void:
 	_resources_label = Label.new()
 	root.add_child(_resources_label)
 
+	root.add_child(_build_workers_section())
+
 	var scroll := ScrollContainer.new()
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	root.add_child(scroll)
@@ -34,12 +38,75 @@ func _ready() -> void:
 
 	GameStateManager.strategic_resource_changed.connect(_on_strategic_resource_changed)
 	GameStateManager.building_upgraded.connect(_on_building_upgraded)
+	GameStateManager.worker_assignment_changed.connect(_on_worker_assignment_changed)
 
 	_refresh_resources_label()
 	for building: GameEnums.BuildingType in _building_rows.keys():
 		_refresh_building_row(building)
+	_refresh_workers_section()
 
 	print("[SettlementUI] Initialized")
+
+## Builds the worker-assignment panel: capacity summary plus one
+## assign/unassign row per strategic resource.
+func _build_workers_section() -> VBoxContainer:
+	var section := VBoxContainer.new()
+	section.add_theme_constant_override("separation", 4)
+
+	_workers_summary_label = Label.new()
+	section.add_child(_workers_summary_label)
+
+	var rows := HBoxContainer.new()
+	rows.add_theme_constant_override("separation", 16)
+	section.add_child(rows)
+
+	for resource: GameEnums.StrategicResource in GameEnums.StrategicResource.values():
+		rows.add_child(_build_worker_row(resource))
+
+	return section
+
+## Builds one resource's worker assignment row: name, count, +/- buttons.
+func _build_worker_row(resource: GameEnums.StrategicResource) -> HBoxContainer:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 4)
+
+	var name_label := Label.new()
+	name_label.text = tr(_resource_name_key(resource))
+	row.add_child(name_label)
+
+	var minus_button := Button.new()
+	minus_button.text = "-"
+	minus_button.pressed.connect(func() -> void: GameStateManager.unassign_worker(resource))
+	row.add_child(minus_button)
+
+	var count_label := Label.new()
+	row.add_child(count_label)
+
+	var plus_button := Button.new()
+	plus_button.text = "+"
+	plus_button.pressed.connect(func() -> void: GameStateManager.assign_worker(resource))
+	row.add_child(plus_button)
+
+	_worker_rows[resource] = {
+		"count_label": count_label,
+		"minus_button": minus_button,
+		"plus_button": plus_button,
+	}
+
+	return row
+
+## Refreshes the capacity summary and every resource's worker count/button state.
+func _refresh_workers_section() -> void:
+	var assigned: int = GameStateManager.get_total_assigned_workers()
+	var capacity: int = GameStateManager.get_worker_capacity()
+	_workers_summary_label.text = "%s: %d/%d" % [tr("BUILDING_HOUSES"), assigned, capacity]
+
+	for resource: GameEnums.StrategicResource in _worker_rows.keys():
+		var row: Dictionary = _worker_rows[resource]
+		var count: int = GameStateManager.get_assigned_workers(resource)
+		(row["count_label"] as Label).text = "%d" % count
+		(row["minus_button"] as Button).disabled = count <= 0
+		(row["plus_button"] as Button).disabled = assigned >= capacity
 
 ## Builds the title/back top bar.
 func _build_top_bar() -> HBoxContainer:
@@ -136,6 +203,11 @@ func _on_strategic_resource_changed(_resource: GameEnums.StrategicResource, _new
 
 func _on_building_upgraded(building: GameEnums.BuildingType, _new_level: int) -> void:
 	_refresh_building_row(building)
+	if building == GameEnums.BuildingType.HOUSES:
+		_refresh_workers_section()
+
+func _on_worker_assignment_changed(_resource: GameEnums.StrategicResource, _worker_count: int) -> void:
+	_refresh_workers_section()
 
 func _on_upgrade_pressed(building: GameEnums.BuildingType) -> void:
 	GameStateManager.upgrade_building(building)
@@ -149,3 +221,5 @@ func _exit_tree() -> void:
 		GameStateManager.strategic_resource_changed.disconnect(_on_strategic_resource_changed)
 	if GameStateManager.building_upgraded.is_connected(_on_building_upgraded):
 		GameStateManager.building_upgraded.disconnect(_on_building_upgraded)
+	if GameStateManager.worker_assignment_changed.is_connected(_on_worker_assignment_changed):
+		GameStateManager.worker_assignment_changed.disconnect(_on_worker_assignment_changed)

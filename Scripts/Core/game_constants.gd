@@ -142,6 +142,18 @@ const PARTY_LEVEL_DAMAGE_BONUS: int = 1
 ## Defense granted to every party member per party level gained.
 const PARTY_LEVEL_DEFENSE_BONUS: int = 1
 
+## Base number of villagers that can be assigned to gather resources or
+## defend the settlement at Houses level 1 (see design document, section 9).
+const HOUSES_BASE_WORKER_CAPACITY: int = 3
+## Additional worker capacity granted per Houses level beyond the first.
+const HOUSES_WORKER_CAPACITY_PER_LEVEL: int = 2
+## How often (in real seconds) worker-assigned resource gathering ticks —
+## applies while the game is running and, via elapsed real time, while
+## the player is offline.
+const SECONDS_PER_RESOURCE_TICK: float = 10.0
+## Amount of its assigned resource one worker produces per tick.
+const RESOURCE_PER_WORKER_PER_TICK: int = 1
+
 ## File name used to store the player's save data.
 const SAVE_FILE_NAME: String = "save_data.json"
 ## Directory in which the save file is stored.
