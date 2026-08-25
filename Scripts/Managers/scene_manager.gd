@@ -128,6 +128,11 @@ func go_to_shop() -> void:
 	GameStateManager.change_state(GameEnums.GameState.SHOP)
 	show_overlay("res://Scenes/UI/ShopScene.tscn")
 
+## Navigates to the settlement screen (buildings — see design document,
+## section 9), accessible from the campaign map like the shop.
+func go_to_settlement() -> void:
+	show_overlay("res://Scenes/UI/SettlementScene.tscn")
+
 ## Shows the "Game Over" screen after a defeat. Unlike a true
 ## GameStateManager.end_game(), a defeat no longer ends the session:
 ## progress is kept, and the player heals up and returns to the campaign

@@ -34,6 +34,12 @@ var party_xp: int = 0
 ## storage limit once it exists.
 var strategic_resources: Dictionary[GameEnums.StrategicResource, int] = {}
 
+## Current level of each settlement building, keyed by type. Buildings
+## start at level 1 (already exist in a basic form) rather than unbuilt —
+## upgrading raises their level and unlocks better bonuses/recipes.
+## Missing keys mean level 1, same as a fresh save.
+var building_levels: Dictionary[GameEnums.BuildingType, int] = {}
+
 ## The Mage's current health.
 var mage_health: int = 0
 ## The Mage's maximum health.
@@ -149,6 +155,10 @@ func to_dict() -> Dictionary:
 	for resource: GameEnums.StrategicResource in strategic_resources.keys():
 		strategic_resources_dict[GameEnums.StrategicResource.keys()[resource]] = strategic_resources[resource]
 
+	var building_levels_dict: Dictionary = {}
+	for building: GameEnums.BuildingType in building_levels.keys():
+		building_levels_dict[GameEnums.BuildingType.keys()[building]] = building_levels[building]
+
 	return {
 		"schemaVersion": schema_version,
 		"currentWave": current_wave,
@@ -157,6 +167,7 @@ func to_dict() -> Dictionary:
 		"completedLevelIds": completed_level_ids,
 		"coins": coins,
 		"strategicResources": strategic_resources_dict,
+		"buildingLevels": building_levels_dict,
 		"partyLevel": party_level,
 		"partyXp": party_xp,
 		"mageHealth": mage_health,
@@ -194,6 +205,11 @@ static func from_dict(data: Dictionary) -> SaveData:
 	var strategic_resources_dict: Dictionary = data.get("strategicResources", {})
 	for resource_key: String in strategic_resources_dict.keys():
 		save.strategic_resources[GameEnums.StrategicResource[resource_key]] = int(strategic_resources_dict[resource_key])
+
+	save.building_levels = {}
+	var building_levels_dict: Dictionary = data.get("buildingLevels", {})
+	for building_key: String in building_levels_dict.keys():
+		save.building_levels[GameEnums.BuildingType[building_key]] = int(building_levels_dict[building_key])
 
 	save.party_level = int(data.get("partyLevel", 1))
 	save.party_xp = int(data.get("partyXp", 0))

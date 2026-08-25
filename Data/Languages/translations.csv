@@ -61,7 +61,24 @@ UI_MAP_BRANCH,Branch,Ответвление
 UI_MAP_LOCKED,Locked,Заблокировано
 UI_MAP_COMPLETED,Completed,Пройдено
 UI_MAP_SHOP,Village Shop,Магазин поселения
+UI_MAP_SETTLEMENT,Settlement,Поселение
 UI_MAP_MAIN_MENU,Main Menu,В главное меню
+BUILDING_FORGE,Forge,Кузница
+BUILDING_HERBALIST,Herbalist's Hut,Травный домик
+BUILDING_BARRACKS,Barracks,Казарма
+BUILDING_WAREHOUSE,Warehouse,Склад
+BUILDING_WALL,Watchtower,Дозорная вышка
+BUILDING_HOUSES,Houses,Дома
+UI_SETTLEMENT_TITLE,Settlement,Поселение
+UI_SETTLEMENT_LEVEL,Level,Уровень
+UI_SETTLEMENT_MAX_LEVEL,Max Level,Макс. уровень
+UI_SETTLEMENT_UPGRADE,Upgrade,Улучшить
+UI_SETTLEMENT_BACK,Back,Назад
+STRATEGIC_RESOURCE_WOOD,Wood,Дерево
+STRATEGIC_RESOURCE_STONE,Stone,Камень
+STRATEGIC_RESOURCE_IRON,Iron,Железо
+STRATEGIC_RESOURCE_SILVER,Silver,Серебро
+STRATEGIC_RESOURCE_GOLD,Gold,Золото
 UI_MAP_SAVED,Saved,Сохранено
 UI_MAP_SAVE_FAILED,Save failed,Не удалось сохранить
 UI_PAUSE_SAVE,Save Game,Сохранить
