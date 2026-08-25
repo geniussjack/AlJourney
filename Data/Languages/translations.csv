@@ -173,15 +173,25 @@ CUTSCENE_NECROMANCER_DEFEAT_1,[Placeholder] Necromancer defeat - slide 1. Replac
 CUTSCENE_NECROMANCER_DEFEAT_2,[Placeholder] Necromancer defeat - slide 2. Replace with real story text.,[Плейсхолдер] Победа над некромантом - слайд 2. Заменить на настоящий текст.
 CUTSCENE_NECROMANCER_DEFEAT_3,[Placeholder] Necromancer defeat - slide 3. Replace with real story text.,[Плейсхолдер] Победа над некромантом - слайд 3. Заменить на настоящий текст.
 MERCENARY_HEALER_MAGE,Healer,Целитель
+MERCENARY_NAME_HEALER_MAGE,Lyra,Лира
 MERCENARY_HEALER_WARRIOR,Field Medic,Полевой лекарь
+MERCENARY_NAME_HEALER_WARRIOR,Todd,Тодд
 MERCENARY_WARDEN_MAGE,Warden,Страж
+MERCENARY_NAME_WARDEN_MAGE,Cassia,Кассия
 MERCENARY_WARDEN_WARRIOR,Shieldbearer,Щитоносец
+MERCENARY_NAME_WARDEN_WARRIOR,Garrett,Гаррет
 MERCENARY_PYRO_MAGE,Pyromancer,Пиромант
+MERCENARY_NAME_PYRO_MAGE,Ignis,Игнис
 MERCENARY_PYRO_WARRIOR,Axeman,Топорщик
+MERCENARY_NAME_PYRO_WARRIOR,Rolf,Рольф
 MERCENARY_CRYO_MAGE,Cryomancer,Крионит
+MERCENARY_NAME_CRYO_MAGE,Freya,Фрея
 MERCENARY_CRYO_WARRIOR,Spearman,Копейщик
+MERCENARY_NAME_CRYO_WARRIOR,Oswald,Освальд
 MERCENARY_STORM_MAGE,Stormcaller,Штормовой маг
+MERCENARY_NAME_STORM_MAGE,Zara,Зара
 MERCENARY_STORM_WARRIOR,Berserker,Берсерк
+MERCENARY_NAME_STORM_WARRIOR,Bran,Бран
 ABILITY_MERC_HEALER_MAGE_1,Light's Blessing,Благословение света
 ABILITY_MERC_HEALER_MAGE_1_DESC,Restores a large amount of health to an ally,Восстанавливает большое количество здоровья союзнику
 ABILITY_MERC_HEALER_MAGE_2,Wave of Healing,Волна исцеления

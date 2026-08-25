@@ -115,20 +115,27 @@ static var storm_warrior_ability_two: AbilityData = AbilityData.new(
 
 ## Every subclass, keyed by archetype then class. Base stats are a
 ## placeholder first pass, not final balance.
+##
+## Unlock conditions (design document, section 9 — decided at Barracks
+## implementation time, August 2026): the 5 Warrior mercenaries unlock one
+## per Barracks level (1-5); the 5 Mage mercenaries unlock one per campaign
+## location reached (Village Ruins is always available as the first level).
+## An even, easy-to-rebalance split — not meant to imply Warrior mercenaries
+## are "the building path" narratively, just a simple v1 rule.
 static var subclasses: Dictionary[GameEnums.CharacterClass, Dictionary] = {
 	GameEnums.CharacterClass.MAGE: {
-		GameEnums.MercenaryClass.HEALER: MercenarySubclassData.new(GameEnums.CharacterClass.MAGE, GameEnums.MercenaryClass.HEALER, "MERCENARY_HEALER_MAGE", 85, 6, 2, healer_mage_ability_one, healer_mage_ability_two),
-		GameEnums.MercenaryClass.WARDEN: MercenarySubclassData.new(GameEnums.CharacterClass.MAGE, GameEnums.MercenaryClass.WARDEN, "MERCENARY_WARDEN_MAGE", 80, 6, 4, warden_mage_ability_one, warden_mage_ability_two),
-		GameEnums.MercenaryClass.PYRO: MercenarySubclassData.new(GameEnums.CharacterClass.MAGE, GameEnums.MercenaryClass.PYRO, "MERCENARY_PYRO_MAGE", 75, 9, 2, pyro_mage_ability_one, pyro_mage_ability_two),
-		GameEnums.MercenaryClass.CRYO: MercenarySubclassData.new(GameEnums.CharacterClass.MAGE, GameEnums.MercenaryClass.CRYO, "MERCENARY_CRYO_MAGE", 75, 8, 2, cryo_mage_ability_one, cryo_mage_ability_two),
-		GameEnums.MercenaryClass.STORM: MercenarySubclassData.new(GameEnums.CharacterClass.MAGE, GameEnums.MercenaryClass.STORM, "MERCENARY_STORM_MAGE", 65, 11, 1, storm_mage_ability_one, storm_mage_ability_two),
+		GameEnums.MercenaryClass.HEALER: MercenarySubclassData.new(GameEnums.CharacterClass.MAGE, GameEnums.MercenaryClass.HEALER, "MERCENARY_HEALER_MAGE", "MERCENARY_NAME_HEALER_MAGE", 85, 6, 2, healer_mage_ability_one, healer_mage_ability_two, 0, "village_ruins_1"),
+		GameEnums.MercenaryClass.WARDEN: MercenarySubclassData.new(GameEnums.CharacterClass.MAGE, GameEnums.MercenaryClass.WARDEN, "MERCENARY_WARDEN_MAGE", "MERCENARY_NAME_WARDEN_MAGE", 80, 6, 4, warden_mage_ability_one, warden_mage_ability_two, 0, "dark_forest_1"),
+		GameEnums.MercenaryClass.PYRO: MercenarySubclassData.new(GameEnums.CharacterClass.MAGE, GameEnums.MercenaryClass.PYRO, "MERCENARY_PYRO_MAGE", "MERCENARY_NAME_PYRO_MAGE", 75, 9, 2, pyro_mage_ability_one, pyro_mage_ability_two, 0, "buried_catacombs_1"),
+		GameEnums.MercenaryClass.CRYO: MercenarySubclassData.new(GameEnums.CharacterClass.MAGE, GameEnums.MercenaryClass.CRYO, "MERCENARY_CRYO_MAGE", "MERCENARY_NAME_CRYO_MAGE", 75, 8, 2, cryo_mage_ability_one, cryo_mage_ability_two, 0, "frozen_wastes_1"),
+		GameEnums.MercenaryClass.STORM: MercenarySubclassData.new(GameEnums.CharacterClass.MAGE, GameEnums.MercenaryClass.STORM, "MERCENARY_STORM_MAGE", "MERCENARY_NAME_STORM_MAGE", 65, 11, 1, storm_mage_ability_one, storm_mage_ability_two, 0, "necromancer_lair_1"),
 	},
 	GameEnums.CharacterClass.WARRIOR: {
-		GameEnums.MercenaryClass.HEALER: MercenarySubclassData.new(GameEnums.CharacterClass.WARRIOR, GameEnums.MercenaryClass.HEALER, "MERCENARY_HEALER_WARRIOR", 125, 9, 4, healer_warrior_ability_one, healer_warrior_ability_two),
-		GameEnums.MercenaryClass.WARDEN: MercenarySubclassData.new(GameEnums.CharacterClass.WARRIOR, GameEnums.MercenaryClass.WARDEN, "MERCENARY_WARDEN_WARRIOR", 120, 9, 7, warden_warrior_ability_one, warden_warrior_ability_two),
-		GameEnums.MercenaryClass.PYRO: MercenarySubclassData.new(GameEnums.CharacterClass.WARRIOR, GameEnums.MercenaryClass.PYRO, "MERCENARY_PYRO_WARRIOR", 115, 13, 3, pyro_warrior_ability_one, pyro_warrior_ability_two),
-		GameEnums.MercenaryClass.CRYO: MercenarySubclassData.new(GameEnums.CharacterClass.WARRIOR, GameEnums.MercenaryClass.CRYO, "MERCENARY_CRYO_WARRIOR", 115, 12, 3, cryo_warrior_ability_one, cryo_warrior_ability_two),
-		GameEnums.MercenaryClass.STORM: MercenarySubclassData.new(GameEnums.CharacterClass.WARRIOR, GameEnums.MercenaryClass.STORM, "MERCENARY_STORM_WARRIOR", 100, 16, 2, storm_warrior_ability_one, storm_warrior_ability_two),
+		GameEnums.MercenaryClass.HEALER: MercenarySubclassData.new(GameEnums.CharacterClass.WARRIOR, GameEnums.MercenaryClass.HEALER, "MERCENARY_HEALER_WARRIOR", "MERCENARY_NAME_HEALER_WARRIOR", 125, 9, 4, healer_warrior_ability_one, healer_warrior_ability_two, 1, ""),
+		GameEnums.MercenaryClass.WARDEN: MercenarySubclassData.new(GameEnums.CharacterClass.WARRIOR, GameEnums.MercenaryClass.WARDEN, "MERCENARY_WARDEN_WARRIOR", "MERCENARY_NAME_WARDEN_WARRIOR", 120, 9, 7, warden_warrior_ability_one, warden_warrior_ability_two, 2, ""),
+		GameEnums.MercenaryClass.PYRO: MercenarySubclassData.new(GameEnums.CharacterClass.WARRIOR, GameEnums.MercenaryClass.PYRO, "MERCENARY_PYRO_WARRIOR", "MERCENARY_NAME_PYRO_WARRIOR", 115, 13, 3, pyro_warrior_ability_one, pyro_warrior_ability_two, 3, ""),
+		GameEnums.MercenaryClass.CRYO: MercenarySubclassData.new(GameEnums.CharacterClass.WARRIOR, GameEnums.MercenaryClass.CRYO, "MERCENARY_CRYO_WARRIOR", "MERCENARY_NAME_CRYO_WARRIOR", 115, 12, 3, cryo_warrior_ability_one, cryo_warrior_ability_two, 4, ""),
+		GameEnums.MercenaryClass.STORM: MercenarySubclassData.new(GameEnums.CharacterClass.WARRIOR, GameEnums.MercenaryClass.STORM, "MERCENARY_STORM_WARRIOR", "MERCENARY_NAME_STORM_WARRIOR", 100, 16, 2, storm_warrior_ability_one, storm_warrior_ability_two, 5, ""),
 	},
 }
 
@@ -146,3 +153,18 @@ static func get_subclasses_for_archetype(archetype: GameEnums.CharacterClass) ->
 		if subclass != null:
 			result.append(subclass)
 	return result
+
+## Returns every mercenary subclass in the roster (all archetypes/classes).
+static func get_all_subclasses() -> Array[MercenarySubclassData]:
+	var result: Array[MercenarySubclassData] = []
+	for archetype: GameEnums.CharacterClass in subclasses.keys():
+		result.append_array(get_subclasses_for_archetype(archetype))
+	return result
+
+## Finds a subclass by its MercenarySubclassData.get_key() string, or null
+## if no subclass has that key.
+static func get_by_key(key: String) -> MercenarySubclassData:
+	for subclass: MercenarySubclassData in get_all_subclasses():
+		if subclass.get_key() == key:
+			return subclass
+	return null

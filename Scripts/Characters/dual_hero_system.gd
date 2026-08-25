@@ -19,6 +19,20 @@ signal hero_died(hero_class: GameEnums.CharacterClass)
 ## Raised when the entire party is defeated. This event typically leads to
 ## the game ending.
 signal party_defeated
+## Raised when the companion mercenary's health changes. Kept separate from
+## hero_health_changed (rather than overloading it with a fabricated
+## GameEnums.CharacterClass value) because a mercenary's character_class
+## holds its archetype, which would collide with the real Mage/Warrior hero
+## of that archetype.
+signal companion_health_changed(current_health: int, max_health: int)
+## Raised when the companion mercenary's shield strength changes.
+signal companion_shield_changed(shield_amount: int)
+## Raised when the companion mercenary dies.
+signal companion_died
+## Raised when the companion slot is filled or emptied (set_companion/
+## clear_companion). Passes the new companion, or null if the slot is now
+## empty. UI listens to this to show/hide the third party member.
+signal companion_changed(companion: PlayerCharacter)
 
 ## Reference to the Mage character (Altarion). Read-only from outside.
 var mage: PlayerCharacter
@@ -60,6 +74,39 @@ func _connect_hero_signals(hero: PlayerCharacter, hero_class: GameEnums.Characte
 		hero_died.emit(hero_class)
 		_check_party_defeated()
 	)
+
+## Fills the companion slot with the given mercenary character, replacing
+## any previous companion. Adds it as a child and routes its signals
+## through companion_health_changed/companion_shield_changed/companion_died.
+func set_companion(character: PlayerCharacter) -> void:
+	clear_companion()
+
+	companion = character
+	add_child(companion)
+
+	companion.health_changed.connect(func(current: int, maximum: int) -> void:
+		companion_health_changed.emit(current, maximum)
+		_check_party_defeated()
+	)
+	companion.shield_changed.connect(func(shield: int) -> void:
+		companion_shield_changed.emit(shield)
+	)
+	companion.character_died.connect(func() -> void:
+		companion_died.emit()
+		_check_party_defeated()
+	)
+
+	companion_changed.emit(companion)
+	print("[DualHeroSystem] Companion set: %s" % companion.mercenary_subclass.get_key())
+
+## Empties the companion slot, if filled, freeing the mercenary character.
+func clear_companion() -> void:
+	if companion == null:
+		return
+
+	companion.queue_free()
+	companion = null
+	companion_changed.emit(null)
 
 ## Emits party_defeated once no party member is left alive.
 func _check_party_defeated() -> void:

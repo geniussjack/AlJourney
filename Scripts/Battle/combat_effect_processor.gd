@@ -52,8 +52,13 @@ const WEAPON_DEBUFF_DURATION: int = 2
 ## vulnerable_amount — see EquipmentDatabase) and applies the matching
 ## status effect to the target that was just hit. Only the weapon slot is
 ## checked, since these are elemental weapon stats, not general equipment
-## bonuses.
+## bonuses. No-op for mercenary casters — they don't have equipment (see
+## PlayerCharacter.is_mercenary) and instead carry their status effects
+## directly on the ability (see _apply_status_effects_from_stats).
 static func _apply_weapon_status_effects(caster: PlayerCharacter, target: Character) -> void:
+	if caster.is_mercenary:
+		return
+
 	var weapon: EquipmentData = InventoryManager.get_equipped_item(caster.character_class, GameEnums.EquipmentSlot.WEAPON)
 	if weapon == null:
 		return

@@ -3,8 +3,20 @@ extends Character
 ## The main player character class, inheriting from Character. Manages base
 ## stats, applying equipment, abilities, and damage calculation.
 
-## This character's class. Set once at creation, treated as read-only afterward.
+## This character's class. Set once at creation, treated as read-only
+## afterward. For a mercenary, this holds the subclass's archetype (Mage or
+## Warrior) — used for attack type — not a claim to Altarion/Aldric's own
+## equipment or legacy ability slots (see is_mercenary).
 var character_class: GameEnums.CharacterClass
+## Whether this character is a settlement mercenary rather than one of the
+## two fixed heroes. Mercenaries don't share the heroes' equipment pool or
+## legacy ability slots (both keyed by character_class, i.e. archetype) —
+## this flag guards _get_equipment_stat/_get_ability_stat so a Mage-archetype
+## mercenary can't read Altarion's own gear. See design document, section 9.
+var is_mercenary: bool = false
+## The subclass definition this mercenary was created from. Null for the
+## two fixed heroes.
+var mercenary_subclass: MercenarySubclassData = null
 
 ## Factory method that creates and initializes a new character of the given class.
 static func create(character_class: GameEnums.CharacterClass) -> PlayerCharacter:
@@ -32,6 +44,21 @@ static func create(character_class: GameEnums.CharacterClass) -> PlayerCharacter
 	print("[PlayerCharacter] Created %s (%s)" % [player._name, GameEnums.CharacterClass.keys()[character_class]])
 	return player
 
+## Factory method that creates a mercenary character from its subclass
+## definition (see MercenaryDatabase). attack_type is derived from the
+## subclass's archetype, matching the two fixed heroes' convention.
+static func create_mercenary(subclass: MercenarySubclassData) -> PlayerCharacter:
+	var attack_type: GameEnums.AttackType = GameEnums.AttackType.MAGICAL if subclass.archetype == GameEnums.CharacterClass.MAGE else GameEnums.AttackType.PHYSICAL
+
+	var player := PlayerCharacter.new()
+	player.character_class = subclass.archetype
+	player.is_mercenary = true
+	player.mercenary_subclass = subclass
+	player.initialize(subclass.character_name_key, subclass.base_hp, subclass.base_damage, subclass.base_defense, attack_type)
+
+	print("[PlayerCharacter] Created mercenary %s (%s)" % [player._name, subclass.get_key()])
+	return player
+
 ## Initializes the character with data loaded from a save file.
 func initialize_from_save(character_display_name: String, initial_max_health: int, initial_current_health: int, damage: int, defense: int, initial_character_class: GameEnums.CharacterClass) -> void:
 	character_class = initial_character_class
@@ -46,8 +73,13 @@ func initialize_from_save(character_display_name: String, initial_max_health: in
 	health_changed.emit(_current_health, get_total_max_health())
 	print("[PlayerCharacter] Loaded %s from save - HP: %d/%d" % [_name, _current_health, get_total_max_health()])
 
-## Sums the given stat across every piece of equipment worn by this character.
+## Sums the given stat across every piece of equipment worn by this
+## character. Always 0 for mercenaries — see is_mercenary; they don't yet
+## have their own equipment pool (design document, section 9, open question).
 func _get_equipment_stat(stat_name: String) -> int:
+	if is_mercenary:
+		return 0
+
 	var equipment: Dictionary = InventoryManager.get_hero_equipment(character_class)
 	var total: int = 0
 	for item: EquipmentData in equipment.values():
@@ -62,8 +94,11 @@ func has_equipment_immunity(status_key: String) -> bool:
 	return _get_equipment_stat("immunity_%s" % status_key) > 0
 
 ## Returns the given stat's total bonus from the legacy ability system's
-## equipped abilities.
+## equipped abilities. Always 0 for mercenaries, who don't participate in
+## that (hero-only) system — see is_mercenary.
 func _get_ability_stat(stat_name: String) -> int:
+	if is_mercenary:
+		return 0
 	return AbilitySystem.get_ability_effect(character_class, stat_name)
 
 ## The character's total defense, including base defense and bonuses from

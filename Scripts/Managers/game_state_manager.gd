@@ -22,6 +22,13 @@ signal hero_stats_changed
 ## if multiple levels were gained from a single XP grant, this only fires
 ## once, already at the final level.
 signal party_leveled_up(new_level: int)
+## Raised when the party's third slot is filled or emptied, carrying the
+## new active mercenary's key (see MercenarySubclassData.get_key()), or ""
+## if the slot is now empty.
+signal active_mercenary_changed(key: String)
+## Raised when a mercenary's recovery countdown changes, carrying its key
+## and the number of battles remaining (0 means available again).
+signal mercenary_recovery_changed(key: String, battles_remaining: int)
 
 ## The current global game state. Only ever changed through change_state().
 var current_state: GameEnums.GameState = GameEnums.GameState.MAIN_MENU
@@ -297,6 +304,105 @@ func unassign_worker(resource: GameEnums.StrategicResource) -> bool:
 
 	print("[GameStateManager] Unassigned a worker from %s (now %d)" % [GameEnums.StrategicResource.keys()[resource], new_count])
 	return true
+
+## Whether the given mercenary subclass's unlock condition has been met —
+## either the required Barracks level or the required campaign level (see
+## MercenarySubclassData). Exactly one of the two conditions is set per
+## subclass, so only the relevant one is checked.
+func is_mercenary_unlocked(subclass: MercenarySubclassData) -> bool:
+	if current_save == null:
+		return false
+
+	if subclass.required_barracks_level > 0:
+		return get_building_level(GameEnums.BuildingType.BARRACKS) >= subclass.required_barracks_level
+
+	return current_save.current_level_id == subclass.required_level_id or current_save.completed_level_ids.has(subclass.required_level_id)
+
+## Returns every mercenary subclass currently unlocked, in roster order.
+func get_unlocked_mercenaries() -> Array[MercenarySubclassData]:
+	var result: Array[MercenarySubclassData] = []
+	for subclass: MercenarySubclassData in MercenaryDatabase.get_all_subclasses():
+		if is_mercenary_unlocked(subclass):
+			result.append(subclass)
+	return result
+
+## Battles remaining before the given mercenary (by
+## MercenarySubclassData.get_key()) is available again after being
+## benched. 0 means it isn't in recovery, but doesn't by itself mean
+## available — see is_mercenary_available().
+func get_battles_until_available(key: String) -> int:
+	return current_save.mercenary_recovery.get(key, 0) if current_save != null else 0
+
+## Whether the given mercenary can be set as the active companion right
+## now: unlocked and not still recovering from a previous battle.
+func is_mercenary_available(subclass: MercenarySubclassData) -> bool:
+	return is_mercenary_unlocked(subclass) and get_battles_until_available(subclass.get_key()) <= 0
+
+## The raw key of the mercenary currently filling the party's third slot
+## (see MercenarySubclassData.get_key()), or "" if empty.
+func get_active_mercenary_key() -> String:
+	return current_save.active_mercenary_key if current_save != null else ""
+
+## The subclass currently filling the party's third slot, or null if empty.
+func get_active_mercenary() -> MercenarySubclassData:
+	if current_save == null or current_save.active_mercenary_key.is_empty():
+		return null
+	return MercenaryDatabase.get_by_key(current_save.active_mercenary_key)
+
+## Sets the given mercenary as the active companion, filling the party's
+## third slot. Returns true on success; fails if the mercenary isn't
+## currently available (see is_mercenary_available()).
+func set_active_mercenary(subclass: MercenarySubclassData) -> bool:
+	if current_save == null or subclass == null or not is_mercenary_available(subclass):
+		return false
+
+	current_save.active_mercenary_key = subclass.get_key()
+	active_mercenary_changed.emit(current_save.active_mercenary_key)
+
+	print("[GameStateManager] Active mercenary set: %s" % subclass.get_key())
+	return true
+
+## Empties the party's third slot without sending the previous companion
+## into recovery — unlike on_battle_completed(), which is what actually
+## benches a mercenary after a fight. Used for the player choosing to
+## leave the slot empty ahead of a battle.
+func clear_active_mercenary() -> void:
+	if current_save == null or current_save.active_mercenary_key.is_empty():
+		return
+
+	current_save.active_mercenary_key = ""
+	active_mercenary_changed.emit("")
+
+## Called once per finished battle, win or loss (see design document,
+## section 9: "смерть в бою или провал набега даёт только временный
+## откат" — a lost battle still advances recovery). Advances every
+## recovering mercenary's countdown by one battle, and — if a companion was
+## used this battle — sends it into recovery and empties the slot.
+func on_battle_completed() -> void:
+	if current_save == null:
+		return
+
+	var recovery: Dictionary[String, int] = current_save.mercenary_recovery
+	for key: String in recovery.keys().duplicate():
+		var remaining: int = maxi(0, recovery[key] - 1)
+		if remaining <= 0:
+			recovery.erase(key)
+		else:
+			recovery[key] = remaining
+		mercenary_recovery_changed.emit(key, remaining)
+
+	if not current_save.active_mercenary_key.is_empty():
+		var used_key: String = current_save.active_mercenary_key
+		var duration: int = _get_mercenary_recovery_duration()
+		recovery[used_key] = duration
+		mercenary_recovery_changed.emit(used_key, duration)
+		clear_active_mercenary()
+
+## Number of battles a mercenary spends in recovery after being used,
+## reduced by Herbalist building upgrades (design document, section 9).
+func _get_mercenary_recovery_duration() -> int:
+	var herbalist_level: int = get_building_level(GameEnums.BuildingType.HERBALIST)
+	return maxi(GameConstants.MERCENARY_MIN_RECOVERY_BATTLES, GameConstants.MERCENARY_BASE_RECOVERY_BATTLES - (herbalist_level - 1))
 
 ## Credits resources gathered by assigned workers for every full tick
 ## (GameConstants.SECONDS_PER_RESOURCE_TICK) of real time elapsed since

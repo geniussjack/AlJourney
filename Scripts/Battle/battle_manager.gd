@@ -343,6 +343,7 @@ func _on_party_defeated() -> void:
 		return
 
 	_battle_ended_signaled = true
+	GameStateManager.on_battle_completed()
 	battle_ended.emit(false)
 
 ## Rolls and grants loot for defeating a boss or miniboss.
@@ -397,6 +398,7 @@ func _on_enemies_cleared() -> void:
 	)
 
 	GameStateManager.complete_level(_level.id)
+	GameStateManager.on_battle_completed()
 
 ## Clears the battle state, unsubscribes from signals and removes enemies.
 ## Called when transitioning to the results screen or a menu.
