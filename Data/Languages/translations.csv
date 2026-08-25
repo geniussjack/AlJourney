@@ -172,3 +172,53 @@ CUTSCENE_NEW_GAME_INTRO_3,[Placeholder] New game intro - slide 3. Replace with r
 CUTSCENE_NECROMANCER_DEFEAT_1,[Placeholder] Necromancer defeat - slide 1. Replace with real story text.,[Плейсхолдер] Победа над некромантом - слайд 1. Заменить на настоящий текст.
 CUTSCENE_NECROMANCER_DEFEAT_2,[Placeholder] Necromancer defeat - slide 2. Replace with real story text.,[Плейсхолдер] Победа над некромантом - слайд 2. Заменить на настоящий текст.
 CUTSCENE_NECROMANCER_DEFEAT_3,[Placeholder] Necromancer defeat - slide 3. Replace with real story text.,[Плейсхолдер] Победа над некромантом - слайд 3. Заменить на настоящий текст.
+MERCENARY_HEALER_MAGE,Healer,Целитель
+MERCENARY_HEALER_WARRIOR,Field Medic,Полевой лекарь
+MERCENARY_WARDEN_MAGE,Warden,Страж
+MERCENARY_WARDEN_WARRIOR,Shieldbearer,Щитоносец
+MERCENARY_PYRO_MAGE,Pyromancer,Пиромант
+MERCENARY_PYRO_WARRIOR,Axeman,Топорщик
+MERCENARY_CRYO_MAGE,Cryomancer,Крионит
+MERCENARY_CRYO_WARRIOR,Spearman,Копейщик
+MERCENARY_STORM_MAGE,Stormcaller,Штормовой маг
+MERCENARY_STORM_WARRIOR,Berserker,Берсерк
+ABILITY_MERC_HEALER_MAGE_1,Light's Blessing,Благословение света
+ABILITY_MERC_HEALER_MAGE_1_DESC,Restores a large amount of health to an ally,Восстанавливает большое количество здоровья союзнику
+ABILITY_MERC_HEALER_MAGE_2,Wave of Healing,Волна исцеления
+ABILITY_MERC_HEALER_MAGE_2_DESC,Restores health to the entire party,Восстанавливает здоровье всему отряду
+ABILITY_MERC_HEALER_WARRIOR_1,Field Dressing,Полевая перевязка
+ABILITY_MERC_HEALER_WARRIOR_1_DESC,Restores a large amount of health to an ally,Восстанавливает большое количество здоровья союзнику
+ABILITY_MERC_HEALER_WARRIOR_2,Rallying Cry,Боевой клич поддержки
+ABILITY_MERC_HEALER_WARRIOR_2_DESC,Restores health to the entire party,Восстанавливает здоровье всему отряду
+ABILITY_MERC_WARDEN_MAGE_1,Arcane Ward,Магический щит
+ABILITY_MERC_WARDEN_MAGE_1_DESC,Grants a strong protective shield to an ally,Даёт союзнику мощный защитный щит
+ABILITY_MERC_WARDEN_MAGE_2,Cleansing Light,Очищающий свет
+ABILITY_MERC_WARDEN_MAGE_2_DESC,Grants a shield and clears negative effects from an ally,Даёт щит и снимает с союзника негативные эффекты
+ABILITY_MERC_WARDEN_WARRIOR_1,Steadfast Guard,Стойкая защита
+ABILITY_MERC_WARDEN_WARRIOR_1_DESC,Grants a strong protective shield to an ally,Даёт союзнику мощный защитный щит
+ABILITY_MERC_WARDEN_WARRIOR_2,Unbreakable Spirit,Несгибаемый дух
+ABILITY_MERC_WARDEN_WARRIOR_2_DESC,Grants a shield and clears negative effects from an ally,Даёт щит и снимает с союзника негативные эффекты
+ABILITY_MERC_PYRO_MAGE_1,Fire Blade,Огненный клинок
+ABILITY_MERC_PYRO_MAGE_1_DESC,A blazing strike that also burns the enemy,"Пылающий удар, который также поджигает врага"
+ABILITY_MERC_PYRO_MAGE_2,Flame Wave,Волна пламени
+ABILITY_MERC_PYRO_MAGE_2_DESC,A weaker strike that inflicts a fierce burn,"Более слабый удар, вызывающий сильное горение"
+ABILITY_MERC_PYRO_WARRIOR_1,Cleaving Strike,Рубящий удар
+ABILITY_MERC_PYRO_WARRIOR_1_DESC,A heavy axe strike that causes bleeding,"Тяжёлый удар топором, вызывающий кровотечение"
+ABILITY_MERC_PYRO_WARRIOR_2,Blood Whirl,Кровавый вихрь
+ABILITY_MERC_PYRO_WARRIOR_2_DESC,A weaker strike that causes heavy bleeding,"Более слабый удар, вызывающий сильное кровотечение"
+ABILITY_MERC_CRYO_MAGE_1,Ice Shard,Ледяной осколок
+ABILITY_MERC_CRYO_MAGE_1_DESC,A shard of ice that weakens the enemy's attack,"Ледяной осколок, ослабляющий атаку врага"
+ABILITY_MERC_CRYO_MAGE_2,Frost Breath,Морозное дыхание
+ABILITY_MERC_CRYO_MAGE_2_DESC,A weaker strike that weakens the enemy severely,"Более слабый удар, сильно ослабляющий врага"
+ABILITY_MERC_CRYO_WARRIOR_1,Precise Thrust,Точный укол
+ABILITY_MERC_CRYO_WARRIOR_1_DESC,A precise spear thrust that leaves the enemy vulnerable,"Точный удар копьём, делающий врага уязвимым"
+ABILITY_MERC_CRYO_WARRIOR_2,Piercing Strike,Пробивающий удар
+ABILITY_MERC_CRYO_WARRIOR_2_DESC,A weaker strike that leaves the enemy severely vulnerable,"Более слабый удар, делающий врага сильно уязвимым"
+ABILITY_MERC_STORM_MAGE_1,Lightning Bolt,Разряд молнии
+ABILITY_MERC_STORM_MAGE_1_DESC,"A powerful bolt that shocks the enemy, increasing incoming damage","Мощный разряд, вызывающий у врага шок и увеличивающий получаемый им урон"
+ABILITY_MERC_STORM_MAGE_2,Storm Surge,Грозовой шторм
+ABILITY_MERC_STORM_MAGE_2_DESC,An all-out burst of raw magical power,Мощнейший выброс чистой магической силы
+ABILITY_MERC_STORM_WARRIOR_1,Furious Strike,Яростный удар
+ABILITY_MERC_STORM_WARRIOR_1_DESC,"A reckless, powerful strike","Безрассудный, мощный удар"
+ABILITY_MERC_STORM_WARRIOR_2,Blood Rage,Кровавая жажда
+ABILITY_MERC_STORM_WARRIOR_2_DESC,An all-out berserker frenzy,Исступлённая ярость берсерка
