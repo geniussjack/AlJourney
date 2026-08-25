@@ -75,6 +75,14 @@ func get_element_color() -> Color:
 			return Color.RED
 		GameEnums.AbilityElement.SHIELD:
 			return Color.BLUE
+		GameEnums.AbilityElement.ICE:
+			return Color.LIGHT_BLUE
+		GameEnums.AbilityElement.LIGHTNING:
+			return Color.YELLOW
+		GameEnums.AbilityElement.BLEED:
+			return Color.CRIMSON
+		GameEnums.AbilityElement.PIERCE:
+			return Color.SILVER
 		_:
 			return Color.WHITE
 

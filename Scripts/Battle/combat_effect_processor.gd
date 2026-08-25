@@ -23,10 +23,10 @@ static func apply_attack_ability(ability: AbilityData, caster: PlayerCharacter, 
 	ComboParticles.spawn_combo_effect(battle_manager, Vector2(640, 200 if is_aoe else 300), ability.element, 1)
 
 	for target: Character in targets:
-		_deal_damage(target, damage, caster, is_aoe, battle_manager)
+		_deal_damage(target, damage, caster, ability, is_aoe, battle_manager)
 
 ## Applies damage to a single target and any reflection back at the caster.
-static func _deal_damage(target: Character, damage: int, caster: PlayerCharacter, is_aoe: bool, battle_manager: BattleManager) -> void:
+static func _deal_damage(target: Character, damage: int, caster: PlayerCharacter, ability: AbilityData, is_aoe: bool, battle_manager: BattleManager) -> void:
 	var reflected: int = target.take_damage(damage, caster.attack_type, true)
 	var particle_pos: Vector2 = Vector2(400, 200) if is_aoe else Vector2(640, 250)
 
@@ -35,6 +35,7 @@ static func _deal_damage(target: Character, damage: int, caster: PlayerCharacter
 
 	if target.is_alive:
 		_apply_weapon_status_effects(caster, target)
+		_apply_status_effects_from_stats(ability.effects, target)
 
 	if reflected > 0:
 		caster.take_damage(reflected, target.attack_type, false)
@@ -57,8 +58,16 @@ static func _apply_weapon_status_effects(caster: PlayerCharacter, target: Charac
 	if weapon == null:
 		return
 
-	var stats: Dictionary[String, int] = weapon.get_total_stats()
+	_apply_status_effects_from_stats(weapon.get_total_stats(), target)
 
+## Reads a stats dictionary — either an equipped weapon's total stats, or
+## an ability's own intrinsic effects — for status-inducing keys and
+## applies the matching status effect to the target. Shared by
+## weapon-driven status effects (see EquipmentDatabase) and
+## ability-intrinsic ones (see MercenaryDatabase, whose subclass attack
+## abilities apply their own status effects directly rather than through
+## equipment, since mercenaries don't share the two heroes' equipment pool).
+static func _apply_status_effects_from_stats(stats: Dictionary[String, int], target: Character) -> void:
 	if stats.has("burn_damage") and not _has_immunity(target, "burn"):
 		target.apply_status_effect(StatusEffectData.new(GameEnums.StatusEffect.BURNING, WEAPON_DOT_DURATION, stats["burn_damage"]))
 
@@ -93,6 +102,7 @@ static func apply_support_ability(ability: AbilityData, targets: Array[Character
 
 	var heal: int = ability.get_effect("heal")
 	var shield: int = ability.get_effect("shield")
+	var cleanse: bool = ability.get_effect("cleanse") > 0
 
 	for target: Character in targets:
 		var position: Vector2 = get_ally_vfx_position(target, hero_system)
@@ -106,6 +116,9 @@ static func apply_support_ability(ability: AbilityData, targets: Array[Character
 			var shield_amount: int = PlayerCharacter.calculate_shield(shield)
 			target.add_shield(shield_amount)
 			ComboParticles.spawn_shield_number(battle_manager, position, shield_amount)
+
+		if cleanse:
+			target.clear_negative_effects()
 
 ## Returns the on-screen position for visual effects above the given party
 ## member. Used both by heroes' combat abilities and by enemy attacks

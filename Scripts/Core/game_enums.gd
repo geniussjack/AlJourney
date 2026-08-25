@@ -98,6 +98,10 @@ enum AbilityElement {
 	HEAL,
 	SWORD,
 	SHIELD,
+	ICE,
+	LIGHTNING,
+	BLEED,
+	PIERCE,
 }
 
 ## Defines who an ability can be targeted at: an enemy, or the caster/an ally.
@@ -138,4 +142,17 @@ enum BuildingType {
 	WAREHOUSE,
 	WALL,
 	HOUSES,
+}
+
+## Mercenary specialization roles (see design document, section 4). Shared
+## conceptually across both archetypes (Mage/Warrior) — each class maps to
+## a differently-named, differently-flavored subclass per archetype (see
+## MercenaryDatabase). Working list, not final — revisit once the game is
+## fully playable and can actually be balance-tested.
+enum MercenaryClass {
+	HEALER,
+	WARDEN,
+	PYRO,
+	CRYO,
+	STORM,
 }
