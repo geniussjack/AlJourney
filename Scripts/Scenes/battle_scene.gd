@@ -114,7 +114,8 @@ func _on_enemy_defeated(enemy: Enemy) -> void:
 ## Called once every wave of the current level has been cleared. The level
 ## (not the wave) is the unit of exiting combat: the shop no longer opens
 ## here, the player returns to the campaign map. If the cleared level was
-## the Necromancer's, the defeat cutscene plays first.
+## the Necromancer's, the defeat cutscene plays first, then the run ends
+## with the victory screen instead of returning to the map.
 func _on_level_completed() -> void:
 	if _is_battle_transition_queued:
 		return
@@ -132,7 +133,7 @@ func _on_level_completed() -> void:
 
 	get_tree().create_timer(1.0).timeout.connect(func() -> void:
 		if defeated_necromancer:
-			CutscenePlayer.play(get_node("CanvasLayer"), CutsceneDatabase.necromancer_defeat, SceneManager.go_to_map)
+			CutscenePlayer.play(get_node("CanvasLayer"), CutsceneDatabase.necromancer_defeat, SceneManager.go_to_victory)
 		else:
 			SceneManager.go_to_map()
 	)
