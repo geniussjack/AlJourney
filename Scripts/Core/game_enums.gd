@@ -156,3 +156,14 @@ enum MercenaryClass {
 	CRYO,
 	STORM,
 }
+
+## What a Herbalist-brewed battle potion does when used (see design
+## document, section 9).
+enum PotionType {
+	## Heals the party member who used the potion.
+	SINGLE_HEAL,
+	## Heals every living party member.
+	PARTY_HEAL,
+	## Adds to the party's shared ultimate charge.
+	ULTIMATE_FILL,
+}

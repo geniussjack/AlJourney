@@ -9,6 +9,7 @@ var _building_rows: Dictionary[GameEnums.BuildingType, Dictionary] = {}
 var _workers_summary_label: Label
 var _worker_rows: Dictionary[GameEnums.StrategicResource, Dictionary] = {}
 var _mercenary_rows: Dictionary[String, Dictionary] = {}
+var _potion_rows: Dictionary[String, Dictionary] = {}
 
 ## Builds the whole settlement layout and subscribes to state changes.
 func _ready() -> void:
@@ -38,12 +39,14 @@ func _ready() -> void:
 		buildings_container.add_child(_build_building_row(building))
 
 	root.add_child(_build_mercenaries_section())
+	root.add_child(_build_potions_section())
 
 	GameStateManager.strategic_resource_changed.connect(_on_strategic_resource_changed)
 	GameStateManager.building_upgraded.connect(_on_building_upgraded)
 	GameStateManager.worker_assignment_changed.connect(_on_worker_assignment_changed)
 	GameStateManager.active_mercenary_changed.connect(_on_active_mercenary_changed)
 	GameStateManager.mercenary_recovery_changed.connect(_on_mercenary_recovery_changed)
+	GameStateManager.potion_count_changed.connect(_on_potion_count_changed)
 
 	_refresh_resources_label()
 	for building: GameEnums.BuildingType in _building_rows.keys():
@@ -51,8 +54,79 @@ func _ready() -> void:
 	_refresh_workers_section()
 	for key: String in _mercenary_rows.keys():
 		_refresh_mercenary_row(key)
+	for id: String in _potion_rows.keys():
+		_refresh_potion_row(id)
 
 	print("[SettlementUI] Initialized")
+
+## Builds the Herbalist brewing panel: one row per potion recipe, showing
+## owned count, brew cost, and a brew button (locked ones show their
+## required Herbalist level instead).
+func _build_potions_section() -> VBoxContainer:
+	var section := VBoxContainer.new()
+	section.add_theme_constant_override("separation", 4)
+
+	var title := Label.new()
+	title.text = tr("UI_SETTLEMENT_POTIONS_TITLE")
+	section.add_child(title)
+
+	for potion: PotionData in PotionDatabase.get_all_potions():
+		section.add_child(_build_potion_row(potion))
+
+	return section
+
+## Builds a single potion's row: name, owned count/cost, and a brew button.
+func _build_potion_row(potion: PotionData) -> HBoxContainer:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 12)
+
+	var name_label := Label.new()
+	name_label.text = tr(potion.name_key)
+	name_label.custom_minimum_size = Vector2(180, 0)
+	row.add_child(name_label)
+
+	var status_label := Label.new()
+	status_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(status_label)
+
+	var brew_button := Button.new()
+	brew_button.text = tr("UI_SETTLEMENT_BREW")
+	brew_button.pressed.connect(func() -> void: GameStateManager.brew_potion(potion))
+	row.add_child(brew_button)
+
+	_potion_rows[potion.id] = {
+		"status_label": status_label,
+		"brew_button": brew_button,
+	}
+
+	return row
+
+## Refreshes one potion row's status text and the brew button's enabled state.
+func _refresh_potion_row(id: String) -> void:
+	var potion: PotionData = PotionDatabase.get_potion(id)
+	var row: Dictionary = _potion_rows[id]
+	var status_label: Label = row["status_label"]
+	var brew_button: Button = row["brew_button"]
+
+	if not GameStateManager.is_potion_unlocked(potion):
+		status_label.text = "%s: %d" % [tr("UI_SETTLEMENT_REQUIRES_HERBALIST_LEVEL"), potion.required_herbalist_level]
+		brew_button.disabled = true
+		return
+
+	var owned: int = GameStateManager.get_potion_count(id)
+	var cost_parts: Array[String] = []
+	var can_afford: bool = true
+	for resource: GameEnums.StrategicResource in potion.brew_cost.keys():
+		cost_parts.append("%s: %d" % [tr(_resource_name_key(resource)), potion.brew_cost[resource]])
+		if GameStateManager.get_strategic_resource(resource) < potion.brew_cost[resource]:
+			can_afford = false
+
+	status_label.text = "%s: %d | %s" % [tr("UI_SETTLEMENT_OWNED"), owned, ", ".join(cost_parts)]
+	brew_button.disabled = not can_afford
+
+func _on_potion_count_changed(id: String, _new_count: int) -> void:
+	if _potion_rows.has(id):
+		_refresh_potion_row(id)
 
 ## Builds the Barracks recruitment panel: one row per mercenary subclass in
 ## the whole roster (locked ones are shown greyed out with their unlock
@@ -309,6 +383,8 @@ func _on_strategic_resource_changed(_resource: GameEnums.StrategicResource, _new
 	_refresh_resources_label()
 	for building: GameEnums.BuildingType in _building_rows.keys():
 		_refresh_building_row(building)
+	for id: String in _potion_rows.keys():
+		_refresh_potion_row(id)
 
 func _on_building_upgraded(building: GameEnums.BuildingType, _new_level: int) -> void:
 	_refresh_building_row(building)
@@ -316,6 +392,9 @@ func _on_building_upgraded(building: GameEnums.BuildingType, _new_level: int) ->
 		_refresh_workers_section()
 	elif building == GameEnums.BuildingType.WAREHOUSE:
 		_refresh_resources_label()
+	elif building == GameEnums.BuildingType.HERBALIST:
+		for id: String in _potion_rows.keys():
+			_refresh_potion_row(id)
 
 func _on_worker_assignment_changed(_resource: GameEnums.StrategicResource, _worker_count: int) -> void:
 	_refresh_workers_section()
@@ -338,3 +417,5 @@ func _exit_tree() -> void:
 		GameStateManager.active_mercenary_changed.disconnect(_on_active_mercenary_changed)
 	if GameStateManager.mercenary_recovery_changed.is_connected(_on_mercenary_recovery_changed):
 		GameStateManager.mercenary_recovery_changed.disconnect(_on_mercenary_recovery_changed)
+	if GameStateManager.potion_count_changed.is_connected(_on_potion_count_changed):
+		GameStateManager.potion_count_changed.disconnect(_on_potion_count_changed)

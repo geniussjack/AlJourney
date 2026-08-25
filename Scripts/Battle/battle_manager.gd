@@ -243,6 +243,34 @@ func _advance_turn_after_action(actor: PlayerCharacter) -> void:
 	else:
 		turn_state_changed.emit()
 
+## Consumes a Herbalist-brewed potion on behalf of the current actor and
+## applies its effect immediately (no target selection — see PotionData:
+## SINGLE_HEAL always targets the actor who drank it). Ends the actor's
+## turn, the same as using an ability.
+## Returns true if the potion was available and used.
+func use_potion(potion: PotionData) -> bool:
+	if current_phase != GameEnums.BattlePhase.PLAYER_TURN or selected_actor == null or potion == null:
+		return false
+
+	if not GameStateManager.use_potion(potion.id):
+		return false
+
+	var actor: PlayerCharacter = selected_actor
+
+	match potion.potion_type:
+		GameEnums.PotionType.SINGLE_HEAL:
+			actor.heal(PlayerCharacter.calculate_healing(potion.effect_value))
+		GameEnums.PotionType.PARTY_HEAL:
+			for member: PlayerCharacter in hero_system.get_alive_members():
+				member.heal(PlayerCharacter.calculate_healing(potion.effect_value))
+		GameEnums.PotionType.ULTIMATE_FILL:
+			add_ultimate_charge(potion.effect_value)
+
+	print("[BattleManager] %s used potion %s" % [actor.get_character_name(), potion.id])
+
+	_advance_turn_after_action(actor)
+	return true
+
 ## Increases (clamped) the party's shared ultimate charge and notifies
 ## subscribers. Called both for successful party attacks and for enemy
 ## attacks landing on the party.

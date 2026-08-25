@@ -109,6 +109,16 @@ func _refresh() -> void:
 			ultimate_button.pressed.connect(func() -> void: _battle_manager.select_ability(ultimate))
 			_ability_row.add_child(ultimate_button)
 
+		for potion: PotionData in PotionDatabase.get_all_potions():
+			var count: int = GameStateManager.get_potion_count(potion.id)
+			if count <= 0:
+				continue
+
+			var potion_button := Button.new()
+			potion_button.text = "%s (x%d)" % [tr(potion.name_key), count]
+			potion_button.pressed.connect(func() -> void: _battle_manager.use_potion(potion))
+			_ability_row.add_child(potion_button)
+
 		return
 
 	_prompt_label.text = tr("UI_BATTLE_CHOOSE_TARGET")
