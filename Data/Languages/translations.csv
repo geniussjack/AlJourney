@@ -87,6 +87,11 @@ UI_SETTLEMENT_REQUIRES_HERBALIST_LEVEL,Requires Herbalist level,Требуетс
 POTION_SINGLE_HEAL,Healing Draught,Зелье лечения
 POTION_PARTY_HEAL,Draught of Renewal,Зелье обновления
 POTION_ULTIMATE_FILL,Draught of Fury,Зелье ярости
+UI_SETTLEMENT_DEFENSE,Defense,Оборона
+UI_SETTLEMENT_NO_RAIDS_YET,No raids yet,Набегов ещё не было
+UI_SETTLEMENT_RAID_REPELLED,Raid repelled,Набег отбит
+UI_SETTLEMENT_RAID_FAILED,Raid failed,Набег не отражён
+UI_SETTLEMENT_SECONDS_AGO,seconds ago,сек. назад
 UI_SETTLEMENT_BACK,Back,Назад
 STRATEGIC_RESOURCE_WOOD,Wood,Дерево
 STRATEGIC_RESOURCE_STONE,Stone,Камень

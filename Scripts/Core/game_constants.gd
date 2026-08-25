@@ -170,6 +170,30 @@ const WAREHOUSE_BASE_STORAGE_CAP: int = 100
 ## level beyond the first.
 const WAREHOUSE_STORAGE_CAP_PER_LEVEL: int = 50
 
+## How often (in real seconds) an undead raid attempt is checked for —
+## applies while the game is running and, via elapsed real time, while the
+## player is offline (see design document, section 9).
+const RAID_CHECK_INTERVAL_SECONDS: float = 300.0
+## A raid's base strength at highest_wave 1.
+const RAID_BASE_STRENGTH: int = 10
+## Additional raid strength per point of highest_wave reached — the
+## "growing frequency/strength with campaign progress" from the design
+## document is expressed here as growing strength at a fixed check
+## interval, rather than a shrinking interval; simpler to reason about
+## and rebalance.
+const RAID_STRENGTH_PER_WAVE: int = 2
+## Defense power contributed by each villager assigned to defend the
+## settlement instead of gathering resources.
+const RAID_DEFENSE_PER_WORKER: int = 3
+## Defense power contributed by each level of the Wall/Watchtower building.
+const RAID_DEFENSE_PER_WALL_LEVEL: int = 5
+## Fraction of each stored strategic resource lost after a successfully
+## repelled raid — raids always cost something, per the design document.
+const RAID_SUCCESS_RESOURCE_LOSS_PERCENT: int = 5
+## Fraction of each stored strategic resource lost after a failed raid —
+## deliberately larger than the success case.
+const RAID_FAILURE_RESOURCE_LOSS_PERCENT: int = 20
+
 ## File name used to store the player's save data.
 const SAVE_FILE_NAME: String = "save_data.json"
 ## Directory in which the save file is stored.

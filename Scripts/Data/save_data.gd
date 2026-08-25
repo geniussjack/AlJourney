@@ -49,6 +49,22 @@ var worker_assignments: Dictionary[GameEnums.StrategicResource, int] = {}
 ## catch-up gains after time spent offline. 0 means never initialized yet.
 var last_resource_tick_unix_time: int = 0
 
+## Villagers currently assigned to defend the settlement against undead
+## raids instead of gathering a resource. Shares the same total worker
+## capacity pool as worker_assignments (see GameStateManager.
+## get_total_assigned_workers()).
+var defense_workers: int = 0
+## Unix timestamp (seconds) of the last undead raid check — same
+## real-time/offline-catch-up pattern as last_resource_tick_unix_time.
+## 0 means never initialized yet.
+var last_raid_check_unix_time: int = 0
+## Whether the most recent raid was repelled. Meaningless (ignore) if no
+## raid has happened yet — see last_raid_unix_time.
+var last_raid_succeeded: bool = false
+## Unix timestamp (seconds) of the most recent raid, or 0 if none has
+## happened yet.
+var last_raid_unix_time: int = 0
+
 ## The mercenary currently filling the party's third slot, identified by
 ## MercenarySubclassData.get_key() (e.g. "MAGE_HEALER"), or "" if the slot
 ## is empty. See design document, section 9.
@@ -197,6 +213,10 @@ func to_dict() -> Dictionary:
 		"buildingLevels": building_levels_dict,
 		"workerAssignments": worker_assignments_dict,
 		"lastResourceTickUnixTime": last_resource_tick_unix_time,
+		"defenseWorkers": defense_workers,
+		"lastRaidCheckUnixTime": last_raid_check_unix_time,
+		"lastRaidSucceeded": last_raid_succeeded,
+		"lastRaidUnixTime": last_raid_unix_time,
 		"activeMercenaryKey": active_mercenary_key,
 		"mercenaryRecovery": mercenary_recovery.duplicate(),
 		"potionCounts": potion_counts.duplicate(),
@@ -248,6 +268,11 @@ static func from_dict(data: Dictionary) -> SaveData:
 	for resource_key: String in worker_assignments_dict.keys():
 		save.worker_assignments[GameEnums.StrategicResource[resource_key]] = int(worker_assignments_dict[resource_key])
 	save.last_resource_tick_unix_time = int(data.get("lastResourceTickUnixTime", 0))
+
+	save.defense_workers = int(data.get("defenseWorkers", 0))
+	save.last_raid_check_unix_time = int(data.get("lastRaidCheckUnixTime", 0))
+	save.last_raid_succeeded = bool(data.get("lastRaidSucceeded", false))
+	save.last_raid_unix_time = int(data.get("lastRaidUnixTime", 0))
 
 	save.active_mercenary_key = data.get("activeMercenaryKey", "")
 	save.mercenary_recovery = {}
