@@ -8,6 +8,9 @@ signal state_changed(new_state: GameEnums.GameState)
 signal wave_changed(wave_number: int)
 ## Raised when the player's coin count changes.
 signal coins_changed(new_amount: int)
+## Raised when a strategic resource's stored amount changes (settlement
+## economy — see design document, section 9).
+signal strategic_resource_changed(resource: GameEnums.StrategicResource, new_amount: int)
 ## Raised when the heroes' stats are updated.
 signal hero_stats_changed
 ## Raised when the shared party level increases. Carries the new level —
@@ -152,6 +155,44 @@ func spend_coins(amount: int) -> bool:
 	coins_changed.emit(current_save.coins)
 
 	print("[GameStateManager] Spent %d coins. Remaining: %d" % [amount, current_save.coins])
+	return true
+
+## Returns the current stored amount of the given strategic resource. A
+## resource that has never been gathered reads as 0, not an error.
+func get_strategic_resource(resource: GameEnums.StrategicResource) -> int:
+	return current_save.strategic_resources.get(resource, 0) if current_save != null else 0
+
+## Adds the given amount of a strategic resource to storage. Uncapped for
+## now — the Warehouse building will introduce a storage limit once it exists.
+func add_strategic_resource(resource: GameEnums.StrategicResource, amount: int) -> void:
+	if current_save == null or amount <= 0:
+		return
+
+	var new_amount: int = get_strategic_resource(resource) + amount
+	current_save.strategic_resources[resource] = new_amount
+	strategic_resource_changed.emit(resource, new_amount)
+
+	print("[GameStateManager] Added %d %s. Total: %d" % [amount, GameEnums.StrategicResource.keys()[resource], new_amount])
+
+## Attempts to spend a combination of strategic resources atomically:
+## either every listed cost can be afforded and all are deducted, or
+## nothing is spent at all.
+## costs: resource type -> amount required.
+## Returns true if the resources were successfully spent.
+func spend_strategic_resources(costs: Dictionary[GameEnums.StrategicResource, int]) -> bool:
+	if current_save == null:
+		return false
+
+	for resource: GameEnums.StrategicResource in costs.keys():
+		if get_strategic_resource(resource) < costs[resource]:
+			return false
+
+	for resource: GameEnums.StrategicResource in costs.keys():
+		var new_amount: int = get_strategic_resource(resource) - costs[resource]
+		current_save.strategic_resources[resource] = new_amount
+		strategic_resource_changed.emit(resource, new_amount)
+
+	print("[GameStateManager] Spent strategic resources: %s" % costs)
 	return true
 
 ## Grants the party shared XP, applying as many level-ups as the amount

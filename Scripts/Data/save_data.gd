@@ -27,6 +27,13 @@ var party_level: int = 1
 ## XP accumulated toward the party's next level (resets on level-up, not cumulative).
 var party_xp: int = 0
 
+## Strategic resources currently stored in the settlement (see design
+## document, section 9), keyed by resource type. Missing keys mean 0, not
+## an error — a resource only appears here once it's been gathered at
+## least once. Uncapped for now — the Warehouse building will introduce a
+## storage limit once it exists.
+var strategic_resources: Dictionary[GameEnums.StrategicResource, int] = {}
+
 ## The Mage's current health.
 var mage_health: int = 0
 ## The Mage's maximum health.
@@ -138,6 +145,10 @@ func to_dict() -> Dictionary:
 	for item: EquipmentData in inventory:
 		inventory_list.append(item.to_dict())
 
+	var strategic_resources_dict: Dictionary = {}
+	for resource: GameEnums.StrategicResource in strategic_resources.keys():
+		strategic_resources_dict[GameEnums.StrategicResource.keys()[resource]] = strategic_resources[resource]
+
 	return {
 		"schemaVersion": schema_version,
 		"currentWave": current_wave,
@@ -145,6 +156,7 @@ func to_dict() -> Dictionary:
 		"currentLevelId": current_level_id,
 		"completedLevelIds": completed_level_ids,
 		"coins": coins,
+		"strategicResources": strategic_resources_dict,
 		"partyLevel": party_level,
 		"partyXp": party_xp,
 		"mageHealth": mage_health,
@@ -177,6 +189,12 @@ static func from_dict(data: Dictionary) -> SaveData:
 		save.completed_level_ids.append(level_id)
 
 	save.coins = int(data.get("coins", 0))
+
+	save.strategic_resources = {}
+	var strategic_resources_dict: Dictionary = data.get("strategicResources", {})
+	for resource_key: String in strategic_resources_dict.keys():
+		save.strategic_resources[GameEnums.StrategicResource[resource_key]] = int(strategic_resources_dict[resource_key])
+
 	save.party_level = int(data.get("partyLevel", 1))
 	save.party_xp = int(data.get("partyXp", 0))
 
