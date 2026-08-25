@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://cdmiad6sigfpe"]
 
-[ext_resource type="Script" path="res://Scripts/UI/ShopUI.cs" id="1_shop"]
+[ext_resource type="Script" uid="uid://b41s423bvlyk" path="res://Scripts/UI/shop_ui.gd" id="1_shop"]
 [ext_resource type="Theme" path="res://Resources/Themes/game_theme.tres" id="2_theme"]
 [ext_resource type="Texture2D" path="res://Resources/Sprites/Backgrounds/menu_background.png" id="3_bg"]
 [ext_resource type="Texture2D" path="res://Resources/Sprites/UI/coin_icon.png" id="4_coin"]

@@ -1,8 +1,8 @@
 [gd_scene load_steps=7 format=3 uid="uid://cmutdu1urtub0"]
 
-[ext_resource type="Script" uid="uid://c7wem1c34vp64" path="res://Scripts/UI/MainMenuUI.cs" id="1_main"]
-[ext_resource type="Script" uid="uid://denji2vl47j8k" path="res://Scripts/UI/SettingsMenuUI.cs" id="2_settings"]
-[ext_resource type="Script" uid="uid://etn4ci8fbhk7" path="res://Scripts/UI/CreditsUI.cs" id="3_credits"]
+[ext_resource type="Script" uid="uid://du2msunc8h7ut" path="res://Scripts/UI/main_menu_ui.gd" id="1_main"]
+[ext_resource type="Script" uid="uid://h8qeg0s0p1b1" path="res://Scripts/UI/settings_menu_ui.gd" id="2_settings"]
+[ext_resource type="Script" uid="uid://sn5q38lqnu1y" path="res://Scripts/UI/credits_ui.gd" id="3_credits"]
 [ext_resource type="Theme" uid="uid://d0twkb22dvira" path="res://Resources/Themes/game_theme.tres" id="4_theme"]
 [ext_resource type="Texture2D" uid="uid://cq4jbitxuh616" path="res://Resources/Sprites/Backgrounds/menu_background.png" id="5_bg"]
 [ext_resource type="Texture2D" uid="uid://gr30g6rbcfoe" path="res://Resources/Sprites/UI/logo.png" id="6_logo"]

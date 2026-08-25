@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://settings_uid"]
 
-[ext_resource type="Script" path="res://Scripts/UI/SettingsMenuUI.cs" id="1_settings"]
+[ext_resource type="Script" uid="uid://h8qeg0s0p1b1" path="res://Scripts/UI/settings_menu_ui.gd" id="1_settings"]
 
 [node name="SettingsPanel" type="Control"]
 layout_mode = 3

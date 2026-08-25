@@ -1,8 +1,8 @@
 [gd_scene load_steps=11 format=3 uid="uid://do01lwwh5yf6i"]
 
-[ext_resource type="Script" uid="uid://bb6df84rte67u" path="res://Scripts/Scenes/BattleScene.cs" id="1_battle"]
+[ext_resource type="Script" uid="uid://cm3h0h7ts4g52" path="res://Scripts/Scenes/battle_scene.gd" id="1_battle"]
 [ext_resource type="PackedScene" uid="uid://cgmssg1q3f8r3" path="res://Scenes/UI/BattleHUD.tscn" id="2_hud"]
-[ext_resource type="Script" uid="uid://cy2w0fdga4ede" path="res://Scripts/Battle/BattleManager.cs" id="3_manager"]
+[ext_resource type="Script" uid="uid://cl1c6lhbeb1ay" path="res://Scripts/Battle/battle_manager.gd" id="3_manager"]
 [ext_resource type="Theme" uid="uid://d0twkb22dvira" path="res://Resources/Themes/game_theme.tres" id="5_theme"]
 [ext_resource type="Texture2D" uid="uid://3emm2y0omi4k" path="res://Resources/Sprites/Backgrounds/battle_background.png" id="6_bg"]
 [ext_resource type="Texture2D" uid="uid://gnpobh3ck1bi" path="res://Resources/Sprites/UI/panel_background.png" id="7_panel"]

@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://inventoryui_123"]
 
-[ext_resource type="Script" path="res://Scripts/UI/SimpleInventoryUI.cs" id="1_inv"]
+[ext_resource type="Script" uid="uid://ddb4ahboih62p" path="res://Scripts/UI/simple_inventory_ui.gd" id="1_inv"]
 [ext_resource type="Theme" path="res://Resources/Themes/game_theme.tres" id="2_theme"]
 
 [node name="InventoryUI" type="Control"]

@@ -16,7 +16,7 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 
 config/name="Altarion's Journey"
 run/main_scene="res://Scenes/UI/MainMenu.tscn"
-config/features=PackedStringArray("4.7", "C#", "Mobile")
+config/features=PackedStringArray("4.7", "Mobile")
 boot_splash/bg_color=Color(0, 0, 0, 1)
 boot_splash/stretch_mode=0
 boot_splash/image="res://Resources/Sprites/UI/logo.png"
@@ -24,25 +24,21 @@ config/icon="res://Resources/Sprites/UI/logo.png"
 
 [autoload]
 
-SaveSystem="*res://Scripts/Managers/SaveSystem.cs"
-GameStateManager="*res://Scripts/Managers/GameStateManager.cs"
-SceneManager="*res://Scripts/Managers/SceneManager.cs"
-AudioManager="*res://Scripts/Managers/AudioManager.cs"
-SettingsManager="*res://Scripts/Managers/SettingsManager.cs"
-UIManager="*res://Scripts/Managers/UIManager.cs"
-InventoryManager="*res://Scripts/Managers/InventoryManager.cs"
-LootSystem="*res://Scripts/Managers/LootSystem.cs"
-AbilitySystem="*res://Scripts/Managers/AbilitySystem.cs"
+SaveSystem="*res://Scripts/Managers/save_system.gd"
+GameStateManager="*res://Scripts/Managers/game_state_manager.gd"
+SceneManager="*res://Scripts/Managers/scene_manager.gd"
+AudioManager="*res://Scripts/Managers/audio_manager.gd"
+SettingsManager="*res://Scripts/Managers/settings_manager.gd"
+UIManager="*res://Scripts/Managers/ui_manager.gd"
+InventoryManager="*res://Scripts/Managers/inventory_manager.gd"
+LootSystem="*res://Scripts/Managers/loot_system.gd"
+AbilitySystem="*res://Scripts/Managers/ability_system.gd"
 
 [display]
 
 window/size/viewport_width=1920
 window/size/viewport_height=1080
 window/stretch/mode="canvas_items"
-
-[dotnet]
-
-project/assembly_name="AlJourney"
 
 [internationalization]
 
