@@ -8,6 +8,9 @@ const RED := Color("ef625d")
 const GREEN := Color("73dd80")
 const INK := Color("182936")
 const DRAG_THRESHOLD: float = 12.0
+const ANIMATED_ATLAS_CELL_SIZE := Vector2(128, 128)
+const ACTION_ANIMATION_DURATION: float = 0.56
+const IDLE_FRAME_DURATION: float = 0.28
 
 var _party: DualHeroSystem
 var _battle: BattleManager
@@ -15,6 +18,8 @@ var _units: Array[Character] = []
 var _positions: Dictionary = {}
 var _textures: Dictionary = {}
 var _regions: Dictionary = {}
+var _animation_states: Dictionary = {}
+var _elapsed_time: float = 0.0
 var _actor: PlayerCharacter
 var _target: Character
 var _pressed_at := Vector2.ZERO
@@ -64,6 +69,7 @@ func initialize(party: DualHeroSystem, battle: BattleManager) -> void:
 	_battle.wave_advanced.connect(_on_wave_changed)
 	_battle.battle_ended.connect(_on_battle_ended)
 	_battle.turn_state_changed.connect(_on_turn_changed)
+	_battle.ability_resolved.connect(_on_ability_resolved)
 	_rebuild_units()
 
 ## Preserves the battle scene's existing enemy setup entry point.
@@ -72,9 +78,11 @@ func setup_enemies(_enemies: Array[Enemy]) -> void:
 	_rebuild_units()
 
 ## Refreshes summons as well as wave changes without binding stale actors.
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	if _battle == null or get_tree().paused:
 		return
+	_elapsed_time += delta
+	_update_animations(delta)
 	if _units.size() != _party.get_party_members().size() + _battle.enemies.size():
 		_rebuild_units()
 	_layout_units()
@@ -92,14 +100,38 @@ func _rebuild_units() -> void:
 	for unit: Character in _units:
 		var path: String = "res://Resources/Sprites/Characters/skeleton_sprite.png"
 		if unit is PlayerCharacter:
-			path = "res://Resources/Sprites/Characters/mage_sprite.png" if unit.character_class == GameEnums.CharacterClass.MAGE else "res://Resources/Sprites/Characters/warrior_sprite.png"
+			if not unit.is_mercenary and unit == _party.mage:
+				path = "res://Resources/Sprites/Characters/Animated/altarion_battle_atlas.png"
+			elif not unit.is_mercenary and unit == _party.warrior:
+				path = "res://Resources/Sprites/Characters/Animated/aldric_battle_atlas.png"
+			else:
+				path = "res://Resources/Sprites/Characters/mage_sprite.png" if unit.character_class == GameEnums.CharacterClass.MAGE else "res://Resources/Sprites/Characters/warrior_sprite.png"
 		elif unit is Enemy and unit.enemy_type == GameEnums.EnemyType.SLIME:
 			path = "res://Resources/Sprites/Characters/slime_sprite.png"
+		elif unit is Enemy and unit.enemy_type == GameEnums.EnemyType.SKELETON_WARRIOR:
+			path = "res://Resources/Sprites/Characters/Animated/skeleton_battle_atlas.png"
 		if not _textures.has(path):
 			_textures[path] = load(path)
-			_regions[path] = (_textures[path] as Texture2D).get_image().get_used_rect()
+			_regions[path] = Rect2(Vector2.ZERO, ANIMATED_ATLAS_CELL_SIZE) if path.contains("/Animated/") else (_textures[path] as Texture2D).get_image().get_used_rect()
 		unit.set_meta("battle_texture", path)
+		if not _animation_states.has(unit):
+			_animation_states[unit] = {"row": 0, "elapsed": 0.0, "locked": false}
+	for animated_unit: Variant in _animation_states.keys():
+		if not _units.has(animated_unit):
+			_animation_states.erase(animated_unit)
 	_layout_units()
+
+## Advances one-shot action states and returns living units to their idle row.
+func _update_animations(delta: float) -> void:
+	for unit: Character in _animation_states.keys():
+		var state: Dictionary = _animation_states[unit]
+		if state["locked"]:
+			continue
+		if state["row"] != 0:
+			state["elapsed"] += delta
+			if state["elapsed"] >= ACTION_ANIMATION_DURATION:
+				state["row"] = 0
+				state["elapsed"] = 0.0
 
 ## Uses staggered floor anchors, leaving the middle free for combat effects.
 func _layout_units() -> void:
@@ -154,6 +186,8 @@ func _draw_unit(unit: Character) -> void:
 	if unit is PlayerCharacter and _battle.can_actor_act(unit) and unit != _actor:
 		_draw_ring(foot, Vector2(78, 22), BLUE)
 	var texture: Texture2D = _textures[path]
+	if path.contains("/Animated/"):
+		region.position = _get_animation_frame(unit) * ANIMATED_ATLAS_CELL_SIZE
 	draw_texture_rect_region(texture, body, region, tint)
 	var maximum: int = unit.get_total_max_health()
 	draw_rect(Rect2(foot + Vector2(-67, 17), Vector2(134, 16)), INK)
@@ -176,6 +210,32 @@ func _draw_unit(unit: Character) -> void:
 			draw_line(center - Vector2(19, 19), center + Vector2(19, 19), RED, 5)
 		elif unit == _target or (_preview != null and _preview.is_aoe and ((unit is PlayerCharacter) == (_target is PlayerCharacter))):
 			_draw_ring(foot, Vector2(82, 26), GREEN if unit is PlayerCharacter else RED)
+
+## Returns the atlas column and row for a unit's current presentation state.
+func _get_animation_frame(unit: Character) -> Vector2:
+	var state: Dictionary = _animation_states.get(unit, {"row": 0, "elapsed": 0.0, "locked": false})
+	var row: int = state["row"]
+	var column: int
+	if state["locked"]:
+		column = 3
+	elif row == 0:
+		column = int(_elapsed_time / IDLE_FRAME_DURATION) % 4
+	else:
+		column = mini(3, int(state["elapsed"] / ACTION_ANIMATION_DURATION * 4.0))
+	return Vector2(column, row)
+
+## Starts attack, hit and defeat rows after combat logic has resolved an ability.
+func _on_ability_resolved(caster: PlayerCharacter, ability: AbilityData, targets: Array[Character]) -> void:
+	if ability.is_attack_ability:
+		_play_animation(caster, 1)
+		for target: Character in targets:
+			_play_animation(target, 3 if not target.is_alive else 2, not target.is_alive)
+
+## Assigns a one-shot row, or freezes a defeated combatant on its final frame.
+func _play_animation(unit: Character, row: int, locked: bool = false) -> void:
+	if not _animation_states.has(unit):
+		return
+	_animation_states[unit] = {"row": row, "elapsed": 0.0, "locked": locked}
 
 ## Renders stepped rings without filtered raster textures.
 func _draw_ring(center: Vector2, radius: Vector2, color: Color) -> void:
