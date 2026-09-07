@@ -30,6 +30,9 @@ signal battle_ended(player_won: bool)
 signal enemy_defeated(enemy: Enemy)
 ## Raised when the party's shared ultimate charge changes.
 signal ultimate_charge_changed(charge: int, max_charge: int)
+## Raised after an ability has changed combat state so the presentation can
+## animate its caster and resolved targets without owning combat rules.
+signal ability_resolved(caster: PlayerCharacter, ability: AbilityData, targets: Array[Character])
 
 ## The maximum value of the party's shared ultimate charge.
 const MAX_ULTIMATE_CHARGE: int = 100
@@ -229,6 +232,7 @@ func _resolve_ability(caster: PlayerCharacter, ability: AbilityData, primary_tar
 		CombatEffectProcessor.apply_attack_ability(ability, caster, targets, self, _camera_shake)
 	else:
 		CombatEffectProcessor.apply_support_ability(ability, targets, hero_system, self, _camera_shake)
+	ability_resolved.emit(caster, ability, targets)
 
 ## Immediately resolves the selected actor's ultimate ability and resets
 ## the party's shared charge. AoE ultimates hit every living enemy;
@@ -245,6 +249,7 @@ func _resolve_ultimate(caster: PlayerCharacter, ultimate: AbilityData) -> void:
 		targets = [] if highest_health_enemy == null else [highest_health_enemy]
 
 	CombatEffectProcessor.apply_attack_ability(ultimate, caster, targets, self, _camera_shake)
+	ability_resolved.emit(caster, ultimate, targets)
 
 	ultimate_charge = 0
 	ultimate_charge_changed.emit(ultimate_charge, MAX_ULTIMATE_CHARGE)
