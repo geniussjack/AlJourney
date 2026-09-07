@@ -3,8 +3,7 @@ extends Node
 ## every system involved in combat: the UI, the hero party system, and the
 ## turn-based combat manager.
 
-var _battle_hud: BattleHUD
-var _turn_action_panel: TurnActionPanel
+var _battle_hud: BattlefieldView
 var _battle_manager: BattleManager
 var _hero_system: DualHeroSystem
 var _camera: Camera2D
@@ -36,9 +35,6 @@ func _ready() -> void:
 
 	_battle_hud.initialize(_hero_system, _battle_manager)
 
-	_turn_action_panel = TurnActionPanel.new()
-	(get_node("CanvasLayer") as CanvasLayer).add_child(_turn_action_panel)
-
 	_battle_manager.level_completed.connect(_on_level_completed)
 	_battle_manager.wave_advanced.connect(_on_wave_advanced)
 	_battle_manager.battle_ended.connect(_on_battle_ended)
@@ -47,53 +43,15 @@ func _ready() -> void:
 	_level = CampaignDatabase.get_level(GameStateManager.current_level_id)
 	if _level == null:
 		_level = CampaignDatabase.get_level(CampaignDatabase.FIRST_LEVEL_ID)
+	if _level.location != GameEnums.LocationId.VILLAGE_RUINS:
+		get_node("CanvasLayer/Background").texture = load("res://Resources/Sprites/Backgrounds/battle_background.png")
 
 	GameStateManager.start_level(_level)
 	_battle_manager.start_battle(_hero_system, _level, _camera_shake)
 
-	_turn_action_panel.initialize(_battle_manager)
-
 	_battle_hud.setup_enemies(_battle_manager.enemies)
 
-	_start_portrait_animations()
-
 	print("[BattleScene] Battle started - Level %s (difficulty %d)" % [_level.id, _level.difficulty_rating])
-
-## Kicks off the idle bob animation for both hero portraits.
-func _start_portrait_animations() -> void:
-	var mage: TextureRect = get_node_or_null("CanvasLayer/DecorativeLayer/LeftPanel/MarginContainer/VBoxContainer/MageRow/MagePortraitContainer/MagePortrait")
-	var warrior: TextureRect = get_node_or_null("CanvasLayer/DecorativeLayer/LeftPanel/MarginContainer/VBoxContainer/WarriorRow/WarriorPortraitContainer/WarriorPortrait")
-
-	print("[BattleScene] Portraits loaded: Mage=%s, Warrior=%s" % [mage != null, warrior != null])
-
-	_animate_portrait(mage)
-	_animate_portrait(warrior)
-
-## Starts a subtle idle bob/scale loop on a single portrait.
-func _animate_portrait(portrait: TextureRect) -> void:
-	if portrait == null:
-		return
-
-	portrait.pivot_offset = portrait.size / 2
-	if portrait.pivot_offset == Vector2.ZERO:
-		portrait.pivot_offset = Vector2(48, 48)  # Fallback.
-
-	print("[BattleScene] Animating portrait: %s with PivotOffset=%s" % [portrait.name, portrait.pivot_offset])
-
-	var tween: Tween = create_tween()
-	tween.set_loops()
-	tween.set_trans(Tween.TRANS_SINE)
-	tween.set_ease(Tween.EASE_IN_OUT)
-
-	var delay: float = randf() * 0.5
-	var dur1: float = 1.0 + (randf() * 0.2)
-	var dur2: float = 1.0 + (randf() * 0.2)
-
-	tween.tween_interval(delay)
-	tween.tween_property(portrait, "scale", Vector2(1.1, 1.1), dur1)
-	tween.parallel().tween_property(portrait, "position", portrait.position - Vector2(0, 4), dur1)
-	tween.tween_property(portrait, "scale", Vector2(1.0, 1.0), dur2)
-	tween.parallel().tween_property(portrait, "position", portrait.position, dur2)
 
 ## Loads hero stats from the current save into the party system.
 func _initialize_heroes() -> void:

@@ -82,6 +82,19 @@ var hero_system: DualHeroSystem
 ## The list of every enemy currently active on the field.
 var enemies: Array[Enemy] = []
 
+## Floor anchors supplied by the presentation, used to place combat effects.
+var visual_positions: Dictionary = {}
+
+## Whether a living actor still owns an action in the current round.
+func can_actor_act(actor: PlayerCharacter) -> bool:
+	return actor != null and actor.is_alive and not actor.is_stunned and current_phase == GameEnums.BattlePhase.PLAYER_TURN and not _battle_ended_signaled and not _is_level_completed and _pending_actors.has(actor)
+
+## The two ordinary abilities belonging to this actor, including specialists.
+func get_actor_abilities(actor: PlayerCharacter) -> Array[AbilityData]:
+	if actor.is_mercenary:
+		return [actor.mercenary_subclass.ability_one, actor.mercenary_subclass.ability_two]
+	return AbilityDatabase.get_hero_abilities(actor.character_class)
+
 ## Party members who have not yet acted in the current round.
 var pending_actors: Array[PlayerCharacter]:
 	get:
@@ -119,6 +132,8 @@ func start_battle(party_hero_system: DualHeroSystem, level: LevelDefinition, cam
 	ultimate_charge = 0
 
 	hero_system.party_defeated.connect(_on_party_defeated)
+	hero_system.mage.damage_taken.connect(_on_hero_damage_taken)
+	hero_system.warrior.damage_taken.connect(_on_hero_damage_taken)
 
 	_spawn_current_wave()
 	_start_player_turn()
@@ -129,12 +144,17 @@ func start_battle(party_hero_system: DualHeroSystem, level: LevelDefinition, cam
 ## turn-order queue.
 func _start_player_turn() -> void:
 	hero_system.process_status_effects()
+	if _battle_ended_signaled or _is_level_completed:
+		return
 
 	_pending_actors = hero_system.get_alive_members()
+	_pending_actors = _pending_actors.filter(func(actor: PlayerCharacter) -> bool: return not actor.is_stunned)
 	selected_actor = null
 	selected_ability = null
 
 	_change_phase(GameEnums.BattlePhase.PLAYER_TURN)
+	if _pending_actors.is_empty():
+		_start_enemy_turn.call_deferred()
 
 ## Sets the current phase and notifies subscribers.
 func _change_phase(new_phase: GameEnums.BattlePhase) -> void:
@@ -144,7 +164,7 @@ func _change_phase(new_phase: GameEnums.BattlePhase) -> void:
 ## Selects the actor who will take the next turn. The player determines the
 ## turn order among the living party members who haven't acted yet this round.
 func select_actor(actor: PlayerCharacter) -> void:
-	if current_phase != GameEnums.BattlePhase.PLAYER_TURN or actor == null or not _pending_actors.has(actor):
+	if not can_actor_act(actor):
 		return
 
 	selected_actor = actor
@@ -156,16 +176,18 @@ func select_actor(actor: PlayerCharacter) -> void:
 ## without a separate target confirmation — it either hits an area, or
 ## picks its own target by its own rules (see _resolve_ultimate()).
 func select_ability(ability: AbilityData) -> void:
-	if current_phase != GameEnums.BattlePhase.PLAYER_TURN or selected_actor == null or ability == null:
+	if not can_actor_act(selected_actor) or ability == null:
 		return
 
 	if ability.is_ultimate:
-		if not is_ultimate_ready:
+		if not is_ultimate_ready or selected_actor.is_mercenary or ability != AbilityDatabase.get_hero_ultimate(selected_actor.character_class):
 			return
 
 		_resolve_ultimate(selected_actor, ability)
 		return
 
+	if not get_actor_abilities(selected_actor).has(ability):
+		return
 	selected_ability = ability
 	turn_state_changed.emit()
 
@@ -184,14 +206,15 @@ func get_valid_targets() -> Array[Character]:
 ## effect. If this was the last party member who hadn't acted yet, the
 ## enemy turn begins.
 func confirm_target(target: Character) -> void:
-	if current_phase != GameEnums.BattlePhase.PLAYER_TURN or selected_actor == null or selected_ability == null:
+	if not can_actor_act(selected_actor) or selected_ability == null:
 		return
 
 	if not get_valid_targets().has(target):
 		return
 
-	_resolve_ability(selected_actor, selected_ability, target)
-	_advance_turn_after_action(selected_actor)
+	var actor: PlayerCharacter = selected_actor
+	_resolve_ability(actor, selected_ability, target)
+	_advance_turn_after_action(actor)
 
 ## Resolves a chosen (non-ultimate) ability against its confirmed target(s).
 func _resolve_ability(caster: PlayerCharacter, ability: AbilityData, primary_target: Character) -> void:
@@ -204,8 +227,6 @@ func _resolve_ability(caster: PlayerCharacter, ability: AbilityData, primary_tar
 
 	if ability.is_attack_ability:
 		CombatEffectProcessor.apply_attack_ability(ability, caster, targets, self, _camera_shake)
-		if not targets.is_empty():
-			add_ultimate_charge(ULTIMATE_CHARGE_PER_ACTION)
 	else:
 		CombatEffectProcessor.apply_support_ability(ability, targets, hero_system, self, _camera_shake)
 
@@ -234,11 +255,16 @@ func _resolve_ultimate(caster: PlayerCharacter, ultimate: AbilityData) -> void:
 ## round, and either passes the turn to the next party member, or (if this
 ## was the last one) starts the enemy turn.
 func _advance_turn_after_action(actor: PlayerCharacter) -> void:
+	if _battle_ended_signaled or _is_level_completed:
+		return
 	_pending_actors.erase(actor)
+	_pending_actors = _pending_actors.filter(func(member: PlayerCharacter) -> bool: return member.is_alive and not member.is_stunned)
 	selected_actor = null
 	selected_ability = null
 
-	if _pending_actors.is_empty():
+	if _all_enemies_dead():
+		_on_enemies_cleared.call_deferred()
+	elif _pending_actors.is_empty():
 		_start_enemy_turn()
 	else:
 		turn_state_changed.emit()
@@ -249,7 +275,7 @@ func _advance_turn_after_action(actor: PlayerCharacter) -> void:
 ## turn, the same as using an ability.
 ## Returns true if the potion was available and used.
 func use_potion(potion: PotionData) -> bool:
-	if current_phase != GameEnums.BattlePhase.PLAYER_TURN or selected_actor == null or potion == null:
+	if not can_actor_act(selected_actor) or potion == null:
 		return false
 
 	if not GameStateManager.use_potion(potion.id):
@@ -282,6 +308,12 @@ func add_ultimate_charge(amount: int) -> void:
 	ultimate_charge = clamped
 	ultimate_charge_changed.emit(ultimate_charge, MAX_ULTIMATE_CHARGE)
 
+## Only health damage to the two main heroes fills the orb. Shield-only
+## absorption and hits on companions do not award charge.
+func _on_hero_damage_taken(amount: int) -> void:
+	if amount > 0:
+		add_ultimate_charge(ULTIMATE_CHARGE_PER_ACTION)
+
 ## Spawns the enemies for the level's current wave (_current_wave_index)
 ## using the curated composition from LevelDefinition.waves, replacing the
 ## previous enemies lineup.
@@ -306,6 +338,9 @@ func _spawn_current_wave() -> void:
 ## short pause between them, then hands control back to the player (or ends
 ## the wave if every enemy is now dead).
 func _start_enemy_turn() -> void:
+	if _battle_ended_signaled or _is_level_completed:
+		return
+	var wave_index: int = _current_wave_index
 	_change_phase(GameEnums.BattlePhase.ENEMY_TURN)
 
 	var active_enemies: Array[Enemy] = []
@@ -317,11 +352,15 @@ func _start_enemy_turn() -> void:
 		enemy.process_status_effects()
 
 	for enemy: Enemy in active_enemies:
+		if _battle_ended_signaled or _is_level_completed or wave_index != _current_wave_index:
+			return
 		if not enemy.is_alive:
 			continue
 
 		EnemyAIController.perform_enemy_action(enemy, self, _camera_shake)
 		await get_tree().create_timer(0.5).timeout
+		if _battle_ended_signaled or _is_level_completed or wave_index != _current_wave_index:
+			return
 
 	if hero_system.get_alive_members().is_empty():
 		return
@@ -418,7 +457,7 @@ func _grant_party_xp(amount: int) -> void:
 ## only guards the branch that completes the level as a whole, where the
 ## enemies lineup stays unchanged (all dead) until the end of the battle.
 func _on_enemies_cleared() -> void:
-	if _is_level_completed or enemies.is_empty() or not _all_enemies_dead():
+	if _battle_ended_signaled or _is_level_completed or enemies.is_empty() or not _all_enemies_dead():
 		return
 
 	if _current_wave_index + 1 < _level.waves.size():
@@ -446,6 +485,11 @@ func _on_enemies_cleared() -> void:
 ## Clears the battle state, unsubscribes from signals and removes enemies.
 ## Called when transitioning to the results screen or a menu.
 func end_battle() -> void:
+	_battle_ended_signaled = true
+	if hero_system != null:
+		for hero: PlayerCharacter in [hero_system.mage, hero_system.warrior]:
+			if hero.damage_taken.is_connected(_on_hero_damage_taken):
+				hero.damage_taken.disconnect(_on_hero_damage_taken)
 	if hero_system != null and hero_system.party_defeated.is_connected(_on_party_defeated):
 		hero_system.party_defeated.disconnect(_on_party_defeated)
 
