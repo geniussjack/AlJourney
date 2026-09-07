@@ -270,3 +270,14 @@ ABILITY_MERC_STORM_WARRIOR_1,Furious Strike,Яростный удар
 ABILITY_MERC_STORM_WARRIOR_1_DESC,"A reckless, powerful strike","Безрассудный, мощный удар"
 ABILITY_MERC_STORM_WARRIOR_2,Blood Rage,Кровавая жажда
 ABILITY_MERC_STORM_WARRIOR_2_DESC,An all-out berserker frenzy,Исступлённая ярость берсерка
+UI_BATTLE_GESTURE_HELP,Drag to attack or help · Click self to support · Right-click for potions · Esc to cancel/pause,Потяни к цели — атака или помощь · Нажми на себя — поддержка · ПКМ — зелья · Esc — отмена/пауза
+STATUS_BURNING,Burning,Горение
+STATUS_BLEEDING,Bleeding,Кровотечение
+STATUS_FREEZE,Freeze,Заморозка
+STATUS_SHOCK,Shock,Шок
+STATUS_VULNERABLE,Vulnerable,Уязвимость
+STATUS_STUNNED,Stunned,Оглушение
+STATUS_WEAKENED,Weakened,Ослабление
+STATUS_SHIELD_REFLECT,Reflection,Отражение
+STATUS_IMMUNITY,Immunity,Иммунитет
+STATUS_REGENERATION,Regeneration,Регенерация

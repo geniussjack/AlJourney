@@ -80,10 +80,9 @@ static func _execute_standard_enemy_attack(enemy: Enemy, target: PlayerCharacter
 	if camera_shake != null:
 		camera_shake.shake_light()
 	var reflected: int = target.take_damage(damage, enemy.attack_type, true)
-	battle_manager.add_ultimate_charge(BattleManager.ULTIMATE_CHARGE_PER_ACTION)
 
 	AudioManager.play_hit_sound()
-	var target_pos: Vector2 = CombatEffectProcessor.get_ally_vfx_position(target, battle_manager.hero_system)
+	var target_pos: Vector2 = battle_manager.visual_positions.get(target, Vector2(960, 540)) - Vector2(0, 160)
 	ComboParticles.spawn_damage_number(battle_manager, target_pos, damage)
 
 	if reflected > 0:
@@ -139,7 +138,6 @@ static func _execute_necromancer_summon(battle_manager: BattleManager) -> void:
 static func _execute_necromancer_dark_bolt(necromancer: Enemy, target: PlayerCharacter, battle_manager: BattleManager) -> void:
 	var damage: int = necromancer.perform_attack()
 	var reflected: int = target.take_damage(damage, GameEnums.AttackType.MAGICAL, true)
-	battle_manager.add_ultimate_charge(BattleManager.ULTIMATE_CHARGE_PER_ACTION)
 
 	if reflected > 0:
 		necromancer.take_damage(reflected, target.attack_type, false)

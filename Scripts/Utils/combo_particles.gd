@@ -12,7 +12,7 @@ extends Node2D
 ## element: the ability's element, used to determine the effect color.
 ## combo_level: the effect's level, determining the number of particles.
 static func spawn_combo_effect(parent: Node, position: Vector2, element: GameEnums.AbilityElement, combo_level: int) -> void:
-	var particles := CpuParticles2D.new()
+	var particles := CPUParticles2D.new()
 	particles.position = position
 	particles.emitting = true
 	particles.one_shot = true

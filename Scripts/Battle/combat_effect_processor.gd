@@ -20,15 +20,20 @@ static func apply_attack_ability(ability: AbilityData, caster: PlayerCharacter, 
 		else:
 			camera_shake.shake_medium()
 
-	ComboParticles.spawn_combo_effect(battle_manager, Vector2(640, 200 if is_aoe else 300), ability.element, 1)
+	ComboParticles.spawn_combo_effect(battle_manager, battle_manager.visual_positions.get(targets[0], Vector2(960, 540)) - Vector2(0, 100), ability.element, 1)
 
+	var dealt_health_damage: bool = false
 	for target: Character in targets:
+		var health_before: int = target.current_health
 		_deal_damage(target, damage, caster, ability, is_aoe, battle_manager)
+		dealt_health_damage = dealt_health_damage or target.current_health < health_before
+	if dealt_health_damage and not caster.is_mercenary and not ability.is_ultimate:
+		battle_manager.add_ultimate_charge(BattleManager.ULTIMATE_CHARGE_PER_ACTION)
 
 ## Applies damage to a single target and any reflection back at the caster.
 static func _deal_damage(target: Character, damage: int, caster: PlayerCharacter, ability: AbilityData, is_aoe: bool, battle_manager: BattleManager) -> void:
 	var reflected: int = target.take_damage(damage, caster.attack_type, true)
-	var particle_pos: Vector2 = Vector2(400, 200) if is_aoe else Vector2(640, 250)
+	var particle_pos: Vector2 = battle_manager.visual_positions.get(target, Vector2(960, 540)) - Vector2(0, 160)
 
 	AudioManager.play_hit_sound()
 	ComboParticles.spawn_damage_number(battle_manager, particle_pos, damage)
@@ -103,14 +108,14 @@ static func apply_support_ability(ability: AbilityData, targets: Array[Character
 
 	if camera_shake != null:
 		camera_shake.shake_light()
-	ComboParticles.spawn_combo_effect(battle_manager, Vector2(640, 360), ability.element, 1)
+	ComboParticles.spawn_combo_effect(battle_manager, battle_manager.visual_positions.get(targets[0], Vector2(960, 540)) - Vector2(0, 100), ability.element, 1)
 
 	var heal: int = ability.get_effect("heal")
 	var shield: int = ability.get_effect("shield")
 	var cleanse: bool = ability.get_effect("cleanse") > 0
 
 	for target: Character in targets:
-		var position: Vector2 = get_ally_vfx_position(target, hero_system)
+		var position: Vector2 = battle_manager.visual_positions.get(target, Vector2(960, 540)) - Vector2(0, 160)
 
 		if heal > 0:
 			var healed_amount: int = PlayerCharacter.calculate_healing(heal)
