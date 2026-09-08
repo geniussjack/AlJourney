@@ -10,6 +10,9 @@ const ENEMY_ATLASES: Dictionary[GameEnums.EnemyType, String] = {
 	GameEnums.EnemyType.SKELETON_ARCHER: "res://Resources/Sprites/Characters/Animated/skeleton_archer_battle_atlas.png",
 	GameEnums.EnemyType.ZOMBIE: "res://Resources/Sprites/Characters/Animated/zombie_battle_atlas.png",
 	GameEnums.EnemyType.SLIME: "res://Resources/Sprites/Characters/Animated/slime_battle_atlas.png",
+	GameEnums.EnemyType.DRAUGR_WARRIOR: "res://Resources/Sprites/Characters/Animated/draugr_warrior_battle_atlas.png",
+	GameEnums.EnemyType.DRAUGR_DEFENDER: "res://Resources/Sprites/Characters/Animated/draugr_defender_battle_atlas.png",
+	GameEnums.EnemyType.DRAUGR_CASTER: "res://Resources/Sprites/Characters/Animated/draugr_caster_battle_atlas.png",
 }
 
 ## Returns a main hero's unique atlas, or the archetype fallback still used by
