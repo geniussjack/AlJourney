@@ -70,6 +70,7 @@ func initialize(party: DualHeroSystem, battle: BattleManager) -> void:
 	_battle.battle_ended.connect(_on_battle_ended)
 	_battle.turn_state_changed.connect(_on_turn_changed)
 	_battle.ability_resolved.connect(_on_ability_resolved)
+	_battle.enemy_attack_resolved.connect(_on_enemy_attack_resolved)
 	_rebuild_units()
 
 ## Preserves the battle scene's existing enemy setup entry point.
@@ -98,21 +99,10 @@ func _rebuild_units() -> void:
 	_units.append_array(_party.get_party_members())
 	_units.append_array(_battle.enemies)
 	for unit: Character in _units:
-		var path: String = "res://Resources/Sprites/Characters/skeleton_sprite.png"
-		if unit is PlayerCharacter:
-			if not unit.is_mercenary and unit == _party.mage:
-				path = "res://Resources/Sprites/Characters/Animated/altarion_battle_atlas.png"
-			elif not unit.is_mercenary and unit == _party.warrior:
-				path = "res://Resources/Sprites/Characters/Animated/aldric_battle_atlas.png"
-			else:
-				path = "res://Resources/Sprites/Characters/mage_sprite.png" if unit.character_class == GameEnums.CharacterClass.MAGE else "res://Resources/Sprites/Characters/warrior_sprite.png"
-		elif unit is Enemy and unit.enemy_type == GameEnums.EnemyType.SLIME:
-			path = "res://Resources/Sprites/Characters/slime_sprite.png"
-		elif unit is Enemy and unit.enemy_type == GameEnums.EnemyType.SKELETON_WARRIOR:
-			path = "res://Resources/Sprites/Characters/Animated/skeleton_battle_atlas.png"
+		var path: String = BattleSpriteCatalog.get_player_texture_path(unit, _party) if unit is PlayerCharacter else BattleSpriteCatalog.get_enemy_texture_path(unit)
 		if not _textures.has(path):
 			_textures[path] = load(path)
-			_regions[path] = Rect2(Vector2.ZERO, ANIMATED_ATLAS_CELL_SIZE) if path.contains("/Animated/") else (_textures[path] as Texture2D).get_image().get_used_rect()
+			_regions[path] = Rect2(Vector2.ZERO, ANIMATED_ATLAS_CELL_SIZE) if BattleSpriteCatalog.is_animated_texture(path) else (_textures[path] as Texture2D).get_image().get_used_rect()
 		unit.set_meta("battle_texture", path)
 		if not _animation_states.has(unit):
 			_animation_states[unit] = {"row": 0, "elapsed": 0.0, "locked": false}
@@ -186,7 +176,7 @@ func _draw_unit(unit: Character) -> void:
 	if unit is PlayerCharacter and _battle.can_actor_act(unit) and unit != _actor:
 		_draw_ring(foot, Vector2(78, 22), BLUE)
 	var texture: Texture2D = _textures[path]
-	if path.contains("/Animated/"):
+	if BattleSpriteCatalog.is_animated_texture(path):
 		region.position = _get_animation_frame(unit) * ANIMATED_ATLAS_CELL_SIZE
 	draw_texture_rect_region(texture, body, region, tint)
 	var maximum: int = unit.get_total_max_health()
@@ -236,6 +226,11 @@ func _play_animation(unit: Character, row: int, locked: bool = false) -> void:
 	if not _animation_states.has(unit):
 		return
 	_animation_states[unit] = {"row": row, "elapsed": 0.0, "locked": locked}
+
+## Animates a standard enemy strike and the resulting player hit or defeat.
+func _on_enemy_attack_resolved(caster: Enemy, target: PlayerCharacter) -> void:
+	_play_animation(caster, 3 if not caster.is_alive else 1, not caster.is_alive)
+	_play_animation(target, 3 if not target.is_alive else 2, not target.is_alive)
 
 ## Renders stepped rings without filtered raster textures.
 func _draw_ring(center: Vector2, radius: Vector2, color: Color) -> void:
