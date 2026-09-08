@@ -33,6 +33,9 @@ signal ultimate_charge_changed(charge: int, max_charge: int)
 ## Raised after an ability has changed combat state so the presentation can
 ## animate its caster and resolved targets without owning combat rules.
 signal ability_resolved(caster: PlayerCharacter, ability: AbilityData, targets: Array[Character])
+## Raised after a standard enemy attack has changed combat state so its
+## presentation can animate independently of EnemyAIController.
+signal enemy_attack_resolved(caster: Enemy, target: PlayerCharacter)
 
 ## The maximum value of the party's shared ultimate charge.
 const MAX_ULTIMATE_CHARGE: int = 100
@@ -87,6 +90,10 @@ var enemies: Array[Enemy] = []
 
 ## Floor anchors supplied by the presentation, used to place combat effects.
 var visual_positions: Dictionary = {}
+
+## Relays an enemy attack result to presentation subscribers.
+func report_enemy_attack_resolved(caster: Enemy, target: PlayerCharacter) -> void:
+	enemy_attack_resolved.emit(caster, target)
 
 ## Whether a living actor still owns an action in the current round.
 func can_actor_act(actor: PlayerCharacter) -> bool:

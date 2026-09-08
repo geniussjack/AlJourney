@@ -80,6 +80,7 @@ static func _execute_standard_enemy_attack(enemy: Enemy, target: PlayerCharacter
 	if camera_shake != null:
 		camera_shake.shake_light()
 	var reflected: int = target.take_damage(damage, enemy.attack_type, true)
+	battle_manager.report_enemy_attack_resolved(enemy, target)
 
 	AudioManager.play_hit_sound()
 	var target_pos: Vector2 = battle_manager.visual_positions.get(target, Vector2(960, 540)) - Vector2(0, 160)

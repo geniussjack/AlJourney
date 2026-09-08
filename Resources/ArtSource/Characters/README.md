@@ -21,6 +21,11 @@ his design. Aldric always carries his sword in his right hand and his round
 shield on his left arm. Enemy sheets face toward the player party throughout
 every animation, including defeat.
 
+The basic enemy set also includes separate sheets for the skeleton archer,
+zombie, and slime. The archer keeps its bow and quiver on consistent sides,
+the zombie remains unarmed, and the slime uses squash-and-stretch while keeping
+the same simple face and palette.
+
 The source images were generated with the built-in image generation tool and
 then normalized to the runtime grid with nearest-neighbor resampling. They are
 kept at their original resolution for manual correction in Aseprite.
