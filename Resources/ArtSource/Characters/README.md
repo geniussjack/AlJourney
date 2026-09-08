@@ -26,6 +26,11 @@ zombie, and slime. The archer keeps its bow and quiver on consistent sides,
 the zombie remains unarmed, and the slime uses squash-and-stretch while keeping
 the same simple face and palette.
 
+The three Draugr share blue-gray skin, pale hair, muted blue cloth, brown iron,
+and faint cyan eyes. Their silhouettes communicate their roles: the warrior has
+an axe and open stance, the defender has a large round shield and short spear,
+and the caster has a crooked staff with compact frost magic.
+
 The source images were generated with the built-in image generation tool and
 then normalized to the runtime grid with nearest-neighbor resampling. They are
 kept at their original resolution for manual correction in Aseprite.
